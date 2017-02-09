@@ -12,7 +12,7 @@
 // #  -> permanently light up status led and freeze if SPI EEPOMR booting attempt fails            #
 // # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: http://opencores.org/project,neo430        #
-// # Copyright 2015-2016, Stephan Nolting: stnolting@gmail.com                                     #
+// # Copyright 2015-2017, Stephan Nolting: stnolting@gmail.com                                     #
 // #                                                                                               #
 // # This source file may be used and distributed without restriction provided that this copyright #
 // # statement is not removed from the file and that any derivative work contains the original     #
@@ -29,7 +29,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from http://www.gnu.org/licenses/lgpl-3.0.en.html                 #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               30.11.2016  #
+// #  Stephan Nolting, Hannover, Germany                                               09.02.2017  #
 // #################################################################################################
 
 // Libraries
@@ -120,13 +120,12 @@ int main(void) {
   // ****************************************************************
   // Show bootloader intro and system information
   // ****************************************************************
-  uart_br_print("\n\nNEO430 Bootloader V20161130\n"
-                "by Stephan Nolting\n\n");
-  uart_br_print("HWV: 0x");
+  uart_br_print("\n\nNEO430 Bootloader V20170209 by Stephan Nolting\n"
+                "HV=$");
   uart_print_hex_word(HW_VERSION);
-  uart_br_print("\nROM: 0x");
+  uart_br_print(" IM=$");
   uart_print_hex_word(IMEM_SIZE);
-  uart_br_print("\nRAM: 0x");
+  uart_br_print(" DM=$");
   uart_print_hex_word(DMEM_SIZE);
   uart_br_print("\n\nAutoboot in "xstr(AUTOBOOT_TIMEOUT_C)"s. Press key to abort.\n");
 
@@ -160,7 +159,7 @@ int main(void) {
   // Bootloader console
   // ****************************************************************
   while (1) {
-    uart_br_print("\nCMD:> ");
+    uart_br_print("\n>> ");
     char c = uart_getc();
     uart_putc(c); // echo
     uart_br_print("\n");
@@ -183,6 +182,7 @@ int main(void) {
       uart_br_print("Bad CMD!");
   }
 }
+
 
 
 /* ------------------------------------------------------------
@@ -278,7 +278,7 @@ void core_dump(void) {
  * ------------------------------------------------------------ */
 void store_eeprom(void) {
 
-  uart_br_print("Proceed (y/n)?");
+  uart_br_print("Proceed y/n?");
   if (uart_getc() != 'y')
     return;
 
@@ -392,7 +392,7 @@ uint16_t get_image(uint8_t src) {
   if (src == UART_IMAGE_C) // boot via UART
     uart_br_print("Awaiting BINEXE... ");
   else //if (src == EEPROM_IMAGE_C)// boot from EEPROM
-    uart_br_print("Loading EEPROM... ");
+    uart_br_print("Loading... ");
 
   // check if valid image
   if (get_image_word(0x0000, src) != 0xCAFE) {

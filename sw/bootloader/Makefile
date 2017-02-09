@@ -21,15 +21,15 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from http://www.gnu.org/licenses/lgpl-3.0.en.html                 #
 # ********************************************************************************************* #
-#  Stephan Nolting, Hannover, Germany                                               13.01.2017  #
+#  Stephan Nolting, Hannover, Germany                                               08.02.2017  #
 #################################################################################################
 
 
 #-------------------------------------------------------------------------------
 # USER CONFIGURATION
 #-------------------------------------------------------------------------------
-# Path to MSPGCC binaries:
-BIN_PATH = C:/msp430-gcc/bin
+# Path to compiler binaries:
+BIN_PATH = /mnt/c/msp430-gcc-6.2.1.16_linux64/bin
 
 #-------------------------------------------------------------------------------
 # Make defaults

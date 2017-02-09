@@ -2,7 +2,7 @@
 @REM #  < NEO430 make file - Windows version >                                                       #
 @REM # ********************************************************************************************* #
 @REM # This file is part of the NEO430 Processor project: http://opencores.org/project,neo430        #
-@REM # Copyright 2015-2016, Stephan Nolting: stnolting@gmail.com                                     #
+@REM # Copyright 2015-2017, Stephan Nolting: stnolting@gmail.com                                     #
 @REM #                                                                                               #
 @REM # This source file may be used and distributed without restriction provided that this copyright #
 @REM # statement is not removed from the file and that any derivative work contains the original     #

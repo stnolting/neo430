@@ -4,7 +4,7 @@
 // #  Prints various information from the system.                                                  #
 // # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: http://opencores.org/project,neo430        #
-// # Copyright 2015-2016, Stephan Nolting: stnolting@gmail.com                                     #
+// # Copyright 2015-2017, Stephan Nolting: stnolting@gmail.com                                     #
 // #                                                                                               #
 // # This source file may be used and distributed without restriction provided that this copyright #
 // # statement is not removed from the file and that any derivative work contains the original     #
@@ -21,7 +21,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from http://www.gnu.org/licenses/lgpl-3.0.en.html                 #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               29.11.2016  #
+// #  Stephan Nolting, Hannover, Germany                                               09.02.2017  #
 // #################################################################################################
 
 
@@ -52,16 +52,10 @@ int main(void) {
   // General information
   // --------------------------------------------
   // HW version
-  _printf("Hardware version: 0x");
-  uart_print_hex_word(HW_VERSION);
+  _printf("Hardware version: 0x%x", HW_VERSION);
 
-  // HW origin
-  _printf("\nHardware ID: ");
-  uint16_t id = CPU_ORIGIN;
-  if (id == 0x4E53)
-    _printf("Genuine SN");
-  else
-    _printf("Others: 0x%x", id);
+  // HW user code
+  _printf("\nUser code: 0x%x", USER_CODE);
   
   // Clock speed
   uint32_t clock = ((uint32_t)CLOCKSPEED_HI << 16) | (uint32_t)CLOCKSPEED_LO;
@@ -99,6 +93,7 @@ int main(void) {
   _printf("\nIRQVEC_PIO   -> 0x%x", IRQVEC_PIO);
   _printf("\nIRQVEC_EXT   -> 0x%x", IRQVEC_EXT);
 
+
   // System features
   // --------------------------------------------
   uint16_t ft = SYS_FEATURES;
@@ -133,7 +128,7 @@ int main(void) {
 
 
 /* ------------------------------------------------------------
- * INFO prints 'EN' if arg is != 0, 'DIS' otherwise
+ * INFO prints 'EN' if arg is != 0, prints 'DIS' otherwise
  * ------------------------------------------------------------ */
 void print_state(uint16_t d) {
 

@@ -27,7 +27,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from http://www.gnu.org/licenses/lgpl-3.0.en.html                 #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               20.12.2016  #
+-- #  Stephan Nolting, Hannover, Germany                                               09.02.1017  #
 -- #################################################################################################
 
 library ieee;
@@ -84,7 +84,6 @@ architecture neo430_wdt_rtl of neo430_wdt is
 
   -- reset counter --
   signal cnt      : std_ulogic_vector(16 downto 0);
-  signal usr_rst  : std_ulogic;
   signal rst_gen  : std_ulogic_vector(03 downto 0);
   signal rst_sync : std_ulogic_vector(01 downto 0);
 
@@ -115,16 +114,13 @@ begin
         clk_sel <= data_i(ctrl_clksel2_c downto ctrl_clksel0_c);
       end if;
       -- reset generator --
-      if ((enable = '1') and (cnt(cnt'left) = '1')) or (usr_rst = '1') then
+      if ((enable = '1') and (cnt(cnt'left) = '1')) then
         rst_gen <= (others => '0');
       else
         rst_gen <= rst_gen(rst_gen'left-1 downto 0) & '1';
       end if;
     end if;
   end process wdt_core;
-
-  -- manual reset --
-  usr_rst <= wren and data_i(ctrl_sysrst_c);
 
 
   -- Counter Update -----------------------------------------------------------

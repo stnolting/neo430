@@ -28,7 +28,7 @@ OUTPUT_ARCH(msp430)
 /* Address space layout - only the boot rom size is required here */
 MEMORY
 {
-  boot_rom (rx) : ORIGIN = 0xF000, LENGTH = 0x0800
+  boot_rom (rx) : ORIGIN = 0xF000, LENGTH = 0x1800
 }
 
 /* Final executable layout */

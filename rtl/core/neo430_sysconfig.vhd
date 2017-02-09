@@ -23,7 +23,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from http://www.gnu.org/licenses/lgpl-3.0.en.html                 #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               27.12.2016  #
+-- #  Stephan Nolting, Hannover, Germany                                               08.02.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -34,6 +34,9 @@ library work;
 use work.neo430_package.all;
 
 entity neo430_sysconfig is
+  generic (
+    USER_CODE : std_ulogic_vector(15 downto 0) := x"0000" -- custom user code
+  );
   port (
     clk_i  : in  std_ulogic; -- global clock line
     rden_i : in  std_ulogic; -- read enable
@@ -96,8 +99,8 @@ begin
   sysinfo_mem(1)(08) <= bool_to_ulogic(imem_rom_c);   -- implement IMEM as true ROM?
   sysinfo_mem(1)(15 downto 9) <= (others => '0');     -- reserved
 
-  -- CPUID2: CPU identifier --
-  sysinfo_mem(2) <= x"4E53";
+  -- CPUID2: User code --
+  sysinfo_mem(2) <= USER_CODE;
 
   -- CPUID3: IMEM (ROM) size --
   sysinfo_mem(3) <= std_ulogic_vector(to_unsigned(imem_size_c, 16)); -- size in bytes

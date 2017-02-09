@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from http://www.gnu.org/licenses/lgpl-3.0.en.html                 #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               27.12.2016  #
+-- #  Stephan Nolting, Hannover, Germany                                               08.02.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -52,7 +52,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0101"; -- no touchy! ;)
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0102"; -- no touchy! ;)
 
   -- Internal Functions ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -470,6 +470,9 @@ package neo430_package is
   -- Component: System Configuration --------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_sysconfig
+  generic (
+    USER_CODE : std_ulogic_vector(15 downto 0) := x"0000" -- custom user code
+  );
   port (
     clk_i  : in  std_ulogic; -- global clock line
     rden_i : in  std_ulogic; -- read enable

@@ -6,7 +6,7 @@
 # the default main "make clean" to clean up generated files.                                    #
 # ********************************************************************************************* #
 # This file is part of the NEO430 Processor project: http://opencores.org/project,neo430        #
-# Copyright 2015-2016, Stephan Nolting: stnolting@gmail.com                                     #
+# Copyright 2015-2017, Stephan Nolting: stnolting@gmail.com                                     #
 #                                                                                               #
 # This source file may be used and distributed without restriction provided that this copyright #
 # statement is not removed from the file and that any derivative work contains the original     #

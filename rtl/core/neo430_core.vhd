@@ -33,7 +33,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from http://www.gnu.org/licenses/lgpl-3.0.en.html                 #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               03.01.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               08.02.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -44,6 +44,9 @@ library work;
 use work.neo430_package.all;
 
 entity neo430_core is
+  generic (
+    USER_CODE : std_ulogic_vector(15 downto 0) := x"0000" -- custom user code
+  );
   port (
     -- global control --
     clk_i      : in  std_ulogic; -- global clock, rising edge
@@ -426,6 +429,9 @@ begin
   -- System Configuration -----------------------------------------------------
   -- -----------------------------------------------------------------------------
   neo430_sysconfig_inst: neo430_sysconfig
+  generic map (
+    USER_CODE => USER_CODE          -- custom user code
+  )
   port map (
     clk_i  => clk_i,                -- global clock line
     rden_i => io_rd_en,             -- read enable

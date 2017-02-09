@@ -6,7 +6,7 @@
 // #  in this library file).                                                                       #
 // # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: http://opencores.org/project,neo430        #
-// # Copyright 2015-2016, Stephan Nolting: stnolting@gmail.com                                     #
+// # Copyright 2015-2017, Stephan Nolting: stnolting@gmail.com                                     #
 // #                                                                                               #
 // # This source file may be used and distributed without restriction provided that this copyright #
 // # statement is not removed from the file and that any derivative work contains the original     #
@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from http://www.gnu.org/licenses/lgpl-3.0.en.html                 #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               27.12.2016  #
+// #  Stephan Nolting, Hannover, Germany                                               08.02.2017  #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -204,7 +204,7 @@
 // aliases
 #define HW_VERSION    CPUID0 // HW verison number
 #define SYS_FEATURES  CPUID1 // synthesized system features
-#define CPU_ORIGIN    CPUID2 // CPU identifier
+#define USER_CODE     CPUID2 // custom user code
 #define IMEM_SIZE     CPUID3 // IMEM/ROM size in bytes
 #define DMEM_BASE     CPUID4 // DMEM/RAM base address
 #define DMEM_SIZE     CPUID5 // DMEM/RAM size in bytes

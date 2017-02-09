@@ -4,7 +4,7 @@
 @REM # Edit the BIN_PATH variable to point to your MSPGCC\bin folder.                                #
 @REM # ********************************************************************************************* #
 @REM # This file is part of the NEO430 Processor project: http://opencores.org/project,neo430        #
-@REM # Copyright 2015-2016, Stephan Nolting: stnolting@gmail.com                                     #
+@REM # Copyright 2015-2017, Stephan Nolting: stnolting@gmail.com                                     #
 @REM #                                                                                               #
 @REM # This source file may be used and distributed without restriction provided that this copyright #
 @REM # statement is not removed from the file and that any derivative work contains the original     #
@@ -21,13 +21,13 @@
 @REM # You should have received a copy of the GNU Lesser General Public License along with this      #
 @REM # source; if not, download it from http://www.gnu.org/licenses/lgpl-3.0.en.html                 #
 @REM # ********************************************************************************************* #
-@REM #  Stephan Nolting, Hannover, Germany                                               13.01.2017  #
+@REM #  Stephan Nolting, Hannover, Germany                                               08.02.2017  #
 @REM #################################################################################################
 
 
 @REM ----------------------USER CONFIGURATION----------------------
 @REM Path to MSPGCC binaries:
-@set BIN_PATH=C:\msp430-gcc\bin
+@set BIN_PATH=C:\msp430-gcc-6.2.1.16_win32\bin
 @REM --------------------------------------------------------------
 
 @REM Tools
