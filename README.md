@@ -39,7 +39,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 ## Processor Features
 
-<img src="https://github.com/stnolting/neo430/doc/figures/neo430_arch.png"/>
+<img src="https://github.com/stnolting/neo430/blob/master/doc/figures/neo430_arch.png"/>
 
 - 16-bit open source soft-core microcontroller-like processor system
 - Code-efficient CISC-like instruction capabilities
@@ -82,9 +82,11 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 ## Let's Get It Started!
 
 At first, make sure to get the most recent version of this project from GitHub:
- git clone https://github.com/stnolting/neo430.git
+
+    git clone https://github.com/stnolting/neo430.git
 
 Next, install the compiler toolchain from:
+
 http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/index_FDS.html
 
 Now follow the instructions from the "Let's Get It Started" chapter of the
@@ -92,7 +94,7 @@ NEO430 documentary: https://github.com/stnolting/neo430/blob/master/doc/NEO430.p
 This guide will provide you with the necessary information to make a simple
 test implementation of the NEO430 run.
 
-<img src="https://github.com/stnolting/neo430/doc/figures/test_setup.jpg"/>
+<img src="https://github.com/stnolting/neo430/blob/master/doc/figures/test_setup.jpg"/>
 
 Have fun! =)
 
@@ -100,4 +102,4 @@ Have fun! =)
 
 
 
-<img src="https://github.com/stnolting/neo430/doc/figures/oshw_logo.png"/>
+<img src="https://github.com/stnolting/neo430/blob/master/doc/figures/oshw_logo.png"/>
