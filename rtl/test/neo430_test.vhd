@@ -47,21 +47,21 @@ architecture neo430_test_rtl of neo430_test is
   component neo430_top
   generic (
     -- general configuration --
-    CLOCK_SPEED : natural := 100000000; -- main clock in Hz
-    IMEM_SIZE   : natural := 4*1024; -- internal IMEM size in bytes, max 32kB (default=4kB)
-    DMEM_SIZE   : natural := 2*1024; -- internal DMEM size in bytes, max 28kB (default=2kB)
+    CLOCK_SPEED : natural; -- main clock in Hz
+    IMEM_SIZE   : natural; -- internal IMEM size in bytes, max 32kB (default=4kB)
+    DMEM_SIZE   : natural; -- internal DMEM size in bytes, max 28kB (default=2kB)
     -- additional configuration --
-    USER_CODE   : std_ulogic_vector(15 downto 0) := x"0000"; -- custom user code
+    USER_CODE   : std_ulogic_vector(15 downto 0); -- custom user code
     -- module configuration --
-    DADD_USE    : boolean := true; -- implement DADD instruction? (default=true)
-    WB32_USE    : boolean := true; -- implement WB32 unit? (default=true)
-    WDT_USE     : boolean := true; -- implement WBT? (default=true)
-    GPIO_USE    : boolean := true; -- implement GPIO unit? (default=true)
-    TIMER_USE   : boolean := true; -- implement timer? (default=true)
-    USART_USE   : boolean := true; -- implement USART? (default=true)
+    DADD_USE    : boolean; -- implement DADD instruction? (default=true)
+    WB32_USE    : boolean; -- implement WB32 unit? (default=true)
+    WDT_USE     : boolean; -- implement WBT? (default=true)
+    GPIO_USE    : boolean; -- implement GPIO unit? (default=true)
+    TIMER_USE   : boolean; -- implement timer? (default=true)
+    USART_USE   : boolean; -- implement USART? (default=true)
     -- boot configuration --
-    BOOTLD_USE  : boolean := true; -- implement and use bootloader? (default=true)
-    IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory? (default=false)
+    BOOTLD_USE  : boolean; -- implement and use bootloader? (default=true)
+    IMEM_AS_ROM : boolean -- implement IMEM as read-only memory? (default=false)
   );
   port (
     -- global control --
