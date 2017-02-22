@@ -1,95 +1,103 @@
-#################################################################################################
-#  << NEO430 Processor Project >>                                                               #
-# ********************************************************************************************* #
-# This file is part of the NEO430 Processor project: http://opencores.org/project,neo430        #
-# Copyright 2015-2017, Stephan Nolting: stnolting@gmail.com                                     #
-#                                                                                               #
-# This source file may be used and distributed without restriction provided that this copyright #
-# statement is not removed from the file and that any derivative work contains the original     #
-# copyright notice and the associated disclaimer.                                               #
-#                                                                                               #
-# This source file is free software; you can redistribute it and/or modify it under the terms   #
-# of the GNU Lesser General Public License as published by the Free Software Foundation,        #
-# either version 3 of the License, or (at your option) any later version.                       #
-#                                                                                               #
-# This source is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;      #
-# without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.     #
-# See the GNU Lesser General Public License for more details.                                   #
-#                                                                                               #
-# You should have received a copy of the GNU Lesser General Public License along with this      #
-# source; if not, download it from http://www.gnu.org/licenses/lgpl-3.0.en.html                 #
-# ********************************************************************************************* #
-#  Stephan Nolting, Hannover, Germany                                               03.01.2017  #
-#################################################################################################
+# Introduction
 
-Hello and welcome to the NEO430 Processor project!
+Welcome to the NEO430 Processor project!
 
-This processor project is the latest one in my list of open-source soft core projects.
-It is my newest attempt to provide a small and nevertheless powerful processing platform for
-embedded applications. I designed the CPU of this project completely from scratch, based only
-on the original TI MSP430 specifications. Most of the IO devices – like the UART or the timer –
-came from my previous projects (STORM and Atlas2k). Finally, the NEO430 processor came out.
-This processor is 100% ISA-compatible (!) to the famous TI(TM) MSP430 instruction set
-architecture. Further information about the instruction set, the available addressing modes and
-general CPU operation can be found in the "MSP430xl xx Family User's Guide", available at
-www.ti.com/lit/ug/slau049f/slau049f.pdf.
+You need a small but still powerful, customizable and microcontroller-like
+processor system for your next FPGA design? Then the NEO430 is the perfect
+choice for you!
 
-The NEO430 features a very small outline, only implementing elementary modules like a single
-timer and basic peripherals and communication modules. Any additional IP blocks, which make a
-more customized system, can be connected via a Wishbone-compatible bus interface. Also, most
-of the processor-internal modules can be excluded from implementation, if their features are
-not required. By this, you can build a system-on-chip, that perfectly fits your needs without
-any unnecessary hardware overhead.
+This processor is based on the Texas Instruments MSP430 ISA and provides 100%
+compatibility with the original instruction set. The NEO430 is not an MSP430
+clone – it is more a complete new implementation from the bottom up. The
+processor features a very small outline, already implementing standard
+features like a timer, a watchdog, UART and SPI serial interfaces, general
+purpose IO ports, an internal bootloader and of course internal memory for
+program code and data. All of the peripheral modules are optional – so if you
+do not need them, you can exclude them from implementation to reduce the size
+of the system. Any additional modules, which make a more customized system,
+can be connected via a Wishbone-compatible bus interface. By this, you can
+built a system, that perfectly fits your needs.
 
-The software development for this processor system is based on the free TI msp430-gcc compiler
-tool chain. Make sure to get a copy of the sources to make this project run. You can either use
-Windows or Linux/Cygwin as build environment for your applications – the project comes with
-build scripts for both worlds! The example folder of this project features several demo
+It is up to you to use the NEO430 as stand-alone, configurable and extensible
+microcontroller, or to include  it as controller within a more complex SoC
+design.
+
+The high-level software development is based on the free TI msp430-gcc
+compiler tool chain. You can either use Windows or Linux/Cygwin as build
+environment for your applications – the project comes with build scripts
+for both worlds. The example folder of this project features several demo
 programs, from which you can start creating your own NEO430 applications.
 
-This project is intended to work "out of the box". The default system setup can be synthesized
-and uploaded to your FPGA of choice. Application installation work by executing a single
-"make" command. Jump to the "Let’s Get It Started" chapter to get your system running right now!
-That’s all you need to do to get your first NEO430 project started. So, have fun with this project! ;)
+This project is intended to work "out of the box". Just synthesize the test
+setup from this project, upload it to your FPGA board of choice and start
+exploring the capabilities of the NEO430 processor. Application program
+generation (and even installation) works by executing a single "make" command.
+Jump to the "Let’s Get It Starte" chapter, which provides a lot of guides and
+tutorials to make your first NEO430 setup run:
+https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 
-Processor Features
-* 16-bit RISC open source soft-core processor
-* Full support of the original MSP430 instruction set architecture
-* Tool chain based on free TI msp430-gcc compiler (C / C++)
-* Application compilation scripts for Windows and Linux/Cygwin
-* Completely described in behavioral, platform-independent VHDL93, no "exotic" VHDL packages used
-* Very small and high operating frequency compared to other implementations ;)
-* Internal DMEN (RAM, for data) and IMEM (RAM or ROM, for code), configurable sizes
-* One external interrupt line
-* Fully customizable hardware outline
-* Optional high-precision timer (TIMER)
-* Optional USART interface; UART and SPI (USART)
-* Optional parallel IO port (16 inputs, 16 outputs) with pin-change interrupt (PIO)
-* Optional 32-bit Wishbone bus interface adapter (WB32)
-* Optional watchdog timer (WDT)
-* Optional internal bootloader (2kB ROM):
-* Upload new application image via UART
-  -> Program external SPI EEPROM
-  -> Boot from external SPI EEPROM
-  -> Core dump
-  -> Automatic boot sequence
+## Processor Features
+
+<img src="https://github.com/stnolting/neo430/doc/figures/neo430_arch.png"/>
+
+- 16-bit open source soft-core microcontroller-like processor system
+- Code-efficient CISC-like instruction capabilities
+- Full support of the original MSP430 instruction set architecture
+- Tool chain based on free TI msp430-gcc compiler
+- Application compilation scripts for Windows and Linux/Cygwin
+- Completely described in behavioral, platform-independent VHDL
+- Fully synchronous design, no latches, no gated clocks
+- Operates at high frequencies (150 MHz) - no clock-domain crossing required for integration
+- Very small outline and high operating frequency compared to other implementations ;)
+- Internal DMEN (RAM, for data) and IMEM (RAM or ROM, for code), configurable sizes
+- One external interrupt line
+- Customizable processor hardware configuration
+- Optional high-precision timer (TIMER)
+- Optional USART interface; UART and SPI (USART)
+- Optional general purpose parallel IO port (GPIO), 16 inputs, 16 outputs, with pin-change interrupt
+- Optional 32-bit Wishbone bus interface adapter (WB32)
+- Optional watchdog timer (WDT)
+- Optional internal bootloader (2kB ROM)
 
 
-Main Differences to TI's Original MSP430 Architecture
-Since the NEO430 is not intended as MSP430 clone, there are several differences to TI's
-original architecture. Existing programs must be modified and re-compiled to
-successfully run on the NEO430.
+## Differences to TI's original MSP430 processors
 
-The main differences are:
+- Completely different processor modules with different functionality
+- No hardware multiplier support (but emulated in software)
+- Maximum of 32kB instruction memory and 28kB data memory
+- Specific memory map – included NEO430 linker script and compilation script required
+- Custom binary executable format
+- Only 4 CPU interrupt channels (instead of 16)
+- Single clock domain for complete processor
+- Different numbers of instruction execution cycles
+- Only one power-down (sleep) mode
+- Wishbone-compatible interface to attach custom IP
+- Internal bootloader with text interface (via UART serial port)
 
-* Completely different processor modules with different functionality
-* No hardware multiplier support yet (but emulated in software)
-* Maximum of 32kB IMEM and 28kB DMEM
-* Specific memory map – included NEO430 linker script and compilation script required
-* Just 4 CPU interrupt channels (instead of 16)
-* Single clock domain for complete processor
-* Different numbers of instruction execution cycles
-* Only one power-down (sleep) mode
-* Wishbone-compatible interface to attach custom IP (e.g. modules from opencores.org)
-* Internal bootloader with text interface (via UART serial port)
+
+## Implementation
+
+
+## Let's Get It Started!
+
+At first, make sure to get the most recent version of this project from GitHub:
+ git clone https://github.com/stnolting/neo430.git
+
+Next, install the compiler toolchain from:
+http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/index_FDS.html
+
+Now follow the instructions from the "Let's Get It Started" chapter of the
+NEO430 documentary: https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
+This guide will provide you with the necessary information to make a simple
+test implementation of the NEO430 run.
+
+<img src="https://github.com/stnolting/neo430/doc/figures/test_setup.jpg"/>
+
+Have fun! =)
+
+
+
+
+
+<img src="https://github.com/stnolting/neo430/doc/figures/oshw_logo.png"/>
