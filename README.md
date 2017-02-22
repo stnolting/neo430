@@ -39,7 +39,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 ## Processor Features
 
-<img src="https://github.com/stnolting/neo430/blob/master/doc/figures/neo430_arch.png" width="600px"/>
+<img src="https://github.com/stnolting/neo430/blob/master/doc/figures/neo430_arch.png" width="500px"/>
 
 - 16-bit open source soft-core microcontroller-like processor system
 - Code-efficient CISC-like instruction capabilities
@@ -94,7 +94,7 @@ NEO430 documentary: https://github.com/stnolting/neo430/blob/master/doc/NEO430.p
 This guide will provide you with the necessary information to make a simple
 test implementation of the NEO430 run.
 
-<img src="https://github.com/stnolting/neo430/blob/master/doc/figures/test_setup.jpg" width="600px"/>
+<img src="https://github.com/stnolting/neo430/blob/master/doc/figures/test_setup.jpg" width="500px"/>
 
 Have fun! =)
 
