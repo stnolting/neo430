@@ -118,8 +118,8 @@ begin
   )
   port map (
     -- global control --
-    clk_i      => clk_gen,            -- global clock, rising edge
-    rst_i      => rst_gen,            -- global reset, sync
+    clk_i      => clk_i,              -- global clock, rising edge
+    rst_i      => rst_i,              -- global reset, sync
     -- gpio --
     gpio_o     => gpio_out,           -- parallel output
     gpio_i     => x"0000",            -- parallel input

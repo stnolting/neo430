@@ -76,9 +76,6 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Internal bootloader with text interface (via UART serial port)
 
 
-## Implementation
-
-
 ## Let's Get It Started!
 
 At first, make sure to get the most recent version of this project from GitHub:
