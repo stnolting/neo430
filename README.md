@@ -39,7 +39,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 ## Processor Features
 
-<img src="https://github.com/stnolting/neo430/blob/master/doc/figures/neo430_arch.png"/>
+<img src="https://github.com/stnolting/neo430/blob/master/doc/figures/neo430_arch.png" width="400px"/>
 
 - 16-bit open source soft-core microcontroller-like processor system
 - Code-efficient CISC-like instruction capabilities
@@ -102,4 +102,4 @@ Have fun! =)
 
 
 
-<img src="https://github.com/stnolting/neo430/blob/master/doc/figures/oshw_logo.png"/>
+<img src="https://github.com/stnolting/neo430/blob/master/doc/figures/oshw_logo.png" width="100px"/>
