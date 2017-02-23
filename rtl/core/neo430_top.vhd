@@ -238,7 +238,7 @@ begin
   neo430_imem_inst: neo430_imem
   generic map (
     IMEM_SIZE   => IMEM_SIZE,       -- internal IMEM size in bytes, max 32kB (default=4kB)
-    IMEM_AS_ROM => IMEM_AS_ROM      -- implement IMEM as read-only memory? (default=false)
+    IMEM_AS_ROM => IMEM_AS_ROM      -- implement IMEM as read-only memory?
   )
   port map (
     clk_i  => clk_i,                -- global clock line
@@ -461,20 +461,20 @@ begin
   generic map (
     -- general configuration --
     CLOCK_SPEED => CLOCK_SPEED,     -- main clock in Hz
-    IMEM_SIZE   => IMEM_SIZE,       -- internal IMEM size in bytes, max 32kB (default=4kB)
-    DMEM_SIZE   => DMEM_SIZE,       -- internal DMEM size in bytes, max 28kB (default=2kB)
+    IMEM_SIZE   => IMEM_SIZE,       -- internal IMEM size in bytes
+    DMEM_SIZE   => DMEM_SIZE,       -- internal DMEM size in bytes
     -- additional configuration --
     USER_CODE   => USER_CODE,       -- custom user code
     -- module configuration --
-    DADD_USE    => DADD_USE,        -- implement DADD instruction? (default=true)
-    WB32_USE    => WB32_USE,        -- implement WB32 unit? (default=true)
-    WDT_USE     => WDT_USE,         -- implement WBT? (default=true)
-    GPIO_USE    => GPIO_USE,        -- implement GPIO unit? (default=true)
-    TIMER_USE   => TIMER_USE,       -- implement timer? (default=true)
-    USART_USE   => USART_USE,       -- implement USART? (default=true)
+    DADD_USE    => DADD_USE,        -- implement DADD instruction?
+    WB32_USE    => WB32_USE,        -- implement WB32 unit?
+    WDT_USE     => WDT_USE,         -- implement WBT?
+    GPIO_USE    => GPIO_USE,        -- implement GPIO unit?
+    TIMER_USE   => TIMER_USE,       -- implement timer?
+    USART_USE   => USART_USE,       -- implement USART?
     -- boot configuration --
-    BOOTLD_USE  => BOOTLD_USE,      -- implement and use bootloader? (default=true)
-    IMEM_AS_ROM => IMEM_AS_ROM      -- implement IMEM as read-only memory? (default=false)
+    BOOTLD_USE  => BOOTLD_USE,      -- implement and use bootloader?
+    IMEM_AS_ROM => IMEM_AS_ROM      -- implement IMEM as read-only memory?
   )
   port map (
     clk_i  => clk_i,                -- global clock line

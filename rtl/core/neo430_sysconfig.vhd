@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               22.02.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               23.02.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -36,20 +36,20 @@ entity neo430_sysconfig is
   generic (
     -- general configuration --
     CLOCK_SPEED : natural := 100000000; -- main clock in Hz
-    IMEM_SIZE   : natural := 4*1024; -- internal IMEM size in bytes, max 32kB (default=4kB)
-    DMEM_SIZE   : natural := 2*1024; -- internal DMEM size in bytes, max 28kB (default=2kB)
+    IMEM_SIZE   : natural := 4*1024; -- internal IMEM size in bytes
+    DMEM_SIZE   : natural := 2*1024; -- internal DMEM size in bytes
     -- additional configuration --
     USER_CODE   : std_ulogic_vector(15 downto 0) := x"0000"; -- custom user code
     -- module configuration --
-    DADD_USE    : boolean := true; -- implement DADD instruction? (default=true)
-    WB32_USE    : boolean := true; -- implement WB32 unit? (default=true)
-    WDT_USE     : boolean := true; -- implement WBT? (default=true)
-    GPIO_USE    : boolean := true; -- implement GPIO unit? (default=true)
-    TIMER_USE   : boolean := true; -- implement timer? (default=true)
-    USART_USE   : boolean := true; -- implement USART? (default=true)
+    DADD_USE    : boolean := true; -- implement DADD instruction?
+    WB32_USE    : boolean := true; -- implement WB32 unit?
+    WDT_USE     : boolean := true; -- implement WBT?
+    GPIO_USE    : boolean := true; -- implement GPIO unit?
+    TIMER_USE   : boolean := true; -- implement timer?
+    USART_USE   : boolean := true; -- implement USART?
     -- boot configuration --
-    BOOTLD_USE  : boolean := true; -- implement and use bootloader? (default=true)
-    IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory? (default=false)
+    BOOTLD_USE  : boolean := true; -- implement and use bootloader?
+    IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory?
   );
   port (
     clk_i  : in  std_ulogic; -- global clock line

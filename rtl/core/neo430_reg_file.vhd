@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               14.02.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               23.02.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -33,7 +33,7 @@ use work.neo430_package.all;
 
 entity neo430_reg_file is
   generic (
-    BOOTLD_USE : boolean := true -- implement and use bootloader? (default=true)
+    BOOTLD_USE : boolean := true -- implement and use bootloader?
   );
   port (
     -- global control --

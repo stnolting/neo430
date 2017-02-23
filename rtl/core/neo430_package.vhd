@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               22.02.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               23.02.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -209,291 +209,291 @@ package neo430_package is
   -- Component: Control ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_control
-  generic (
-    DADD_USE : boolean := true -- implement DADD instruction? (default=true)
-  );
-  port (
-    -- global control --
-    clk_i      : in  std_ulogic; -- global clock, rising edge
-    rst_i      : in  std_ulogic; -- global reset, low-active, async
-    -- memory interface --
-    instr_i    : in  std_ulogic_vector(15 downto 0); -- instruction word from memory
-    -- control --
-    sreg_i     : in  std_ulogic_vector(15 downto 0); -- current status register
-    ctrl_o     : out std_ulogic_vector(ctrl_width_c-1 downto 0); -- control signals
-    irq_vec_o  : out std_ulogic_vector(01 downto 0); -- irq channel address
-    imm_o      : out std_ulogic_vector(15 downto 0); -- branch offset
-    -- irq lines --
-    irq_i      : in  std_ulogic_vector(03 downto 0)  -- IRQ lines
-  );
+    generic (
+      DADD_USE : boolean := true -- implement DADD instruction?
+    );
+    port (
+      -- global control --
+      clk_i      : in  std_ulogic; -- global clock, rising edge
+      rst_i      : in  std_ulogic; -- global reset, low-active, async
+      -- memory interface --
+      instr_i    : in  std_ulogic_vector(15 downto 0); -- instruction word from memory
+      -- control --
+      sreg_i     : in  std_ulogic_vector(15 downto 0); -- current status register
+      ctrl_o     : out std_ulogic_vector(ctrl_width_c-1 downto 0); -- control signals
+      irq_vec_o  : out std_ulogic_vector(01 downto 0); -- irq channel address
+      imm_o      : out std_ulogic_vector(15 downto 0); -- branch offset
+      -- irq lines --
+      irq_i      : in  std_ulogic_vector(03 downto 0)  -- IRQ lines
+    );
   end component;
 
   -- Component: Register File ---------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_reg_file
-  generic (
-    BOOTLD_USE : boolean := true -- implement and use bootloader? (default=true)
-  );
-  port (
-    -- global control --
-    clk_i      : in  std_ulogic; -- global clock, rising edge
-    rst_i      : in  std_ulogic; -- global reset, low-active, async
-    -- data input --
-    alu_i      : in  std_ulogic_vector(15 downto 0); -- data from alu
-    addr_i     : in  std_ulogic_vector(15 downto 0); -- data from addr unit
-    flag_i     : in  std_ulogic_vector(03 downto 0); -- new ALU flags
-    -- control --
-    ctrl_i     : in  std_ulogic_vector(ctrl_width_c-1 downto 0);
-    -- data output --
-    data_o     : out std_ulogic_vector(15 downto 0); -- read data
-    sreg_o     : out std_ulogic_vector(15 downto 0)  -- current SR
-  );
+    generic (
+      BOOTLD_USE : boolean := true -- implement and use bootloader?
+    );
+    port (
+      -- global control --
+      clk_i      : in  std_ulogic; -- global clock, rising edge
+      rst_i      : in  std_ulogic; -- global reset, low-active, async
+      -- data input --
+      alu_i      : in  std_ulogic_vector(15 downto 0); -- data from alu
+      addr_i     : in  std_ulogic_vector(15 downto 0); -- data from addr unit
+      flag_i     : in  std_ulogic_vector(03 downto 0); -- new ALU flags
+      -- control --
+      ctrl_i     : in  std_ulogic_vector(ctrl_width_c-1 downto 0);
+      -- data output --
+      data_o     : out std_ulogic_vector(15 downto 0); -- read data
+      sreg_o     : out std_ulogic_vector(15 downto 0)  -- current SR
+    );
   end component;
 
   -- Component: Data ALU --------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_alu
-  generic (
-    DADD_USE : boolean := true -- implement DADD instruction? (default=true)
-  );
-  port (
-    -- global control --
-    clk_i      : in  std_ulogic; -- global clock, rising edge
-    -- operands --
-    reg_i      : in  std_ulogic_vector(15 downto 0); -- data from reg file
-    mem_i      : in  std_ulogic_vector(15 downto 0); -- data from memory
-    sreg_i     : in  std_ulogic_vector(15 downto 0); -- current SR
-    -- control --
-    ctrl_i     : in  std_ulogic_vector(ctrl_width_c-1 downto 0);
-    -- results --
-    data_o     : out std_ulogic_vector(15 downto 0); -- result
-    flag_o     : out std_ulogic_vector(03 downto 0)  -- new ALU flags
-  );
+    generic (
+      DADD_USE : boolean := true -- implement DADD instruction?
+    );
+    port (
+      -- global control --
+      clk_i      : in  std_ulogic; -- global clock, rising edge
+      -- operands --
+      reg_i      : in  std_ulogic_vector(15 downto 0); -- data from reg file
+      mem_i      : in  std_ulogic_vector(15 downto 0); -- data from memory
+      sreg_i     : in  std_ulogic_vector(15 downto 0); -- current SR
+      -- control --
+      ctrl_i     : in  std_ulogic_vector(ctrl_width_c-1 downto 0);
+      -- results --
+      data_o     : out std_ulogic_vector(15 downto 0); -- result
+      flag_o     : out std_ulogic_vector(03 downto 0)  -- new ALU flags
+    );
   end component;
 
   -- Component: Address Generator -----------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_addr_gen
-  port (
-    -- global control --
-    clk_i      : in  std_ulogic; -- global clock, rising edge
-    -- data input --
-    reg_i      : in  std_ulogic_vector(15 downto 0); -- reg file input
-    mem_i      : in  std_ulogic_vector(15 downto 0); -- memory input
-    imm_i      : in  std_ulogic_vector(15 downto 0); -- branch offset
-    irq_sel_i  : in  std_ulogic_vector(01 downto 0); -- IRQ vector
-    -- control --
-    ctrl_i     : in  std_ulogic_vector(ctrl_width_c-1 downto 0);
-    -- data output --
-    mem_addr_o : out std_ulogic_vector(15 downto 0); -- memory address
-    dwb_o      : out std_ulogic_vector(15 downto 0)  -- data write back output
-  );
+    port (
+      -- global control --
+      clk_i      : in  std_ulogic; -- global clock, rising edge
+      -- data input --
+      reg_i      : in  std_ulogic_vector(15 downto 0); -- reg file input
+      mem_i      : in  std_ulogic_vector(15 downto 0); -- memory input
+      imm_i      : in  std_ulogic_vector(15 downto 0); -- branch offset
+      irq_sel_i  : in  std_ulogic_vector(01 downto 0); -- IRQ vector
+      -- control --
+      ctrl_i     : in  std_ulogic_vector(ctrl_width_c-1 downto 0);
+      -- data output --
+      mem_addr_o : out std_ulogic_vector(15 downto 0); -- memory address
+      dwb_o      : out std_ulogic_vector(15 downto 0)  -- data write back output
+    );
   end component;
 
   -- Component: CPU core --------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_cpu
-  generic (
-    DADD_USE   : boolean := true; -- implement DADD instruction? (default=true)
-    BOOTLD_USE : boolean := true  -- implement and use bootloader? (default=true)
-  );
-  port(
-    -- global control --
-    clk_i      : in  std_ulogic; -- global clock, rising edge
-    rst_i      : in  std_ulogic; -- global reset, low-active, async
-    -- memory interface --
-    mem_rd_o   : out std_ulogic; -- memory read
-    mem_imwe_o : out std_ulogic; -- allow writing to IMEM
-    mem_wr_o   : out std_ulogic_vector(01 downto 0); -- memory write
-    mem_addr_o : out std_ulogic_vector(15 downto 0); -- address
-    mem_data_o : out std_ulogic_vector(15 downto 0); -- write data
-    mem_data_i : in  std_ulogic_vector(15 downto 0); -- read data
-    -- interrupt system --
-    irq_i      : in  std_ulogic_vector(03 downto 0)  -- interrupt requests
-  );
+    generic (
+      DADD_USE   : boolean := true; -- implement DADD instruction?
+      BOOTLD_USE : boolean := true  -- implement and use bootloader?
+    );
+    port(
+      -- global control --
+      clk_i      : in  std_ulogic; -- global clock, rising edge
+      rst_i      : in  std_ulogic; -- global reset, low-active, async
+      -- memory interface --
+      mem_rd_o   : out std_ulogic; -- memory read
+      mem_imwe_o : out std_ulogic; -- allow writing to IMEM
+      mem_wr_o   : out std_ulogic_vector(01 downto 0); -- memory write
+      mem_addr_o : out std_ulogic_vector(15 downto 0); -- address
+      mem_data_o : out std_ulogic_vector(15 downto 0); -- write data
+      mem_data_i : in  std_ulogic_vector(15 downto 0); -- read data
+      -- interrupt system --
+      irq_i      : in  std_ulogic_vector(03 downto 0)  -- interrupt requests
+    );
   end component;
 
   -- Component: Instruction Memory (ROM) ----------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_imem
-  generic (
-    IMEM_SIZE   : natural := 4*1024; -- internal IMEM size in bytes, max 32kB (default=4kB)
-    IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory? (default=false)
-  );
-  port (
-    clk_i  : in  std_ulogic; -- global clock line
-    rden_i : in  std_ulogic; -- read enable
-    wren_i : in  std_ulogic_vector(01 downto 0); -- write enable
-    upen_i : in  std_ulogic; -- update enable
-    addr_i : in  std_ulogic_vector(15 downto 0); -- address
-    data_i : in  std_ulogic_vector(15 downto 0); -- data in
-    data_o : out std_ulogic_vector(15 downto 0)  -- data out
-  );
+    generic (
+      IMEM_SIZE   : natural := 4*1024; -- internal IMEM size in bytes
+      IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory?
+    );
+    port (
+      clk_i  : in  std_ulogic; -- global clock line
+      rden_i : in  std_ulogic; -- read enable
+      wren_i : in  std_ulogic_vector(01 downto 0); -- write enable
+      upen_i : in  std_ulogic; -- update enable
+      addr_i : in  std_ulogic_vector(15 downto 0); -- address
+      data_i : in  std_ulogic_vector(15 downto 0); -- data in
+      data_o : out std_ulogic_vector(15 downto 0)  -- data out
+    );
   end component;
 
   -- Component: Data Memory (RAM) -----------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_dmem
-  generic (
-    DMEM_SIZE : natural := 2*1024 -- internal DMEM size in bytes, max 28kB (default=2kB)
-  );
-  port (
-    clk_i  : in  std_ulogic; -- global clock line
-    rden_i : in  std_ulogic; -- read enable
-    wren_i : in  std_ulogic_vector(01 downto 0); -- write enable
-    addr_i : in  std_ulogic_vector(15 downto 0); -- address
-    data_i : in  std_ulogic_vector(15 downto 0); -- data in
-    data_o : out std_ulogic_vector(15 downto 0)  -- data out
-  );
+    generic (
+      DMEM_SIZE : natural := 2*1024 -- internal DMEM size in bytes
+    );
+    port (
+      clk_i  : in  std_ulogic; -- global clock line
+      rden_i : in  std_ulogic; -- read enable
+      wren_i : in  std_ulogic_vector(01 downto 0); -- write enable
+      addr_i : in  std_ulogic_vector(15 downto 0); -- address
+      data_i : in  std_ulogic_vector(15 downto 0); -- data in
+      data_o : out std_ulogic_vector(15 downto 0)  -- data out
+    );
   end component;
 
   -- Component: Bootloader ROM --------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_boot_rom
-  port (
-    clk_i  : in  std_ulogic; -- global clock line
-    rden_i : in  std_ulogic; -- read enable
-    addr_i : in  std_ulogic_vector(15 downto 0); -- address
-    data_o : out std_ulogic_vector(15 downto 0)  -- data out
-  );
+    port (
+      clk_i  : in  std_ulogic; -- global clock line
+      rden_i : in  std_ulogic; -- read enable
+      addr_i : in  std_ulogic_vector(15 downto 0); -- address
+      data_o : out std_ulogic_vector(15 downto 0)  -- data out
+    );
   end component;
 
   -- Component: 32bit Wishbone Interface ----------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_wb_interface
-  port (
-    -- host access --
-    clk_i       : in  std_ulogic; -- global clock line
-    rden_i      : in  std_ulogic; -- read enable
-    wren_i      : in  std_ulogic_vector(01 downto 0); -- write enable
-    addr_i      : in  std_ulogic_vector(15 downto 0); -- address
-    data_i      : in  std_ulogic_vector(15 downto 0); -- data in
-    data_o      : out std_ulogic_vector(15 downto 0); -- data out
-    -- wishbone interface --
-    wb_adr_o    : out std_ulogic_vector(31 downto 0); -- address
-    wb_dat_i    : in  std_ulogic_vector(31 downto 0); -- read data
-    wb_dat_o    : out std_ulogic_vector(31 downto 0); -- write data
-    wb_we_o     : out std_ulogic; -- read/write
-    wb_sel_o    : out std_ulogic_vector(03 downto 0); -- byte enable
-    wb_stb_o    : out std_ulogic; -- strobe
-    wb_cyc_o    : out std_ulogic; -- valid cycle
-    wb_ack_i    : in  std_ulogic  -- transfer acknowledge
-  );
+    port (
+      -- host access --
+      clk_i       : in  std_ulogic; -- global clock line
+      rden_i      : in  std_ulogic; -- read enable
+      wren_i      : in  std_ulogic_vector(01 downto 0); -- write enable
+      addr_i      : in  std_ulogic_vector(15 downto 0); -- address
+      data_i      : in  std_ulogic_vector(15 downto 0); -- data in
+      data_o      : out std_ulogic_vector(15 downto 0); -- data out
+      -- wishbone interface --
+      wb_adr_o    : out std_ulogic_vector(31 downto 0); -- address
+      wb_dat_i    : in  std_ulogic_vector(31 downto 0); -- read data
+      wb_dat_o    : out std_ulogic_vector(31 downto 0); -- write data
+      wb_we_o     : out std_ulogic; -- read/write
+      wb_sel_o    : out std_ulogic_vector(03 downto 0); -- byte enable
+      wb_stb_o    : out std_ulogic; -- strobe
+      wb_cyc_o    : out std_ulogic; -- valid cycle
+      wb_ack_i    : in  std_ulogic  -- transfer acknowledge
+    );
   end component;
 
   -- Component: USART -----------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_usart
-  port (
-    -- host access --
-    clk_i       : in  std_ulogic; -- global clock line
-    rden_i      : in  std_ulogic; -- read enable
-    wren_i      : in  std_ulogic_vector(01 downto 0); -- write enable
-    addr_i      : in  std_ulogic_vector(15 downto 0); -- address
-    data_i      : in  std_ulogic_vector(15 downto 0); -- data in
-    data_o      : out std_ulogic_vector(15 downto 0); -- data out
-    -- clock generator --
-    clkgen_en_o : out std_ulogic; -- enable clock generator
-    clkgen_i    : in  std_ulogic_vector(07 downto 0);
-    -- com lines --
-    uart_txd_o  : out std_ulogic;
-    uart_rxd_i  : in  std_ulogic;
-    spi_sclk_o  : out std_ulogic; -- SPI serial clock
-    spi_mosi_o  : out std_ulogic; -- SPI master out, slave in
-    spi_miso_i  : in  std_ulogic; -- SPI master in, slave out
-    spi_cs_o    : out std_ulogic_vector(05 downto 0); -- SPI CS 0..5
-    -- interrupts --
-    usart_irq_o : out std_ulogic  -- spi transmission done / uart rx/tx interrupt
-  );
+    port (
+      -- host access --
+      clk_i       : in  std_ulogic; -- global clock line
+      rden_i      : in  std_ulogic; -- read enable
+      wren_i      : in  std_ulogic_vector(01 downto 0); -- write enable
+      addr_i      : in  std_ulogic_vector(15 downto 0); -- address
+      data_i      : in  std_ulogic_vector(15 downto 0); -- data in
+      data_o      : out std_ulogic_vector(15 downto 0); -- data out
+      -- clock generator --
+      clkgen_en_o : out std_ulogic; -- enable clock generator
+      clkgen_i    : in  std_ulogic_vector(07 downto 0);
+      -- com lines --
+      uart_txd_o  : out std_ulogic;
+      uart_rxd_i  : in  std_ulogic;
+      spi_sclk_o  : out std_ulogic; -- SPI serial clock
+      spi_mosi_o  : out std_ulogic; -- SPI master out, slave in
+      spi_miso_i  : in  std_ulogic; -- SPI master in, slave out
+      spi_cs_o    : out std_ulogic_vector(05 downto 0); -- SPI CS 0..5
+      -- interrupts --
+      usart_irq_o : out std_ulogic  -- spi transmission done / uart rx/tx interrupt
+    );
   end component;
 
   -- Component: GPIO ------------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_gpio
-  port (
-    -- host access --
-    clk_i       : in  std_ulogic; -- global clock line
-    rden_i      : in  std_ulogic; -- read enable
-    wren_i      : in  std_ulogic_vector(01 downto 0); -- write enable
-    addr_i      : in  std_ulogic_vector(15 downto 0); -- address
-    data_i      : in  std_ulogic_vector(15 downto 0); -- data in
-    data_o      : out std_ulogic_vector(15 downto 0); -- data out
-    -- parallel io --
-    gpio_o      : out std_ulogic_vector(15 downto 0);
-    gpio_i      : in  std_ulogic_vector(15 downto 0);
-    -- interrupt --
-    irq_o       : out std_ulogic
-  );
+    port (
+      -- host access --
+      clk_i       : in  std_ulogic; -- global clock line
+      rden_i      : in  std_ulogic; -- read enable
+      wren_i      : in  std_ulogic_vector(01 downto 0); -- write enable
+      addr_i      : in  std_ulogic_vector(15 downto 0); -- address
+      data_i      : in  std_ulogic_vector(15 downto 0); -- data in
+      data_o      : out std_ulogic_vector(15 downto 0); -- data out
+      -- parallel io --
+      gpio_o      : out std_ulogic_vector(15 downto 0);
+      gpio_i      : in  std_ulogic_vector(15 downto 0);
+      -- interrupt --
+      irq_o       : out std_ulogic
+    );
   end component;
 
   -- Component: High-Precision Timer --------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_timer
-  port (
-    -- host access --
-    clk_i       : in  std_ulogic; -- global clock line
-    rden_i      : in  std_ulogic; -- read enable
-    wren_i      : in  std_ulogic_vector(01 downto 0); -- write enable
-    addr_i      : in  std_ulogic_vector(15 downto 0); -- address
-    data_i      : in  std_ulogic_vector(15 downto 0); -- data in
-    data_o      : out std_ulogic_vector(15 downto 0); -- data out
-    -- clock generator --
-    clkgen_en_o : out std_ulogic; -- enable clock generator
-    clkgen_i    : in  std_ulogic_vector(07 downto 0);
-    -- interrupt --
-    irq_o       : out std_ulogic  -- interrupt request
-  );
+    port (
+      -- host access --
+      clk_i       : in  std_ulogic; -- global clock line
+      rden_i      : in  std_ulogic; -- read enable
+      wren_i      : in  std_ulogic_vector(01 downto 0); -- write enable
+      addr_i      : in  std_ulogic_vector(15 downto 0); -- address
+      data_i      : in  std_ulogic_vector(15 downto 0); -- data in
+      data_o      : out std_ulogic_vector(15 downto 0); -- data out
+      -- clock generator --
+      clkgen_en_o : out std_ulogic; -- enable clock generator
+      clkgen_i    : in  std_ulogic_vector(07 downto 0);
+      -- interrupt --
+      irq_o       : out std_ulogic  -- interrupt request
+    );
   end component;
 
   -- Component: Watchdog Timer --------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_wdt
-  port (
-    -- host access --
-    clk_i       : in  std_ulogic; -- global clock line
-    rst_i       : in  std_ulogic; -- global (external) reset, low-active, use as async
-    rden_i      : in  std_ulogic; -- read enable
-    wren_i      : in  std_ulogic_vector(01 downto 0); -- write enable
-    addr_i      : in  std_ulogic_vector(15 downto 0); -- address
-    data_i      : in  std_ulogic_vector(15 downto 0); -- data in
-    data_o      : out std_ulogic_vector(15 downto 0); -- data out
-    -- clock generator --
-    clkgen_en_o : out std_ulogic; -- enable clock generator
-    clkgen_i    : in  std_ulogic_vector(07 downto 0);
-    -- system reset --
-    rst_o       :  out std_ulogic  -- timeout reset, low_active, use as async
-  );
+    port (
+      -- host access --
+      clk_i       : in  std_ulogic; -- global clock line
+      rst_i       : in  std_ulogic; -- global (external) reset, low-active, use as async
+      rden_i      : in  std_ulogic; -- read enable
+      wren_i      : in  std_ulogic_vector(01 downto 0); -- write enable
+      addr_i      : in  std_ulogic_vector(15 downto 0); -- address
+      data_i      : in  std_ulogic_vector(15 downto 0); -- data in
+      data_o      : out std_ulogic_vector(15 downto 0); -- data out
+      -- clock generator --
+      clkgen_en_o : out std_ulogic; -- enable clock generator
+      clkgen_i    : in  std_ulogic_vector(07 downto 0);
+      -- system reset --
+      rst_o       :  out std_ulogic  -- timeout reset, low_active, use as async
+    );
   end component;
 
   -- Component: System Configuration --------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_sysconfig
-  generic (
-    -- general configuration --
-    CLOCK_SPEED : natural := 100000000; -- main clock in Hz
-    IMEM_SIZE   : natural := 4*1024; -- internal IMEM size in bytes, max 32kB (default=4kB)
-    DMEM_SIZE   : natural := 2*1024; -- internal DMEM size in bytes, max 28kB (default=2kB)
-    -- additional configuration --
-    USER_CODE   : std_ulogic_vector(15 downto 0) := x"0000"; -- custom user code
-    -- module configuration --
-    DADD_USE    : boolean := true; -- implement DADD instruction? (default=true)
-    WB32_USE    : boolean := true; -- implement WB32 unit? (default=true)
-    WDT_USE     : boolean := true; -- implement WBT? (default=true)
-    GPIO_USE    : boolean := true; -- implement GPIO unit? (default=true)
-    TIMER_USE   : boolean := true; -- implement timer? (default=true)
-    USART_USE   : boolean := true; -- implement USART? (default=true)
-    -- boot configuration --
-    BOOTLD_USE  : boolean := true; -- implement and use bootloader? (default=true)
-    IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory? (default=false)
-  );
-  port (
-    clk_i  : in  std_ulogic; -- global clock line
-    rden_i : in  std_ulogic; -- read enable
-    wren_i : in  std_ulogic_vector(01 downto 0); -- write enable
-    addr_i : in  std_ulogic_vector(15 downto 0); -- address
-    data_i : in  std_ulogic_vector(15 downto 0); -- data in
-    data_o : out std_ulogic_vector(15 downto 0)  -- data out
-  );
+    generic (
+      -- general configuration --
+      CLOCK_SPEED : natural := 100000000; -- main clock in Hz
+      IMEM_SIZE   : natural := 4*1024; -- internal IMEM size in bytes
+      DMEM_SIZE   : natural := 2*1024; -- internal DMEM size in bytes
+      -- additional configuration --
+      USER_CODE   : std_ulogic_vector(15 downto 0) := x"0000"; -- custom user code
+      -- module configuration --
+      DADD_USE    : boolean := true; -- implement DADD instruction?
+      WB32_USE    : boolean := true; -- implement WB32 unit?
+      WDT_USE     : boolean := true; -- implement WBT?
+      GPIO_USE    : boolean := true; -- implement GPIO unit?
+      TIMER_USE   : boolean := true; -- implement timer?
+      USART_USE   : boolean := true; -- implement USART?
+      -- boot configuration --
+      BOOTLD_USE  : boolean := true; -- implement and use bootloader?
+      IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory?
+    );
+    port (
+      clk_i  : in  std_ulogic; -- global clock line
+      rden_i : in  std_ulogic; -- read enable
+      wren_i : in  std_ulogic_vector(01 downto 0); -- write enable
+      addr_i : in  std_ulogic_vector(15 downto 0); -- address
+      data_i : in  std_ulogic_vector(15 downto 0); -- data in
+      data_o : out std_ulogic_vector(15 downto 0)  -- data out
+    );
   end component;
 
 end neo430_package;

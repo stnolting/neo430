@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hanover, Germany                                                22.02.2017  #
+-- #  Stephan Nolting, Hanover, Germany                                                23.02.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -60,50 +60,50 @@ architecture neo430_tb_rtl of neo430_tb is
 
   -- The core of the problem --
   component neo430_top
-  generic (
-    -- general configuration --
-    CLOCK_SPEED : natural; -- main clock in Hz
-    IMEM_SIZE   : natural; -- internal IMEM size in bytes, max 32kB (default=4kB)
-    DMEM_SIZE   : natural; -- internal DMEM size in bytes, max 28kB (default=2kB)
-    -- additional configuration --
-    USER_CODE   : std_ulogic_vector(15 downto 0); -- custom user code
-    -- module configuration --
-    DADD_USE    : boolean; -- implement DADD instruction? (default=true)
-    WB32_USE    : boolean; -- implement WB32 unit? (default=true)
-    WDT_USE     : boolean; -- implement WBT? (default=true)
-    GPIO_USE    : boolean; -- implement GPIO unit? (default=true)
-    TIMER_USE   : boolean; -- implement timer? (default=true)
-    USART_USE   : boolean; -- implement USART? (default=true)
-    -- boot configuration --
-    BOOTLD_USE  : boolean; -- implement and use bootloader? (default=true)
-    IMEM_AS_ROM : boolean -- implement IMEM as read-only memory? (default=false)
-  );
-  port (
-    -- global control --
-    clk_i      : in  std_ulogic; -- global clock, rising edge
-    rst_i      : in  std_ulogic; -- global reset, async, LOW-active
-    -- gpio --
-    gpio_o     : out std_ulogic_vector(15 downto 0); -- parallel output
-    gpio_i     : in  std_ulogic_vector(15 downto 0); -- parallel input
-    -- serial com --
-    uart_txd_o : out std_ulogic; -- UART send data
-    uart_rxd_i : in  std_ulogic; -- UART receive data
-    spi_sclk_o : out std_ulogic; -- serial clock line
-    spi_mosi_o : out std_ulogic; -- serial data line out
-    spi_miso_i : in  std_ulogic; -- serial data line in
-    spi_cs_o   : out std_ulogic_vector(05 downto 0); -- SPI CS 0..5
-    -- 32-bit wishbone interface --
-    wb_adr_o   : out std_ulogic_vector(31 downto 0); -- address
-    wb_dat_i   : in  std_ulogic_vector(31 downto 0); -- read data
-    wb_dat_o   : out std_ulogic_vector(31 downto 0); -- write data
-    wb_we_o    : out std_ulogic; -- read/write
-    wb_sel_o   : out std_ulogic_vector(03 downto 0); -- byte enable
-    wb_stb_o   : out std_ulogic; -- strobe
-    wb_cyc_o   : out std_ulogic; -- valid cycle
-    wb_ack_i   : in  std_ulogic; -- transfer acknowledge
-    -- external interrupt --
-    irq_i      : in  std_ulogic  -- external interrupt request line
-  );
+    generic (
+      -- general configuration --
+      CLOCK_SPEED : natural; -- main clock in Hz
+      IMEM_SIZE   : natural; -- internal IMEM size in bytes, max 32kB (default=4kB)
+      DMEM_SIZE   : natural; -- internal DMEM size in bytes, max 28kB (default=2kB)
+      -- additional configuration --
+      USER_CODE   : std_ulogic_vector(15 downto 0); -- custom user code
+      -- module configuration --
+      DADD_USE    : boolean; -- implement DADD instruction? (default=true)
+      WB32_USE    : boolean; -- implement WB32 unit? (default=true)
+      WDT_USE     : boolean; -- implement WBT? (default=true)
+      GPIO_USE    : boolean; -- implement GPIO unit? (default=true)
+      TIMER_USE   : boolean; -- implement timer? (default=true)
+      USART_USE   : boolean; -- implement USART? (default=true)
+      -- boot configuration --
+      BOOTLD_USE  : boolean; -- implement and use bootloader? (default=true)
+      IMEM_AS_ROM : boolean -- implement IMEM as read-only memory? (default=false)
+    );
+    port (
+      -- global control --
+      clk_i      : in  std_ulogic; -- global clock, rising edge
+      rst_i      : in  std_ulogic; -- global reset, async, LOW-active
+      -- gpio --
+      gpio_o     : out std_ulogic_vector(15 downto 0); -- parallel output
+      gpio_i     : in  std_ulogic_vector(15 downto 0); -- parallel input
+      -- serial com --
+      uart_txd_o : out std_ulogic; -- UART send data
+      uart_rxd_i : in  std_ulogic; -- UART receive data
+      spi_sclk_o : out std_ulogic; -- serial clock line
+      spi_mosi_o : out std_ulogic; -- serial data line out
+      spi_miso_i : in  std_ulogic; -- serial data line in
+      spi_cs_o   : out std_ulogic_vector(05 downto 0); -- SPI CS 0..5
+      -- 32-bit wishbone interface --
+      wb_adr_o   : out std_ulogic_vector(31 downto 0); -- address
+      wb_dat_i   : in  std_ulogic_vector(31 downto 0); -- read data
+      wb_dat_o   : out std_ulogic_vector(31 downto 0); -- write data
+      wb_we_o    : out std_ulogic; -- read/write
+      wb_sel_o   : out std_ulogic_vector(03 downto 0); -- byte enable
+      wb_stb_o   : out std_ulogic; -- strobe
+      wb_cyc_o   : out std_ulogic; -- valid cycle
+      wb_ack_i   : in  std_ulogic; -- transfer acknowledge
+      -- external interrupt --
+      irq_i      : in  std_ulogic  -- external interrupt request line
+    );
   end component;
 
   -- generators --

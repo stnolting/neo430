@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               14.02.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               23.02.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -31,7 +31,7 @@ use work.neo430_package.all;
 
 entity neo430_dmem is
   generic (
-    DMEM_SIZE : natural := 2*1024 -- internal DMEM size in bytes, max 28kB (default=2kB)
+    DMEM_SIZE : natural := 2*1024 -- internal DMEM size in bytes
   );
   port (
     clk_i  : in  std_ulogic; -- global clock line
