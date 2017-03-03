@@ -86,7 +86,11 @@ Next, install the compiler toolchain from:
 
 http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/index_FDS.html
 
-Now follow the instructions from the "Let's Get It Started" chapter of the
+This project also includes a lot of examples, from which you can start:
+
+https://github.com/stnolting/neo430/tree/master/sw/example
+
+Follow the instructions from the "Let's Get It Started" chapter of the
 NEO430 documentary:
 
 https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
