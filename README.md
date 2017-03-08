@@ -79,8 +79,10 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 ## Let's Get It Started!
 
  * At first, make sure to get the most recent version of this project from GitHub:
-
-    git clone https://github.com/stnolting/neo430.git
+ 
+    ~~~
+    $ git clone https://github.com/stnolting/neo430.git
+    ~~~
 
  * Next, install the compiler toolchain from:
 
