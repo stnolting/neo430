@@ -1,5 +1,4 @@
 # Introduction
-==============
 
 Welcome to the NEO430 Processor project!
 
@@ -39,7 +38,6 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 
 ## Processor Features
----------------------
 
 <img src="https://github.com/stnolting/neo430/blob/master/doc/figures/neo430_arch.png" width="500px"/>
 
@@ -64,7 +62,6 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 
 ## Differences to TI's original MSP430 processors
--------------------------------------------------
 
 - Completely different processor modules with different functionality
 - No hardware multiplier support (but emulated in software)
@@ -80,7 +77,6 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 
 ## Let's Get It Started!
-------------------------
 
  * At first, make sure to get the most recent version of this project from GitHub:
 
@@ -97,7 +93,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
  * Follow the instructions from the "Let's Get It Started" chapter of the
   NEO430 documentary:
 
-https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
+  https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
  * This guide will provide you with the necessary information to make a simple
   test implementation of the NEO430 run:
