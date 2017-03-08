@@ -84,27 +84,30 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
     git clone https://github.com/stnolting/neo430.git
     ~~~
 
- * Next, install the compiler toolchain from:
+ * Next, install the compiler toolchain from the TI homepage (select the "compiler only" package):
 
   http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/index_FDS.html
 
- * This project also includes a lot of examples, from which you can start:
-
-  https://github.com/stnolting/neo430/tree/master/sw/example
-
- * Follow the instructions from the "Let's Get It Started" chapter of the
-  NEO430 documentary:
+ * Follow the instructions from the "Let's Get It Started" section of the NEO430 documentary:
 
   https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
- * This guide will provide you with the necessary information to make a simple
-  test implementation of the NEO430 run:
+ * The NEO430 documentary will guide you to create a simple test setup, which serves as "hello world" FPGA demo: 
 
-<img src="https://github.com/stnolting/neo430/blob/master/doc/figures/test_setup.jpg" width="500px"/>
+<img src="https://github.com/stnolting/neo430/blob/master/doc/figures/test_setup.jpg" width="400px"/>
+
+ * This project also includes some example programs, from which you can start:
+
+  https://github.com/stnolting/neo430/tree/master/sw/example
 
  * Have fun! =)
 
 
+## Questions?
+
+If you have any question or if you are encountering problems with the NEO430, feel free to drop me a line:
+
+  mailto:stnolting@gmail.com
 
 
 
