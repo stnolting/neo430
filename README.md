@@ -105,9 +105,9 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 ## Questions?
 
-If you have any question or if you are encountering problems with the NEO430, feel free to drop me a line:
+If you have any questions, bug reports, ideas or if you are facing problems with the NEO430, feel free to drop me a line:
 
-  mailto:stnolting@gmail.com
+  stnolting@gmail.com
 
 
 
