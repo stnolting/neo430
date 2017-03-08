@@ -1,4 +1,5 @@
 # Introduction
+==============
 
 Welcome to the NEO430 Processor project!
 
@@ -38,6 +39,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 
 ## Processor Features
+---------------------
 
 <img src="https://github.com/stnolting/neo430/blob/master/doc/figures/neo430_arch.png" width="500px"/>
 
@@ -62,6 +64,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 
 ## Differences to TI's original MSP430 processors
+-------------------------------------------------
 
 - Completely different processor modules with different functionality
 - No hardware multiplier support (but emulated in software)
@@ -77,30 +80,31 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 
 ## Let's Get It Started!
+------------------------
 
-At first, make sure to get the most recent version of this project from GitHub:
+ * At first, make sure to get the most recent version of this project from GitHub:
 
     git clone https://github.com/stnolting/neo430.git
 
-Next, install the compiler toolchain from:
+ * Next, install the compiler toolchain from:
 
-http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/index_FDS.html
+  http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/index_FDS.html
 
-This project also includes a lot of examples, from which you can start:
+ * This project also includes a lot of examples, from which you can start:
 
-https://github.com/stnolting/neo430/tree/master/sw/example
+  https://github.com/stnolting/neo430/tree/master/sw/example
 
-Follow the instructions from the "Let's Get It Started" chapter of the
-NEO430 documentary:
+ * Follow the instructions from the "Let's Get It Started" chapter of the
+  NEO430 documentary:
 
 https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
-This guide will provide you with the necessary information to make a simple
-test implementation of the NEO430 run:
+ * This guide will provide you with the necessary information to make a simple
+  test implementation of the NEO430 run:
 
 <img src="https://github.com/stnolting/neo430/blob/master/doc/figures/test_setup.jpg" width="500px"/>
 
-Have fun! =)
+ * Have fun! =)
 
 
 
