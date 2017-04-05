@@ -112,7 +112,7 @@ begin
   imem_file_access: process(clk_i)
   begin
     if rising_edge(clk_i) then
-      rden  <= rden_i and acc_en;
+      rden <= rden_i and acc_en;
       if (IMEM_AS_ROM = false) then
         if (acc_en = '1') and (wren_i(0) = '1') and (upen_i = '1') then -- write low byte
           imem_file_l(addr) <= data_i(07 downto 0);
