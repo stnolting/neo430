@@ -14,10 +14,10 @@ vcom -work work -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_addr_gen.vh
 vcom -work work -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_alu.vhd
 vcom -work work -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_boot_rom.vhd
 vcom -work work -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_control.vhd
-vcom -work work -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_cpu_top.vhd
+vcom -work work -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_cpu.vhd
 vcom -work work -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_dmem.vhd
 vcom -work work -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_imem.vhd
-vcom -work work -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_parallel_io.vhd
+vcom -work work -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_gpio.vhd
 vcom -work work -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_reg_file.vhd
 vcom -work work -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_sysconfig.vhd
 vcom -work work -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_timer.vhd
