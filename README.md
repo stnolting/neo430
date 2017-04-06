@@ -42,6 +42,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 <img src="https://github.com/stnolting/neo430/blob/master/doc/figures/neo430_arch.png" width="500px"/>
 (optional modules are marked using dashed lines)
 
+
 - 16-bit open source soft-core microcontroller-like processor system
 - Code-efficient CISC-like instruction capabilities
 - Full support of the original MSP430 instruction set architecture
