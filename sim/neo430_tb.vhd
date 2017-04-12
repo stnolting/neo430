@@ -180,7 +180,7 @@ begin
   -- Dummy UART Receiver ------------------------------------------------------
   -- -----------------------------------------------------------------------------
   uart_rx_unit: process(clk_gen)
-    variable i, j     : natural;
+    variable i, j     : integer;
     file uart_rx_file : text is out "uart_rx_dump.txt";
     variable line_tmp : line;
   begin
