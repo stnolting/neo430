@@ -36,7 +36,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               22.02.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               18.04.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -363,7 +363,7 @@ begin
     uart_txd_o  <= '1';
     spi_sclk_o  <= '0';
     spi_mosi_o  <= '0';
-    spi_cs_o    <= (others => '0');
+    spi_cs_o    <= (others => '1');
   end generate;
 
 
