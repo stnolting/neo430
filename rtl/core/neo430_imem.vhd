@@ -24,7 +24,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               23.02.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               19.04.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -113,15 +113,17 @@ begin
   begin
     if rising_edge(clk_i) then
       rden <= rden_i and acc_en;
-      if (IMEM_AS_ROM = false) then
+      if (IMEM_AS_ROM = false) then -- IMEM as true RAM
         if (acc_en = '1') and (wren_i(0) = '1') and (upen_i = '1') then -- write low byte
           imem_file_l(addr) <= data_i(07 downto 0);
         end if;
         if (acc_en = '1') and (wren_i(1) = '1') and (upen_i = '1') then -- write high byte
           imem_file_h(addr) <= data_i(15 downto 8);
         end if;
+        rdata <= imem_file_h(addr) & imem_file_l(addr);
+      else -- IMEM as true ROM
+        rdata <= imem_init_file(addr);
       end if;
-      rdata <= imem_file_h(addr) & imem_file_l(addr);
     end if;
   end process imem_file_access;
 
