@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               23.02.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               18.04.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -620,36 +620,36 @@ begin
   -- -----------------------------------------------------------------------------
   irq_controller: process(rst_i, clk_i)
   begin
-      if (rst_i = '0') then
-        irq_buf   <= (others => '0');
-        irq_vec   <= (others => '0');
-        irq_start <= '0'; -- starting IRQ handler
-        irq_run   <= '0'; -- running IRQ handler
-      elsif rising_edge(clk_i) then
-        for i in 0 to 3 loop
-          if (irq_ack_mask(i) = '1') then
-            irq_buf(i) <= (sreg_i(sreg_i_c) or irq_run) and (irq_buf(i) or irq_i(i));
-          else
-            irq_buf(i) <= '0';
-          end if;
-        end loop; -- i
-        -- starting IRQ --
-        if (irq_start = '0') then -- no starting IRQ
-          irq_vec <= irq_vec_nxt;
-          if (irq_buf /= "0000") and (sreg_i(sreg_i_c) = '1') then
-            irq_start <= '1';
-          end if;
-        -- acknowledge start of IRQ handler or disable IRQs
-        elsif (irq_ack = '1') or (sreg_i(sreg_i_c) = '0') then
-          irq_start <= '0';
+    if (rst_i = '0') then
+      irq_buf   <= (others => '0');
+      irq_vec   <= (others => '0');
+      irq_start <= '0'; -- starting IRQ handler
+      irq_run   <= '0'; -- running IRQ handler
+    elsif rising_edge(clk_i) then
+      for i in 0 to 3 loop
+        if (irq_ack_mask(i) = '1') then
+          irq_buf(i) <= (sreg_i(sreg_i_c) or irq_run) and (irq_buf(i) or irq_i(i));
+        else
+          irq_buf(i) <= '0';
         end if;
-        -- running IRQ --
-        if (irq_run = '0') then -- no executing IRQ
-          irq_run <= irq_start;
-        elsif (irq_ret = '1') then -- return from irq
-          irq_run <= '0';
+      end loop; -- i
+      -- starting IRQ --
+      if (irq_start = '0') then -- no starting IRQ
+        irq_vec <= irq_vec_nxt;
+        if (irq_buf /= "0000") and (sreg_i(sreg_i_c) = '1') then
+          irq_start <= '1';
         end if;
+      -- acknowledge start of IRQ handler or disable IRQs
+      elsif (irq_ack = '1') or (sreg_i(sreg_i_c) = '0') then
+        irq_start <= '0';
       end if;
+      -- running IRQ --
+      if (irq_run = '0') then -- no executing IRQ
+        irq_run <= irq_start;
+      elsif (irq_ret = '1') then -- return from irq
+        irq_run <= '0';
+      end if;
+    end if;
   end process irq_controller;
 
   -- acknowledge mask --
