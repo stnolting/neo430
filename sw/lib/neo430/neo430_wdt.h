@@ -1,5 +1,5 @@
 // #################################################################################################
-// #  < Test program for the Watchdog Timer (WDT) >                                                #
+// #  < neo430_wdt.h - Watchdog helper functions >                                                 #
 // # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 // # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -22,64 +22,53 @@
 // #  Stephan Nolting, Hannover, Germany                                               22.04.2017  #
 // #################################################################################################
 
+#ifndef neo430_wdt_h
+#define neo430_wdt_h
 
-// Libraries
-#include <stdint.h>
-#include "../../lib/neo430/neo430.h"
-
-// Configuration
-#define BAUD_RATE 19200
+// prototypes
+void wdt_enable(uint8_t prsc);
+void wdt_disable(void);
+void wdt_reset(void);
+void wdt_force_hw_reset(void);
 
 
 /* ------------------------------------------------------------
- * INFO Main function
+ * INFO Enable watchdog
+ * PARAM Prescaler selection (0..7)
  * ------------------------------------------------------------ */
-int main(void) {
+void wdt_enable(uint8_t prsc) {
 
-  // setup UART
-  uart_set_baud(BAUD_RATE);
-  USI_CT = (1<<USI_CT_EN)  | (5<<USI_CT_SPIPRSC0) | (63<<USI_CT_SPICS0);
-
-  // intro text
-  uart_br_print("\n<<< Watchdog Test Program >>>\n\n");
-
-  // check if WDT was synthesized, exit if no WDT is available
-  if (!(SYS_FEATURES & (1<<SYS_WDT_EN))) {
-    uart_br_print("Error! No WDT synthesized!");
-    return 0;
-  }
-
-  uart_br_print("Cause of last processor reset: ");
-  if ((WDT_CTRL & (1<<WDT_RCAUSE)) == 0)
-    uart_br_print("EXTERNAL RESET");
-  else
-    uart_br_print("WATCHDOG");
-
-  uart_br_print("\n\nWill reset WDT 64 times.\n"
-                "A system reset will be executed in the following time out.\n"
-                "Press any key to trigger manual WDT hardware reset.\n"
-                "[----------------------------------------------------------------]\n ");
-
-  // init watchdog: third largest period
-  wdt_enable(5);
-
-  uint8_t i;
-  for (i=0; i<64; i++) {
-    uart_putc('.');
-    wdt_reset(); // reset watchdog
-    cpu_delay(4); // wait some time
-
-    // trigger manual reset if key pressed
-    if (uart_char_received()) {
-      wdt_force_hw_reset();
-    }
-  }
-
-  while (1) { // wait for the watchdog time-out or key press
-    if (uart_char_received()) {
-      wdt_force_hw_reset();
-    }
-  }
-
-  return 0;
+  WDT_CTRL = (WDT_PASSWORD<<8) | (1<<WDT_ENABLE) | (prsc & 0x07);
 }
+
+
+/* ------------------------------------------------------------
+ * INFO Disable watchdog
+ * ------------------------------------------------------------ */
+void wdt_disable(void) {
+
+  WDT_CTRL = (WDT_PASSWORD<<8) | (0<<WDT_ENABLE);
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Reset watchdog
+ * ------------------------------------------------------------ */
+void wdt_reset(void) {
+
+  WDT_CTRL = WDT_CTRL | (WDT_PASSWORD<<8);
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Perform a hardware reset by activating the WDT and
+ * writing performing an invalid access (wrong password)
+ * ------------------------------------------------------------ */
+void wdt_force_hw_reset(void) {
+
+  WDT_CTRL = (WDT_PASSWORD<<8) | (1<<WDT_ENABLE);
+  WDT_CTRL = 0; // invalid access -> triggers reset
+}
+
+
+#endif // neo430_wdt_h

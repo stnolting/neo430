@@ -1,10 +1,11 @@
 -- #################################################################################################
 -- #  << NEO430 - Watchdog Timer >>                                                                #
 -- # ********************************************************************************************* #
--- # The internal counter is 16 bit wide and triggers the reset when overflowing. The clock is     #
+-- # The internal counter is 16 bit wide and triggers a HW reset when overflowing. The clock is    #
 -- # selected via the clk_sel bits of the control register. The WDT can only operate when the      #
 -- # enable bit is set. A write access to the WDT can only be performed, if the higher byte of the #
--- # written data contains the specific WDT password (0x47).                                       #
+-- # written data contains the specific WDT password (0x47). I a write access occurs with a wrong  #
+-- # password, a HW reset is triggered, but only if the WDT is enabled.                            #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -24,7 +25,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               14.02.1017  #
+-- #  Stephan Nolting, Hannover, Germany                                               22.02.1017  #
 -- #################################################################################################
 
 library ieee;
@@ -69,9 +70,10 @@ architecture neo430_wdt_rtl of neo430_wdt is
   constant ctrl_rcause_c  : natural := 4; -- r/-: reset cause (0: external, 1: watchdog timeout)
 
   -- access control --
-  signal acc_en : std_ulogic; -- module access enable
-  signal pwd_ok : std_ulogic; -- password correct
-  signal wren   : std_ulogic;
+  signal acc_en        : std_ulogic; -- module access enable
+  signal pwd_ok        : std_ulogic; -- password correct
+  signal fail, fail_ff : std_ulogic; -- unauthorized access
+  signal wren          : std_ulogic;
 
   -- accessible regs --
   signal source  : std_ulogic; -- source of the system reset: '0' = external, '1' = watchdog timeout
@@ -92,7 +94,8 @@ begin
   -- -----------------------------------------------------------------------------
   acc_en <= '1' when (addr_i(hi_abb_c downto lo_abb_c) = wdt_base_c(hi_abb_c downto lo_abb_c)) else '0';
   pwd_ok <= '1' when (data_i(15 downto 8) = wdt_password_c) else '0'; -- password check
-  wren   <= '1' when ((acc_en = '1') and (wren_i = "11") and (pwd_ok = '1')) else '0';
+  wren   <= '1' when ((acc_en = '1') and (wren_i = "11") and (pwd_ok = '1')) else '0'; -- access ok
+  fail   <= '1' when ((acc_en = '1') and (wren_i = "11") and (pwd_ok = '0')) else '0'; -- access fail!
 
 
   -- Write Access, Reset Generator --------------------------------------------
@@ -108,8 +111,8 @@ begin
         enable  <= data_i(ctrl_enable_c);
         clk_sel <= data_i(ctrl_clksel2_c downto ctrl_clksel0_c);
       end if;
-      -- reset generator --
-      if ((enable = '1') and (cnt(cnt'left) = '1')) then
+      -- reset generator - enabled and (overflow or unauthorized access)? --
+      if (enable = '1') and ((cnt(cnt'left) = '1') or (fail_ff = '1')) then
         rst_gen <= (others => '0');
       else
         rst_gen <= rst_gen(rst_gen'left-1 downto 0) & '1';
@@ -123,6 +126,8 @@ begin
   cnt_sync: process(clk_i)
   begin
     if rising_edge(clk_i) then
+      -- unauthorized access buffer --
+      fail_ff <= fail;
       -- reset synchronizer --
       rst_sync <= rst_sync(0) & rst_gen(rst_gen'left);
       -- tick generator --

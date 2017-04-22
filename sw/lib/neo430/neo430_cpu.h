@@ -37,6 +37,8 @@ void _memset(uint8_t *dst, uint8_t data, uint16_t num);
 uint8_t _memcmp(uint8_t *dst, uint8_t *src, uint16_t num);
 void _memcpy(uint8_t *dst, uint8_t *src, uint16_t num);
 void soft_reset(void);
+void jump_address(uint16_t addr);
+void call_address(uint16_t addr);
 
 
 /* ------------------------------------------------------------
@@ -167,6 +169,28 @@ void _memcpy(uint8_t *dst, uint8_t *src, uint16_t num) {
 void soft_reset(void) {
 
   asm volatile ("mov #0x0000, r0");
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Jump to address
+ * PARAM Destination address
+ * ------------------------------------------------------------ */
+void goto_address(uint16_t addr) {
+
+  register uint16_t r = addr;
+  asm volatile ("mov %0, r0" : : "r" (r));
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Call address and save return address to stack
+ * PARAM Destination address
+ * ------------------------------------------------------------ */
+void call_address(uint16_t addr) {
+
+  register uint16_t r = addr;
+  asm volatile ("call %0" : : "r" (r));
 }
 
 

@@ -23,11 +23,15 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               21.02.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               22.04.2017  #
 // #################################################################################################
 
 #ifndef neo430_h
 #define neo430_h
+
+// STD libraries
+#include <stdint.h>
+#include <stdlib.h>
 
 // ----------------------------------------------------------------------------
 // CPU Status Register (r2) Flags
@@ -162,7 +166,7 @@
 #define WDT_CTRL (*(REG16 0xFFD0)) // r/w: Watchdog control register
 
 // Watchdog control register
-#define WDT_PASSWORD 0x47
+#define WDT_PASSWORD 0x47 // must be set in the upper 8 bits of the WDT CTRL register
 #define WDT_CLKSEL0  0 // r/w: prescaler select bit 0
 #define WDT_CLKSEL1  1 // r/w: prescaler select bit 1
 #define WDT_CLKSEL2  2 // r/w: prescaler select bit 2
@@ -229,6 +233,7 @@
 #include "neo430_cpu.h"
 #include "neo430_gpio.h"
 #include "neo430_usart.h"
+#include "neo430_wdt.h"
 #include "neo430_wishbone.h"
 
 
