@@ -36,7 +36,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               18.04.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               22.04.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -89,7 +89,8 @@ entity neo430_top is
     wb_cyc_o   : out std_ulogic; -- valid cycle
     wb_ack_i   : in  std_ulogic; -- transfer acknowledge
     -- external interrupt --
-    irq_i      : in  std_ulogic  -- external interrupt request line
+    irq_i      : in  std_ulogic; -- external interrupt request line
+    irq_ack_o  : out std_ulogic  -- external interrupt request acknowledge
   );
 end neo430_top;
 
@@ -134,6 +135,7 @@ architecture neo430_top_rtl of neo430_top is
 
   -- interrupt system --
   signal irq       : std_ulogic_vector(03 downto 0);
+  signal irq_ack   : std_ulogic_vector(03 downto 0);
   signal timer_irq : std_ulogic;
   signal usart_irq : std_ulogic;
   signal gpio_irq  : std_ulogic;
@@ -211,7 +213,8 @@ begin
     mem_data_o => cpu_bus.wdata,    -- write data
     mem_data_i => cpu_bus.rdata,    -- read data
     -- interrupt system --
-    irq_i      => irq               -- interrupt request lines
+    irq_i      => irq,              -- interrupt request lines
+    irq_ack_o  => irq_ack           -- IRQ acknowledge
   );
 
   -- final CPU read data --
@@ -231,6 +234,10 @@ begin
   irq(1) <= usart_irq;    -- UART Rx available | UART Tx done | SPI RTX done
   irq(2) <= gpio_irq;     -- GPIO input pin change
   irq(3) <= xirq_sync(1); -- external interrupt request
+
+  -- external interrupt acknowledge --
+  irq_ack_o <= irq_ack(3);
+  --- the internal irq sources DO NOT REQUIRE an acknowledge!
 
 
   -- Main Memory (ROM & RAM) --------------------------------------------------

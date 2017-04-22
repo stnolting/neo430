@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               23.02.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               22.04.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -30,7 +30,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0108"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0109"; -- no touchy!
 
   -- Internal Functions ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -224,7 +224,8 @@ package neo430_package is
       irq_vec_o  : out std_ulogic_vector(01 downto 0); -- irq channel address
       imm_o      : out std_ulogic_vector(15 downto 0); -- branch offset
       -- irq lines --
-      irq_i      : in  std_ulogic_vector(03 downto 0)  -- IRQ lines
+      irq_i     : in  std_ulogic_vector(03 downto 0); -- IRQ lines
+      irq_ack_o : out std_ulogic_vector(03 downto 0)  -- IRQ acknowledge
     );
   end component;
 
@@ -309,7 +310,8 @@ package neo430_package is
       mem_data_o : out std_ulogic_vector(15 downto 0); -- write data
       mem_data_i : in  std_ulogic_vector(15 downto 0); -- read data
       -- interrupt system --
-      irq_i      : in  std_ulogic_vector(03 downto 0)  -- interrupt requests
+      irq_i      : in  std_ulogic_vector(03 downto 0); -- interrupt requests
+      irq_ack_o  : out std_ulogic_vector(03 downto 0)  -- IRQ acknowledge
     );
   end component;
 

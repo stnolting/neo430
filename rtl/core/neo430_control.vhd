@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               18.04.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               22.04.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -47,7 +47,8 @@ entity neo430_control is
     irq_vec_o : out std_ulogic_vector(01 downto 0); -- irq channel address
     imm_o     : out std_ulogic_vector(15 downto 0); -- branch offset
     -- irq lines --
-    irq_i     : in  std_ulogic_vector(03 downto 0)  -- IRQ lines
+    irq_i     : in  std_ulogic_vector(03 downto 0); -- IRQ lines
+    irq_ack_o : out std_ulogic_vector(03 downto 0)  -- IRQ acknowledge
   );
 end neo430_control;
 
@@ -627,9 +628,9 @@ begin
       irq_run   <= '0'; -- running IRQ handler
     elsif rising_edge(clk_i) then
       for i in 0 to 3 loop
-        if (irq_ack_mask(i) = '1') then
+        if (irq_ack_mask(i) = '0') then -- gather irqs
           irq_buf(i) <= (sreg_i(sreg_i_c) or irq_run) and (irq_buf(i) or irq_i(i));
-        else
+        else -- ack irq
           irq_buf(i) <= '0';
         end if;
       end loop; -- i
@@ -658,13 +659,16 @@ begin
   begin
     irq_tmp_v := irq_ack & irq_vec;
     case irq_tmp_v is
-      when "100"   => irq_ack_mask <= "1110";
-      when "101"   => irq_ack_mask <= "1101";
-      when "110"   => irq_ack_mask <= "1011";
-      when "111"   => irq_ack_mask <= "0111";
-      when others  => irq_ack_mask <= "1111";
+      when "100"   => irq_ack_mask <= "0001";
+      when "101"   => irq_ack_mask <= "0010";
+      when "110"   => irq_ack_mask <= "0100";
+      when "111"   => irq_ack_mask <= "1000";
+      when others  => irq_ack_mask <= "0000";
     end case;
   end process;
+
+  -- ack output --
+  irq_ack_o <= irq_ack_mask;
 
   -- interrupt priority encoder --
   irq_priority: process(irq_buf)
@@ -680,8 +684,8 @@ begin
     end if;
   end process irq_priority;
 
-  -- output --
-  irq_vec_o <= irq_vec;
+  -- interrupt vector output --
+  irq_vec_o <= irq_vec; -- the final address is constructed in the address generator
 
 
 end neo430_control_rtl;

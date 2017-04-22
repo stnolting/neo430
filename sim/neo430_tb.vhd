@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hanover, Germany                                                23.02.2017  #
+-- #  Stephan Nolting, Hanover, Germany                                                22.04.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -102,7 +102,8 @@ architecture neo430_tb_rtl of neo430_tb is
       wb_cyc_o   : out std_ulogic; -- valid cycle
       wb_ack_i   : in  std_ulogic; -- transfer acknowledge
       -- external interrupt --
-      irq_i      : in  std_ulogic  -- external interrupt request line
+      irq_i      : in  std_ulogic; -- external interrupt request line
+      irq_ack_o  : out std_ulogic  -- external interrupt request acknowledge
     );
   end component;
 
@@ -173,7 +174,8 @@ begin
     wb_cyc_o   => open,               -- valid cycle
     wb_ack_i   => '0',                -- transfer acknowledge
     -- external interrupt --
-    irq_i      => '0'                 -- external interrupt request line
+    irq_i      => '0',                -- external interrupt request line
+    irq_ack_o  => open                -- external interrupt request acknowledge
   );
 
 

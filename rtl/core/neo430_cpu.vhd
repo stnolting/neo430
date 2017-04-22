@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               23.02.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               22.04.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -48,7 +48,8 @@ entity neo430_cpu is
     mem_data_o : out std_ulogic_vector(15 downto 0); -- write data
     mem_data_i : in  std_ulogic_vector(15 downto 0); -- read data
     -- interrupt system --
-    irq_i      : in  std_ulogic_vector(03 downto 0)  -- interrupt requests
+    irq_i      : in  std_ulogic_vector(03 downto 0); -- interrupt requests
+    irq_ack_o  : out std_ulogic_vector(03 downto 0)  -- IRQ acknowledge
   );
 end neo430_cpu;
 
@@ -88,7 +89,8 @@ begin
     irq_vec_o  => irq_sel,    -- irq channel address
     imm_o      => imm,        -- branch offset
     -- irq lines --
-    irq_i      => irq_i       -- IRQ lines
+    irq_i      => irq_i,      -- IRQ lines
+    irq_ack_o  => irq_ack_o   -- IRQ acknowledge
   );
 
 
@@ -168,7 +170,7 @@ begin
   mem_wr_o(0) <= ctrl_bus(ctrl_mem_wr_c) when (bw_ff = '0') else (ctrl_bus(ctrl_mem_wr_c) and (not mem_addr(0)));
   mem_wr_o(1) <= ctrl_bus(ctrl_mem_wr_c) when (bw_ff = '0') else (ctrl_bus(ctrl_mem_wr_c) and mem_addr(0));
 
-  -- only allow write-access to IMEM when r flag is set --
+  -- only allow write-access to IMEM when r-flag is set --
   mem_imwe_o <= sreg(sreg_r_c);
 
   -- data in/out swap --
