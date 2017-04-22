@@ -176,7 +176,7 @@ void soft_reset(void) {
  * INFO Jump to address
  * PARAM Destination address
  * ------------------------------------------------------------ */
-void goto_address(uint16_t addr) {
+void jump_address(uint16_t addr) {
 
   register uint16_t r = addr;
   asm volatile ("mov %0, r0" : : "r" (r));
