@@ -19,7 +19,7 @@
 /* # You should have received a copy of the GNU Lesser General Public License along with this      # */
 /* # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                # */
 /* # ********************************************************************************************* # */
-/* #  Stephan Nolting, Hannover, Germany                                               26.11.2016  # */
+/* #  Stephan Nolting, Hannover, Germany                                               22.04.2017  # */
 /* ################################################################################################# */
 
 OUTPUT_ARCH(msp430)
@@ -84,17 +84,36 @@ SECTIONS
     PROVIDE(__textend = .);
   } > rom
 
-
   .rodata :
   {
     . = ALIGN(2);
     PROVIDE(__rodata_start = .);
     PROVIDE(__rodatastart = .);
+
     *(.plt);
-    *(.rodata .rodata.* .gnu.linkonce.r.* .const .const:*);
-    *(.rodata1);
-    *(.eh_frame_hdr);
     . = ALIGN(2);
+    *(.lower.rodata.* .lower.rodata)
+    . = ALIGN(2);
+    *(.rodata .rodata.* .gnu.linkonce.r.* .const .const:*)
+    . = ALIGN(2);
+    *(.either.rodata.* .either.rodata)
+    . = ALIGN(2);
+    *(.rodata1)
+    . = ALIGN(2);
+
+    KEEP (*(.gcc_except_table)) *(.gcc_except_table.*)
+    PROVIDE (__preinit_array_start = .);
+    KEEP (*(.preinit_array))
+    PROVIDE (__preinit_array_end = .);
+    PROVIDE (__init_array_start = .);
+    KEEP (*(SORT(.init_array.*)))
+    KEEP (*(.init_array))
+    PROVIDE (__init_array_end = .);
+    PROVIDE (__fini_array_start = .);
+    KEEP (*(.fini_array))
+    KEEP (*(SORT(.fini_array.*)))
+    PROVIDE (__fini_array_end = .);
+
     PROVIDE(__rodata_end = .);
     PROVIDE(__rodataend = .);
   } > rom
@@ -107,18 +126,26 @@ SECTIONS
     . = ALIGN(2);
     PROVIDE(__data_start = .);
     PROVIDE(__datastart = .);
-    KEEP (*(.gnu.linkonce.d.*personality*));
-    SORT(CONSTRUCTORS);
-    *(.data1);
-    *(.got.plt) *(.got);
-    . = ALIGN(2);
-    *(.sdata .sdata.* .gnu.linkonce.s.* D_2 D_1);
-    KEEP (*(.jcr));
-    *(.dynamic);
 
-    *(.data .data.* .gnu.linkonce.d.*);
-    *(.near.data .near.data.*);
+    *(.lower.data.* .lower.data)
+    *(.data .data.* .gnu.linkonce.d.*)
+    *(.either.data.* .either.data)
+
+    KEEP (*(.jcr))
+    *(.data.rel.ro.local) *(.data.rel.ro*)
+    *(.dynamic)
+
+    KEEP (*(.gnu.linkonce.d.*personality*))
+    SORT(CONSTRUCTORS)
+    *(.data1)
+    *(.got.plt) *(.got)
+
     . = ALIGN(2);
+    *(.sdata .sdata.* .gnu.linkonce.s.* D_2 D_1)
+
+    . = ALIGN(2);
+    _edata = .;
+    PROVIDE(edata = .);
     PROVIDE(__data_end = .);
     PROVIDE(__dataend = .);
   } > ram AT > rom
@@ -130,12 +157,16 @@ SECTIONS
     . = ALIGN(2);
     PROVIDE(__bss_start = .);
     PROVIDE(__bssstart = .);
+
+    *(.lower.bss.* .lower.bss)
     *(.dynbss);
     *(.sbss .sbss.*);
     *(.bss .bss.* .gnu.linkonce.b.*);
+    *(.either.bss.* .either.bss)
     . = ALIGN(2);
     *(COMMON);
     . = ALIGN(2);
+
     PROVIDE(__bss_end = .);
     PROVIDE(__bssend = .);
   } > ram
