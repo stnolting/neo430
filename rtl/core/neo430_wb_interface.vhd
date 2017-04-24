@@ -34,7 +34,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               14.02.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               24.04.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -156,7 +156,7 @@ begin
       if (pending = '0') or (enable = '0') then
         wb_stb_o <= '0';
         pending  <= '0';
-        if (wr_en = '1') and ((addr_i = wb32_adr_lo_r_addr_c) or (addr_i = wb32_adr_lo_w_addr_c)) then
+        if (wr_en = '1') and (enable = '1') ((addr_i = wb32_adr_lo_r_addr_c) or (addr_i = wb32_adr_lo_w_addr_c)) then
           wb_stb_o <= '1';
           pending  <= '1';
           terr_ff  <= '0';
