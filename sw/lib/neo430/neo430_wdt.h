@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               22.04.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               24.04.2017  #
 // #################################################################################################
 
 #ifndef neo430_wdt_h
@@ -62,7 +62,7 @@ void wdt_reset(void) {
 
 /* ------------------------------------------------------------
  * INFO Perform a hardware reset by activating the WDT and
- * writing performing an invalid access (wrong password)
+ * performing an invalid access (wrong password)
  * ------------------------------------------------------------ */
 void wdt_force_hw_reset(void) {
 
