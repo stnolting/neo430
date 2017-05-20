@@ -21,7 +21,7 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 # ********************************************************************************************* #
-#  Stephan Nolting, Hannover, Germany                                               08.02.2017  #
+#  Stephan Nolting, Hannover, Germany                                               20.05.2017  #
 #################################################################################################
 
 
@@ -56,7 +56,7 @@ SIZE      = $(BIN_PATH)/msp430-elf-size
 IMAGE_GEN = $(TOOL_PATH)/image_gen/image_gen
 
 # Remove -g to exclude debugging information
-CC_OPTS  = -nostartfiles -pipe -fwhole-program -fdata-sections -ffunction-sections -Xlinker --gc-sections -Wl,-static -s -Wall
+CC_OPTS  = -nostartfiles -pipe -fwhole-program -fdata-sections -ffunction-sections -Xlinker --gc-sections -Wl,-static -Wall
 CC_OPTS += -lm -Os -mmcu=msp430f133 -T boot_linker_script.x -minrt -Xassembler --mY -mhwmult=none
 
 #-------------------------------------------------------------------------------

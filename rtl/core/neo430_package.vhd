@@ -597,8 +597,8 @@ package body neo430_package is
     variable output_v : std_ulogic_vector(input'range);
   begin
     output_v(input'length-1) := input(input'length-1); -- keep MSB
-    for i in input'length-2 to 0 loop
-      output_v(i) := input(i+1) xor input(i);
+    for i in input'length-2 downto 0 loop
+      output_v(i) := input(i) xor input(i+1);
     end loop; -- i
     return output_v;
   end function bin_to_gray;

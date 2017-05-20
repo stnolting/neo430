@@ -21,7 +21,7 @@
 @REM # You should have received a copy of the GNU Lesser General Public License along with this      #
 @REM # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 @REM # ********************************************************************************************* #
-@REM #  Stephan Nolting, Hannover, Germany                                               08.02.2017  #
+@REM #  Stephan Nolting, Hannover, Germany                                               20.05.2017  #
 @REM #################################################################################################
 
 
@@ -42,7 +42,7 @@
 @echo NEO430 BOOTLOADER compilation script
 
 @REM Compiler flags
-@set CC_OPTS=-nostartfiles -pipe -fwhole-program -fdata-sections -ffunction-sections -Xlinker --gc-sections -Wl,-static -s -Wall
+@set CC_OPTS=-nostartfiles -pipe -fwhole-program -fdata-sections -ffunction-sections -Xlinker --gc-sections -Wl,-static -Wall
 @set CC_OPTS=%CC_OPTS% -lm -Os -mmcu=msp430f133 -T boot_linker_script.x -minrt -Xassembler --mY -mhwmult=none
 
 

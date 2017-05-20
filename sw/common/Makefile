@@ -21,7 +21,7 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 # ********************************************************************************************* #
-#  Stephan Nolting, Hannover, Germany                                               07.02.2017  #
+#  Stephan Nolting, Hannover, Germany                                               20.05.2017  #
 #################################################################################################
 
 
@@ -94,7 +94,7 @@ endif
 IMAGE_GEN = $(TOOL_PATH)/image_gen/image_gen
 
 # Compiler flags
-CC_OPTS = -pipe -nostartfiles -fwhole-program -fdata-sections -ffunction-sections -Xlinker --gc-sections -Wl,-static -s -Wall
+CC_OPTS = -pipe -nostartfiles -fwhole-program -fdata-sections -ffunction-sections -Xlinker --gc-sections -Wl,-static -Wall
 ifeq ($(USE_TIMSP430_GCC),true)
   CC_OPTS += -minrt -Xassembler --mY -mhwmult=none
 endif
