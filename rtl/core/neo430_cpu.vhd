@@ -97,9 +97,9 @@ begin
   -- Register File ------------------------------------------------------------
   -- -----------------------------------------------------------------------------
   neo430_reg_file_inst: neo430_reg_file
-  generic (
+  generic map (
     BOOTLD_USE => BOOTLD_USE  -- implement and use bootloader?
-  );
+  )
   port map (
     -- global control --
     clk_i      => clk_i,      -- global clock, rising edge
