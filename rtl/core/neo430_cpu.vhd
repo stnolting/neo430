@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               22.04.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               01.06.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -97,6 +97,9 @@ begin
   -- Register File ------------------------------------------------------------
   -- -----------------------------------------------------------------------------
   neo430_reg_file_inst: neo430_reg_file
+  generic (
+    BOOTLD_USE => BOOTLD_USE  -- implement and use bootloader?
+  );
   port map (
     -- global control --
     clk_i      => clk_i,      -- global clock, rising edge
