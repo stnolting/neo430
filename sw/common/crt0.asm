@@ -19,7 +19,7 @@
 ; # You should have received a copy of the GNU Lesser General Public License along with this      #
 ; # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 ; # ********************************************************************************************* #
-; #  Stephan Nolting, Hannover, Germany                                               27.11.2016  #
+; #  Stephan Nolting, Hannover, Germany                                               08.06.2017  #
 ; #################################################################################################
 
   .file	"crt0.asm"
@@ -39,7 +39,7 @@ __crt0_begin:
 ; -----------------------------------------------------------
 ; Minimal required hardware setup
 ; -----------------------------------------------------------
-    clr  r2               ; clear status register & disable interrupts
+    mov  #0, r2           ; clear status register & disable interrupts
     add  r8, r1           ; r1 = stack pointer = end of RAM
     mov  #0x4700, &0xFFD0 ; deactivate watchdog
 
@@ -91,25 +91,9 @@ __crt0_cpy_data_end:
 
 
 ; -----------------------------------------------------------
-; Clear all CPU data registers
-; -----------------------------------------------------------
-    clr  r4
-    clr  r5
-    clr  r6
-    clr  r7
-    clr  r8
-    clr  r9
-    clr  r10
-    clr  r11
-    clr  r12 ; set argc = 0
-    clr  r13
-    clr  r14
-    clr  r15
-
-
-; -----------------------------------------------------------
 ; This is where the actual application is started
 ; -----------------------------------------------------------
+    mov   #0, r12 ; set argc = 0
     call  #main
 
 
@@ -118,8 +102,8 @@ __crt0_cpy_data_end:
 ; -----------------------------------------------------------
 __crt0_this_is_the_end:
     mov  #0x4700, &0xFFD0 ; deactivate watchdog
-    mov  #0, r2 ; deativate IRQ
-    mov  #16, r2 ; set CPU to sleep mode
+    mov  #0, r2           ; deativate IRQ
+    mov  #16, r2          ; set CPU to sleep mode
     nop
 
 .Lfe0:
