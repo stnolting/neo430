@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               22.04.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               07.06.2017  #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -126,9 +126,10 @@
 
 
 /* --- GPIO --- */
-#define GPIO_IN    (*(REG16 0xFFB0)) // r/-: parallel input
-#define GPIO_OUT   (*(REG16 0xFFB2)) // r/w: parallel output
-#define GPIO_CTRL  (*(REG16 0xFFB4)) // -/w: control register
+#define GPIO_IN      (*(REG16 0xFFB0)) // r/-: parallel input
+#define GPIO_OUT     (*(REG16 0xFFB2)) // r/w: parallel output
+#define GPIO_CTRL    (*(REG16 0xFFB4)) // -/w: control register
+#define GPIO_IRQMASK (*(REG16 0xFFB6)) // -/w: irq mask register
 
 // bits 1:0 of GPIO CTRL reg: Trigger
 // 00: low level

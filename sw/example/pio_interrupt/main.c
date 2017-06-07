@@ -22,7 +22,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               21.02.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               07.06.2017  #
 // #################################################################################################
 
 
@@ -37,9 +37,6 @@
 void __attribute__((__interrupt__)) gpio_irq_handler(void);
 void __attribute__((__interrupt__)) timer_irq_handler(void);
 void delay(uint16_t t);
-
-// Global varibles
-volatile uint16_t old_gpio; // volatile since it is also accessed in IRQ handler
 
 
 /* ------------------------------------------------------------
@@ -68,11 +65,12 @@ int main(void) {
   GPIO_OUT = 0;
 
   // set address of IRQ handler
-  IRQVEC_GPIO = (uint16_t)(&gpio_irq_handler);
+  IRQVEC_GPIO  = (uint16_t)(&gpio_irq_handler);
   IRQVEC_TIMER = (uint16_t)(&timer_irq_handler);
 
   // configure GPIO module
-  GPIO_CTRL = (1<<2) | (3<<0); // enable IRQs and trigger on rising edge
+  GPIO_CTRL    = (1<<2) | (3<<0); // enable IRQs and trigger on rising edge
+  GPIO_IRQMASK = 0xFFFF; // use all input pins as trigger
 
   // set timer period:
   // LED cnt update frequency = 5Hz
@@ -106,15 +104,11 @@ int main(void) {
  * ------------------------------------------------------------ */
 void __attribute__((__interrupt__)) gpio_irq_handler(void) {
 
-  // sample input before it changes again; we cannot ensure to actually get
-  // the very state of the input register, that caused the IRQ
-  uint16_t current_state = GPIO_IN;
+  // we cannot ensure to actually get the specific state of
+  // the input register, which caused the IRQ
 
-  uart_br_print("Old GPIO input: 0x");
-  uart_print_hex_word(old_gpio);
-
-  uart_br_print("; Current GPIO input: 0x");
-  uart_print_hex_word(current_state);
+  uart_br_print("GPIO pin.change interrupt! Current input state: 0x");
+  uart_print_hex_word(GPIO_IN);
   uart_br_print("\n");
 }
 

@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               21.02.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               07.06.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -64,6 +64,7 @@ architecture neo430_gpio_rtl of neo430_gpio is
   signal irq_en    : std_ulogic;
   signal trigger   : std_ulogic_vector(01 downto 0);
   signal dout, din : std_ulogic_vector(15 downto 0);
+  signal irq_mask  : std_ulogic_vector(15 downto 0);
 
   -- misc --
   signal irq_raw, sync_in, in_buf : std_ulogic_vector(15 downto 0);
@@ -89,6 +90,8 @@ begin
           when gpio_ctrl_addr_c =>
             trigger <= data_i(1 downto 0);
             irq_en  <= data_i(2);
+          when gpio_irqmask_addr_c =>
+            irq_mask <= data_i;
           when others =>
             NULL;
         end case;
@@ -117,11 +120,19 @@ begin
     end case;
   end process irq_trigger;
 
-  -- IRQ --
-  irq_o <= irq_en when (irq_raw /= x"0000") else '0';
+  -- CPU interrupt request --
+  irq_output_reg: process(clk_i)
+  begin
+    if rising_edge(clk_i) then
+      irq_o <= '0';
+      if ((irq_raw and irq_mask) /= x"0000") and (irq_en = '1') then
+        irq_o <= '1';
+      end if;
+    end if;
+  end process irq_output_reg;
 
 
-  -- Read access and IN sync --------------------------------------------------
+  -- Read access --------------------------------------------------------------
   -- -----------------------------------------------------------------------------
   rd_access: process(clk_i)
   begin
@@ -135,7 +146,7 @@ begin
       if (rden_i = '1') and (acc_en = '1') then
         if (addr = gpio_in_addr_c) then
           data_o <= din;
-        else
+        else -- gpio_out_addr_c
           data_o <= dout;
         end if;
       end if;
