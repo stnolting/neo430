@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               14.02.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               15.06.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -76,7 +76,9 @@ architecture neo430_timer_rtl of neo430_timer is
   signal prsc_tick, prsc_sel, prsc_sel_ff : std_ulogic;
 
   -- timer control --
-  signal match : std_ulogic; -- thres = tcnt
+  signal match       : std_ulogic; -- thres = tcnt
+  signal irq_fire    : std_ulogic;
+  signal irq_fire_ff : std_ulogic;
 
 begin
 
@@ -92,6 +94,8 @@ begin
   wr_access: process(clk_i)
   begin
     if rising_edge(clk_i) then
+      -- edge detector --
+      irq_fire_ff <= irq_fire;
       -- tick generator --
       prsc_sel_ff <= prsc_sel;
       -- timer reg --
@@ -133,7 +137,10 @@ begin
   match <= '1' when (tcnt = thres) else '0';
 
   -- interrupt line --
-  irq_o <= match and tctrl(tctrl_en_bit_c) and tctrl(tctrl_irq_en_bit_c);
+  irq_fire <= match and tctrl(tctrl_en_bit_c) and tctrl(tctrl_irq_en_bit_c);
+
+  -- edge detector --
+  irq_o <= irq_fire and (not irq_fire_ff);
 
 
   -- Read access --------------------------------------------------------------
