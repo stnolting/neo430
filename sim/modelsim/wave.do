@@ -11,6 +11,7 @@ add wave -noupdate /neo430_tb/neo430_top_inst/ext_rst
 add wave -noupdate /neo430_tb/neo430_top_inst/sys_rst
 
 add wave -noupdate -divider CPUControl
+add wave -noupdate /neo430_tb/neo430_top_inst/neo430_cpu_inst/neo430_control_inst/ir
 add wave -noupdate /neo430_tb/neo430_top_inst/neo430_cpu_inst/neo430_control_inst/irq_i
 add wave -noupdate /neo430_tb/neo430_top_inst/neo430_cpu_inst/neo430_control_inst/irq_buf
 add wave -noupdate /neo430_tb/neo430_top_inst/neo430_cpu_inst/neo430_control_inst/irq_ack

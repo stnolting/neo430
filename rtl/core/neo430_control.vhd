@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               22.04.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               16.06.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -55,14 +55,14 @@ end neo430_control;
 architecture neo430_control_rtl of neo430_control is
 
   -- instruction register --
-  signal ir_ff   : std_ulogic_vector(15 downto 0);
+  signal ir   : std_ulogic_vector(15 downto 0);
   signal ir_wren : std_ulogic;
 
   -- branch system --
   signal branch_taken : std_ulogic;
 
   -- state machine --
-  type state_t is (RESET, IFETCH_0, IFETCH_1, IFETCH_2, DECODE,
+  type state_t is (RESET, IFETCH_0, IFETCH_1, DECODE, BRANCH,
     TRANS_0, TRANS_1, TRANS_3, TRANS_4, TRANS_6, TRANS_7, TRANS_8, TRANS_9,
     PUSHCALL_0, PUSHCALL_1, PUSHCALL_2,
     RETI_0, RETI_1, RETI_2, RETI_3, RETI_4,
@@ -84,9 +84,9 @@ begin
 
   -- Branch Condition Check ---------------------------------------------------
   -- -----------------------------------------------------------------------------
-  cond_check: process(ir_ff, sreg_i)
+  cond_check: process(ir, sreg_i)
   begin
-    case ir_ff(12 downto 10) is -- condition
+    case ir(12 downto 10) is -- condition
       when cond_ne_c => branch_taken <= not sreg_i(sreg_z_c); -- JNE/JNZ
       when cond_eq_c => branch_taken <= sreg_i(sreg_z_c); -- JEQ/JZ
       when cond_lo_c => branch_taken <= not sreg_i(sreg_c_c); -- JNC/JLO
@@ -100,7 +100,7 @@ begin
   end process cond_check;
 
   -- branch offset (sign-extended) --
-  imm_o <= ir_ff(9) & ir_ff(9) & ir_ff(9) & ir_ff(9) & ir_ff(9) & ir_ff(9 downto 0) & '0';
+  imm_o <= ir(9) & ir(9) & ir(9) & ir(9) & ir(9) & ir(9 downto 0) & '0';
 
 
   -- Arbiter State Machine Sync -----------------------------------------------
@@ -125,7 +125,7 @@ begin
       am        <= am_nxt;
       sam       <= sam_nxt;
       if (ir_wren = '1') then
-        ir_ff <= instr_i; -- instruction register
+        ir <= instr_i; -- instruction register
       end if;
     end if;
   end process arbiter_sync1;
@@ -136,7 +136,7 @@ begin
 
   -- Arbiter State Machine Comb -----------------------------------------------
   -- -----------------------------------------------------------------------------
-  arbiter_comb: process(state, ir_ff, ctrl, branch_taken, src, am, sam, mem_rd_ff, irq_start, sreg_i)
+  arbiter_comb: process(state, instr_i, ir, ctrl, branch_taken, src, am, sam, mem_rd_ff, irq_start, sreg_i)
     variable spec_cmd_v, valid_wb_v : std_ulogic;
   begin
     -- arbiter defaults --
@@ -159,7 +159,7 @@ begin
 
     -- special single ALU operation? --
     spec_cmd_v := '0';
-    if (ir_ff(15 downto 9) = "0001001") then -- CALL/PUSH/RETI
+    if (ir(15 downto 9) = "0001001") then -- CALL/PUSH/RETI
       spec_cmd_v := '1';
     end if;
 
@@ -202,41 +202,33 @@ begin
 
       when IFETCH_1 => -- wait for memory
       -- ------------------------------------------------------------
-        state_nxt <= IFETCH_2;
-
-      when IFETCH_2 => -- IR update
-      -- ------------------------------------------------------------
-        ir_wren   <= '1'; -- update instruction register
         state_nxt <= DECODE;
 
 
-      when DECODE => -- decode instruction
+      when DECODE => -- decode applied instruction and store it to IR
       -- ------------------------------------------------------------
-        ctrl_nxt(ctrl_alu_bw_c) <= ir_ff(6); -- byte/word mode
-        sam_nxt <= ir_ff(5 downto 4);
-        if (ir_ff(15 downto 14) = "00") then -- branch or format II instruction
-          if (ir_ff(13) = '1') then -- BRANCH INSTRUCTION
+        ir_wren <= '1'; -- update instruction register
+        ctrl_nxt(ctrl_alu_bw_c) <= instr_i(6); -- byte/word mode
+        sam_nxt <= instr_i(5 downto 4);
+        if (instr_i(15 downto 14) = "00") then -- branch or format II instruction
+          if (instr_i(13) = '1') then -- BRANCH INSTRUCTION
           -- ------------------------------------------------------------
-            ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_pc_c; -- source/destination: PC
-            ctrl_nxt(ctrl_adr_imm_en_c) <= '1'; -- add immediate
-            ctrl_nxt(ctrl_rf_in_sel_c)  <= '1'; -- select addr feedback
-            ctrl_nxt(ctrl_rf_wb_en_c)   <= branch_taken; -- valid RF write back if branch taken
-            state_nxt <= IFETCH_0;
-          elsif (ir_ff(12) = '1') then -- FORMAT II INSTRUCTION
+            state_nxt <= BRANCH;
+          elsif (instr_i(12) = '1') then -- FORMAT II INSTRUCTION
             -- ------------------------------------------------------------
-            am_nxt(0) <= ir_ff(4) or ir_ff(5); -- dst addressing mode
+            am_nxt(0) <= instr_i(4) or instr_i(5); -- dst addressing mode
             am_nxt(3) <= '0'; -- class II
-            if (ir_ff(3 downto 0) = reg_cg_c) or ((ir_ff(3 downto 0) = reg_sr_c) and (ir_ff(5) = '1')) then -- source special?
+            if (instr_i(3 downto 0) = reg_cg_c) or ((instr_i(3 downto 0) = reg_sr_c) and (instr_i(5) = '1')) then -- source special?
               am_nxt(2 downto 1) <= "00"; -- source addressing mode
             else
-              am_nxt(2 downto 1) <= ir_ff(5 downto 4); -- source addressing mode
+              am_nxt(2 downto 1) <= instr_i(5 downto 4); -- source addressing mode
             end if;
-            src_nxt <= ir_ff(3 downto 0); -- src is also dst
-            if (spec_cmd_v = '0') then -- not PUSH/CALL/RETI?
-              ctrl_nxt(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) <= ir_ff(10 downto 7); -- ALU function
+            src_nxt <= instr_i(3 downto 0); -- src is also dst
+            if (instr_i(15 downto 9) /= "0001001") then -- not PUSH/CALL/RETI?
+              ctrl_nxt(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) <= instr_i(10 downto 7); -- ALU function
             end if;
-            ctrl_nxt(ctrl_rf_ad_c) <= ir_ff(5) or ir_ff(4);
-            case ir_ff(9 downto 7) is
+            ctrl_nxt(ctrl_rf_ad_c) <= instr_i(5) or instr_i(4);
+            case instr_i(9 downto 7) is
               when "100"  => state_nxt <= TRANS_0; -- PUSH (via single ALU OP)
               when "101"  => state_nxt <= TRANS_0; -- CALL (via single ALU OP)
               when "110"  => state_nxt <= RETI_0; -- RETI
@@ -250,17 +242,26 @@ begin
         else -- FORMAT I INSTRUCTION
         -- ------------------------------------------------------------
           am_nxt(3) <= '1'; -- class I
-          if (ir_ff(11 downto 8) = reg_cg_c) or ((ir_ff(11 downto 8) = reg_sr_c) and (ir_ff(5) = '1')) then -- source special?
+          if (instr_i(11 downto 8) = reg_cg_c) or ((instr_i(11 downto 8) = reg_sr_c) and (instr_i(5) = '1')) then -- source special?
             am_nxt(2 downto 1) <= "00"; -- source addressing mode
           else
-            am_nxt(2 downto 1) <= ir_ff(5 downto 4); -- source addressing mode
+            am_nxt(2 downto 1) <= instr_i(5 downto 4); -- source addressing mode
           end if;
-          am_nxt(0) <= ir_ff(7); -- dst addressing mode
-          ctrl_nxt(ctrl_rf_ad_c) <= ir_ff(7);
-          ctrl_nxt(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) <= ir_ff(15 downto 12); -- ALU function
-          src_nxt   <= ir_ff(11 downto 8);
+          am_nxt(0) <= instr_i(7); -- dst addressing mode
+          ctrl_nxt(ctrl_rf_ad_c) <= instr_i(7);
+          ctrl_nxt(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) <= instr_i(15 downto 12); -- ALU function
+          src_nxt   <= instr_i(11 downto 8);
           state_nxt <= TRANS_0;
         end if;
+
+
+      when BRANCH => -- branch operation
+      -- ------------------------------------------------------------
+        ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_pc_c; -- source/destination: PC
+        ctrl_nxt(ctrl_adr_imm_en_c) <= '1'; -- add immediate
+        ctrl_nxt(ctrl_rf_in_sel_c)  <= '1'; -- select addr feedback
+        ctrl_nxt(ctrl_rf_wb_en_c)   <= branch_taken; -- valid RF write back if branch taken
+        state_nxt <= IFETCH_0;
 
 
       when TRANS_0 => -- operand transfer cycle 0
@@ -308,7 +309,7 @@ begin
             ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= src; -- source/destination: reg A
             ctrl_nxt(ctrl_adr_mar_wr_c) <= '1'; -- write to MAR
             mem_rd <= '1'; -- Memory read
-            if (ir_ff(6) = '0') or (src = reg_pc_c) then -- word mode (force if accessing PC)
+            if (ir(6) = '0') or (src = reg_pc_c) then -- word mode (force if accessing PC)
               ctrl_nxt(ctrl_adr_off1_c downto ctrl_adr_off0_c) <= "10"; -- add +2
             else -- byte mode
               ctrl_nxt(ctrl_adr_off1_c downto ctrl_adr_off0_c) <= "01"; -- add +1
@@ -326,7 +327,7 @@ begin
             -- "1000" = CLASS II, SRC: register direct, DST: register direct
             -- "1001" = CLASS II, SRC: register direct, DST: indexed
             ctrl_nxt(ctrl_rf_as1_c downto ctrl_rf_as0_c)   <= "00"; -- DST address mode = REG
-            ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= ir_ff(3 downto 0); -- source: reg B
+            ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= ir(3 downto 0); -- source: reg B
             ctrl_nxt(ctrl_alu_opb_wr_c) <= '1'; -- write OpB
             if (spec_cmd_v = '1') then -- push or call
               state_nxt <= PUSHCALL_0;
@@ -341,7 +342,7 @@ begin
             -- "011-" = CLASS  I, SRC/DST: indirect auto inc,
             -- "1110" = CLASS II, SRC: indirect auto inc, DST: register direct
             ctrl_nxt(ctrl_rf_as1_c downto ctrl_rf_as0_c)   <= "00"; -- DST address mode = REG
-            ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= ir_ff(3 downto 0); -- source: reg B
+            ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= ir(3 downto 0); -- source: reg B
             ctrl_nxt(ctrl_alu_opb_wr_c) <= '1'; -- write OpB
             state_nxt <= TRANS_3;
           when others =>
@@ -406,8 +407,8 @@ begin
             -- "1101" = CLASS II, SRC: indirect, DST: indexed
             -- "1111" = CLASS II, SRC: indirect auto inc, DST: indexed
             ctrl_nxt(ctrl_rf_as1_c) <= '0'; -- DST address mode = REG or INDEXED
-            ctrl_nxt(ctrl_rf_as0_c) <= ir_ff(7); -- DST address mode = REG or INDEXED
-            ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= ir_ff(3 downto 0); -- source: reg B
+            ctrl_nxt(ctrl_rf_as0_c) <= ir(7); -- DST address mode = REG or INDEXED
+            ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= ir(3 downto 0); -- source: reg B
             ctrl_nxt(ctrl_adr_off1_c downto ctrl_adr_off0_c) <= "00"; -- add memory data in
             ctrl_nxt(ctrl_adr_mar_sel_c) <= '1'; -- use result from adder
             ctrl_nxt(ctrl_adr_mar_wr_c) <= '1'; -- write to MAR
@@ -457,7 +458,7 @@ begin
 
       when TRANS_8 => -- operand transfer cycle 8
       -- ------------------------------------------------------------
-        ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= ir_ff(3 downto 0); -- destination
+        ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= ir(3 downto 0); -- destination
         if (ctrl(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) = alu_dadd_c) and (DADD_USE = true) then
           state_nxt <= TRANS_9;
         else
@@ -472,7 +473,7 @@ begin
 
       when TRANS_9 => -- operand transfer cycle 9
       -- ------------------------------------------------------------
-        ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= ir_ff(3 downto 0); -- destination
+        ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= ir(3 downto 0); -- destination
         ctrl_nxt(ctrl_rf_fup_c) <= not spec_cmd_v; -- update ALU status flags
         if (am(0) = '0') then -- DST: register direct
           ctrl_nxt(ctrl_rf_wb_en_c) <= valid_wb_v; -- valid RF write back (not for CMP/BIT!)
@@ -490,7 +491,7 @@ begin
         ctrl_nxt(ctrl_adr_mar_sel_c) <= '1'; -- use result from adder
         ctrl_nxt(ctrl_rf_in_sel_c) <= '1'; -- select addr feedback
         ctrl_nxt(ctrl_rf_wb_en_c) <= '1'; -- valid RF write back
-        if (ir_ff(7) = '1') then -- CALL
+        if (ir(7) = '1') then -- CALL
           state_nxt <= PUSHCALL_1;
         else -- PUSH
           state_nxt <= PUSHCALL_2;
