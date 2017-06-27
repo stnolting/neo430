@@ -29,7 +29,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               21.02.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               24.06.2017  #
 // #################################################################################################
 
 // Libraries
@@ -132,7 +132,7 @@ int main(void) {
   // ****************************************************************
   // Show bootloader intro and system information
   // ****************************************************************
-  uart_br_print("\n\nNEO430 Bootloader V20170221 by Stephan Nolting\n"
+  uart_br_print("\n\nNEO430 Bootloader V20170624 by Stephan Nolting\n"
                 "HWV: 0x");
   uart_print_hex_word(HW_VERSION);
   uart_br_print("\nROM: 0x");
@@ -149,6 +149,7 @@ int main(void) {
     // timeout? start auto boot sequence
     if (TIMEOUT_CNT == 4*AUTOBOOT_TIMEOUT) { // in 0.25 seconds
       get_image(EEPROM_IMAGE); // try loading from EEPROM
+      uart_br_print("\n");
       start_app(); // start app if loading was successful
     }
     // key pressed?
