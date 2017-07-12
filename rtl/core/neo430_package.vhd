@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               20.06.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               12.07.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -90,7 +90,7 @@ package neo430_package is
 
   -- IO: GPIO  --
   constant gpio_base_c : std_ulogic_vector(15 downto 0) := x"FFB0";
-  constant gpio_size_c : natural := 6; -- bytes
+  constant gpio_size_c : natural := 8; -- bytes
 
   constant gpio_in_addr_c      : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0000");
   constant gpio_out_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0002");
