@@ -2,7 +2,7 @@
 // #  < Wishbone bus explorer >                                                                    #
 // # ********************************************************************************************* #
 // # Manual access to the registers of modules, which are connected to Wishbone bus. This is also  #
-// # a cool example to illustrate the construction of a console-like user interface.               #
+// # a neat example to illustrate the construction of a console-like user interface.               #
 // # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 // # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -22,7 +22,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               19.02.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               16.07.2017  #
 // #################################################################################################
 
 
@@ -40,7 +40,6 @@ void read_wb_address(void);
 void write_wb_address(void);
 void dump_wb(void);
 uint32_t hex_str_to_uint32(char *buffer);
-void wishbone_dconfig(uint8_t bytes);
 
 // Configuration
 #define MAX_CMD_LENGTH 16
@@ -72,13 +71,14 @@ int main(void) {
 
   // default config
   wb_config = 1;
-  WB32_CT = (1<<WB32_CT_EN) | (1<<WB32_CT_TO_EN) |
-            (0<<WB32_CT_WBSEL3) | (0<<WB32_CT_WBSEL2) |
-            (0<<WB32_CT_WBSEL1) | (1<<WB32_CT_WBSEL0);
 
   uart_br_print("Configure the actual data transfer size (1, 2 or 4 bytes)\n"
                 "using 'setup'. Addresses are always 32-bit wide.\n"
-                "Type 'help' to see the help menu.\n");
+                "Type 'help' to see the help menu.\n\n"
+
+                "Note: Do not access unused addreses! This program uses\n"
+                "blocking accesses, so performing transactions to unimplemented\n"
+                "addresses will permanently stall the program!\n");
 
   // Main menu
   for (;;) {
@@ -180,7 +180,6 @@ void setup_wb(void) {
     return;
   }
 
-  wishbone_dconfig(wb_config);
   uart_br_print("\nSetup done.\n");
 }
 
@@ -200,20 +199,27 @@ void read_wb_address(void) {
   uart_print_hex_dword(address);
   uart_br_print("]... ");
 
-  uint32_t r_data;
-  if (wishbone_read32(address, &r_data)) { // always read a 32-bit word
-    uart_br_print("ERROR! Device not responding!\n");
-  }
-  else {
-    uart_br_print("Read data: 0x");
-    if (wb_config == 1)
-      uart_print_hex_byte((uint8_t)r_data);
-    if (wb_config == 2)
-      uart_print_hex_word((uint16_t)r_data);
-    if (wb_config == 4)
-      uart_print_hex_dword(r_data);
-    uart_br_print("\n");
-  }
+  uint8_t r_data8 = 0;
+  uint16_t r_data16 = 0;
+  uint32_t r_data32 = 0;
+
+  // perform access
+  if (wb_config == 1)
+    r_data8 = wishbone_read8(address);
+  if (wb_config == 2)
+    r_data16 = wishbone_read16(address);
+  if (wb_config == 4)
+    r_data32 = wishbone_read32(address);
+
+  // print result
+  uart_br_print("Read data: 0x");
+  if (wb_config == 1)
+    uart_print_hex_byte(r_data8);
+  if (wb_config == 2)
+    uart_print_hex_word(r_data16);
+  if (wb_config == 4)
+    uart_print_hex_dword(r_data32);
+  uart_br_print("\n");
 }
 
 
@@ -230,18 +236,27 @@ void write_wb_address(void) {
 
   uart_br_print("\nEnter hexadecimal write data: 0x");
   uart_scan(buffer, wb_config*2+1); // get right number of hex chars for data plus '\0'
-  uint32_t w_data = hex_str_to_uint32(buffer);
+  uint32_t data = hex_str_to_uint32(buffer);
 
   uart_br_print("\nWriting '0x");
-  uart_print_hex_dword(w_data);
+  uart_print_hex_dword(data);
   uart_br_print("' to [0x");
   uart_print_hex_dword(address);
   uart_br_print("]... ");
 
-  if (wishbone_write32(address, w_data))
-    uart_br_print("ERROR! Device not responding!\n");
-  else
-    uart_br_print("Done.\n"); 
+  uint8_t w_data8 = (uint8_t)data;
+  uint16_t w_data16 = (uint16_t)data;
+  uint32_t w_data32 = data;
+
+  // perform access
+  if (wb_config == 1)
+    wishbone_write8(address, w_data8);
+  if (wb_config == 2)
+    wishbone_write16(address, w_data16);
+  if (wb_config == 4)
+    wishbone_write32(address, w_data32);
+
+  uart_br_print("Done.\n"); 
 }
 
 
@@ -251,7 +266,6 @@ void write_wb_address(void) {
 void dump_wb(void) {
 
   char buffer[9];
-  uint32_t r_data = 0;
   uint16_t i = 0;
 
   uart_br_print("Enter hexadecimal start address: 0x");
@@ -262,6 +276,10 @@ void dump_wb(void) {
                 "You can abort dumping by pressing any key.\n");
   while(!uart_char_received());
 
+  uint8_t r_data8 = 0;
+  uint16_t r_data16 = 0;
+  uint32_t r_data32 = 0;
+
   while(1) {
     uart_br_print("0x");
     uart_print_hex_dword(address);
@@ -269,21 +287,25 @@ void dump_wb(void) {
 
     uint16_t border = 16 / wb_config;
     for (i=0; i<border; i++) {
-      if (wishbone_read32(address, &r_data)) { // always read a 32-bit word
-        uart_br_print("ERROR! Device not responding!\n");
-        return;
-      }
+
+      // perform access
+      if (wb_config == 1)
+        r_data8 = wishbone_read8(address);
+      if (wb_config == 2)
+        r_data16 = wishbone_read16(address);
+      if (wb_config == 4)
+        r_data32 = wishbone_read32(address);
 
       if (wb_config == 1) {
-        uart_print_hex_byte((uint8_t)r_data);
+        uart_print_hex_byte(r_data8);
         address += 1;
       }
       else if (wb_config == 2) {
-        uart_print_hex_word((uint16_t)r_data);
+        uart_print_hex_word(r_data16);
         address += 2;
       }
       else {
-        uart_print_hex_dword(r_data);
+        uart_print_hex_dword(r_data32);
         address += 4;
       }
       uart_putc(' ');
@@ -324,19 +346,4 @@ uint32_t hex_str_to_uint32(char *buffer) {
   }
 
   return res;
-}
-
-
-/* ------------------------------------------------------------
- * INFO Init Wishbone adapter's transfer data width
- * PARAM Data size in bytes (1,2,4)
- * ------------------------------------------------------------ */
-void wishbone_dconfig(uint8_t bytes) {
-
-  if (bytes == 1)
-    WB32_CT = (1<<WB32_CT_EN) | (1<<WB32_CT_TO_EN) | (1<<WB32_CT_WBSEL0);
-  else if (bytes == 2)
-    WB32_CT = (1<<WB32_CT_EN) | (1<<WB32_CT_TO_EN) | (3<<WB32_CT_WBSEL0);
-  else if (bytes == 4)
-    WB32_CT = (1<<WB32_CT_EN) | (1<<WB32_CT_TO_EN) | (15<<WB32_CT_WBSEL0);
 }

@@ -21,7 +21,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               21.02.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               17.07.2017  #
 // #################################################################################################
 
 
@@ -98,29 +98,32 @@ int main(void) {
   // --------------------------------------------
   uint16_t ft = SYS_FEATURES;
   _printf("\n\nSystem features\n");
+  // CFU
+  _printf("- Custom Functions Unit: ");
+  print_state(ft & (1<<SYS_CFU_EN));
   // WB32
-  _printf("- Wishbone adapter:     ");
+  _printf("- Wishbone adapter:      ");
   print_state(ft & (1<<SYS_WB32_EN));
   // WDT
-  _printf("- Watchdog timer:       ");
+  _printf("- Watchdog timer:        ");
   print_state(ft & (1<<SYS_WDT_EN));
   // GPIO
-  _printf("- GPIO unit:            ");
+  _printf("- GPIO unit:             ");
   print_state(ft & (1<<SYS_GPIO_EN));
   // TIMER
-  _printf("- High-precision timer: ");
+  _printf("- High-precision timer:  ");
   print_state(ft & (1<<SYS_TIMER_EN));
   // USART
-  _printf("- USART:                ");
+  _printf("- USART:                 ");
   print_state(ft & (1<<SYS_USART_EN));
   // DADD
-  _printf("- DADD instruction:     ");
+  _printf("- DADD instruction:      ");
   print_state(ft & (1<<SYS_DADD_EN));
   // Bootloader installed
-  _printf("- Internal bootloader:  ");
+  _printf("- Internal bootloader:   ");
   print_state(ft & (1<<SYS_BTLD_EN));
   // is IMEM true ROM?
-  _printf("- IMEM as true ROM:     ");
+  _printf("- IMEM as true ROM:      ");
   print_state(ft & (1<<SYS_IROM_EN));
 
   return 0;

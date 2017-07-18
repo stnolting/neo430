@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               27.06.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               14.07.2017  #
 // #################################################################################################
 
 
@@ -64,8 +64,8 @@ int main(void) {
   clear_universe(1);
 
   _printf("\n\n### Conways's Game of Life ###\n\n");
-  _printf("This program requires a terminal resolution of at least %ux%u charcters.\n", NUM_CELLS_X+2, NUM_CELLS_Y+3);
-  _printf("Press any key to start a random-initialized universe of %ux%u cells.\n", NUM_CELLS_X, NUM_CELLS_Y);
+  _printf("This program requires a terminal resolution of at least %ux%u characters.\n", NUM_CELLS_X+2, NUM_CELLS_Y+3);
+  _printf("Press any key to start a random-initialized torus-style universe of %ux%u cells.\n", NUM_CELLS_X, NUM_CELLS_Y);
   _printf("You can pause/restart the simulation by pressing any key.\n");
 
   // randomize until key pressed

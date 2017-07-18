@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               16.02.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               15.07.2017  #
 // #################################################################################################
 
 #ifndef neo430_usart_h
@@ -114,7 +114,7 @@ uint8_t spi_trans(uint8_t d) {
 void uart_set_baud(uint32_t baudrate){
 
   // raw baud rate prescaler
-  uint32_t clock = ((uint32_t)CLOCKSPEED_HI << 16) | (uint32_t)CLOCKSPEED_LO;
+  uint32_t clock = CLOCKSPEED_32bit;
   uint16_t i = 0; // BAUD rate divisor
   uint8_t p = 0; // prsc = CLK/2
   while (clock >= 2*baudrate) {
