@@ -1,10 +1,6 @@
 // #################################################################################################
 // #  < neo430_wishbone.h - Internal Wishbone interface control functions >                        #
 // # ********************************************************************************************* #
-// # Always uses 32-bit address, just constrain address argument value                             #
-// # when using smaller address bus sizes.                                                         #
-// # Make sure to configure the control register before using this functions.                      #
-// # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 // # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
 // #                                                                                               #
@@ -23,184 +19,307 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               16.02.2017  #
+// #  Thanks to Edward Sherriff!                                                                   #
+// #  Stephan Nolting, Hannover, Germany                                               17.07.2017  #
 // #################################################################################################
 
 #ifndef neo430_wishbone_h
 #define neo430_wishbone_h
 
-// prototypes
-uint8_t wishbone_read32(uint32_t a, uint32_t *d);
-uint8_t wishbone_write32(uint32_t a, uint32_t d);
-uint8_t wishbone_read16(uint32_t a, uint16_t *d);
-uint8_t wishbone_write16(uint32_t a, uint16_t d);
-uint8_t wishbone_read8(uint32_t a, uint8_t *d);
-uint8_t wishbone_write8(uint32_t a, uint8_t d);
+// prototypes blocking functions using classic transfers
+uint32_t wishbone_read32(uint32_t a);
+void wishbone_write32(uint32_t a, uint32_t d);
+uint16_t wishbone_read16(uint32_t a);
+void wishbone_write16(uint32_t a, uint16_t d);
+uint8_t wishbone_read8(uint32_t a);
+void wishbone_write8(uint32_t a, uint8_t d);
 
+// prototypes blocking functions using pipelined transfers
+uint32_t wishbone_read32_pipelined(uint32_t a);
+void wishbone_write32_pipelined(uint32_t a, uint32_t d);
+uint16_t wishbone_read16_pipelined(uint32_t a);
+void wishbone_write16_pipelined(uint32_t a, uint16_t d);
+uint8_t wishbone_read8_pipelined(uint32_t a);
+void wishbone_write8_pipelined(uint32_t a, uint8_t d);
+
+
+// ************************************************************************************************
+// Blocking functions, classic transfer cycles
+// ************************************************************************************************
 
 /* ------------------------------------------------------------
- * INFO Read 32-bit from Wishbone device
- * PARAM a: 32-bit device address
- * PARAM d: pointer to 32-bit read data
- * RETURN 0 if success, 1 if timeout
+ * INFO Read 32-bit from Wishbone device (blocking) via classic cycle
+ * PARAM 32-bit device address
+ * RETURN read data
  * ------------------------------------------------------------ */
-uint8_t wishbone_read32(uint32_t a, uint32_t *d) {
+uint32_t wishbone_read32(uint32_t a) {
 
-  register uint16_t ctrl_reg = 0;
+  // 32-bit transfer, classic cycle
+  WB32_CT = 0xF;
 
-  // device address
-  WB32_HA  = (uint16_t)(a >> 16);
-  WB32_LAR = (uint16_t)(a >>  0); // trigger transfer
+  // device address aligned to 32-bit + transfer trigger
+  WB32_RA_32bit = a & (~3);
 
-  // wait for access to be completed or terminated
-  while(1) {
-    ctrl_reg = WB32_CT;
-    if ((ctrl_reg & (1<<WB32_CT_TIMEOUT)) != 0)
-      return 1; // device not responding
-    if ((ctrl_reg & (1<<WB32_CT_PENDING)) == 0) {
-      *d = (((uint32_t)WB32_HDI) << 16) | (uint32_t)WB32_LDI; // read data
-      return 0; // success!
-    }
-  }
+  // wait for access to be completed - blocking!
+  while((WB32_CT & (1<<WB32_CT_PENDING)) != 0);
+
+  return WB32_D_32bit;
 }
 
 
 /* ------------------------------------------------------------
- * INFO Write 16-bit to Wishbone device
+ * INFO Write 32-bit to Wishbone device (blocking) via classic cycle
  * PARAM a: 32-bit device address
  * PARAM d: 32-bit write data
- * RETURN 0 if success, 1 if timeout
  * ------------------------------------------------------------ */
-uint8_t wishbone_write32(uint32_t a, uint32_t d) {
+void wishbone_write32(uint32_t a, uint32_t d) {
 
-  register uint16_t ctrl_reg = 0;
+  // 32-bit transfer, classic cycle
+  WB32_CT = 0xF;
 
   // write data
-  WB32_HDO = (uint16_t)(d >> 16);
-  WB32_LDO = (uint16_t)(d >>  0);
+  WB32_D_32bit = d;
 
-  // device address
-  WB32_HA  = (uint16_t)(a >> 16);
-  WB32_LAW = (uint16_t)(a >>  0); // trigger transfer
+  // device address aligned to 32-bit + transfer trigger
+  WB32_WA_32bit = a & (~3);
 
-  // wait for access to be completed or terminated
-  while(1) {
-    ctrl_reg = WB32_CT;
-    if ((ctrl_reg & (1<<WB32_CT_TIMEOUT)) != 0)
-      return 1; // device not responding
-    if ((ctrl_reg & (1<<WB32_CT_PENDING)) == 0)
-      return 0; // success!
-  }
+  // wait for access to be completed - blocking!
+  while((WB32_CT & (1<<WB32_CT_PENDING)) != 0);
 }
 
 
 /* ------------------------------------------------------------
- * INFO Read 16-bit from Wishbone device
- * PARAM a: 32-bit device address
- * PARAM d: pointer to 16-bit read data
- * RETURN 0 if success, 1 if timeout
+ * INFO Read 16-bit from Wishbone device (blocking) via classic cycle
+ * PARAM 32-bit device address
+ * RETURN 16-bit read data
  * ------------------------------------------------------------ */
-uint8_t wishbone_read16(uint32_t a, uint16_t *d) {
+uint16_t wishbone_read16(uint32_t a) {
 
-  register uint16_t ctrl_reg = 0;
+  // 16-bit transfer, classic cycle
+  if (a & 2)
+    WB32_CT = 0b1100; // high 16-bit word
+  else
+    WB32_CT = 0b0011; // low 16-bit word
 
-  // device address
-  WB32_HA  = (uint16_t)(a >> 16);
-  WB32_LAR = (uint16_t)(a >>  0); // trigger transfer
+  // device address aligned to 16-bit + transfer trigger
+  WB32_RA_32bit = a & (~1);
 
-  // wait for access to be completed or terminated
-  while(1) {
-    ctrl_reg = WB32_CT;
-    if ((ctrl_reg & (1<<WB32_CT_TIMEOUT)) != 0)
-      return 1; // device not responding
-    if ((ctrl_reg & (1<<WB32_CT_PENDING)) == 0) {
-      *d = WB32_LDI; // read data
-      return 0; // success!
-    }
-  }
+  // wait for access to be completed - blocking!
+  while((WB32_CT & (1<<WB32_CT_PENDING)) != 0);
+
+  if (a & 2)
+    return WB32_HD; // high 16-bit word
+  else
+    return WB32_LD; // low 16-bit word
 }
 
 
 /* ------------------------------------------------------------
- * INFO Write 32-bit to Wishbone device
+ * INFO Write 16-bit to Wishbone device (blocking) via classic cycle
  * PARAM a: 32-bit device address
  * PARAM d: 16-bit write data
- * RETURN 0 if success, 1 if timeout
  * ------------------------------------------------------------ */
-uint8_t wishbone_write16(uint32_t a, uint16_t d) {
+void wishbone_write16(uint32_t a, uint16_t d) {
 
-  register uint16_t ctrl_reg = 0;
-
-  // write data
-  WB32_LDO = d;
-
-  // device address
-  WB32_HA  = (uint16_t)(a >> 16);
-  WB32_LAW = (uint16_t)(a >>  0); // trigger transfer
-
-  // wait for access to be completed or terminated
-  while(1) {
-    ctrl_reg = WB32_CT;
-    if ((ctrl_reg & (1<<WB32_CT_TIMEOUT)) != 0)
-      return 1; // device not responding
-    if ((ctrl_reg & (1<<WB32_CT_PENDING)) == 0)
-      return 0; // success!
+  // 16-bit transfer, classic cycle
+  if (a & 2) {
+    WB32_CT = 0b1100; // high 16-bit word
+    WB32_HD = d;
   }
+  else {
+    WB32_CT = 0b0011; // low 16-bit word
+    WB32_LD = d;
+  }
+
+  // device address aligned to 16-bit + transfer trigger
+  WB32_WA_32bit = a & (~1);
+
+  // wait for access to be completed - blocking!
+  while((WB32_CT & (1<<WB32_CT_PENDING)) != 0);
 }
 
 
 /* ------------------------------------------------------------
- * INFO Read 8-bit from Wishbone device
- * PARAM a: 32-bit device address
- * PARAM d: pointer to 8-bit read data
+ * INFO Read 8-bit from Wishbone device (blocking) via classic cycle
+ * PARAM 32-bit device address
  * RETURN 0 if success, 1 if timeout
  * ------------------------------------------------------------ */
-uint8_t wishbone_read8(uint32_t a, uint8_t *d) {
+uint8_t wishbone_read8(uint32_t a) {
 
-  register uint16_t ctrl_reg = 0;
+  // 8-bit transfer, classic cycle
+  WB32_CT = 1 << (a & 3); // corresponding byte enable
 
-  // device address
-  WB32_HA  = (uint16_t)(a >> 16);
-  WB32_LAR = (uint16_t)(a >>  0); // trigger transfer
+  // device address aligned to 8-bit + transfer trigger
+  WB32_RA_32bit = a;
 
-  // wait for access to be completed or terminated
-  while(1) {
-    ctrl_reg = WB32_CT;
-    if ((ctrl_reg & (1<<WB32_CT_TIMEOUT)) != 0)
-      return 1; // device not responding
-    if ((ctrl_reg & (1<<WB32_CT_PENDING)) == 0) {
-      *d = (uint8_t)WB32_LDI; // read data
-      return 0; // success!
-    }
-  }
+  // wait for access to be completed - blocking!
+  while((WB32_CT & (1<<WB32_CT_PENDING)) != 0);
+
+  // select correct byte to be written
+  volatile uint8_t* in = (uint8_t*)(&WB32_LD + ((uint16_t)a & 3));
+  return *in;
 }
 
 
 /* ------------------------------------------------------------
- * INFO Write 8-bit to Wishbone device
+ * INFO Write 8-bit to Wishbone device (blocking) via classic cycle
  * PARAM a: 32-bit device address
  * PARAM d: 8-bit write data
- * RETURN 0 if success, 1 if timeout
  * ------------------------------------------------------------ */
-uint8_t wishbone_write8(uint32_t a, uint8_t d) {
+void wishbone_write8(uint32_t a, uint8_t d) {
 
-  register uint16_t ctrl_reg = 0;
+  // 8-bit transfer, classic cycle
+  WB32_CT = 1 << (a & 3); // corresponding byte enable
+
+  // select correct byte to be written
+  volatile uint8_t* out = (uint8_t*)(&WB32_LD + ((uint16_t)a & 3));
+  *out = d;
+
+  // device address aligned to 8-bit + transfer trigger
+  WB32_WA_32bit = a;
+
+  // wait for access to be completed - blocking!
+  while((WB32_CT & (1<<WB32_CT_PENDING)) != 0);
+}
+
+
+// ************************************************************************************************
+// Blocking functions, pipelined transfer cycles
+// ************************************************************************************************
+
+/* ------------------------------------------------------------
+ * INFO Read 32-bit from Wishbone device (blocking) via pipelined cycle
+ * PARAM 32-bit device address
+ * RETURN 32-bit read data
+ * ------------------------------------------------------------ */
+uint32_t wishbone_read32_pipelined(uint32_t a) {
+
+  // 32-bit transfer, pipelined cycle
+  WB32_CT = 0x1F;
+
+  // device address aligned to 32-bit + transfer trigger
+  WB32_RA_32bit = a & (~3);
+
+  // wait for access to be completed - blocking!
+  while((WB32_CT & (1<<WB32_CT_PENDING)) != 0);
+
+  return WB32_D_32bit;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Write 32-bit to Wishbone device (blocking) via pipelined cycle
+ * PARAM a: 32-bit device address
+ * PARAM d: 32-bit write data
+ * ------------------------------------------------------------ */
+void wishbone_write32_pipelined(uint32_t a, uint32_t d) {
+
+  // 32-bit transfer, pipelined cycle
+  WB32_CT = 0x1F;
 
   // write data
-  WB32_LDO = (uint16_t)d;
+  WB32_D_32bit = d;
 
-  // device address
-  WB32_HA  = (uint16_t)(a >> 16);
-  WB32_LAW = (uint16_t)(a >>  0); // trigger transfer
+  // device address aligned to 32-bit + transfer trigger
+  WB32_WA_32bit = a & (~3);
 
-  // wait for access to be completed or terminated
-  while(1) {
-    ctrl_reg = WB32_CT;
-    if ((ctrl_reg & (1<<WB32_CT_TIMEOUT)) != 0)
-      return 1; // device not responding
-    if ((ctrl_reg & (1<<WB32_CT_PENDING)) == 0)
-      return 0; // success!
+  // wait for access to be completed - blocking!
+  while((WB32_CT & (1<<WB32_CT_PENDING)) != 0);
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Read 16-bit from Wishbone device (blocking) via pipelined cycle
+ * PARAM 32-bit device address
+ * RETURN 16-bit read data
+ * ------------------------------------------------------------ */
+uint16_t wishbone_read16_pipelined(uint32_t a) {
+
+  // 16-bit transfer, pipelined cycle
+  if (a & 2)
+    WB32_CT = 0b11100; // high 16-bit word
+  else
+    WB32_CT = 0b10011; // low 16-bit word
+
+  // device address aligned to 16-bit + transfer trigger
+  WB32_RA_32bit = a & (~1);
+
+  // wait for access to be completed - blocking!
+  while((WB32_CT & (1<<WB32_CT_PENDING)) != 0);
+
+  if (a & 2)
+    return WB32_HD; // high 16-bit word
+  else
+    return WB32_LD; // low 16-bit word
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Write 16-bit to Wishbone device (blocking) via pipelined cycle
+ * PARAM a: 32-bit device address
+ * PARAM d: 16-bit write data
+ * ------------------------------------------------------------ */
+void wishbone_write16_pipelined(uint32_t a, uint16_t d) {
+
+  // 16-bit transfer, pipelined cycle
+  if (a & 2) {
+    WB32_CT = 0b11100; // high 16-bit word
+    WB32_HD = d;
   }
+  else {
+    WB32_CT = 0b10011; // low 16-bit word
+    WB32_LD = d;
+  }
+
+  // device address aligned to 16-bit + transfer trigger
+  WB32_WA_32bit = a & (~1);
+
+  // wait for access to be completed - blocking!
+  while((WB32_CT & (1<<WB32_CT_PENDING)) != 0);
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Read 8-bit from Wishbone device (blocking) via pipelined cycle
+ * PARAM 32-bit device address
+ * RETURN 8-bit read data
+ * ------------------------------------------------------------ */
+uint8_t wishbone_read8_pipelined(uint32_t a) {
+
+  // 8-bit transfer, pipelined cycle
+  WB32_CT = (1 << (a & 3)) | 0x10; // corresponding byte enable
+
+  // device address aligned to 8-bit + transfer trigger
+  WB32_RA_32bit = a;
+
+  // wait for access to be completed - blocking!
+  while((WB32_CT & (1<<WB32_CT_PENDING)) != 0);
+
+  // select correct byte to be read
+  volatile uint8_t* in = (uint8_t*)(&WB32_LD + ((uint16_t)a & 3));
+  return *in;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Write 8-bit to Wishbone device (blocking) via pipelined cycle
+ * PARAM a: 32-bit device address
+ * PARAM d: 8-bit write data
+ * ------------------------------------------------------------ */
+void wishbone_write8_pipelined(uint32_t a, uint8_t d) {
+
+  // 8-bit transfer, pipelined cycle
+  WB32_CT = (1 << (a & 3)) | 0x10; // corresponding byte enable
+
+  // select correct byte to be written
+  volatile uint8_t* out = (uint8_t*)(&WB32_LD + ((uint16_t)a & 3));
+  *out = d;
+
+  // device address aligned to 8-bit + transfer trigger
+  WB32_WA_32bit = a;
+
+  // wait for access to be completed - blocking!
+  while((WB32_CT & (1<<WB32_CT_PENDING)) != 0);
 }
 
 

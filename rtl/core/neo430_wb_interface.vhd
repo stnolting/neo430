@@ -1,21 +1,6 @@
 -- #################################################################################################
 -- #  << NEO430 - 32-bit Wishbone Interface >>                                                     #
 -- # ********************************************************************************************* #
--- #  This interface only supports classic pipelined cycles. No bursts! Only one data              #
--- #  transmission can be pending at once. Code fetched via this interface cannot be directly      #
--- #  executed.                                                                                    #
--- #  A write transfer is started when writing to 'adr_lo_w_addr_c', a read transfer is started    #
--- #  when writing to 'adr_lo_r_addr_c'. Make sure to set the high part of the address, the        #
--- #  write-data and the byte enable signals (in the ctrl register) before. A transfer may take    #
--- #  max 256 cycles before it is automatically cancelled due to a timeout error. This can be      #
--- #  checked via bit #14 of the ctrl reg. This auto-timeout must be enabled via bit #11 of the    #
--- #  control registerThe current state of the transfer can be checked via                         #
--- #  bit #15 (pending) of the ctrl reg. This unit only performs 'pipelined' transfers. CYC stays  #
--- #  active until the cycle is acknowledged by the slave. STB is only applied for one cycle       #
--- #  (pipelined mode) or for the complete cycle (standard mode) (config via bit #13).             #
--- #  Activate this unit using the enable bit (#12). A pending transfer can be terminated by       #
--- #  clearing this bit.                                                                           #
--- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
 -- #                                                                                               #
@@ -34,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               25.04.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               17.07.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -72,42 +57,39 @@ architecture neo430_wb_interface_rtl of neo430_wb_interface is
   constant lo_abb_c : natural := index_size(wb32_size_c); -- low address boundary bit
 
   -- control reg bits --
-  constant ctrl_wb_sel0_c : natural :=  0; -- r/w: wishbone data byte enable bit 0
-  constant ctrl_wb_sel1_c : natural :=  1; -- r/w: wishbone data byte enable bit 1
-  constant ctrl_wb_sel2_c : natural :=  2; -- r/w: wishbone data byte enable bit 2
-  constant ctrl_wb_sel3_c : natural :=  3; -- r/w: wishbone data byte enable bit 3
-  constant ctrl_to_en_c   : natural := 11; -- r/w: enable timeout auto abort
-  constant ctrl_enable_c  : natural := 12; -- r/w: enable wishbone interface
-  constant ctrl_pipe_en_c : natural := 13; -- r/w: 0: standard mode, 1: pipelined mode
-  constant ctrl_timeout_c : natural := 14; -- r/-: a timeout occured during WB bus access
-  constant ctrl_pending_c : natural := 15; -- r/-: pending wb transfer
+  constant ctrl_byte_en0_c : natural :=  0; -- -/w: wishbone data byte enable bit 0
+  constant ctrl_byte_en1_c : natural :=  1; -- -/w: wishbone data byte enable bit 1
+  constant ctrl_byte_en2_c : natural :=  2; -- -/w: wishbone data byte enable bit 2
+  constant ctrl_byte_en3_c : natural :=  3; -- -/w: wishbone data byte enable bit 3
+  constant ctrl_pmode_c    : natural :=  4; -- -/w: 0: standard mode, 1: pipelined mode
+  constant ctrl_pending_c  : natural := 15; -- r/-: pending wb transfer
 
   -- access control --
   signal acc_en  : std_ulogic; -- module access enable
   signal addr    : std_ulogic_vector(15 downto 0); -- access address
   signal wr_en   : std_ulogic; -- word write enable
+  signal bwr_en  : std_ulogic_vector(01 downto 0); -- byte write enable
+
   -- accessible regs --
   signal wb_addr   : std_ulogic_vector(31 downto 0);
-  signal wb_di     : std_ulogic_vector(31 downto 0);
-  signal wb_do     : std_ulogic_vector(31 downto 0);
-  signal byte_sel  : std_ulogic_vector(03 downto 0);
-  signal pipelined : std_ulogic; -- pipelined mode enable
-  signal enable    : std_ulogic; -- enable wishbone interface
-
-  -- access arbiter --
+  signal wb_rdata  : std_ulogic_vector(31 downto 0);
+  signal wb_wdata  : std_ulogic_vector(31 downto 0);
   signal pending   : std_ulogic; -- pending transfer?
-  signal timeout   : std_ulogic_vector(07 downto 0); -- timeout counter
-  signal terr      : std_ulogic; -- timeout detector
-  signal terr_ff   : std_ulogic; -- timeout indicator
-  signal terr_en   : std_ulogic; -- timeout enabled
+  signal pipelined : std_ulogic; -- pipelined mode enable
+  signal byte_en   : std_ulogic_vector(03 downto 0);
+
+  -- misc --
+  signal enable : std_ulogic;
 
 begin
 
   -- Access control -----------------------------------------------------------
   -- -----------------------------------------------------------------------------
-  acc_en <= '1' when (addr_i(hi_abb_c downto lo_abb_c) = wb32_base_c(hi_abb_c downto lo_abb_c)) else '0';
-  addr   <= wb32_base_c(15 downto lo_abb_c) & addr_i(lo_abb_c-1 downto 1) & '0'; -- word aligned
-  wr_en  <= acc_en and wren_i(1) and wren_i(0);
+  acc_en    <= '1' when (addr_i(hi_abb_c downto lo_abb_c) = wb32_base_c(hi_abb_c downto lo_abb_c)) else '0';
+  addr      <= wb32_base_c(15 downto lo_abb_c) & addr_i(lo_abb_c-1 downto 1) & '0'; -- word aligned
+  bwr_en(0) <= acc_en and wren_i(0);
+  bwr_en(1) <= acc_en and wren_i(1);
+  wr_en     <= acc_en and wren_i(1) and wren_i(0);
 
 
   -- Write access -------------------------------------------------------------
@@ -115,36 +97,46 @@ begin
   wr_access: process(clk_i)
   begin
     if rising_edge(clk_i) then
-      if (wr_en = '1') then
-        case addr is
-          when wb32_adr_lo_r_addr_c =>
-            wb_addr(15 downto 00) <= data_i;
-            wb_we_o <= '0'; -- read transfer
-          when wb32_adr_lo_w_addr_c =>
-            wb_addr(15 downto 00) <= data_i;
-            wb_we_o <= '1'; -- write transfer
-          when wb32_adr_hi_addr_c =>
-            wb_addr(31 downto 16) <= data_i;
-          when wb32_do_lo_addr_c =>
-            wb_do(15 downto 00) <= data_i;
-          when wb32_do_hi_addr_c =>
-            wb_do(31 downto 16) <= data_i;
-          when wb32_ctrl_addr_c =>
-            byte_sel  <= data_i(ctrl_wb_sel3_c downto ctrl_wb_sel0_c);
-            pipelined <= data_i(ctrl_pipe_en_c);
-            enable    <= data_i(ctrl_enable_c);
-            terr_en   <= data_i(ctrl_to_en_c);
-          when others =>
-            NULL;
-        end case;
-      end if;
+      wb_we_o <= '0';
+      for i in 0 to 1 loop
+        if (bwr_en(i) = '1') then
+          case addr is
+            when wb32_rd_adr_lo_addr_c =>
+              wb_addr(i*8+7 downto i*8) <= data_i(i*8+7 downto i*8);
+            when wb32_rd_adr_hi_addr_c =>
+              wb_addr(i*8+7+16 downto i*8+16) <= data_i(i*8+7 downto i*8);
+            when wb32_wr_adr_lo_addr_c =>
+              wb_addr(i*8+7 downto i*8) <= data_i(i*8+7 downto i*8);
+              wb_we_o <= '1';
+            when wb32_wr_adr_hi_addr_c =>
+              wb_addr(i*8+7+16 downto i*8+16) <= data_i(i*8+7 downto i*8);
+              wb_we_o <= '1';
+            when wb32_data_lo_addr_c =>
+              wb_wdata(i*8+7 downto i*8) <= data_i(i*8+7 downto i*8);
+            when wb32_data_hi_addr_c =>
+              wb_wdata(i*8+7+16 downto i*8+16) <= data_i(i*8+7 downto i*8);
+            when wb32_ctrl_addr_c =>
+              if (i = 0) then -- low byte
+                byte_en(0) <= data_i(ctrl_byte_en0_c);
+                byte_en(1) <= data_i(ctrl_byte_en1_c);
+                byte_en(2) <= data_i(ctrl_byte_en2_c);
+                byte_en(3) <= data_i(ctrl_byte_en3_c);
+                pipelined  <= data_i(ctrl_pmode_c);
+              else
+                NULL;
+              end if;
+            when others =>
+              NULL;
+          end case;
+        end if;
+      end loop; -- i
     end if;
   end process wr_access;
 
-  -- wb direct output --
+  -- direct output --
   wb_adr_o <= wb_addr; -- address
-  wb_dat_o <= wb_do; -- write data
-  wb_sel_o <= byte_sel; -- byte enable
+  wb_dat_o <= wb_wdata; -- write data
+  wb_sel_o <= byte_en; -- byte enable
 
 
   -- Access arbiter -------------------------------------------------------------
@@ -156,54 +148,27 @@ begin
       if (pending = '0') or (enable = '0') then
         wb_stb_o <= '0';
         pending  <= '0';
-        if (wr_en = '1') and (enable = '1') and ((addr_i = wb32_adr_lo_r_addr_c) or (addr_i = wb32_adr_lo_w_addr_c)) then
+        if (wr_en = '1') and (enable = '1') and ((addr_i = wb32_rd_adr_hi_addr_c) or (addr_i = wb32_wr_adr_hi_addr_c)) then
           wb_stb_o <= '1';
           pending  <= '1';
-          terr_ff  <= '0';
         end if;
       else -- transfer in progress
-        wb_stb_o <= not pipelined; -- keep alive if standard cycle 
-        -- waiting for ACK or timeout
-        if (wb_ack_i = '1') or (terr = '1') then
+        wb_stb_o <= not pipelined; -- keep activated if standard/classic cycle 
+        -- waiting for ACK
+        if (wb_ack_i = '1') then
+          wb_rdata <= wb_dat_i; -- sample input data
           wb_stb_o <= '0';
           pending  <= '0';
         end if;
-        terr_ff <= terr;
       end if;
     end if;
   end process arbiter;
 
+  -- device actually in use? --
+  enable <= '0' when (byte_en = "0000") else '1';
+
   -- valid cycle signal --
   wb_cyc_o <= pending;
-
-
-  -- Timeout logic ------------------------------------------------------------
-  -- -----------------------------------------------------------------------------
-  timeout_logic: process(clk_i)
-  begin
-    if rising_edge(clk_i) then
-      if (pending = '1') and (terr_en = '1') then
-        timeout <= std_ulogic_vector(unsigned(timeout) - 1);
-      else
-        timeout <= (others => '1');
-      end if;
-    end if;
-  end process timeout_logic;
-
-  -- timeout detector --
-  terr <= terr_en when (to_integer(unsigned(timeout)) = 0) else '0';
-
-
-  -- Input sampling -----------------------------------------------------------
-  -- -----------------------------------------------------------------------------
-  sample_din: process(clk_i)
-  begin
-    if rising_edge(clk_i) then
-      if (wb_ack_i = '1') and (pending = '1') then
-        wb_di <= wb_dat_i;
-      end if;
-    end if;
-  end process sample_din;
 
 
   -- Read access --------------------------------------------------------------
@@ -214,18 +179,13 @@ begin
       data_o <= (others => '0');
       if (rden_i = '1') and (acc_en = '1') then
         case addr is
-          when wb32_di_lo_addr_c =>
-            data_o <= wb_di(15 downto 00);
-          when wb32_di_hi_addr_c =>
-            data_o <= wb_di(31 downto 16);
+          when wb32_data_lo_addr_c =>
+            data_o <= wb_rdata(15 downto 00);
+          when wb32_data_hi_addr_c =>
+            data_o <= wb_rdata(31 downto 16);
           when others =>
 --        when wb32_ctrl_addr_c =>
-            data_o(ctrl_wb_sel3_c downto ctrl_wb_sel0_c) <= byte_sel;
-            data_o(ctrl_pipe_en_c) <= pipelined;
             data_o(ctrl_pending_c) <= pending;
-            data_o(ctrl_timeout_c) <= terr_ff;
-            data_o(ctrl_enable_c)  <= enable;
-            data_o(ctrl_to_en_c)   <= terr_en;
         end case;
       end if;
     end if;

@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               07.06.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               17.07.2017  #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -49,30 +49,58 @@
 // Processor peripheral/IO devices
 // Beginning of IO area: 0xFF80, size of IO area: 128 Bytes
 // ----------------------------------------------------------------------------
+#define REG8  (volatile uint8_t*)
 #define REG16 (volatile uint16_t*)
+#define REG32 (volatile uint32_t*)
 
-/* --- Multiplier --- */
-// OBSOLETE! //
+/* --- Custom Functions Unit --- */
+#define CFU_REG0    (*(REG16 0xFF80)) // r/w: simple register
+#define CFU_REG0_LO (*(REG8  0xFF80)) // r/w: simple register
+#define CFU_REG0_HI (*(REG8  0xFF81)) // r/w: simple register
+#define CFU_REG1    (*(REG16 0xFF82)) // r/w: simple register
+#define CFU_REG1_LO (*(REG8  0xFF82)) // r/w: simple register
+#define CFU_REG1_HI (*(REG8  0xFF83)) // r/w: simple register
+#define CFU_REG2    (*(REG16 0xFF84)) // r/w: simple register
+#define CFU_REG2_LO (*(REG8  0xFF84)) // r/w: simple register
+#define CFU_REG2_HI (*(REG8  0xFF85)) // r/w: simple register
+#define CFU_REG3    (*(REG16 0xFF86)) // r/w: simple register
+#define CFU_REG3_LO (*(REG8  0xFF86)) // r/w: simple register
+#define CFU_REG3_HI (*(REG8  0xFF87)) // r/w: simple register
+#define CFU_REG4    (*(REG16 0xFF88)) // r/w: simple register
+#define CFU_REG4_LO (*(REG8  0xFF88)) // r/w: simple register
+#define CFU_REG4_HI (*(REG8  0xFF89)) // r/w: simple register
+#define CFU_REG5    (*(REG16 0xFF8A)) // r/w: simple register
+#define CFU_REG5_LO (*(REG8  0xFF8A)) // r/w: simple register
+#define CFU_REG5_HI (*(REG8  0xFF8B)) // r/w: simple register
+#define CFU_REG6    (*(REG16 0xFF8C)) // r/w: simple register
+#define CFU_REG6_LO (*(REG8  0xFF8C)) // r/w: simple register
+#define CFU_REG6_HI (*(REG8  0xFF8D)) // r/w: simple register
+#define CFU_REG7    (*(REG16 0xFF8E)) // r/w: simple register
+#define CFU_REG7_LO (*(REG8  0xFF8E)) // r/w: simple register
+#define CFU_REG7_HI (*(REG8  0xFF8F)) // r/w: simple register
+
 
 /* --- WB32 --- */
-#define WB32_LAR (*(REG16 0xFF90)) // -/w: low address for read transfer (+trigger)
-#define WB32_LAW (*(REG16 0xFF92)) // -/w: low address for write transfer (+trigger)
-#define WB32_HA  (*(REG16 0xFF94)) // -/w: high address
-#define WB32_LDO (*(REG16 0xFF96)) // -/w: low data output
-#define WB32_HDO (*(REG16 0xFF98)) // -/w: high data output
-#define WB32_LDI (*(REG16 0xFF9A)) // r/-; low data input
-#define WB32_HDI (*(REG16 0xFF9C)) // r/-; high data input
+#define WB32_LRA (*(REG16 0xFF90)) // -/w: low address for read transfer
+#define WB32_HRA (*(REG16 0xFF92)) // -/w: high address for read transfer (+trigger)
+#define WB32_LWA (*(REG16 0xFF94)) // -/w: low address for write transfer
+#define WB32_HWA (*(REG16 0xFF96)) // -/w: high address for write transfer (+trigger)
+#define WB32_LD  (*(REG16 0xFF98)) // r/w: low data
+#define WB32_HD  (*(REG16 0xFF9A)) // r/w: high data
+#define WB32_xxx (*(REG16 0xFF9C)) // -/-: reserved
 #define WB32_CT  (*(REG16 0xFF9E)) // r/w: control register
 
+// WB32 - 32-bit register access
+#define WB32_RA_32bit (*(REG32 0xFF90)) // -/w: address for read transfer (+trigger)
+#define WB32_WA_32bit (*(REG32 0xFF94)) // -/w: address for write transfer (+trigger)
+#define WB32_D_32bit  (*(REG32 0xFF98)) // r/w: read/write data
+
 // WB32 control register
-#define WB32_CT_WBSEL0   0 // r/w: wishbone data byte enable bit 0
-#define WB32_CT_WBSEL1   1 // r/w: wishbone data byte enable bit 1
-#define WB32_CT_WBSEL2   2 // r/w: wishbone data byte enable bit 2
-#define WB32_CT_WBSEL3   3 // r/w: wishbone data byte enable bit 3
-#define WB32_CT_TO_EN   11 // r/w: enable timeout auto abort
-#define WB32_CT_EN      12 // r/w: activate wishbone interface adapter when '1'
-#define WB32_CT_PMODE   13 // r/w: 0: standard transfers, 1: pipelined transfers
-#define WB32_CT_TIMEOUT 14 // r/-: timeout during bus access
+#define WB32_CT_WBSEL0   0 // -/w: wishbone data byte enable bit 0
+#define WB32_CT_WBSEL1   1 // -/w: wishbone data byte enable bit 1
+#define WB32_CT_WBSEL2   2 // -/w: wishbone data byte enable bit 2
+#define WB32_CT_WBSEL3   3 // -/w: wishbone data byte enable bit 3
+#define WB32_CT_PMODE    4 // -/w: 0: standard transfers, 1: pipelined transfers
 #define WB32_CT_PENDING 15 // r/-: pending transfer
 
 
@@ -196,18 +224,21 @@
 #define CPUID6 (*(REG16 0xFFEC)) // r/-: clock speed lo
 #define CPUID7 (*(REG16 0xFFEE)) // r/-: clock speed hi
 
-// aliases
-#define HW_VERSION    CPUID0 // HW verison number
-#define SYS_FEATURES  CPUID1 // synthesized system features
-#define USER_CODE     CPUID2 // custom user code
-#define IMEM_SIZE     CPUID3 // IMEM/ROM size in bytes
-#define DMEM_BASE     CPUID4 // DMEM/RAM base address
-#define DMEM_SIZE     CPUID5 // DMEM/RAM size in bytes
-#define CLOCKSPEED_LO CPUID6 // clock speed (in Hz) low part
-#define CLOCKSPEED_HI CPUID7 // clock speed (in Hz) high part
+// SysConfig - 32-bit register access
+#define CLOCKSPEED_32bit (*(REG32 0xFFEC)) // r/-: clock speed (in Hz)
+
+// Aliases
+#define HW_VERSION    CPUID0 // r/-: HW verison number
+#define SYS_FEATURES  CPUID1 // r/-: synthesized system features
+#define USER_CODE     CPUID2 // r/-: custom user code
+#define IMEM_SIZE     CPUID3 // r/-: IMEM/ROM size in bytes
+#define DMEM_BASE     CPUID4 // r/-: DMEM/RAM base address
+#define DMEM_SIZE     CPUID5 // r/-: DMEM/RAM size in bytes
+#define CLOCKSPEED_LO CPUID6 // r/-: clock speed (in Hz) low part
+#define CLOCKSPEED_HI CPUID7 // r/-: clock speed (in Hz) high part
 
 // SYS features
-//#define SYS_MAC16_EN_C  0 // MAC16 - OBSOLETE
+#define SYS_CFU_EN    0 // CFU synthesized
 #define SYS_WB32_EN   1 // WB32 synthesized
 #define SYS_WDT_EN    2 // WDT synthesized
 #define SYS_GPIO_EN   3 // GPIO synthesized
