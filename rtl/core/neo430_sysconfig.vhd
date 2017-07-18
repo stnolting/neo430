@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               23.02.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               17.07.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -41,12 +41,13 @@ entity neo430_sysconfig is
     -- additional configuration --
     USER_CODE   : std_ulogic_vector(15 downto 0) := x"0000"; -- custom user code
     -- module configuration --
-    DADD_USE    : boolean := true; -- implement DADD instruction?
-    WB32_USE    : boolean := true; -- implement WB32 unit?
-    WDT_USE     : boolean := true; -- implement WBT?
-    GPIO_USE    : boolean := true; -- implement GPIO unit?
-    TIMER_USE   : boolean := true; -- implement timer?
-    USART_USE   : boolean := true; -- implement USART?
+    DADD_USE    : boolean := true;  -- implement DADD instruction?
+    CFU_USE     : boolean := false; -- implementcustom function unit?
+    WB32_USE    : boolean := true;  -- implement WB32 unit?
+    WDT_USE     : boolean := true;  -- implement WBT?
+    GPIO_USE    : boolean := true;  -- implement GPIO unit?
+    TIMER_USE   : boolean := true;  -- implement timer?
+    USART_USE   : boolean := true;  -- implement USART?
     -- boot configuration --
     BOOTLD_USE  : boolean := true; -- implement and use bootloader?
     IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory?
@@ -110,7 +111,7 @@ begin
   sysinfo_mem(0) <= hw_version_c; -- HW version
 
   -- CPUID1: System setup (features) --
-  sysinfo_mem(1)(00) <= '0';                         -- obsolete: MAC16
+  sysinfo_mem(1)(00) <= bool_to_ulogic(CFU_USE);     -- CFU present?
   sysinfo_mem(1)(01) <= bool_to_ulogic(WB32_USE);    -- WB32 present?
   sysinfo_mem(1)(02) <= bool_to_ulogic(WDT_USE);     -- WDT present?
   sysinfo_mem(1)(03) <= bool_to_ulogic(GPIO_USE);    -- GPIO present?

@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               22.04.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               17.07.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -54,6 +54,7 @@ architecture neo430_test_rtl of neo430_test is
       USER_CODE   : std_ulogic_vector(15 downto 0); -- custom user code
       -- module configuration --
       DADD_USE    : boolean; -- implement DADD instruction? (default=true)
+      CFU_USE     : boolean; -- implement custom function unit? (default=false)
       WB32_USE    : boolean; -- implement WB32 unit? (default=true)
       WDT_USE     : boolean; -- implement WBT? (default=true)
       GPIO_USE    : boolean; -- implement GPIO unit? (default=true)
@@ -108,6 +109,7 @@ begin
     USER_CODE   => x"CAFE",           -- custom user code
     -- module configuration --
     DADD_USE    => true,              -- implement DADD instruction? (default=true)
+    CFU_USE     => false,             -- implement custom function unit? (default=false)
     WB32_USE    => true,              -- implement WB32 unit? (default=true)
     WDT_USE     => true,              -- implement WBT? (default=true)
     GPIO_USE    => true,              -- implement GPIO unit? (default=true)

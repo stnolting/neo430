@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               12.07.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               17.07.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -30,7 +30,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0113"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0120"; -- no touchy!
 
   -- Internal Functions ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -43,6 +43,7 @@ package neo430_package is
   function bool_to_ulogic(cond: boolean) return std_ulogic;
   function bin_to_gray(input : std_ulogic_vector) return std_ulogic_vector;
   function gray_to_bin(input : std_ulogic_vector) return std_ulogic_vector;
+  function int_to_hexchar(input : integer) return character;
 
   -- Address Space Layout -------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -62,22 +63,31 @@ package neo430_package is
   constant io_base_c : std_ulogic_vector(15 downto 0) := x"FF80";
   constant io_size_c : natural := 128; -- bytes, fixed!
 
-  -- IO: Multiplier (obsolete!) --
---constant mul_base_c : std_ulogic_vector(15 downto 0) := x"FF80";
---constant mul_size_c : natural := 16; -- bytes
+  -- IO: Custom Functions Unit (CFU) --
+  constant cfu_base_c : std_ulogic_vector(15 downto 0) := x"FF80";
+  constant cfu_size_c : natural := 16; -- bytes
+
+  constant cfu_reg0_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"0000");
+  constant cfu_reg1_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"0002");
+  constant cfu_reg2_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"0004");
+  constant cfu_reg3_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"0006");
+  constant cfu_reg4_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"0008");
+  constant cfu_reg5_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"000A");
+  constant cfu_reg6_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"000C");
+  constant cfu_reg7_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"000E");
 
   -- IO: Wishbone32 Interface --
   constant wb32_base_c : std_ulogic_vector(15 downto 0) := x"FF90";
   constant wb32_size_c : natural := 16; -- bytes
 
-  constant wb32_adr_lo_r_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"0000");
-  constant wb32_adr_lo_w_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"0002");
-  constant wb32_adr_hi_addr_c   : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"0004");
-  constant wb32_do_lo_addr_c    : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"0006");
-  constant wb32_do_hi_addr_c    : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"0008");
-  constant wb32_di_lo_addr_c    : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"000A");
-  constant wb32_di_hi_addr_c    : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"000C");
-  constant wb32_ctrl_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"000E");
+  constant wb32_rd_adr_lo_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"0000");
+  constant wb32_rd_adr_hi_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"0002");
+  constant wb32_wr_adr_lo_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"0004");
+  constant wb32_wr_adr_hi_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"0006");
+  constant wb32_data_lo_addr_c   : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"0008");
+  constant wb32_data_hi_addr_c   : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"000A");
+--constant ...                   : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"000C");
+  constant wb32_ctrl_addr_c      : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"000E");
 
   -- IO: USART --
   constant usart_base_c : std_ulogic_vector(15 downto 0) := x"FFA0";
@@ -361,6 +371,22 @@ package neo430_package is
     );
   end component;
 
+  -- Component: Custom Functions Unit -------------------------------------------------------
+  -- -------------------------------------------------------------------------------------------
+  component neo430_cfu
+    port (
+      -- host access --
+      clk_i  : in  std_ulogic; -- global clock line
+      rden_i : in  std_ulogic; -- read enable
+      wren_i : in  std_ulogic_vector(01 downto 0); -- write enable
+      addr_i : in  std_ulogic_vector(15 downto 0); -- address
+      data_i : in  std_ulogic_vector(15 downto 0); -- data in
+      data_o : out std_ulogic_vector(15 downto 0)  -- data out
+      -- custom IOs --
+--    ...
+    );
+  end component;
+
   -- Component: 32bit Wishbone Interface ----------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_wb_interface
@@ -479,12 +505,13 @@ package neo430_package is
       -- additional configuration --
       USER_CODE   : std_ulogic_vector(15 downto 0) := x"0000"; -- custom user code
       -- module configuration --
-      DADD_USE    : boolean := true; -- implement DADD instruction?
-      WB32_USE    : boolean := true; -- implement WB32 unit?
-      WDT_USE     : boolean := true; -- implement WBT?
-      GPIO_USE    : boolean := true; -- implement GPIO unit?
-      TIMER_USE   : boolean := true; -- implement timer?
-      USART_USE   : boolean := true; -- implement USART?
+      DADD_USE    : boolean := true;  -- implement DADD instruction?
+      CFU_USE     : boolean := false; -- implementcustom function unit?
+      WB32_USE    : boolean := true;  -- implement WB32 unit?
+      WDT_USE     : boolean := true;  -- implement WBT?
+      GPIO_USE    : boolean := true;  -- implement GPIO unit?
+      TIMER_USE   : boolean := true;  -- implement timer?
+      USART_USE   : boolean := true;  -- implement USART?
       -- boot configuration --
       BOOTLD_USE  : boolean := true; -- implement and use bootloader?
       IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory?
@@ -615,5 +642,32 @@ package body neo430_package is
     end loop; -- i
     return output_v;
   end function gray_to_bin;
+
+  -- Function: Integer (4-bit) to hex char --------------------------------------------------
+  -- -------------------------------------------------------------------------------------------
+  function int_to_hexchar(input : integer) return character is
+    variable output_v : character;
+  begin
+    case (input) is
+      when  0 => output_v := '0';
+      when  1 => output_v := '1';
+      when  2 => output_v := '2';
+      when  3 => output_v := '3';
+      when  4 => output_v := '4';
+      when  5 => output_v := '5';
+      when  6 => output_v := '6';
+      when  7 => output_v := '7';
+      when  8 => output_v := '8';
+      when  9 => output_v := '9';
+      when 10 => output_v := 'A';
+      when 11 => output_v := 'B';
+      when 12 => output_v := 'C';
+      when 13 => output_v := 'D';
+      when 14 => output_v := 'E';
+      when 15 => output_v := 'F';
+      when others => output_v := '?';
+    end case;
+    return output_v;
+  end function int_to_hexchar;
 
 end neo430_package;

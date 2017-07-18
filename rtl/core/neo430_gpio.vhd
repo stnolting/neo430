@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               07.06.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               17.07.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -86,7 +86,7 @@ begin
       if (wr_en = '1') then
         case addr is
           when gpio_out_addr_c =>
-           dout <= data_i;
+            dout <= data_i;
           when gpio_ctrl_addr_c =>
             trigger <= data_i(1 downto 0);
             irq_en  <= data_i(2);

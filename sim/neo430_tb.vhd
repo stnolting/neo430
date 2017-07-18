@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hanover, Germany                                                22.04.2017  #
+-- #  Stephan Nolting, Hanover, Germany                                                15.07.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -51,7 +51,7 @@ architecture neo430_tb_rtl of neo430_tb is
   constant f_clk_c    : natural := natural(f_clock_c);
 
   -- reduced ASCII table --
-  type ascii_t is array (0 to 95-1) of character;
+  type ascii_t is array (0 to 94) of character;
   constant ascii_lut : ascii_t := (' ', '!', '"', '#', '$', '%', '&', ''', '(', ')', '*', '+', ',', '-',
   '.', '/', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A',
   'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
@@ -69,6 +69,7 @@ architecture neo430_tb_rtl of neo430_tb is
       USER_CODE   : std_ulogic_vector(15 downto 0); -- custom user code
       -- module configuration --
       DADD_USE    : boolean; -- implement DADD instruction? (default=true)
+      CFU_USE     : boolean; -- implement custom function unit? (default=false)
       WB32_USE    : boolean; -- implement WB32 unit? (default=true)
       WDT_USE     : boolean; -- implement WBT? (default=true)
       GPIO_USE    : boolean; -- implement GPIO unit? (default=true)
@@ -141,6 +142,7 @@ begin
     USER_CODE   => x"4788",           -- custom user code
     -- module configuration --
     DADD_USE    => true,              -- implement DADD instruction? (default=true)
+    CFU_USE     => true,              -- implementcustom function unit? (default=false)
     WB32_USE    => true,              -- implement WB32 unit? (default=true)
     WDT_USE     => true,              -- implement WBT? (default=true)
     GPIO_USE    => true,              -- implement GPIO unit? (default=true)
@@ -183,7 +185,7 @@ begin
   -- -----------------------------------------------------------------------------
   uart_rx_unit: process(clk_gen)
     variable i, j     : integer;
-    file uart_rx_file : text is out "uart_rx_dump.txt";
+    file uart_rx_file : text open write_mode is "uart_rx_dump.txt";
     variable line_tmp : line;
   begin
     if rising_edge(clk_gen) then
@@ -214,9 +216,9 @@ begin
             end if;
 
             if (i < 32) or (j > 32+95) then
-              report "UART: Received data: (" & integer'image(i) & ")"; -- print code
+              report "UART TX: (" & integer'image(i) & ")"; -- print code
             else
-              report "UART: Received data: " & ascii_lut(j); -- print ASCII
+              report "UART TX: " & ascii_lut(j); -- print ASCII
             end if;
 
             if (i = 10) then -- Linux line break

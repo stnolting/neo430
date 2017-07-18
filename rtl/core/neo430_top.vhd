@@ -10,6 +10,7 @@
 -- #  - NEO430 CPU (MSP430(TM)-ISA-compatible)                                                     #
 -- #  - Internal ROM (IMEM, configurable size) for code                                            #
 -- #  - Internal RAM (DMEM, configurable size) for data (and code)                                 #
+-- #  - Optional custom functions unit                                                             #
 -- #  - Optional 16bit IN and 16bit OUT GPIO port                                                  #
 -- #  - Optional 32-bit Wishbone interface                                                         #
 -- #  - Optional High precision timer                                                              #
@@ -36,7 +37,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               22.04.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               17.07.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -55,12 +56,13 @@ entity neo430_top is
     -- additional configuration --
     USER_CODE   : std_ulogic_vector(15 downto 0) := x"0000"; -- custom user code
     -- module configuration --
-    DADD_USE    : boolean := true; -- implement DADD instruction? (default=true)
-    WB32_USE    : boolean := true; -- implement WB32 unit? (default=true)
-    WDT_USE     : boolean := true; -- implement WBT? (default=true)
-    GPIO_USE    : boolean := true; -- implement GPIO unit? (default=true)
-    TIMER_USE   : boolean := true; -- implement timer? (default=true)
-    USART_USE   : boolean := true; -- implement USART? (default=true)
+    DADD_USE    : boolean := true;  -- implement DADD instruction? (default=true)
+    CFU_USE     : boolean := false; -- implement custom function unit? (default=false)
+    WB32_USE    : boolean := true;  -- implement WB32 unit? (default=true)
+    WDT_USE     : boolean := true;  -- implement WBT? (default=true)
+    GPIO_USE    : boolean := true;  -- implement GPIO unit? (default=true)
+    TIMER_USE   : boolean := true;  -- implement timer? (default=true)
+    USART_USE   : boolean := true;  -- implement USART? (default=true)
     -- boot configuration --
     BOOTLD_USE  : boolean := true; -- implement and use bootloader? (default=true)
     IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory? (default=false)
@@ -125,6 +127,7 @@ architecture neo430_top_rtl of neo430_top is
   -- read-back data busses --
   signal rom_rdata       : std_ulogic_vector(15 downto 0);
   signal ram_rdata       : std_ulogic_vector(15 downto 0);
+  signal cfu_rdata       : std_ulogic_vector(15 downto 0);
   signal wb_rdata        : std_ulogic_vector(15 downto 0);
   signal boot_rdata      : std_ulogic_vector(15 downto 0);
   signal wdt_rdata       : std_ulogic_vector(15 downto 0);
@@ -218,8 +221,8 @@ begin
   );
 
   -- final CPU read data --
-  cpu_bus.rdata <= rom_rdata or ram_rdata or boot_rdata or wb_rdata or usart_rdata or
-                   gpio_rdata or timer_rdata or wdt_rdata or sysconfig_rdata;
+  cpu_bus.rdata <= rom_rdata or ram_rdata or boot_rdata or cfu_rdata or wb_rdata or
+                   usart_rdata or gpio_rdata or timer_rdata or wdt_rdata or sysconfig_rdata;
 
   -- sync for external IRQ --
   external_irq_sync: process(clk_i)
@@ -295,6 +298,30 @@ begin
   io_acc   <= '1' when (cpu_bus.addr(15 downto index_size(io_size_c)) = io_base_c(15 downto index_size(io_size_c))) else '0';
   io_rd_en <= cpu_bus.rd_en when (io_acc = '1') else '0';
   io_wr_en <= cpu_bus.wr_en when (io_acc = '1') else "00";
+
+
+  -- Custom Functions Unit ----------------------------------------------------
+  -- -----------------------------------------------------------------------------
+  neo430_cfu_inst_true:
+  if (CFU_USE = true) generate
+    neo430_cfu_inst: neo430_cfu
+    port map (
+      -- host access --
+      clk_i  => clk_i,              -- global clock line
+      rden_i => io_rd_en,           -- read enable
+      wren_i => io_wr_en,           -- write enable
+      addr_i => cpu_bus.addr,       -- address
+      data_i => cpu_bus.wdata,      -- data in
+      data_o => cfu_rdata           -- data out
+      -- custom IOs --
+--    ...
+    );
+  end generate;
+
+  neo430_cfu_inst_false:
+  if (CFU_USE = false) generate
+    cfu_rdata <= (others => '0');
+  end generate;
 
 
   -- Wishbone Adapter ---------------------------------------------------------
@@ -474,6 +501,7 @@ begin
     USER_CODE   => USER_CODE,       -- custom user code
     -- module configuration --
     DADD_USE    => DADD_USE,        -- implement DADD instruction?
+    CFU_USE     => CFU_USE,         -- implementcustom function unit?
     WB32_USE    => WB32_USE,        -- implement WB32 unit?
     WDT_USE     => WDT_USE,         -- implement WBT?
     GPIO_USE    => GPIO_USE,        -- implement GPIO unit?
