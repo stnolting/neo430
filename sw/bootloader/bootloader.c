@@ -29,7 +29,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               24.06.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               16.07.2017  #
 // #################################################################################################
 
 // Libraries
@@ -132,13 +132,19 @@ int main(void) {
   // ****************************************************************
   // Show bootloader intro and system information
   // ****************************************************************
-  uart_br_print("\n\nNEO430 Bootloader V20170624 by Stephan Nolting\n"
+  uart_br_print("\n\nNEO430 Bootloader V20170716 by Stephan Nolting\n\n"
+
                 "HWV: 0x");
   uart_print_hex_word(HW_VERSION);
+  uart_br_print("\nCLK: 0x");
+  uart_print_hex_word(CLOCKSPEED_HI);
+  uart_print_hex_word(CLOCKSPEED_LO);
   uart_br_print("\nROM: 0x");
   uart_print_hex_word(IMEM_SIZE);
   uart_br_print("\nRAM: 0x");
   uart_print_hex_word(DMEM_SIZE);
+  uart_br_print("\nSYS: 0x");
+  uart_print_hex_word(SYS_FEATURES);
 
 
   // ****************************************************************
