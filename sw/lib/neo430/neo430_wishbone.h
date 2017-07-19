@@ -147,7 +147,13 @@ void wishbone_write16(uint32_t a, uint16_t d) {
 uint8_t wishbone_read8(uint32_t a) {
 
   // 8-bit transfer, classic cycle
-  WB32_CT = 1 << (((uint8_t)a) & 3); // corresponding byte enable
+  switch (((uint8_t)a) & 3) {
+    case 0: WB32_CT = 0b00001; break;
+    case 1: WB32_CT = 0b00010; break;
+    case 2: WB32_CT = 0b00100; break;
+    case 3: WB32_CT = 0b01000; break;
+  }
+//WB32_CT = 1 << (((uint8_t)a) & 3); // corresponding byte enable
 
   // device address aligned to 8-bit + transfer trigger
   WB32_RA_32bit = a;
@@ -169,7 +175,13 @@ uint8_t wishbone_read8(uint32_t a) {
 void wishbone_write8(uint32_t a, uint8_t d) {
 
   // 8-bit transfer, classic cycle
-  WB32_CT = 1 << (((uint8_t)a) & 3); // corresponding byte enable
+  switch (((uint8_t)a) & 3) {
+    case 0: WB32_CT = 0b00001; break;
+    case 1: WB32_CT = 0b00010; break;
+    case 2: WB32_CT = 0b00100; break;
+    case 3: WB32_CT = 0b01000; break;
+  }
+//WB32_CT = 1 << (((uint8_t)a) & 3); // corresponding byte enable
 
   // select correct byte to be written
   volatile uint8_t* out = (uint8_t*)(&WB32_D_8bit + ((uint8_t)a & 3));
@@ -287,7 +299,13 @@ void wishbone_write16_pipelined(uint32_t a, uint16_t d) {
 uint8_t wishbone_read8_pipelined(uint32_t a) {
 
   // 8-bit transfer, pipelined cycle
-  WB32_CT = (1 << (((uint8_t)a) & 3)) | 0x10; // corresponding byte enable
+  switch (((uint8_t)a) & 3) {
+    case 0: WB32_CT = 0b10001; break;
+    case 1: WB32_CT = 0b10010; break;
+    case 2: WB32_CT = 0b10100; break;
+    case 3: WB32_CT = 0b11000; break;
+  }
+//WB32_CT = (1 << (((uint8_t)a) & 3)) | 0x10; // corresponding byte enable
 
   // device address aligned to 8-bit + transfer trigger
   WB32_RA_32bit = a;
@@ -309,7 +327,13 @@ uint8_t wishbone_read8_pipelined(uint32_t a) {
 void wishbone_write8_pipelined(uint32_t a, uint8_t d) {
 
   // 8-bit transfer, pipelined cycle
-  WB32_CT = (1 << (((uint8_t)a) & 3)) | 0x10; // corresponding byte enable
+  switch (((uint8_t)a) & 3) {
+    case 0: WB32_CT = 0b10001; break;
+    case 1: WB32_CT = 0b10010; break;
+    case 2: WB32_CT = 0b10100; break;
+    case 3: WB32_CT = 0b11000; break;
+  }
+//WB32_CT = (1 << (((uint8_t)a) & 3)) | 0x10; // corresponding byte enable
 
   // select correct byte to be written
   volatile uint8_t* out = (uint8_t*)(&WB32_D_8bit + ((uint8_t)a & 3));
