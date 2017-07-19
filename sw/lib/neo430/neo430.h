@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               17.07.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               19.07.2017  #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -53,34 +53,34 @@
 #define REG16 (volatile uint16_t*)
 #define REG32 (volatile uint32_t*)
 
-/* --- Custom Functions Unit --- */
-#define CFU_REG0    (*(REG16 0xFF80)) // r/w: simple register
-#define CFU_REG0_LO (*(REG8  0xFF80)) // r/w: simple register
-#define CFU_REG0_HI (*(REG8  0xFF81)) // r/w: simple register
-#define CFU_REG1    (*(REG16 0xFF82)) // r/w: simple register
-#define CFU_REG1_LO (*(REG8  0xFF82)) // r/w: simple register
-#define CFU_REG1_HI (*(REG8  0xFF83)) // r/w: simple register
-#define CFU_REG2    (*(REG16 0xFF84)) // r/w: simple register
-#define CFU_REG2_LO (*(REG8  0xFF84)) // r/w: simple register
-#define CFU_REG2_HI (*(REG8  0xFF85)) // r/w: simple register
-#define CFU_REG3    (*(REG16 0xFF86)) // r/w: simple register
-#define CFU_REG3_LO (*(REG8  0xFF86)) // r/w: simple register
-#define CFU_REG3_HI (*(REG8  0xFF87)) // r/w: simple register
-#define CFU_REG4    (*(REG16 0xFF88)) // r/w: simple register
-#define CFU_REG4_LO (*(REG8  0xFF88)) // r/w: simple register
-#define CFU_REG4_HI (*(REG8  0xFF89)) // r/w: simple register
-#define CFU_REG5    (*(REG16 0xFF8A)) // r/w: simple register
-#define CFU_REG5_LO (*(REG8  0xFF8A)) // r/w: simple register
-#define CFU_REG5_HI (*(REG8  0xFF8B)) // r/w: simple register
-#define CFU_REG6    (*(REG16 0xFF8C)) // r/w: simple register
-#define CFU_REG6_LO (*(REG8  0xFF8C)) // r/w: simple register
-#define CFU_REG6_HI (*(REG8  0xFF8D)) // r/w: simple register
-#define CFU_REG7    (*(REG16 0xFF8E)) // r/w: simple register
-#define CFU_REG7_LO (*(REG8  0xFF8E)) // r/w: simple register
-#define CFU_REG7_HI (*(REG8  0xFF8F)) // r/w: simple register
+/* --- Custom Function Unit - CFU --- */
+#define CFU_REG0    (*(REG16 0xFF80)) // r/w: simple register, customize it!
+#define CFU_REG0_LO (*(REG8  0xFF80)) // r/w: simple register, customize it!
+#define CFU_REG0_HI (*(REG8  0xFF81)) // r/w: simple register, customize it!
+#define CFU_REG1    (*(REG16 0xFF82)) // r/w: simple register, customize it!
+#define CFU_REG1_LO (*(REG8  0xFF82)) // r/w: simple register, customize it!
+#define CFU_REG1_HI (*(REG8  0xFF83)) // r/w: simple register, customize it!
+#define CFU_REG2    (*(REG16 0xFF84)) // r/w: simple register, customize it!
+#define CFU_REG2_LO (*(REG8  0xFF84)) // r/w: simple register, customize it!
+#define CFU_REG2_HI (*(REG8  0xFF85)) // r/w: simple register, customize it!
+#define CFU_REG3    (*(REG16 0xFF86)) // r/w: simple register, customize it!
+#define CFU_REG3_LO (*(REG8  0xFF86)) // r/w: simple register, customize it!
+#define CFU_REG3_HI (*(REG8  0xFF87)) // r/w: simple register, customize it!
+#define CFU_REG4    (*(REG16 0xFF88)) // r/w: simple register, customize it!
+#define CFU_REG4_LO (*(REG8  0xFF88)) // r/w: simple register, customize it!
+#define CFU_REG4_HI (*(REG8  0xFF89)) // r/w: simple register, customize it!
+#define CFU_REG5    (*(REG16 0xFF8A)) // r/w: simple register, customize it!
+#define CFU_REG5_LO (*(REG8  0xFF8A)) // r/w: simple register, customize it!
+#define CFU_REG5_HI (*(REG8  0xFF8B)) // r/w: simple register, customize it!
+#define CFU_REG6    (*(REG16 0xFF8C)) // r/w: simple register, customize it!
+#define CFU_REG6_LO (*(REG8  0xFF8C)) // r/w: simple register, customize it!
+#define CFU_REG6_HI (*(REG8  0xFF8D)) // r/w: simple register, customize it!
+#define CFU_REG7    (*(REG16 0xFF8E)) // r/w: simple register, customize it!
+#define CFU_REG7_LO (*(REG8  0xFF8E)) // r/w: simple register, customize it!
+#define CFU_REG7_HI (*(REG8  0xFF8F)) // r/w: simple register, customize it!
 
 
-/* --- WB32 --- */
+/* --- Wishbone Bus Adapter - WB32 --- */
 #define WB32_LRA (*(REG16 0xFF90)) // -/w: low address for read transfer
 #define WB32_HRA (*(REG16 0xFF92)) // -/w: high address for read transfer (+trigger)
 #define WB32_LWA (*(REG16 0xFF94)) // -/w: low address for write transfer
@@ -91,9 +91,10 @@
 #define WB32_CT  (*(REG16 0xFF9E)) // r/w: control register
 
 // WB32 - 32-bit register access
-#define WB32_RA_32bit (*(REG32 0xFF90)) // -/w: address for read transfer (+trigger)
-#define WB32_WA_32bit (*(REG32 0xFF94)) // -/w: address for write transfer (+trigger)
-#define WB32_D_32bit  (*(REG32 0xFF98)) // r/w: read/write data
+#define WB32_RA_32bit (*(REG32 (&WB32_LRA))) // -/w: address for read transfer (+trigger)
+#define WB32_WA_32bit (*(REG32 (&WB32_LWA))) // -/w: address for write transfer (+trigger)
+#define WB32_D_32bit  (*(REG32 (&WB32_LD)))  // r/w: read/write data (for 32-bit access)
+#define WB32_D_8bit   (*(REG8  (&WB32_LD)))  // r/w: read/write data (for 8-bit access)
 
 // WB32 control register
 #define WB32_CT_WBSEL0   0 // -/w: wishbone data byte enable bit 0
@@ -104,7 +105,7 @@
 #define WB32_CT_PENDING 15 // r/-: pending transfer
 
 
-/* --- USART/USI --- */
+/* --- Universal Serial Transceiver - USART/USI --- */
 #define USI_SPIRTX  (*(REG16 0xFFA0)) // r/w: spi receive/transmit register
 #define USI_UARTRTX (*(REG16 0xFFA2)) // r/w: uart receive/transmit register
 #define USI_BAUD    (*(REG16 0xFFA4)) // r/w: uart baud rate generator value
@@ -153,7 +154,7 @@
 // 7: CLK/4096
 
 
-/* --- GPIO --- */
+/* --- Genearl Purpose Inputs/Outputs - GPIO --- */
 #define GPIO_IN      (*(REG16 0xFFB0)) // r/-: parallel input
 #define GPIO_OUT     (*(REG16 0xFFB2)) // r/w: parallel output
 #define GPIO_CTRL    (*(REG16 0xFFB4)) // -/w: control register
@@ -167,7 +168,7 @@
 // bit 2: General interrupt enable flag
 
 
-/* --- High-Precision Timer --- */
+/* --- High-Precision Timer - TIMER --- */
 #define TMR_CNT   (*(REG16 0xFFC0)) // r/w: counter register
 #define TMR_THRES (*(REG16 0xFFC2)) // r/w: threshold register
 #define TMR_CT    (*(REG16 0xFFC4)) // r/w: control register
@@ -191,7 +192,7 @@
 // 7: CLK/4096
 
 
-/* --- Watchdog Timer --- */
+/* --- Watchdog Timer - WTD --- */
 #define WDT_CTRL (*(REG16 0xFFD0)) // r/w: Watchdog control register
 
 // Watchdog control register
@@ -214,7 +215,7 @@
 // 7: CLK/4096
 
 
-/* --- SysConfig --- */
+/* --- System Configuration - SYSCONFIG --- */
 #define CPUID0 (*(REG16 0xFFE0)) // r/-: HW version
 #define CPUID1 (*(REG16 0xFFE2)) // r/-: system configuration
 #define CPUID2 (*(REG16 0xFFE4)) // r/-: CPU identifier
@@ -223,10 +224,6 @@
 #define CPUID5 (*(REG16 0xFFEA)) // r/-: DMEM/RAM size in bytes
 #define CPUID6 (*(REG16 0xFFEC)) // r/-: clock speed lo
 #define CPUID7 (*(REG16 0xFFEE)) // r/-: clock speed hi
-
-// SysConfig - 32-bit register access
-#define CLOCKSPEED_32bit (*(REG32 0xFFEC)) // r/-: clock speed (in Hz)
-
 // Aliases
 #define HW_VERSION    CPUID0 // r/-: HW verison number
 #define SYS_FEATURES  CPUID1 // r/-: synthesized system features
@@ -236,6 +233,9 @@
 #define DMEM_SIZE     CPUID5 // r/-: DMEM/RAM size in bytes
 #define CLOCKSPEED_LO CPUID6 // r/-: clock speed (in Hz) low part
 #define CLOCKSPEED_HI CPUID7 // r/-: clock speed (in Hz) high part
+
+// SysConfig - 32-bit register access
+#define CLOCKSPEED_32bit (*(REG32 (&CLOCKSPEED_LO))) // r/-: clock speed (in Hz)
 
 // SYS features
 #define SYS_CFU_EN    0 // CFU synthesized

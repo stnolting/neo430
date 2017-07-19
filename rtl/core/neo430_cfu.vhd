@@ -26,7 +26,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               18.06.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               19.06.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -91,7 +91,7 @@ begin
   wr_access: process(clk_i)
   begin
     if rising_edge(clk_i) then
-      -- write access to the low byte (bits 7..0) --
+      -- write access to the low bytes (bits 7..0) --
       if (acc_en = '1') and (bwr_en(0) = '1') then -- valid write acces to LO byte
         case addr is
           when cfu_reg0_addr_c => user_reg0(7 downto 0) <= data_i(7 downto 0);
@@ -105,7 +105,7 @@ begin
           when others => NULL;
         end case;
       end if;
-      -- write access to the high byte (bits 15..8) --
+      -- write access to the high bytes (bits 15..8) --
       if (acc_en = '1') and (bwr_en(1) = '1') then -- valid write access to HI byte
         case addr is
           when cfu_reg0_addr_c => user_reg0(15 downto 8) <= data_i(15 downto 8);
