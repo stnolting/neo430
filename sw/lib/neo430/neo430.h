@@ -47,37 +47,38 @@
 
 // ----------------------------------------------------------------------------
 // Processor peripheral/IO devices
-// Beginning of IO area: 0xFF80, size of IO area: 128 Bytes
+// Beginning of IO area: 0xFF80
+// Size of IO area: 128 bytes
 // ----------------------------------------------------------------------------
 #define REG8  (volatile uint8_t*)
 #define REG16 (volatile uint16_t*)
 #define REG32 (volatile uint32_t*)
 
 /* --- Custom Function Unit - CFU --- */
-#define CFU_REG0    (*(REG16 0xFF80)) // r/w: simple register, customize it!
-#define CFU_REG0_LO (*(REG8  0xFF80)) // r/w: simple register, customize it!
-#define CFU_REG0_HI (*(REG8  0xFF81)) // r/w: simple register, customize it!
-#define CFU_REG1    (*(REG16 0xFF82)) // r/w: simple register, customize it!
-#define CFU_REG1_LO (*(REG8  0xFF82)) // r/w: simple register, customize it!
-#define CFU_REG1_HI (*(REG8  0xFF83)) // r/w: simple register, customize it!
-#define CFU_REG2    (*(REG16 0xFF84)) // r/w: simple register, customize it!
-#define CFU_REG2_LO (*(REG8  0xFF84)) // r/w: simple register, customize it!
-#define CFU_REG2_HI (*(REG8  0xFF85)) // r/w: simple register, customize it!
-#define CFU_REG3    (*(REG16 0xFF86)) // r/w: simple register, customize it!
-#define CFU_REG3_LO (*(REG8  0xFF86)) // r/w: simple register, customize it!
-#define CFU_REG3_HI (*(REG8  0xFF87)) // r/w: simple register, customize it!
-#define CFU_REG4    (*(REG16 0xFF88)) // r/w: simple register, customize it!
-#define CFU_REG4_LO (*(REG8  0xFF88)) // r/w: simple register, customize it!
-#define CFU_REG4_HI (*(REG8  0xFF89)) // r/w: simple register, customize it!
-#define CFU_REG5    (*(REG16 0xFF8A)) // r/w: simple register, customize it!
-#define CFU_REG5_LO (*(REG8  0xFF8A)) // r/w: simple register, customize it!
-#define CFU_REG5_HI (*(REG8  0xFF8B)) // r/w: simple register, customize it!
-#define CFU_REG6    (*(REG16 0xFF8C)) // r/w: simple register, customize it!
-#define CFU_REG6_LO (*(REG8  0xFF8C)) // r/w: simple register, customize it!
-#define CFU_REG6_HI (*(REG8  0xFF8D)) // r/w: simple register, customize it!
-#define CFU_REG7    (*(REG16 0xFF8E)) // r/w: simple register, customize it!
-#define CFU_REG7_LO (*(REG8  0xFF8E)) // r/w: simple register, customize it!
-#define CFU_REG7_HI (*(REG8  0xFF8F)) // r/w: simple register, customize it!
+#define CFU_REG0    (*(REG16 0xFF80)) // ?/? user defined
+#define CFU_REG0_LO (*(REG8  0xFF80)) // ?/? user defined
+#define CFU_REG0_HI (*(REG8  0xFF81)) // ?/? user defined
+#define CFU_REG1    (*(REG16 0xFF82)) // ?/? user defined
+#define CFU_REG1_LO (*(REG8  0xFF82)) // ?/? user defined
+#define CFU_REG1_HI (*(REG8  0xFF83)) // ?/? user defined
+#define CFU_REG2    (*(REG16 0xFF84)) // ?/? user defined
+#define CFU_REG2_LO (*(REG8  0xFF84)) // ?/? user defined
+#define CFU_REG2_HI (*(REG8  0xFF85)) // ?/? user defined
+#define CFU_REG3    (*(REG16 0xFF86)) // ?/? user defined
+#define CFU_REG3_LO (*(REG8  0xFF86)) // ?/? user defined
+#define CFU_REG3_HI (*(REG8  0xFF87)) // ?/? user defined
+#define CFU_REG4    (*(REG16 0xFF88)) // ?/? user defined
+#define CFU_REG4_LO (*(REG8  0xFF88)) // ?/? user defined
+#define CFU_REG4_HI (*(REG8  0xFF89)) // ?/? user defined
+#define CFU_REG5    (*(REG16 0xFF8A)) // ?/? user defined
+#define CFU_REG5_LO (*(REG8  0xFF8A)) // ?/? user defined
+#define CFU_REG5_HI (*(REG8  0xFF8B)) // ?/? user defined
+#define CFU_REG6    (*(REG16 0xFF8C)) // ?/? user defined
+#define CFU_REG6_LO (*(REG8  0xFF8C)) // ?/? user defined
+#define CFU_REG6_HI (*(REG8  0xFF8D)) // ?/? user defined
+#define CFU_REG7    (*(REG16 0xFF8E)) // ?/? user defined
+#define CFU_REG7_LO (*(REG8  0xFF8E)) // ?/? user defined
+#define CFU_REG7_HI (*(REG8  0xFF8F)) // ?/? user defined
 
 
 /* --- Wishbone Bus Adapter - WB32 --- */
@@ -136,12 +137,12 @@
 #define USI_CT_SPIPRSC0   7 // r/w: spi prescaler select bit 0
 #define USI_CT_SPIPRSC1   8 // r/w: spi prescaler select bit 1
 #define USI_CT_SPIPRSC2   9 // r/w: spi prescaler select bit 2
-#define USI_CT_SPICS0    10 // r/w: spi direct CS 0
-#define USI_CT_SPICS1    11 // r/w: spi direct CS 1
-#define USI_CT_SPICS2    12 // r/w: spi direct CS 2
-#define USI_CT_SPICS3    13 // r/w: spi direct CS 3
-#define USI_CT_SPICS4    14 // r/w: spi direct CS 4
-#define USI_CT_SPICS5    15 // r/w: spi direct CS 5
+#define USI_CT_SPICS0    10 // r/w: spi direct CS 0, CS is low (active) when bit is set
+#define USI_CT_SPICS1    11 // r/w: spi direct CS 1, CS is low (active) when bit is set
+#define USI_CT_SPICS2    12 // r/w: spi direct CS 2, CS is low (active) when bit is set
+#define USI_CT_SPICS3    13 // r/w: spi direct CS 3, CS is low (active) when bit is set
+#define USI_CT_SPICS4    14 // r/w: spi direct CS 4, CS is low (active) when bit is set
+#define USI_CT_SPICS5    15 // r/w: spi direct CS 5, CS is low (active) when bit is set
 
 // SPI clock prescaler select:
 // 0: CLK/2
