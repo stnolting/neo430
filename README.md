@@ -55,6 +55,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Internal DMEN (RAM, for data) and IMEM (RAM or ROM, for code), configurable sizes
 - One external interrupt line
 - Customizable processor hardware configuration
+- Optional custom function unit (CFU) to add your custom memory-mapped functions
 - Optional high-precision timer (TIMER)
 - Optional USART interface; UART and SPI (USART)
 - Optional general purpose parallel IO port (GPIO), 16 inputs, 16 outputs, with pin-change interrupt
