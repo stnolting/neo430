@@ -29,7 +29,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               16.07.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               19.07.2017  #
 // #################################################################################################
 
 // Libraries
@@ -46,7 +46,7 @@
 #define STATUS_LED           0 // GPIO.out(0) is status LED
 
 // 25LC512 EEPROM
-#define BOOT_EEP_CS USI_CT_SPICS0 // boot EEPROM CS (SPI.CS0)
+#define BOOT_EEP_CS 0    // boot EEPROM CS (SPI.CS0)
 #define EEP_WRITE   0x02 // initialize start of write sequence
 #define EEP_READ    0x03 // initialize start of read sequence
 #define EEP_RDSR    0x05 // read status register
@@ -112,7 +112,7 @@ int main(void) {
   // enable USART, no IRQs, SPI clock mode 0, 1/1024 SPI speed, disable all 6 SPI CS lines (set high)
   USI_CT = 0; // reset USART
   uart_set_baud(BAUD_RATE);
-  USI_CT = (1<<USI_CT_EN)  | (5<<USI_CT_SPIPRSC0) | (63<<USI_CT_SPICS0);
+  USI_CT = (1<<USI_CT_EN)  | (5<<USI_CT_SPIPRSC0);
   spi_trans(0); // clear SPI RTX buffer
   uart_char_read(); // clear UART RX buffer
 
@@ -132,7 +132,7 @@ int main(void) {
   // ****************************************************************
   // Show bootloader intro and system information
   // ****************************************************************
-  uart_br_print("\n\nNEO430 Bootloader V20170716 by Stephan Nolting\n\n"
+  uart_br_print("\n\nNEO430 Bootloader V20170719 by Stephan Nolting\n\n"
 
                 "HWV: 0x");
   uart_print_hex_word(HW_VERSION);
