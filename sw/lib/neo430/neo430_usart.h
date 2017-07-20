@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               15.07.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               19.07.2017  #
 // #################################################################################################
 
 #ifndef neo430_usart_h
@@ -29,8 +29,8 @@
 #include <stdarg.h>
 
 // prototypes (SPI)
-void spi_cs_en(const uint8_t cs);
-void spi_cs_dis(const uint8_t cs);
+void spi_cs_en(uint8_t cs);
+void spi_cs_dis(uint8_t cs);
 uint8_t spi_trans(uint8_t d);
 
 // prototypes (UART)
@@ -55,21 +55,21 @@ void _printf(char *format, ...);
 
 /* ------------------------------------------------------------
  * INFO Enable SPI CSx (set low)
- * PARAM CS port (USI_CT_SPICS0_C..USI_CT_SPICS5_C)
+ * PARAM CS line (0..5)
  * ------------------------------------------------------------ */
-void spi_cs_en(const uint8_t cs) {
+void spi_cs_en(uint8_t cs) {
 
-  USI_CT &= ~(1<<cs);
+  USI_CT |= 1 << (USI_CT_SPICS0 + cs);
 }
 
 
 /* ------------------------------------------------------------
  * INFO Disable SPI CSx (set high)
- * PARAM CS port (USI_CT_SPICS0_C..USI_CT_SPICS5_C)
+ * PARAM CS line (0..5)
  * ------------------------------------------------------------ */
-void spi_cs_dis(const uint8_t cs) {
+void spi_cs_dis(uint8_t cs) {
 
-  USI_CT |= (1<<cs);
+  USI_CT &= ~(1 << (USI_CT_SPICS0 + cs));
 }
 
 

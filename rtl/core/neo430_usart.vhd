@@ -3,7 +3,7 @@
 -- # ********************************************************************************************* #
 -- #  Synchronous & asynchronous serial transceivers.                                              #
 -- #  UART: 8-bit, no parity bit, 1 stop bit, variable BAUD rate.                                  #
--- #  SPI: 8-bit, 2 clock modes, 8 clock speeds, 6 dedicated CS lines.                             #
+-- #  SPI: 8-bit, MSB first, 2 clock modes, 8 clock speeds, 6 dedicated CS lines.                  #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -23,7 +23,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               14.02.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               19.07.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -312,12 +312,12 @@ begin
   end process spi_rtx_unit;
 
   -- direct CS --
-  spi_cs_o(0) <= ctrl(ctrl_spi_cs0_c);
-  spi_cs_o(1) <= ctrl(ctrl_spi_cs1_c);
-  spi_cs_o(2) <= ctrl(ctrl_spi_cs2_c);
-  spi_cs_o(3) <= ctrl(ctrl_spi_cs3_c);
-  spi_cs_o(4) <= ctrl(ctrl_spi_cs4_c);
-  spi_cs_o(5) <= ctrl(ctrl_spi_cs5_c);
+  spi_cs_o(0) <= not ctrl(ctrl_spi_cs0_c);
+  spi_cs_o(1) <= not ctrl(ctrl_spi_cs1_c);
+  spi_cs_o(2) <= not ctrl(ctrl_spi_cs2_c);
+  spi_cs_o(3) <= not ctrl(ctrl_spi_cs3_c);
+  spi_cs_o(4) <= not ctrl(ctrl_spi_cs4_c);
+  spi_cs_o(5) <= not ctrl(ctrl_spi_cs5_c);
 
 
   -- Interrupt ----------------------------------------------------------------
