@@ -322,7 +322,7 @@ begin
 
   -- Interrupt ----------------------------------------------------------------
   -- -----------------------------------------------------------------------------
-  -- UART Rx data available OR UART TX complete OR SPI transmission done
+  -- UART Rx data available [OR] UART Tx complete [OR] SPI transmission done
   usart_irq_o <= (uart_rx_busy_ff and (not uart_rx_busy) and ctrl(ctrl_uart_rx_irq_c)) or
                  (uart_tx_done and ctrl(ctrl_uart_tx_irq_c)) or
                  (spi_irq and ctrl(ctrl_spi_irq_en_c));

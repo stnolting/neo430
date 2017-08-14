@@ -37,7 +37,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               17.07.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               21.07.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -233,17 +233,17 @@ begin
   end process external_irq_sync;
 
   -- interrupt priority assignment --
-  irq(0) <= timer_irq;    -- timer match
+  irq(0) <= timer_irq;    -- timer match (highest priority)
   irq(1) <= usart_irq;    -- UART Rx available | UART Tx done | SPI RTX done
   irq(2) <= gpio_irq;     -- GPIO input pin change
-  irq(3) <= xirq_sync(1); -- external interrupt request
+  irq(3) <= xirq_sync(1); -- external interrupt request (lowest priority)
 
   -- external interrupt acknowledge --
   irq_ack_o <= irq_ack(3);
   --- the internal irq sources DO NOT REQUIRE an acknowledge!
 
 
-  -- Main Memory (ROM & RAM) --------------------------------------------------
+  -- Main Memory (ROM/IMEM & RAM/DMEM) ----------------------------------------
   -- -----------------------------------------------------------------------------
   neo430_imem_inst: neo430_imem
   generic map (

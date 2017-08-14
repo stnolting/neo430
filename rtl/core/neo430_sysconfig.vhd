@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               17.07.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               09.08.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -88,11 +88,6 @@ architecture neo430_sysconfig_rtl of neo430_sysconfig is
   -- interrupt vectors RAM --
   type irqv_mem_t is array (0 to 3) of std_ulogic_vector(15 downto 0);
   signal irqvec_mem : irqv_mem_t; -- RAM
-
-  --- RAM attribute to inhibit bypass-logic - Altera only! ---
-  attribute ramstyle : string;
-  attribute ramstyle of sysinfo_mem : signal is "no_rw_check, M512";
-  attribute ramstyle of irqvec_mem  : signal is "no_rw_check, M512";
 
 begin
 

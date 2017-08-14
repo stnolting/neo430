@@ -34,7 +34,7 @@ The result can also be "read" as 32-bit value:
 To install the hardware of this unit, replace the original neo430_cfu.vhd in the rtl\core folder with the
 neo430_cfu.vhd from this folder.
 
-Include the header file from this folder to you application code to install the required software driver functions.
+Include the header file from this folder to your application code to install the required software driver functions.
 
 The header file (cfu_mac16.h) provides the required definitions of the unit's interface registers
 as well as some rudimentary multiplication/multiply-and-accumulate operations implemented as inlined

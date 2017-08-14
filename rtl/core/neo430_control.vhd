@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               16.06.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               13.08.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -76,7 +76,6 @@ architecture neo430_control_rtl of neo430_control is
 
   -- irq system --
   signal irq_start, irq_ack    : std_ulogic;
-  signal irq_run, irq_ret      : std_ulogic;
   signal irq_ack_mask, irq_buf : std_ulogic_vector(3 downto 0);
   signal irq_vec_nxt, irq_vec  : std_ulogic_vector(1 downto 0);
 
@@ -147,7 +146,6 @@ begin
     ir_wren   <= '0';
     mem_rd    <= '0';
     irq_ack   <= '0';
-    irq_ret   <= '0';
 
     -- control defaults --
     ctrl_nxt <= (others => '0');
@@ -548,7 +546,6 @@ begin
       -- ------------------------------------------------------------
         ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_pc_c; -- destination: PC
         ctrl_nxt(ctrl_rf_wb_en_c) <= '1'; -- valid RF write back
-        irq_ret   <= '1';
         state_nxt <= IFETCH_0; -- done!
 
 
@@ -626,30 +623,19 @@ begin
       irq_buf   <= (others => '0');
       irq_vec   <= (others => '0');
       irq_start <= '0'; -- starting IRQ handler
-      irq_run   <= '0'; -- running IRQ handler
     elsif rising_edge(clk_i) then
-      for i in 0 to 3 loop
-        if (irq_ack_mask(i) = '0') then -- gather irqs
-          irq_buf(i) <= (sreg_i(sreg_i_c) or irq_run) and (irq_buf(i) or irq_i(i));
-        else -- ack irq
-          irq_buf(i) <= '0';
-        end if;
-      end loop; -- i
+      -- gather IRQs --
+      irq_buf <= (irq_buf or irq_i) and (not irq_ack_mask);
       -- starting IRQ --
       if (irq_start = '0') then -- no starting IRQ
         irq_vec <= irq_vec_nxt;
         if (irq_buf /= "0000") and (sreg_i(sreg_i_c) = '1') then
           irq_start <= '1';
         end if;
-      -- acknowledge start of IRQ handler or disable IRQs
-      elsif (irq_ack = '1') or (sreg_i(sreg_i_c) = '0') then
+      -- clear start flag when entering IRQ service routinge (auto clear of I flag)
+      -- or manually abort IRQ start by clearing the I flag
+      elsif (sreg_i(sreg_i_c) = '0') then
         irq_start <= '0';
-      end if;
-      -- running IRQ --
-      if (irq_run = '0') then -- no executing IRQ
-        irq_run <= irq_start;
-      elsif (irq_ret = '1') then -- return from irq
-        irq_run <= '0';
       end if;
     end if;
   end process irq_controller;

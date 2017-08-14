@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               20.07.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               13.08.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -30,7 +30,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0122"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0123"; -- no touchy!
 
   -- Internal Functions ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ package neo430_package is
   constant boot_base_c : std_ulogic_vector(15 downto 0) := x"F000"; -- bootloader base address, fixed!
   constant boot_size_c : natural := 2048; -- bytes, max 2048 bytes!
 
-  -- IO: IO Area --
+  -- IO: Peripheral Devices ("IO") Area --
   -- Each internal IO device (except sysconfig) must not use more than 16 bytes address space!
   constant io_base_c : std_ulogic_vector(15 downto 0) := x"FF80";
   constant io_size_c : natural := 128; -- bytes, fixed!
@@ -216,6 +216,58 @@ package neo430_package is
   constant alu_bis_c  : std_ulogic_vector(3 downto 0) := "1101"; -- r <= a | b
   constant alu_xor_c  : std_ulogic_vector(3 downto 0) := "1110"; -- r <= a xor b
   constant alu_and_c  : std_ulogic_vector(3 downto 0) := "1111"; -- r <= a & b
+
+
+  -- The Core of the Problem: Processor Top Entity ------------------------------------------
+  -- -------------------------------------------------------------------------------------------
+  component neo430_top
+    generic (
+      -- general configuration --
+      CLOCK_SPEED : natural := 100000000; -- main clock in Hz
+      IMEM_SIZE   : natural := 4*1024; -- internal IMEM size in bytes, max 32kB (default=4kB)
+      DMEM_SIZE   : natural := 2*1024; -- internal DMEM size in bytes, max 28kB (default=2kB)
+      -- additional configuration --
+      USER_CODE   : std_ulogic_vector(15 downto 0) := x"0000"; -- custom user code
+      -- module configuration --
+      DADD_USE    : boolean := true;  -- implement DADD instruction? (default=true)
+      CFU_USE     : boolean := false; -- implement custom function unit? (default=false)
+      WB32_USE    : boolean := true;  -- implement WB32 unit? (default=true)
+      WDT_USE     : boolean := true;  -- implement WBT? (default=true)
+      GPIO_USE    : boolean := true;  -- implement GPIO unit? (default=true)
+      TIMER_USE   : boolean := true;  -- implement timer? (default=true)
+      USART_USE   : boolean := true;  -- implement USART? (default=true)
+      -- boot configuration --
+      BOOTLD_USE  : boolean := true; -- implement and use bootloader? (default=true)
+      IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory? (default=false)
+    );
+    port (
+      -- global control --
+      clk_i      : in  std_ulogic; -- global clock, rising edge
+      rst_i      : in  std_ulogic; -- global reset, async, low-active
+      -- gpio --
+      gpio_o     : out std_ulogic_vector(15 downto 0); -- parallel output
+      gpio_i     : in  std_ulogic_vector(15 downto 0); -- parallel input
+      -- serial com --
+      uart_txd_o : out std_ulogic; -- UART send data
+      uart_rxd_i : in  std_ulogic; -- UART receive data
+      spi_sclk_o : out std_ulogic; -- serial clock line
+      spi_mosi_o : out std_ulogic; -- serial data line out
+      spi_miso_i : in  std_ulogic; -- serial data line in
+      spi_cs_o   : out std_ulogic_vector(05 downto 0); -- SPI CS 0..5
+      -- 32-bit wishbone interface --
+      wb_adr_o   : out std_ulogic_vector(31 downto 0); -- address
+      wb_dat_i   : in  std_ulogic_vector(31 downto 0); -- read data
+      wb_dat_o   : out std_ulogic_vector(31 downto 0); -- write data
+      wb_we_o    : out std_ulogic; -- read/write
+      wb_sel_o   : out std_ulogic_vector(03 downto 0); -- byte enable
+      wb_stb_o   : out std_ulogic; -- strobe
+      wb_cyc_o   : out std_ulogic; -- valid cycle
+      wb_ack_i   : in  std_ulogic; -- transfer acknowledge
+      -- interrupts --
+      irq_i      : in  std_ulogic; -- external interrupt request line
+      irq_ack_o  : out std_ulogic  -- external interrupt request acknowledge
+    );
+  end component;
 
   -- Component: Control ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------

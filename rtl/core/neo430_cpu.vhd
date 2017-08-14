@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               01.06.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               13.08.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -39,7 +39,7 @@ entity neo430_cpu is
   port (
     -- global control --
     clk_i      : in  std_ulogic; -- global clock, rising edge
-    rst_i      : in  std_ulogic; -- global reset, low-active
+    rst_i      : in  std_ulogic; -- global reset, low-active, async
     -- memory interface --
     mem_rd_o   : out std_ulogic; -- memory read enable
     mem_imwe_o : out std_ulogic; -- allow writing to IMEM
@@ -80,7 +80,7 @@ begin
   port map (
     -- global control --
     clk_i      => clk_i,      -- global clock, rising edge
-    rst_i      => rst_i,      -- global reset, low-active
+    rst_i      => rst_i,      -- global reset, low-active, async
     -- memory interface --
     instr_i    => mem_data_i, -- instruction word from memory
     -- control --
@@ -103,7 +103,7 @@ begin
   port map (
     -- global control --
     clk_i      => clk_i,      -- global clock, rising edge
-    rst_i      => rst_i,      -- global reset, low-active
+    rst_i      => rst_i,      -- global reset, low-active, async
     -- data input --
     alu_i      => alu_res,    -- data from alu
     addr_i     => addr_fb,    -- data from addr unit

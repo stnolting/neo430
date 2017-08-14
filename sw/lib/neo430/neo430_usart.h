@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               19.07.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               21.07.2017  #
 // #################################################################################################
 
 #ifndef neo430_usart_h
@@ -131,7 +131,7 @@ void uart_set_baud(uint32_t baudrate){
     p++;
   }
 
-  USI_BAUD = ((uint16_t)p << 8) | (i & 0x00FF);
+  USI_BAUD = ((uint16_t)p << 8) | i;
 }
 
 

@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               23.02.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               13.08.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -135,7 +135,7 @@ begin
   -- assign virtual SREG --
   virtual_sreg: process(c_flag, z_flag, n_flag, i_flag, s_flag, v_flag, r_flag)
   begin
-    sreg(15 downto 0) <= (others => '0');
+    sreg <= (others => '0');
     sreg(sreg_c_c) <= c_flag;
     sreg(sreg_z_c) <= z_flag;
     sreg(sreg_n_c) <= n_flag;
