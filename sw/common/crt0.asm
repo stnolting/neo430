@@ -91,9 +91,9 @@ __crt0_cpy_data_end:
 
 
 ; -----------------------------------------------------------
-; Clear all pending IRQ from buffer
+; Re-init SR and clear all pending IRQ from buffer
 ; -----------------------------------------------------------
-    bis #(1<<14), r2 ; this flag auto clears
+    mov #(1<<14), r2 ; this flag auto clears
 
 
 ; -----------------------------------------------------------

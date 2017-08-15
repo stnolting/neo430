@@ -212,16 +212,13 @@ void __attribute__((__interrupt__)) timer_irq_handler(void) {
  * ------------------------------------------------------------ */
 void start_app(void) {
 
-  // deactivate IRQs, no more write access to IMEM
-  asm volatile ("mov #0, r2");
+  // deactivate IRQs, no more write access to IMEM, clear all pending IRQ
+  asm volatile ("mov %0, r2" : : "i" (1<<Q_FLAG));
 
   uart_br_print("Booting...\n");
 
   // wait for UART to finish transmitting
   while(USI_CT & (1<<USI_CT_UARTTXBSY));
-
-  // clear all pending interrupts
-  clear_irq_buffer();
 
   // start app in IMEM at address 0x0000
   while (1) {
