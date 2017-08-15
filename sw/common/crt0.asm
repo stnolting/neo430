@@ -19,7 +19,7 @@
 ; # You should have received a copy of the GNU Lesser General Public License along with this      #
 ; # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 ; # ********************************************************************************************* #
-; #  Stephan Nolting, Hannover, Germany                                               08.06.2017  #
+; #  Stephan Nolting, Hannover, Germany                                               15.08.2017  #
 ; #################################################################################################
 
   .file	"crt0.asm"
@@ -88,6 +88,12 @@ __crt0_cpy_data:
       incd r7
       jmp  __crt0_cpy_data
 __crt0_cpy_data_end:
+
+
+; -----------------------------------------------------------
+; Clear all pending IRQ from buffer
+; -----------------------------------------------------------
+    bis #(1<<14), r2 ; this flag auto clears
 
 
 ; -----------------------------------------------------------

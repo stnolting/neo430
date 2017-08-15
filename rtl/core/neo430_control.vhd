@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               13.08.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               15.08.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -625,7 +625,9 @@ begin
       irq_start <= '0'; -- starting IRQ handler
     elsif rising_edge(clk_i) then
       -- gather IRQs --
-      irq_buf <= (irq_buf or irq_i) and (not irq_ack_mask);
+      for i in 0 to 3 loop
+        irq_buf(i) <= (irq_buf(i) or irq_i(i)) and (not sreg_i(sreg_q_c)) and (not irq_ack_mask(i));
+      end loop; -- i
       -- starting IRQ --
       if (irq_start = '0') then -- no starting IRQ
         irq_vec <= irq_vec_nxt;

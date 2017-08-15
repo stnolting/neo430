@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               13.08.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               15.08.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -63,7 +63,7 @@ architecture neo430_reg_file_rtl of neo430_reg_file is
   attribute ramstyle of reg_file : signal is "no_rw_check";
 
   -- status flags --
-  signal c_flag, z_flag, n_flag, i_flag, s_flag, v_flag, r_flag : std_ulogic;
+  signal c_flag, z_flag, n_flag, i_flag, s_flag, v_flag, q_flag, r_flag : std_ulogic;
 
   -- misc --
   signal in_data_tmp : std_ulogic_vector(15 downto 0); -- input selection tmp
@@ -96,6 +96,7 @@ begin
       i_flag <= '0'; -- interrupts disabled
       s_flag <= '0'; -- sleep disabled
       v_flag <= '0'; -- overflow
+      q_flag <= '0'; -- clear pending IRQ buffer
       r_flag <= '0'; -- IMEM (ROM) write access disabled
     elsif rising_edge(clk_i) then
       -- status register --
@@ -107,8 +108,10 @@ begin
         i_flag <= in_data(sreg_i_c);
         s_flag <= in_data(sreg_s_c);
         v_flag <= in_data(sreg_v_c);
+        q_flag <= in_data(sreg_q_c);
         r_flag <= in_data(sreg_r_c);
       else -- automatic update
+        q_flag <= '0'; -- auto-clear
         if (ctrl_i(ctrl_rf_dsleep_c) = '1') then -- disable sleep mode
           s_flag <= '0';
         end if;
@@ -133,7 +136,7 @@ begin
   end process rf_write;
 
   -- assign virtual SREG --
-  virtual_sreg: process(c_flag, z_flag, n_flag, i_flag, s_flag, v_flag, r_flag)
+  virtual_sreg: process(c_flag, z_flag, n_flag, i_flag, s_flag, v_flag, q_flag, r_flag)
   begin
     sreg <= (others => '0');
     sreg(sreg_c_c) <= c_flag;
@@ -142,6 +145,7 @@ begin
     sreg(sreg_i_c) <= i_flag;
     sreg(sreg_s_c) <= s_flag;
     sreg(sreg_v_c) <= v_flag;
+    sreg(sreg_q_c) <= q_flag;
     sreg(sreg_r_c) <= r_flag;
   end process virtual_sreg;
 

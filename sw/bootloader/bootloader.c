@@ -29,7 +29,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               19.07.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               18.08.2017  #
 // #################################################################################################
 
 // Libraries
@@ -126,13 +126,14 @@ int main(void) {
   TMR_CT = (1<<TMR_CT_EN) | (1<<TMR_CT_ARST) | (1<<TMR_CT_IRQ) | ((16-1)<<TMR_CT_PRSC0);
   TMR_CNT = 0;
 
+  clear_irq_buffer(); // clear all pending interrupts
   eint(); // enable global interrupts
 
 
   // ****************************************************************
   // Show bootloader intro and system information
   // ****************************************************************
-  uart_br_print("\n\nNEO430 Bootloader V20170719 by Stephan Nolting\n\n"
+  uart_br_print("\n\nNEO430 Bootloader V20170818 by Stephan Nolting\n\n"
 
                 "HWV: 0x");
   uart_print_hex_word(HW_VERSION);
@@ -218,6 +219,9 @@ void start_app(void) {
 
   // wait for UART to finish transmitting
   while(USI_CT & (1<<USI_CT_UARTTXBSY));
+
+  // clear all pending interrupts
+  clear_irq_buffer();
 
   // start app in IMEM at address 0x0000
   while (1) {

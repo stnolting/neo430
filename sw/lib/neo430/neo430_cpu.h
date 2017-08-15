@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               19.07.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               15.08.2017  #
 // #################################################################################################
 
 #ifndef neo430_cpu_h
@@ -32,6 +32,7 @@ inline uint16_t get_sp(void);
 inline uint16_t get_sreg(void);
 inline void set_sreg(uint16_t d);
 inline void sleep(void);
+inline void clear_irq_buffer(void);
 void cpu_delay(uint16_t t);
 void _memset(uint8_t *dst, uint8_t data, uint16_t num);
 uint8_t _memcmp(uint8_t *dst, uint8_t *src, uint16_t num);
@@ -104,6 +105,16 @@ inline void set_sreg(uint16_t d){
 inline void sleep(void){
 
   asm volatile ("bis %0, r2" : : "i" (1<<S_FLAG));
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Clear CPU pending IRQ buffer
+ * ------------------------------------------------------------ */
+inline void clear_irq_buffer(void){
+
+  asm volatile ("bis %0, r2" : : "i" (1<<Q_FLAG));
+  // no need to reset the flag as it automatically clears again
 }
 
 

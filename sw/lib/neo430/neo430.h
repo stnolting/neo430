@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               19.07.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               15.08.2017  #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -36,13 +36,14 @@
 // ----------------------------------------------------------------------------
 // CPU Status Register (r2) Flags
 // ----------------------------------------------------------------------------
-#define C_FLAG 0  // carry
-#define Z_FLAG 1  // zero
-#define N_FLAG 2  // negative
-#define I_FLAG 3  // global interrupt enable
-#define S_FLAG 4  // sleep
-#define V_FLAG 8  // overflow
-#define R_FLAG 15 // allow write-access to IMEM
+#define C_FLAG 0  // r/w: carry
+#define Z_FLAG 1  // r/w: zero
+#define N_FLAG 2  // r/w: negative
+#define I_FLAG 3  // r/w: global interrupt enable
+#define S_FLAG 4  // r/w: sleep
+#define V_FLAG 8  // r/w: overflow
+#define Q_FLAG 14 // -/w: clear pending IRQ buffer when set
+#define R_FLAG 15 // r/w: allow write-access to IMEM
 
 
 // ----------------------------------------------------------------------------

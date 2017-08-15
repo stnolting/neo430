@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               13.08.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               15.08.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -30,7 +30,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0123"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0124"; -- no touchy!
 
   -- Internal Functions ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -134,13 +134,14 @@ package neo430_package is
 
   -- Status Register ------------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant sreg_c_c : natural := 0;  -- carry flag
-  constant sreg_z_c : natural := 1;  -- zero flag
-  constant sreg_n_c : natural := 2;  -- negative flag
-  constant sreg_i_c : natural := 3;  -- global interrupt enable
-  constant sreg_s_c : natural := 4;  -- CPU sleep flag
-  constant sreg_v_c : natural := 8;  -- overflow flag
-  constant sreg_r_c : natural := 15; -- enable write access to IMEM (ROM) when set
+  constant sreg_c_c : natural := 0;  -- r/w: carry flag
+  constant sreg_z_c : natural := 1;  -- r/w: zero flag
+  constant sreg_n_c : natural := 2;  -- r/w: negative flag
+  constant sreg_i_c : natural := 3;  -- r/w: global interrupt enable
+  constant sreg_s_c : natural := 4;  -- r/w: CPU sleep flag
+  constant sreg_v_c : natural := 8;  -- r/w: overflow flag
+  constant sreg_q_c : natural := 14; -- -/w: clear pending IRQ buffer when set
+  constant sreg_r_c : natural := 15; -- r/w: enable write access to IMEM (ROM) when set
 
   -- ALU Flag Bus ---------------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
