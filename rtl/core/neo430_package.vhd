@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               15.08.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               19.08.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -34,13 +34,14 @@ package neo430_package is
 
   -- Internal Functions ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  function index_size(input: natural) return natural;
-  function bit_reversal(input: std_ulogic_vector) return std_ulogic_vector;
-  function set_bits(input: std_ulogic_vector) return natural;
-  function leading_zeros(input: std_ulogic_vector) return natural;
-  function cond_sel_natural(cond: boolean; val_t: natural; val_f: natural) return natural;
-  function cond_sel_stdulogicvector(cond: boolean; val_t: std_ulogic_vector; val_f: std_ulogic_vector) return std_ulogic_vector;
-  function bool_to_ulogic(cond: boolean) return std_ulogic;
+  function index_size(input : natural) return natural;
+  function is_power_of_two(num : natural; bit_width : natural) return boolean;
+  function bit_reversal(input : std_ulogic_vector) return std_ulogic_vector;
+  function set_bits(input : std_ulogic_vector) return natural;
+  function leading_zeros(input : std_ulogic_vector) return natural;
+  function cond_sel_natural(cond : boolean; val_t : natural; val_f : natural) return natural;
+  function cond_sel_stdulogicvector(cond : boolean; val_t : std_ulogic_vector; val_f : std_ulogic_vector) return std_ulogic_vector;
+  function bool_to_ulogic(cond : boolean) return std_ulogic;
   function bin_to_gray(input : std_ulogic_vector) return std_ulogic_vector;
   function gray_to_bin(input : std_ulogic_vector) return std_ulogic_vector;
   function int_to_hexchar(input : integer) return character;
@@ -594,9 +595,21 @@ package body neo430_package is
       if (2**i >= input) then
         return i;
       end if;
-    end loop;
+    end loop; -- i
     return 0;
   end function index_size;
+
+  -- Function: Test is value (encoded with a certain bit width) is a power of 2 -------------
+  -- -------------------------------------------------------------------------------------------
+  function is_power_of_two(num : natural; bit_width : natural) return boolean is
+  begin
+    for i in 0 to bit_width loop
+      if ((2**i) = num) then
+        return true;
+      end if;
+    end loop; -- i
+    return false;
+  end function is_power_of_two;
 
   -- Function: Bit reversal -----------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -641,7 +654,7 @@ package body neo430_package is
 
   -- Function: Conditional select natural ---------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  function cond_sel_natural(cond: boolean; val_t: natural; val_f: natural) return natural is
+  function cond_sel_natural(cond : boolean; val_t : natural; val_f : natural) return natural is
   begin
     if (cond = true) then
       return val_t;
@@ -652,7 +665,7 @@ package body neo430_package is
 
   -- Function: Conditional select std_ulogic_vector -----------------------------------------
   -- -------------------------------------------------------------------------------------------
-  function cond_sel_stdulogicvector(cond: boolean; val_t: std_ulogic_vector; val_f: std_ulogic_vector) return std_ulogic_vector is
+  function cond_sel_stdulogicvector(cond : boolean; val_t : std_ulogic_vector; val_f : std_ulogic_vector) return std_ulogic_vector is
   begin
     if (cond = true) then
       return val_t;
@@ -663,7 +676,7 @@ package body neo430_package is
 
   -- Function: Convert BOOL to STD_ULOGIC ---------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  function bool_to_ulogic(cond: boolean) return std_ulogic is
+  function bool_to_ulogic(cond : boolean) return std_ulogic is
   begin
     if (cond = true) then
       return '1';

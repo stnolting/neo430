@@ -212,7 +212,7 @@ void __attribute__((__interrupt__)) timer_irq_handler(void) {
  * ------------------------------------------------------------ */
 void start_app(void) {
 
-  // deactivate IRQs, no more write access to IMEM, clear all pending IRQ
+  // deactivate IRQs, no more write access to IMEM, clear all pending IRQs
   asm volatile ("mov %0, r2" : : "i" (1<<Q_FLAG));
 
   uart_br_print("Booting...\n");

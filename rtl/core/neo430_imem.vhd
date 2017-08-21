@@ -24,7 +24,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               09.08.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               19.08.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -85,7 +85,7 @@ architecture neo430_imem_rtl of neo430_imem is
   signal acc_en : std_ulogic;
   signal rdata  : std_ulogic_vector(15 downto 0);
   signal rden   : std_ulogic;
-  signal addr   : natural range 0 to IMEM_SIZE/2-1;
+  signal addr   : integer;
 
   -- ROM --
   constant imem_init_file : init_file_t := init_imem(application_init_image);
@@ -94,7 +94,7 @@ architecture neo430_imem_rtl of neo430_imem is
   signal imem_file_l : imem_file8_t := split_imem(false, imem_init_file);
   signal imem_file_h : imem_file8_t := split_imem(true,  imem_init_file);
 
-  --- RAM attribute to inhibit bypass-logic - Altera only! ---
+  -- RAM attribute to inhibit bypass-logic - Altera only! --
   attribute ramstyle : string;
   attribute ramstyle of imem_file_l : signal is "no_rw_check";
   attribute ramstyle of imem_file_h : signal is "no_rw_check";
@@ -104,7 +104,7 @@ begin
   -- Access Control -----------------------------------------------------------
   -- -----------------------------------------------------------------------------
   acc_en <= '1' when (addr_i >= imem_base_c) and (addr_i < std_ulogic_vector(unsigned(imem_base_c) + IMEM_SIZE)) else '0';
-  addr <= to_integer(unsigned(addr_i(index_size(IMEM_SIZE/2) downto 1))); -- word aligned
+  addr   <= to_integer(unsigned(addr_i(index_size(IMEM_SIZE/2) downto 1))); -- word aligned
 
 
   -- Memory Access ------------------------------------------------------------
@@ -113,18 +113,42 @@ begin
   begin
     if rising_edge(clk_i) then
       rden <= rden_i and acc_en;
-      if (IMEM_AS_ROM = false) then -- IMEM as true RAM
+      if (IMEM_AS_ROM = false) then -- implement IMEM as true RAM?
         if (acc_en = '1') and (upen_i = '1') then -- valid write access at all?
           if (wren_i(0) = '1') then -- write low byte
-            imem_file_l(addr) <= data_i(07 downto 0);
+            if (is_power_of_two(IMEM_SIZE, 16) = true) then
+              imem_file_l(addr) <= data_i(07 downto 0);
+            -- modified write-access: to prevent simulation errors when IMEM_SIZE is not a power of 2 --
+            elsif (addr < IMEM_SIZE/2) then
+              imem_file_l(addr) <= data_i(07 downto 0);
+            else
+              report "IMEM write access out of range since IMEM_SIZE is not a power of 2!" severity error;
+            end if;
           end if;
           if (wren_i(1) = '1') then -- write high byte
-            imem_file_h(addr) <= data_i(15 downto 8);
+            if (is_power_of_two(IMEM_SIZE, 16) = true) then
+              imem_file_h(addr) <= data_i(15 downto 8);
+            -- modified write-access: to prevent simulation errors when IMEM_SIZE is not a power of 2 --
+            elsif (addr < IMEM_SIZE/2) then
+              imem_file_h(addr) <= data_i(15 downto 8);
+            else
+              report "IMEM write access out of range since IMEM_SIZE is not a power of 2!" severity error;
+            end if;
           end if;
         end if;
+      end if;
+      if (is_power_of_two(IMEM_SIZE, 16) = false) then
+        -- modified read-access: to prevent simulation errors when IMEM_SIZE is not a power of 2 --
+        if (addr < IMEM_SIZE/2) then
+          rdata <= imem_file_h(addr) & imem_file_l(addr);
+        else
+          if ((rden_i and acc_en) = '1') then
+            report "IMEM read access out of range since IMEM_SIZE is not a power of 2!" severity error;
+          end if;
+          rdata <= (others => '-');
+        end if;
+      else
         rdata <= imem_file_h(addr) & imem_file_l(addr);
-      else -- IMEM as true ROM
-        rdata <= imem_init_file(addr);
       end if;
     end if;
   end process imem_file_access;
