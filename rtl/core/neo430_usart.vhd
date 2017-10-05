@@ -23,7 +23,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               19.07.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               28.09.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -293,13 +293,18 @@ begin
           spi_mosi_o <= spi_rtx_sreg(7); -- MSB first
           if (spi_clk = '1') then
             spi_state1   <= '1';
-            spi_rtx_sreg <= spi_rtx_sreg(6 downto 0) & spi_miso_ff1; -- MSB first
+            if (ctrl(ctrl_spi_cpha_c) = '0') then
+              spi_rtx_sreg <= spi_rtx_sreg(6 downto 0) & spi_miso_ff1; -- MSB first
+            end if;
             spi_bitcnt   <= std_ulogic_vector(unsigned(spi_bitcnt) - 1);
           end if;
         else -- second half of transmission
           spi_sclk_o <= not ctrl(ctrl_spi_cpha_c);
           if (spi_clk = '1') then
             spi_state1 <= '0';
+            if (ctrl(ctrl_spi_cpha_c) = '1') then
+              spi_rtx_sreg <= spi_rtx_sreg(6 downto 0) & spi_miso_ff1; -- MSB first
+            end if;
             if (spi_bitcnt = "0000") then
               spi_state0 <= '0';
               spi_busy   <= '0';
