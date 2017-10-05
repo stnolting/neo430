@@ -21,7 +21,7 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 # ********************************************************************************************* #
-#  Stephan Nolting, Hannover, Germany                                               20.05.2017  #
+#  Stephan Nolting, Hannover, Germany                                               05.10.2017  #
 #################################################################################################
 
 
@@ -29,7 +29,7 @@
 # USER CONFIGURATION
 #-------------------------------------------------------------------------------
 # Path of compiler binaries:
-BIN_PATH = /mnt/c/msp430-gcc-6.2.1.16_linux64/bin
+BIN_PATH = /mnt/c/msp430-gcc-6.4.0.32_linux64/bin
 
 # Compiler effort (-Os = optimize for size)
 EFFORT = -Os
@@ -54,23 +54,10 @@ all: $(APP_ASM) $(APP_BIN) neo430_application_image.vhd clean
 #-------------------------------------------------------------------------------
 # Definitions
 #-------------------------------------------------------------------------------
-#This script is still compatible with the old MSPGCC.
-#Use MSPGCC only if you know what you are doing!
-#MSPGCC is obsolete!
+# This script is still compatible with the old MSPGCC.
+# Use MSPGCC only if you know what you are doing!
+# MSPGCC is obsolete!
 USE_TIMSP430_GCC = true
-MULTIPLIER = false
-
-# MAC/MUL option (OBSOLETE!!!)
-ifeq ($(MULTIPLIER),true)
-ifeq ($(USE_TIMSP430_GCC),true)
-	@echo WARNING! NEO430 hardware multiplier not supported by msp430-elf-gcc!
-  MCU = msp430f133
-else
-  MCU = msp430f233
-endif
-else
-  MCU = msp430f133
-endif
 
 #-------------------------------------------------------------------------------
 # Tools
@@ -129,11 +116,11 @@ $(IMAGE_GEN): $(TOOL_PATH)/image_gen/main.cpp
 #-------------------------------------------------------------------------------
 # Assemble startup code
 crt0.elf: $(COMMON_PATH)/crt0.asm
-	@$(AS) -g -mY -mmcu=$(MCU) $< -o $@
+	@$(AS) -g -mY -mcpu=msp430 $< -o $@
 
 # Compile app sources
 main.elf: $(APP_SRC) crt0.elf
-	@$(CC) $(CC_OPTS) $(EFFORT) -mmcu=$(MCU) $< -T neo430_linker_script.x -o $@ -lm
+	@$(CC) $(CC_OPTS) $(EFFORT) -mcpu=msp430 -hwmult=none $< -T neo430_linker_script.x -o $@ -lm
 	@echo Memory utilization:
 	@$(SIZE) main.elf
 

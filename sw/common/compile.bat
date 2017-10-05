@@ -21,37 +21,24 @@
 @REM # You should have received a copy of the GNU Lesser General Public License along with this      #
 @REM # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 @REM # ********************************************************************************************* #
-@REM #  Stephan Nolting, Hannover, Germany                                               20.05.2017  #
+@REM #  Stephan Nolting, Hannover, Germany                                               05.10.2017  #
 @REM #################################################################################################
 
 
 @REM ----------------------USER CONFIGURATION----------------------
 @REM Path of compiler binaries:
-@set BIN_PATH=C:\msp430-gcc-6.2.1.16_win32\bin
+@set BIN_PATH=C:\msp430-gcc-6.4.0.32_win32\bin
 
 @REM Compiler effort (-Os = optimize for size)
 @set EFFORT=-Os
 @REM --------------------------------------------------------------
 
 
-
 @REM This script is still compatible with the old MSPGCC.
 @REM Use MSPGCC only if you know what you are doing!
 @REM MSPGCC is obsolete!
 @set USE_TIMSP430_GCC=true
-@set MULTIPLIER=false
 
-@REM MAC/MUL option (OBSOLETE!!!)
-@if %MULTIPLIER%==true (
-  @if %USE_TIMSP430_GCC%==true (
-    @echo WARNING! NEO430 hardware multiplier not supported by msp430-elf-gcc!
-    @set MCU=msp430f133
-  ) else (
-    @set MCU=msp430f233
-  )
-) else (
-  @set MCU=msp430f133
-)
 
 @REM Compiler tools (obsolete!!!)
 @if %USE_TIMSP430_GCC%==false (
@@ -78,10 +65,10 @@
 )
 
 @REM Assemble start-up code
-@%AS% -mmcu=msp430f133 crt0.asm -mY -o crt0.elf
+@%AS% -mcpu=msp430 crt0.asm -mY -o crt0.elf
 
 @REM Compile
-@%CC% %CC_OPTS% %EFFORT% -mmcu=%MCU% %1 -T neo430_linker_script.x -o main.elf -lm
+@%CC% %CC_OPTS% %EFFORT% -mcpu=msp430 -hwmult=none %1 -T neo430_linker_script.x -o main.elf -lm
 
 @REM Print memory utilization
 @echo Memory utilization:

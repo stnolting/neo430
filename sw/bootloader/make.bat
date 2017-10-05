@@ -21,13 +21,13 @@
 @REM # You should have received a copy of the GNU Lesser General Public License along with this      #
 @REM # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 @REM # ********************************************************************************************* #
-@REM #  Stephan Nolting, Hannover, Germany                                               20.05.2017  #
+@REM #  Stephan Nolting, Hannover, Germany                                               05.10.2017  #
 @REM #################################################################################################
 
 
 @REM ----------------------USER CONFIGURATION----------------------
 @REM Path of MSPGCC binaries:
-@set BIN_PATH=C:\msp430-gcc-6.2.1.16_win32\bin
+@set BIN_PATH=C:\msp430-gcc-6.4.0.32_win32\bin
 @REM --------------------------------------------------------------
 
 @REM Tools
@@ -43,11 +43,11 @@
 
 @REM Compiler flags
 @set CC_OPTS=-nostartfiles -pipe -fwhole-program -fdata-sections -ffunction-sections -Xlinker --gc-sections -Wl,-static -Wall
-@set CC_OPTS=%CC_OPTS% -lm -Os -mmcu=msp430f133 -T boot_linker_script.x -minrt -Xassembler --mY -mhwmult=none
+@set CC_OPTS=%CC_OPTS% -lm -Os -mcpu=msp430 -T boot_linker_script.x -minrt -Xassembler --mY -mhwmult=none
 
 
 @REM Assemble startup code
-@%AS% -mmcu=msp430 boot_crt0.asm -mY -o crt0.elf
+@%AS% -mcpu=msp430 boot_crt0.asm -mY -o crt0.elf
 
 @REM Compile app sources
 @%CC% %CC_OPTS% bootloader.c -o main.elf

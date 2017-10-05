@@ -21,7 +21,7 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 # ********************************************************************************************* #
-#  Stephan Nolting, Hannover, Germany                                               20.05.2017  #
+#  Stephan Nolting, Hannover, Germany                                               05.10.2017  #
 #################################################################################################
 
 
@@ -29,7 +29,7 @@
 # USER CONFIGURATION
 #-------------------------------------------------------------------------------
 # Path of compiler binaries:
-BIN_PATH = /mnt/c/msp430-gcc-6.2.1.16_linux64/bin
+BIN_PATH = /mnt/c/msp430-gcc-6.4.0.32_linux64/bin
 
 #-------------------------------------------------------------------------------
 # Make defaults
@@ -57,7 +57,7 @@ IMAGE_GEN = $(TOOL_PATH)/image_gen/image_gen
 
 # Remove -g to exclude debugging information
 CC_OPTS  = -nostartfiles -pipe -fwhole-program -fdata-sections -ffunction-sections -Xlinker --gc-sections -Wl,-static -Wall
-CC_OPTS += -lm -Os -mmcu=msp430f133 -T boot_linker_script.x -minrt -Xassembler --mY -mhwmult=none
+CC_OPTS += -lm -Os -mcpu=msp430 -T boot_linker_script.x -minrt -Xassembler --mY -mhwmult=none
 
 #-------------------------------------------------------------------------------
 # Paths
@@ -87,7 +87,7 @@ $(IMAGE_GEN): $(TOOL_PATH)/image_gen/main.cpp
 #-------------------------------------------------------------------------------
 # Assemble startup code
 crt0.elf: boot_crt0.asm
-	@$(AS) -g -mY -mmcu=msp430 $< -o $@
+	@$(AS) -g -mY -mcpu=msp430 $< -o $@
 
 # Compile app sources
 main.elf: bootloader.c crt0.elf
