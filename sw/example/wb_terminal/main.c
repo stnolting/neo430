@@ -115,7 +115,7 @@ int main(void) {
                       " setup - configure WB interface\n"
                       " read  - read from WB address\n"
                       " write - write to WB address\n"
-                      " dump  - dump data from WB address\n"
+                      " dump  - dump data from WB addresses\n"
                       " reset - perform soft-reset\n"
                       " exit  - exit program and return to bootloader\n");
         break;

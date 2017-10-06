@@ -19,7 +19,7 @@
 ; # You should have received a copy of the GNU Lesser General Public License along with this      #
 ; # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 ; # ********************************************************************************************* #
-; #  Stephan Nolting, Hannover, Germany                                               15.08.2017  #
+; #  Stephan Nolting, Hannover, Germany                                               06.10.2017  #
 ; #################################################################################################
 
   .file	"crt0.asm"
@@ -45,7 +45,7 @@ __crt0_begin:
 
 
 ; -----------------------------------------------------------
-; Additional hardware setup
+; Setup of peripheral modules
 ; -----------------------------------------------------------
     mov  #0, &0xFF9E ; clear WB control register
     mov  #0, &0xFFA6 ; clear USI control register
@@ -57,17 +57,17 @@ __crt0_begin:
 ; -----------------------------------------------------------
 ; Set all interrupt vectors to 0x0000 (reset)
 ; -----------------------------------------------------------
-    mov  #0, &0xFFF8 ; set timer match IRQ
-    mov  #0, &0xFFFA ; set uart rx avail / uart tx done / spi rtx done IRQ
-    mov  #0, &0xFFFC ; set pio pin change IRQ
-    mov  #0, &0xFFFE ; set external IRQ
+    mov  #0, &0xFFF8 ; timer match IRQ vector
+    mov  #0, &0xFFFA ; uart rx avail / uart tx done / spi rtx done IRQ vector
+    mov  #0, &0xFFFC ; pio pin change IRQ vector
+    mov  #0, &0xFFFE ; external IRQ vector
 
 
 ; -----------------------------------------------------------
 ; Clear complete DMEM (including .bss section)
 ; -----------------------------------------------------------
 __crt0_clr_dmem:
-      cmp  r8, r1    ; base address equal to end of RAM?
+      cmp  r8, r1 ; base address equal to end of RAM?
       jeq  __crt0_clr_dmem_end
       mov  #0, 0(r8) ; clear entry
       incd r8
@@ -108,8 +108,8 @@ __crt0_cpy_data_end:
 ; -----------------------------------------------------------
 __crt0_this_is_the_end:
     mov  #0x4700, &0xFFD0 ; deactivate watchdog
-    mov  #0, r2           ; deativate IRQ
-    mov  #16, r2          ; set CPU to sleep mode
+    mov  #0, r2 ; deativate IRQ
+    mov  #16, r2 ; set CPU to sleep mode
     nop
 
 .Lfe0:

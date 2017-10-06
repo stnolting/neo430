@@ -1,15 +1,15 @@
 // #################################################################################################
 // #  < NEO430 Bootloader >                                                                        #
 // # ********************************************************************************************* #
-// # Boot from IMEM, UART or SPI EEPROM at CS0                                                     #
+// # Boot from IMEM, UART or SPI EEPROM at SPI.CS[0]                                               #
 // #                                                                                               #
 // # UART configuration: 8N1 at 19200 baud                                                         #
-// # Boot EEPROM: SPI, 16-bit addresses, SPI.CS0, e.g. 25LC512                                     #
+// # Boot EEPROM: SPI, 16-bit addresses, SPI.CS[0], e.g. 25LC512                                   #
 // # GPIO.out[0] is used as high-active status LED                                                 #
 // #                                                                                               #
 // # Auto boot sequence after timeout:                                                             #
-// #  -> Try booting from SPI EEPROM                                                               #
-// #  -> permanently light up status led and freeze if SPI EEPOMR booting attempt fails            #
+// #  -> Try booting from SPI EEPROM at SPI.CS[0]                                                  #
+// #  -> permanently light up status led and freeze if SPI EEPROM booting attempt fails            #
 // # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 // # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -46,15 +46,15 @@
 #define STATUS_LED           0 // GPIO.out(0) is status LED
 
 // 25LC512 EEPROM
-#define BOOT_EEP_CS 0    // boot EEPROM CS (SPI.CS0)
-#define EEP_WRITE   0x02 // initialize start of write sequence
-#define EEP_READ    0x03 // initialize start of read sequence
-#define EEP_RDSR    0x05 // read status register
-#define EEP_WREN    0x06 // write enable
+#define BOOT_EEP_CS      0    // boot EEPROM CS (SPI.CS0)
+#define EEP_WRITE        0x02 // initialize start of write sequence
+#define EEP_READ         0x03 // initialize start of read sequence
+#define EEP_RDSR         0x05 // read status register
+#define EEP_WREN         0x06 // write enable
 
 // Image sources
-#define UART_IMAGE   0x00
-#define EEPROM_IMAGE 0x01
+#define UART_IMAGE       0x00
+#define EEPROM_IMAGE     0x01
 
 // Error codes
 #define ERROR_EEPROM     0x00 // EEPROM access error
@@ -64,7 +64,7 @@
 #define ERROR_CHECKSUM   0x08 // checksum error
 #define ERROR_UNKNOWN    0xFF // unknown error
 
-// Scratch register - abuse an unused IRQ vector for this
+// Scratch register for timeout counter - abuse an unused IRQ vector for this
 #define TIMEOUT_CNT IRQVEC_GPIO // this IRQ is disabled, so we are save ;)
 
 // Function prototypes
@@ -134,7 +134,6 @@ int main(void) {
   // Show bootloader intro and system information
   // ****************************************************************
   uart_br_print("\n\nNEO430 Bootloader V20170818 by Stephan Nolting\n\n"
-
                 "HWV: 0x");
   uart_print_hex_word(HW_VERSION);
   uart_br_print("\nCLK: 0x");
@@ -153,13 +152,15 @@ int main(void) {
   // ****************************************************************
   uart_br_print("\n\nAutoboot in "xstr(AUTOBOOT_TIMEOUT)"s. Press key to abort.\n");
   while (1) { // wait for any key to be pressed or timeout
+
     // timeout? start auto boot sequence
     if (TIMEOUT_CNT == 4*AUTOBOOT_TIMEOUT) { // in 0.25 seconds
       get_image(EEPROM_IMAGE); // try loading from EEPROM
       uart_br_print("\n");
       start_app(); // start app if loading was successful
     }
-    // key pressed?
+
+    // key pressed? -> enter user console
     if ((USI_UARTRTX & (1<<USI_UARTRTX_UARTRXAVAIL)) != 0)
       break;
   }
@@ -171,6 +172,7 @@ int main(void) {
   // Bootloader console
   // ****************************************************************
   while (1) {
+
     uart_br_print("\nCMD:> ");
     char c = uart_getc();
     uart_putc(c); // echo
