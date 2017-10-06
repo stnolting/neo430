@@ -21,7 +21,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               17.07.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               06.10.2017  #
 // #################################################################################################
 
 
@@ -44,7 +44,7 @@ int main(void) {
 
   // setup UART
   uart_set_baud(BAUD_RATE);
-  USI_CT = (1<<USI_CT_EN)  | (5<<USI_CT_SPIPRSC0) | (63<<USI_CT_SPICS0);
+  USI_CT = (1<<USI_CT_EN);
 
   // intro text
   _printf("\nNEO430 Hardware Analysis Tool\n\n");
@@ -88,10 +88,10 @@ int main(void) {
   // Interrupt vectors
   // --------------------------------------------
   _printf("\nInterrupt Vectors");
-  _printf("\nIRQVEC_TIMER -> 0x%x", IRQVEC_TIMER);
-  _printf("\nIRQVEC_USART -> 0x%x", IRQVEC_USART);
-  _printf("\nIRQVEC_GPIO  -> 0x%x", IRQVEC_GPIO);
-  _printf("\nIRQVEC_EXT   -> 0x%x", IRQVEC_EXT);
+  _printf("\n(0) IRQVEC_TIMER -> 0x%x", IRQVEC_TIMER);
+  _printf("\n(1) IRQVEC_USART -> 0x%x", IRQVEC_USART);
+  _printf("\n(2) IRQVEC_GPIO  -> 0x%x", IRQVEC_GPIO);
+  _printf("\n(3) IRQVEC_EXT   -> 0x%x", IRQVEC_EXT);
 
 
   // System features
@@ -136,7 +136,7 @@ int main(void) {
 void print_state(uint16_t d) {
 
   if (d)
-    _printf("EN\n");
+    _printf("ENABLED\n");
   else
-    _printf("DIS\n");
+    _printf("DISABLED\n");
 }

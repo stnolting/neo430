@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               14.07.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               06.10.2017  #
 // #################################################################################################
 
 
@@ -55,7 +55,7 @@ int main(void) {
 
   // setup UART
   uart_set_baud(BAUD_RATE);
-  USI_CT = (1<<USI_CT_EN)  | (5<<USI_CT_SPIPRSC0) | (63<<USI_CT_SPICS0);
+  USI_CT = (1<<USI_CT_EN);
 
 
   // initialize universe
