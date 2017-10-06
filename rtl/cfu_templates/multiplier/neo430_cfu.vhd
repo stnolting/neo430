@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from http://www.gnu.org/licenses/lgpl-3.0.en.html                 #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               19.07.2016  #
+-- #  Stephan Nolting, Hannover, Germany                                               06.10.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -108,7 +108,7 @@ begin
             NULL;
         end case;
         -- operation --
-        case (addr) is
+        case addr is
           when mac16_mpy_addr_c =>
             mode <= "00"; -- multiply unsigned
           when mac16_mpys_addr_c =>
@@ -160,10 +160,10 @@ begin
     if rising_edge(clk_i) then
       data_o <= (others => '0');
       if (acc_en = '1') and (rden_i = '1') then -- valid read access
-        if (addr = mac16_reslo_addr_c) then
+        if (addr = mac16_reshi_addr_c) then
+          data_o <= mac_res(31 downto 16);
+        else -- mac16_reslo_addr_c =>
           data_o <= mac_res(15 downto 00);
-        else -- mac16_reshi_addr_c =>
-            data_o <= mac_res(31 downto 16);
         end if;
       end if;
     end if;
