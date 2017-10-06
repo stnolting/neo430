@@ -21,7 +21,7 @@
 @REM # You should have received a copy of the GNU Lesser General Public License along with this      #
 @REM # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 @REM # ********************************************************************************************* #
-@REM #  Stephan Nolting, Hannover, Germany                                               05.10.2017  #
+@REM #  Stephan Nolting, Hannover, Germany                                               06.10.2017  #
 @REM #################################################################################################
 
 
@@ -34,28 +34,13 @@
 @REM --------------------------------------------------------------
 
 
-@REM This script is still compatible with the old MSPGCC.
-@REM Use MSPGCC only if you know what you are doing!
-@REM MSPGCC is obsolete!
-@set USE_TIMSP430_GCC=true
-
-
-@REM Compiler tools (obsolete!!!)
-@if %USE_TIMSP430_GCC%==false (
-  @set AS=%BIN_PATH%\msp430-as
-  @set CC=%BIN_PATH%\msp430-gcc
-  @set LD=%BIN_PATH%\msp430-ld
-  @set OBJDUMP=%BIN_PATH%\msp430-objdump
-  @set OBJCOPY=%BIN_PATH%\msp430-objcopy
-  @set SIZE=%BIN_PATH%\msp430-size
-) else (
-  @set AS=%BIN_PATH%\msp430-elf-as
-  @set CC=%BIN_PATH%\msp430-elf-gcc
-  @set LD=%BIN_PATH%\msp430-elf-ld
-  @set OBJDUMP=%BIN_PATH%\msp430-elf-objdump
-  @set OBJCOPY=%BIN_PATH%\msp430-elf-objcopy
-  @set SIZE=%BIN_PATH%\msp430-elf-size
-)
+@REM Compiler tools
+@set AS=%BIN_PATH%\msp430-elf-as
+@set CC=%BIN_PATH%\msp430-elf-gcc
+@set LD=%BIN_PATH%\msp430-elf-ld
+@set OBJDUMP=%BIN_PATH%\msp430-elf-objdump
+@set OBJCOPY=%BIN_PATH%\msp430-elf-objcopy
+@set SIZE=%BIN_PATH%\msp430-elf-size
 @set IMAGE_GEN=..\tools\image_gen\image_gen
 
 @REM Compiler flags

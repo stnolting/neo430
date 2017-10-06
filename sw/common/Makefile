@@ -21,7 +21,7 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 # ********************************************************************************************* #
-#  Stephan Nolting, Hannover, Germany                                               05.10.2017  #
+#  Stephan Nolting, Hannover, Germany                                               06.10.2017  #
 #################################################################################################
 
 
@@ -52,32 +52,15 @@ APP_ASM = $(APP_DIR)/main.s
 all: $(APP_ASM) $(APP_BIN) neo430_application_image.vhd clean
 
 #-------------------------------------------------------------------------------
-# Definitions
-#-------------------------------------------------------------------------------
-# This script is still compatible with the old MSPGCC.
-# Use MSPGCC only if you know what you are doing!
-# MSPGCC is obsolete!
-USE_TIMSP430_GCC = true
-
-#-------------------------------------------------------------------------------
 # Tools
 #-------------------------------------------------------------------------------
 #C ompiler tools (obsolete!!!)
-ifeq ($(USE_TIMSP430_GCC),false)
-  AS        = $(BIN_PATH)/msp430-as
-  CC        = $(BIN_PATH)/msp430-gcc
-  LD        = $(BIN_PATH)/msp430-ld
-  OBJDUMP   = $(BIN_PATH)/msp430-objdump
-  OBJCOPY   = $(BIN_PATH)/msp430-objcopy
-  SIZE      = $(BIN_PATH)/msp430-size
-else
-  AS        = $(BIN_PATH)/msp430-elf-as
-  CC        = $(BIN_PATH)/msp430-elf-gcc
-  LD        = $(BIN_PATH)/msp430-elf-ld
-  OBJDUMP   = $(BIN_PATH)/msp430-elf-objdump
-  OBJCOPY   = $(BIN_PATH)/msp430-elf-objcopy
-  SIZE      = $(BIN_PATH)/msp430-elf-size
-endif
+AS        = $(BIN_PATH)/msp430-elf-as
+CC        = $(BIN_PATH)/msp430-elf-gcc
+LD        = $(BIN_PATH)/msp430-elf-ld
+OBJDUMP   = $(BIN_PATH)/msp430-elf-objdump
+OBJCOPY   = $(BIN_PATH)/msp430-elf-objcopy
+SIZE      = $(BIN_PATH)/msp430-elf-size
 IMAGE_GEN = $(TOOL_PATH)/image_gen/image_gen
 
 # Compiler flags

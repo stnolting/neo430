@@ -21,7 +21,7 @@
 @REM # You should have received a copy of the GNU Lesser General Public License along with this      #
 @REM # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 @REM # ********************************************************************************************* #
-@REM #  Stephan Nolting, Hannover, Germany                                               05.10.2017  #
+@REM #  Stephan Nolting, Hannover, Germany                                               06.10.2017  #
 @REM #################################################################################################
 
 

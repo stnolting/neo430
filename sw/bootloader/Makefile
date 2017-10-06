@@ -21,7 +21,7 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 # ********************************************************************************************* #
-#  Stephan Nolting, Hannover, Germany                                               05.10.2017  #
+#  Stephan Nolting, Hannover, Germany                                               06.10.2017  #
 #################################################################################################
 
 
