@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               15.08.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               14.10.2017  #
 // #################################################################################################
 
 #ifndef neo430_cpu_h
@@ -34,13 +34,14 @@ inline void set_sreg(uint16_t d);
 inline void sleep(void);
 inline void clear_irq_buffer(void);
 void cpu_delay(uint16_t t);
-void _memset(uint8_t *dst, uint8_t data, uint16_t num);
-uint8_t _memcmp(uint8_t *dst, uint8_t *src, uint16_t num);
-void _memcpy(uint8_t *dst, uint8_t *src, uint16_t num);
+void __memset(uint8_t *dst, uint8_t data, uint16_t num);
+uint8_t __memcmp(uint8_t *dst, uint8_t *src, uint16_t num);
+void __memcpy(uint8_t *dst, uint8_t *src, uint16_t num);
 inline void soft_reset(void);
 inline void jump_address(uint16_t addr);
 inline void call_address(uint16_t addr);
-inline uint16_t _bswap(uint16_t a);
+inline uint16_t __bswap(uint16_t a);
+inline uint16_t __dadd(uint16_t a, uint16_t b);
 
 
 /* ------------------------------------------------------------
@@ -138,7 +139,7 @@ void cpu_delay(uint16_t t) {
  * PARAM data: Init data
  * PARAM num: Number of bytes to initialize
  * ------------------------------------------------------------ */
-void _memset(uint8_t *dst, uint8_t data, uint16_t num) {
+void __memset(uint8_t *dst, uint8_t data, uint16_t num) {
 
   while (num--)
     *dst++ = data;
@@ -152,7 +153,7 @@ void _memset(uint8_t *dst, uint8_t data, uint16_t num) {
  * PARAM num: Number of bytes to compare
  * RETURN 0 if src == dst
  * ------------------------------------------------------------ */
-uint8_t _memcmp(uint8_t *dst, uint8_t *src, uint16_t num) {
+uint8_t __memcmp(uint8_t *dst, uint8_t *src, uint16_t num) {
 
   while (num--) {
     if ((*dst++ - *src++) != 0)
@@ -168,7 +169,7 @@ uint8_t _memcmp(uint8_t *dst, uint8_t *src, uint16_t num) {
  * PARAM src: Pointer to beginning source memory space
  * PARAM num: Number of bytes to copy
  * ------------------------------------------------------------ */
-void _memcpy(uint8_t *dst, uint8_t *src, uint16_t num) {
+void __memcpy(uint8_t *dst, uint8_t *src, uint16_t num) {
 
   while (num--)
     *dst++ = *src++;
@@ -211,11 +212,25 @@ inline void call_address(uint16_t addr) {
  * PARAM 16-bit input word
  * RETURN 16-bit word with swapped bytes
  * ------------------------------------------------------------ */
-inline uint16_t _bswap(uint16_t a) {
+inline uint16_t __bswap(uint16_t a) {
 
   register uint16_t r = a;
   asm volatile ("swpb %0, %1" : "=r" (r) : "r" (r));
   return r;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Binary-coded decimal addition
+ * WARNING Make sure the DADD unit is syntheszied!!!!
+ * PARAM 2x 16-bit BCD operands (4 digits)
+ * RETURN 16-bit BCD result (4 digits)
+ * ------------------------------------------------------------ */
+inline uint16_t __dadd(uint16_t a, uint16_t b) {
+
+  register uint16_t z = a;
+  asm volatile ("dadd %[b], %[z]" : [z] "=r" (z) : "[z]" (z), [b] "r" (b));
+  return z;
 }
 
 
