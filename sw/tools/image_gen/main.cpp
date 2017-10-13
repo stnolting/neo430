@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               20.12.2016  #
+// #  Stephan Nolting, Hannover, Germany                                               13.10.2017  #
 // #################################################################################################
 
 #include <stdint.h>
@@ -30,14 +30,14 @@
 int main(int argc, char *argv[]) {
 
   if (argc != 4) {
-  	printf("< NEO430 program image generator >\n"
+  	printf("<<< NEO430 executable image generator >>>\n"
 	       "Three arguments are required.\n"
 	       "1st: Option\n"
 	       " -app_bin : Generate application executable binary (with header!) \n"
 	       " -app_img : Generate application raw executable memory image (text file, no header!)\n"
 	       " -bld_img : Generate bootloader raw executable memory image (text file, no header!)\n"
-		   "2nd: Input file\n"
-		   "3rd: Output file\n");
+		   "2nd: Input file (raw binary image)\n"
+		   "3rd: Output file (as selected)\n");
   	return 1;
   }
 
@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
 						"\r\n"
 						"package neo430_application_image is\r\n"
 						"\r\n"
-						"  type application_init_image_t is array (0 to (2**16)-1) of std_ulogic_vector(15 downto 0);\r\n"
+						"  type application_init_image_t is array (0 to 65535) of std_ulogic_vector(15 downto 0);\r\n"
 						"  constant application_init_image : application_init_image_t := (\r\n");
     fputs(tmp_string, output);
 
@@ -168,7 +168,7 @@ int main(int argc, char *argv[]) {
 						"\r\n"
 						"package neo430_bootloader_image is\r\n"
 						"\r\n"
-						"  type bootloader_init_image_t is array (0 to (2**16)-1) of std_ulogic_vector(15 downto 0);\r\n"
+						"  type bootloader_init_image_t is array (0 to 65535) of std_ulogic_vector(15 downto 0);\r\n"
 						"  constant bootloader_init_image : bootloader_init_image_t := (\r\n");
     fputs(tmp_string, output);
 
