@@ -21,7 +21,7 @@
 @REM # You should have received a copy of the GNU Lesser General Public License along with this      #
 @REM # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 @REM # ********************************************************************************************* #
-@REM #  Stephan Nolting, Hannover, Germany                                               06.10.2017  #
+@REM #  Stephan Nolting, Hannover, Germany                                               13.10.2017  #
 @REM #################################################################################################
 
 
@@ -45,9 +45,7 @@
 
 @REM Compiler flags
 @set CC_OPTS= -nostartfiles -pipe -fwhole-program -fdata-sections -ffunction-sections -Xlinker --gc-sections -Wl,-static -Wall
-@if %USE_TIMSP430_GCC%==true (
-  @set CC_OPTS=%CC_OPTS% -minrt -Xassembler --mY -mhwmult=none
-)
+@set CC_OPTS=%CC_OPTS% -minrt -Xassembler --mY -mhwmult=none
 
 @REM Assemble start-up code
 @%AS% -mcpu=msp430 crt0.asm -mY -o crt0.elf
@@ -80,7 +78,7 @@
 
 @REM Check if "DADD" is used
 @echo off
-@find /I /C "dadd " main.s > NUL
+@find /I /C "dadd" main.s > NUL
 @echo on
 @if %errorlevel% equ 0 echo NEO430: WARNING! 'DADD' instruction might be used! Make sure it is synthesized!
 

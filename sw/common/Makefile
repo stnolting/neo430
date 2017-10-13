@@ -21,7 +21,7 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 # ********************************************************************************************* #
-#  Stephan Nolting, Hannover, Germany                                               06.10.2017  #
+#  Stephan Nolting, Hannover, Germany                                               14.10.2017  #
 #################################################################################################
 
 
@@ -54,7 +54,7 @@ all: $(APP_ASM) $(APP_BIN) neo430_application_image.vhd clean
 #-------------------------------------------------------------------------------
 # Tools
 #-------------------------------------------------------------------------------
-#C ompiler tools (obsolete!!!)
+#C ompiler tools
 AS        = $(BIN_PATH)/msp430-elf-as
 CC        = $(BIN_PATH)/msp430-elf-gcc
 LD        = $(BIN_PATH)/msp430-elf-ld
@@ -65,9 +65,7 @@ IMAGE_GEN = $(TOOL_PATH)/image_gen/image_gen
 
 # Compiler flags
 CC_OPTS = -pipe -nostartfiles -fwhole-program -fdata-sections -ffunction-sections -Xlinker --gc-sections -Wl,-static -Wall
-ifeq ($(USE_TIMSP430_GCC),true)
-  CC_OPTS += -minrt -Xassembler --mY -mhwmult=none
-endif
+CC_OPTS += -minrt -Xassembler --mY -mhwmult=none
 
 #-------------------------------------------------------------------------------
 # Paths
@@ -117,6 +115,9 @@ image.bin: main.elf
 # Assembly listing file
 $(APP_ASM): main.elf
 	@$(OBJDUMP) -D -S -z  $< > $@
+	if grep -qR "dadd" $@; \
+	then echo "NEO430: WARNING! 'DADD' instruction might be used! Make sure it is synthesized!"; \
+	fi
 
 # Generate NEO430 executable image for bootloader update
 $(APP_BIN): image.bin $(IMAGE_GEN)
@@ -127,6 +128,7 @@ neo430_application_image.vhd: image.bin $(IMAGE_GEN)
 	@$(IMAGE_GEN) -app_img $< $@
 	@echo Installing application image to rtl/core/neo430_application_image.vhd
 	@cp neo430_application_image.vhd ../../rtl/core/.
+
 
 #-------------------------------------------------------------------------------
 # Clean up
