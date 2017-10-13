@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               15.08.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               13.10.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -66,23 +66,24 @@ architecture neo430_reg_file_rtl of neo430_reg_file is
   signal c_flag, z_flag, n_flag, i_flag, s_flag, v_flag, q_flag, r_flag : std_ulogic;
 
   -- misc --
-  signal in_data_tmp : std_ulogic_vector(15 downto 0); -- input selection tmp
-  signal in_data     : std_ulogic_vector(15 downto 0); -- input selection
-  signal boot_addr   : std_ulogic_vector(15 downto 0); -- the boot address
+  signal in_data   : std_ulogic_vector(15 downto 0); -- input selection
+  signal boot_addr : std_ulogic_vector(15 downto 0); -- the boot address
 
 begin
 
   -- Boot address Selection ---------------------------------------------------
   -- -----------------------------------------------------------------------------
-  -- Boot from beginning of IMEM if no bootloader is used
-  -- Boot from beginning of boot ROM if bootloader IS used
+  -- Boot from beginning of IMEM if *NO* bootloader is used
+  -- Boot from beginning of boot ROM if bootloader *IS USED*
   boot_addr <= imem_base_c when (BOOTLD_USE = false) else boot_base_c;
+  -- By not using a reset-like init of the PC, the CP can be mapped into a dedicated
+  -- block RAM saving logic resources ;)
 
 
   -- Input Operand Selection --------------------------------------------------
   -- -----------------------------------------------------------------------------
-  in_data_tmp <= alu_i when (ctrl_i(ctrl_rf_in_sel_c) = '0') else addr_i;
-  in_data     <= in_data_tmp when (ctrl_i(ctrl_rf_boot_c) = '0') else boot_addr;
+  in_data <= boot_addr when (ctrl_i(ctrl_rf_boot_c)   = '1') else
+             addr_i    when (ctrl_i(ctrl_rf_in_sel_c) = '1') else alu_i;
 
 
   -- Register File Write Access -----------------------------------------------
@@ -90,42 +91,38 @@ begin
   sreg_write: process(rst_i, clk_i)
   begin
     if (rst_i = '0') then
-      c_flag <= '0'; -- carry
-      z_flag <= '0'; -- zero
-      n_flag <= '0'; -- negative
-      i_flag <= '0'; -- interrupts disabled
-      s_flag <= '0'; -- sleep disabled
-      v_flag <= '0'; -- overflow
-      q_flag <= '0'; -- clear pending IRQ buffer
-      r_flag <= '0'; -- IMEM (ROM) write access disabled
+      sreg <= (others => '0'); -- here we NEED a true hardware reset
     elsif rising_edge(clk_i) then
       -- status register --
       if ((ctrl_i(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) = reg_sr_c) and
           (ctrl_i(ctrl_rf_ad_c) = '0') and (ctrl_i(ctrl_rf_wb_en_c) = '1')) then -- only write in reg-addr-mode!
-        c_flag <= in_data(sreg_c_c);
-        z_flag <= in_data(sreg_z_c);
-        n_flag <= in_data(sreg_n_c);
-        i_flag <= in_data(sreg_i_c);
-        s_flag <= in_data(sreg_s_c);
-        v_flag <= in_data(sreg_v_c);
-        q_flag <= in_data(sreg_q_c);
-        r_flag <= in_data(sreg_r_c);
+        sreg(sreg_c_c) <= in_data(sreg_c_c);
+        sreg(sreg_z_c) <= in_data(sreg_z_c);
+        sreg(sreg_n_c) <= in_data(sreg_n_c);
+        sreg(sreg_i_c) <= in_data(sreg_i_c);
+        sreg(sreg_s_c) <= in_data(sreg_s_c);
+        sreg(sreg_v_c) <= in_data(sreg_v_c);
+        sreg(sreg_q_c) <= in_data(sreg_q_c);
+        sreg(sreg_r_c) <= in_data(sreg_r_c);
       else -- automatic update
-        q_flag <= '0'; -- auto-clear
+        sreg(sreg_q_c) <= '0'; -- auto-clear
         if (ctrl_i(ctrl_rf_dsleep_c) = '1') then -- disable sleep mode
-          s_flag <= '0';
+          sreg(sreg_s_c) <= '0';
         end if;
         if (ctrl_i(ctrl_rf_fup_c) = '1') then -- update ALU flags
-          c_flag <= flag_i(flag_c_c);
-          z_flag <= flag_i(flag_z_c);
-          n_flag <= flag_i(flag_n_c);
-          v_flag <= flag_i(flag_v_c);
+          sreg(sreg_c_c) <= flag_i(flag_c_c);
+          sreg(sreg_z_c) <= flag_i(flag_z_c);
+          sreg(sreg_n_c) <= flag_i(flag_n_c);
+          sreg(sreg_v_c) <= flag_i(flag_v_c);
         end if;
       end if;
     end if;
   end process sreg_write;
 
-  -- gp regs (including PW, dummy SR and dummy CG) --
+  -- status register output --
+  sreg_o <= sreg;
+
+  -- gp regs (including PC, dummy SR and dummy CG) --
   rf_write: process(clk_i)
   begin
     if rising_edge(clk_i) then
@@ -135,49 +132,29 @@ begin
     end if;
   end process rf_write;
 
-  -- assign virtual SREG --
-  virtual_sreg: process(c_flag, z_flag, n_flag, i_flag, s_flag, v_flag, q_flag, r_flag)
-  begin
-    sreg <= (others => '0');
-    sreg(sreg_c_c) <= c_flag;
-    sreg(sreg_z_c) <= z_flag;
-    sreg(sreg_n_c) <= n_flag;
-    sreg(sreg_i_c) <= i_flag;
-    sreg(sreg_s_c) <= s_flag;
-    sreg(sreg_v_c) <= v_flag;
-    sreg(sreg_q_c) <= q_flag;
-    sreg(sreg_r_c) <= r_flag;
-  end process virtual_sreg;
-
-  -- output --
-  sreg_o <= sreg;
-
 
   -- Register File Read Access ------------------------------------------------
   -- -----------------------------------------------------------------------------
   rf_read: process(ctrl_i, reg_file, sreg)
     variable const_sel_v : std_ulogic_vector(02 downto 0);
-    variable const_gen_v : std_ulogic_vector(15 downto 0);
   begin
-    -- constant generator --
-    const_sel_v := ctrl_i(ctrl_rf_adr0_c) & ctrl_i(ctrl_rf_as1_c) & ctrl_i(ctrl_rf_as0_c);
-    case const_sel_v is
-      when "000"  => const_gen_v := sreg; -- read SR
-      when "001"  => const_gen_v := x"0000"; -- absolute addressing mode
-      when "010"  => const_gen_v := x"0004"; -- +4
-      when "011"  => const_gen_v := x"0008"; -- +8
-      when "100"  => const_gen_v := x"0000"; --  0
-      when "101"  => const_gen_v := x"0001"; -- +1
-      when "110"  => const_gen_v := x"0002"; -- +2
-      when "111"  => const_gen_v := x"FFFF"; -- -1
-      when others => const_gen_v := x"0000";
-    end case;
-
-    -- output select --
     if ((ctrl_i(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) = reg_sr_c) or
         (ctrl_i(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) = reg_cg_c)) then
-      data_o <= const_gen_v;
+      -- constant generator / SR read access --
+      const_sel_v := ctrl_i(ctrl_rf_adr0_c) & ctrl_i(ctrl_rf_as1_c) & ctrl_i(ctrl_rf_as0_c);
+      case const_sel_v is
+        when "000"  => data_o <= sreg; -- read SR
+        when "001"  => data_o <= x"0000"; -- absolute addressing mode
+        when "010"  => data_o <= x"0004"; -- +4
+        when "011"  => data_o <= x"0008"; -- +8
+        when "100"  => data_o <= x"0000"; --  0
+        when "101"  => data_o <= x"0001"; -- +1
+        when "110"  => data_o <= x"0002"; -- +2
+        when "111"  => data_o <= x"FFFF"; -- -1
+        when others => data_o <= x"0000";
+      end case;
     else
+      -- register file read access --
       data_o <= reg_file(to_integer(unsigned(ctrl_i(ctrl_rf_adr3_c downto ctrl_rf_adr0_c))));
     end if;
   end process rf_read;

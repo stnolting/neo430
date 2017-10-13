@@ -73,6 +73,8 @@ begin
   begin
     if rising_edge(clk_i) then
       rden  <= rden_i and acc_en;
+
+      -- write access LOW byte --
       if (acc_en = '1') and (wren_i(0) = '1') then -- write low byte
         if (is_power_of_two(DMEM_SIZE, 16) = true) then
           dmem_file(addr)(07 downto 0) <= data_i(07 downto 0);
@@ -83,6 +85,8 @@ begin
           report "DMEM write access out of range since DMEM_SIZE is not a power of 2!" severity error;
         end if;
       end if;
+
+      -- write access HIGH byte --
       if (acc_en = '1') and (wren_i(1) = '1') then -- write high byte
         if (is_power_of_two(DMEM_SIZE, 16) = true) then
           dmem_file(addr)(15 downto 8) <= data_i(15 downto 8);
@@ -93,6 +97,8 @@ begin
           report "DMEM write access out of range since DMEM_SIZE is not a power of 2!" severity error;
         end if;
       end if;
+
+      -- read access (both bytes) --
       if (is_power_of_two(DMEM_SIZE, 16) = false) then
         -- modified read-access: to prevent simulation errors when DMEM_SIZE is not a power of 2 --
         if (addr < DMEM_SIZE/2) then

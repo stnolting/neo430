@@ -256,6 +256,7 @@ begin
       when BRANCH => -- branch operation
       -- ------------------------------------------------------------
         ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_pc_c; -- source/destination: PC
+        ctrl_nxt(ctrl_adr_off1_c downto ctrl_adr_off0_c) <= "00"; -- add immediate offset
         ctrl_nxt(ctrl_adr_imm_en_c) <= '1'; -- add immediate
         ctrl_nxt(ctrl_rf_in_sel_c)  <= '1'; -- select addr feedback
         ctrl_nxt(ctrl_rf_wb_en_c)   <= branch_taken; -- valid RF write back if branch taken
@@ -484,8 +485,8 @@ begin
       when PUSHCALL_0 => -- PUSH/CALL cycle 0 (stack update)
       -- ------------------------------------------------------------
         ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_sp_c; -- source/destination: SP
-        ctrl_nxt(ctrl_adr_mar_wr_c) <= '1'; -- write to MAR
         ctrl_nxt(ctrl_adr_off1_c downto ctrl_adr_off0_c) <= "11"; -- add -2
+        ctrl_nxt(ctrl_adr_mar_wr_c) <= '1'; -- write to MAR
         ctrl_nxt(ctrl_adr_mar_sel_c) <= '1'; -- use result from adder
         ctrl_nxt(ctrl_rf_in_sel_c) <= '1'; -- select addr feedback
         ctrl_nxt(ctrl_rf_wb_en_c) <= '1'; -- valid RF write back
@@ -549,7 +550,7 @@ begin
         state_nxt <= IFETCH_0; -- done!
 
 
-      when IRQ_0 => -- IRQ processing cycle 0
+      when IRQ_0 => -- IRQ processing cycle 0: SP=SP-2, disable sleep mode
       -- ------------------------------------------------------------
         ctrl_nxt(ctrl_rf_dsleep_c)   <= '1'; -- disable sleep mode
         ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_sp_c; -- source/destination: SP
@@ -560,14 +561,14 @@ begin
         ctrl_nxt(ctrl_rf_wb_en_c)    <= '1'; -- valid RF write back
         state_nxt <= IRQ_1;
 
-      when IRQ_1 => -- IRQ processing cycle 1
+      when IRQ_1 => -- IRQ processing cycle 1: Buffer PC for memory write
       -- ------------------------------------------------------------
         ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_pc_c; -- source: PC
         ctrl_nxt(ctrl_alu_opa_wr_c) <= '1'; -- write PC to OpA
         ctrl_nxt(ctrl_alu_opb_wr_c) <= '1'; -- write PC to OpB
         state_nxt <= IRQ_2;
 
-      when IRQ_2 => -- IRQ processing cycle 2
+      when IRQ_2 => -- IRQ processing cycle 2: Write PC (push), SP=SP-2
       -- ------------------------------------------------------------
         ctrl_nxt(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) <= alu_mov_c;
         ctrl_nxt(ctrl_mem_wr_c) <= '1'; -- write memory request (store PC)
@@ -579,7 +580,7 @@ begin
         ctrl_nxt(ctrl_rf_wb_en_c)    <= '1'; -- valid RF write back
         state_nxt <= IRQ_3;
 
-      when IRQ_3 => -- IRQ processing cycle 3
+      when IRQ_3 => -- IRQ processing cycle 3: Buffer SR for memory write, clear SR, set IRQ vector address
       -- ------------------------------------------------------------
         ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_sr_c; -- source: SR
         ctrl_nxt(ctrl_alu_opa_wr_c) <= '1'; -- write to OpA
@@ -590,7 +591,7 @@ begin
         ctrl_nxt(ctrl_mem_rd_c)      <= '1'; -- Memory read (fast)
         state_nxt <= IRQ_4;
 
-      when IRQ_4 => -- IRQ processing cycle 4
+      when IRQ_4 => -- IRQ processing cycle 4: Write SR (push), get IRQ vector
       -- ------------------------------------------------------------
         ctrl_nxt(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) <= alu_mov_c;
         ctrl_nxt(ctrl_mem_wr_c)     <= '1'; -- write memory request
@@ -598,7 +599,7 @@ begin
         ctrl_nxt(ctrl_alu_opa_wr_c) <= '1'; -- write to OpA
         state_nxt <= IRQ_5;
 
-      when IRQ_5 => -- IRQ processing cycle 5
+      when IRQ_5 => -- IRQ processing cycle 5: Store IRQ vector to PC
       -- ------------------------------------------------------------
         ctrl_nxt(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) <= alu_mov_c;
         ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c)   <= reg_pc_c; -- destination: PC

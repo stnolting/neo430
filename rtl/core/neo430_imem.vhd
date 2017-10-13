@@ -113,6 +113,8 @@ begin
   begin
     if rising_edge(clk_i) then
       rden <= rden_i and acc_en;
+
+      -- write access --
       if (IMEM_AS_ROM = false) then -- implement IMEM as true RAM?
         if (acc_en = '1') and (upen_i = '1') then -- valid write access at all?
           if (wren_i(0) = '1') then -- write low byte
@@ -137,6 +139,8 @@ begin
           end if;
         end if;
       end if;
+
+      -- read access --
       if (is_power_of_two(IMEM_SIZE, 16) = false) then
         -- modified read-access: to prevent simulation errors when IMEM_SIZE is not a power of 2 --
         if (addr < IMEM_SIZE/2) then

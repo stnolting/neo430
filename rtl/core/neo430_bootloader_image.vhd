@@ -6,7 +6,7 @@ use ieee.std_logic_1164.all;
 
 package neo430_bootloader_image is
 
-  type bootloader_init_image_t is array (0 to (2**16)-1) of std_ulogic_vector(15 downto 0);
+  type bootloader_init_image_t is array (0 to 65535) of std_ulogic_vector(15 downto 0);
   constant bootloader_init_image : bootloader_init_image_t := (
     000000 => x"4303",
     000001 => x"4302",

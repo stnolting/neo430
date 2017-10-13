@@ -1,12 +1,14 @@
 -- #################################################################################################
 -- #  << NEO430 - Custom Functions Unit >>                                                         #
 -- # ********************************************************************************************* #
--- # This unit is a template for implementing custom function, which are directly memory-mapped    #
--- # into the CPU's address space. The address space of this unit is 16 bytes large. This unit can #
--- # be accessed using full word (16-bit) or byte-wide accesses.                                   #
+-- # This unit is a template for implementing custom functions, which are directly memory-mapped   #
+-- # into the CPU's IO address space. The address space of this unit is 16 bytes large. This unit  #
+-- # can be accessed using full word (16-bit) or byte-wide accesses.                               #
 -- # In the original state, this unit only provides 8 16-bit register (also accessible in byte     #
 -- # mode), that do not perform any kind of data manipulation.                                     #
 -- # Examplary applications: multiplier, divider, complex artihmetic, rocket science, ...          #
+-- #                                                                                               #
+-- # Take a look at the rtl\cfu_templates folder for some example CFU implementations.             #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
