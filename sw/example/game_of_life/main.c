@@ -73,14 +73,12 @@ int main(void) {
     xorshift32();
   }
 
-
   // initialize universe using random data
   for (x=0; x<NUM_CELLS_X/8; x++) {
     for (y=0; y<NUM_CELLS_Y; y++) {
       universe[0][x][y] = (uint8_t)xorshift32();
     }
   }
-
 
   while(1) {
 
