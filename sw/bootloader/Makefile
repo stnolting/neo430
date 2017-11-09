@@ -1,7 +1,8 @@
 #################################################################################################
 #  < NEO430 bootloader (!) compilation script - Linux version >                                 #
 # ********************************************************************************************* #
-# Edit the BIN_PATH variable to point to your compiler's binary folder!                         #
+# Edit the MSP430GCC_BIN_PATH variable to point to your compiler's binary folder.               #
+# Alternatively, you can set it in your environment variables.                                  #
 # ********************************************************************************************* #
 # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -21,7 +22,7 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 # ********************************************************************************************* #
-#  Stephan Nolting, Hannover, Germany                                               06.10.2017  #
+#  Stephan Nolting, Hannover, Germany                                               16.10.2017  #
 #################################################################################################
 
 
@@ -29,7 +30,7 @@
 # USER CONFIGURATION
 #-------------------------------------------------------------------------------
 # Path of compiler binaries:
-BIN_PATH = /mnt/c/msp430-gcc-6.4.0.32_linux64/bin
+MSP430GCC_BIN_PATH ?= /mnt/c/msp430-gcc-6.4.0.32_linux64/bin
 
 #-------------------------------------------------------------------------------
 # Make defaults
@@ -47,12 +48,12 @@ $(warning Making bootloader.c)
 #-------------------------------------------------------------------------------
 # Tools
 #-------------------------------------------------------------------------------
-AS        = $(BIN_PATH)/msp430-elf-as
-CC        = $(BIN_PATH)/msp430-elf-gcc
-LD        = $(BIN_PATH)/msp430-elf-ld
-OBJDUMP   = $(BIN_PATH)/msp430-elf-objdump
-OBJCOPY   = $(BIN_PATH)/msp430-elf-objcopy
-SIZE      = $(BIN_PATH)/msp430-elf-size
+AS        = $(MSP430GCC_BIN_PATH)/msp430-elf-as
+CC        = $(MSP430GCC_BIN_PATH)/msp430-elf-gcc
+LD        = $(MSP430GCC_BIN_PATH)/msp430-elf-ld
+OBJDUMP   = $(MSP430GCC_BIN_PATH)/msp430-elf-objdump
+OBJCOPY   = $(MSP430GCC_BIN_PATH)/msp430-elf-objcopy
+SIZE      = $(MSP430GCC_BIN_PATH)/msp430-elf-size
 IMAGE_GEN = $(TOOL_PATH)/image_gen/image_gen
 
 # Remove -g to exclude debugging information

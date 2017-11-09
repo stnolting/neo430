@@ -1,7 +1,8 @@
 @REM #################################################################################################
 @REM #  < NEO430 application compilation script - Windows version >                                  #
 @REM # ********************************************************************************************* #
-@REM # Edit the BIN_PATH variable to point to your compiler's binary folder!                         #
+@REM # Edit the MSP430GCC_BIN_PATH variable to point to your compiler's binary folder.               #
+@REM # Alternatively, you can set it in your environment variables.                                  #
 @REM # ********************************************************************************************* #
 @REM # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 @REM # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -21,13 +22,13 @@
 @REM # You should have received a copy of the GNU Lesser General Public License along with this      #
 @REM # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 @REM # ********************************************************************************************* #
-@REM #  Stephan Nolting, Hannover, Germany                                               13.10.2017  #
+@REM #  Stephan Nolting, Hannover, Germany                                               16.10.2017  #
 @REM #################################################################################################
 
 
 @REM ----------------------USER CONFIGURATION----------------------
 @REM Path of compiler binaries:
-@set BIN_PATH=C:\msp430-gcc-6.4.0.32_win32\bin
+@if "%MSP430GCC_BIN_PATH%" == "" set MSP430GCC_BIN_PATH=C:\msp430-gcc-6.4.0.32_win32\bin
 
 @REM Compiler effort (-Os = optimize for size)
 @set EFFORT=-Os
@@ -35,12 +36,12 @@
 
 
 @REM Compiler tools
-@set AS=%BIN_PATH%\msp430-elf-as
-@set CC=%BIN_PATH%\msp430-elf-gcc
-@set LD=%BIN_PATH%\msp430-elf-ld
-@set OBJDUMP=%BIN_PATH%\msp430-elf-objdump
-@set OBJCOPY=%BIN_PATH%\msp430-elf-objcopy
-@set SIZE=%BIN_PATH%\msp430-elf-size
+@set AS=%MSP430GCC_BIN_PATH%\msp430-elf-as
+@set CC=%MSP430GCC_BIN_PATH%\msp430-elf-gcc
+@set LD=%MSP430GCC_BIN_PATH%\msp430-elf-ld
+@set OBJDUMP=%MSP430GCC_BIN_PATH%\msp430-elf-objdump
+@set OBJCOPY=%MSP430GCC_BIN_PATH%\msp430-elf-objcopy
+@set SIZE=%MSP430GCC_BIN_PATH%\msp430-elf-size
 @set IMAGE_GEN=..\tools\image_gen\image_gen
 
 @REM Compiler flags
