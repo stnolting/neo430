@@ -23,13 +23,13 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               15.08.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               08.11.2017  #
 // #################################################################################################
 
 #ifndef neo430_h
 #define neo430_h
 
-// STD libraries
+// Standard libraries
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -113,16 +113,16 @@
 #define USI_BAUD    (*(REG16 0xFFA4)) // r/w: uart baud rate generator value
 #define USI_CT      (*(REG16 0xFFA6)) // r/w: control register
 
-// UART USI_BAUD[7:0]:  baud rate value
+// UART USI_BAUD[7:0]:  baud rate value (remainder)
 // UART USI_BAUD[10:8]: baud prescaler select:
-// 0: CLK/2
-// 1: CLK/4
-// 2: CLK/8
-// 3: CLK/64
-// 4: CLK/128
-// 5: CLK/1024
-// 6: CLK/2048
-// 7: CLK/4096
+#define USI_UART_PRSC_2    0 // CLK/2
+#define USI_UART_PRSC_4    1 // CLK/4
+#define USI_UART_PRSC_8    2 // CLK/8
+#define USI_UART_PRSC_64   3 // CLK/64
+#define USI_UART_PRSC_128  4 // CLK/128
+#define USI_UART_PRSC_1024 5 // CLK/1024
+#define USI_UART_PRSC_2048 6 // CLK/2048
+#define USI_UART_PRSC_4096 7 // CLK/4096
 
 // USART UART RTX register
 #define USI_UARTRTX_UARTRXAVAIL 15 // r/-: uart receiver data available
@@ -138,22 +138,22 @@
 #define USI_CT_SPIPRSC0   7 // r/w: spi prescaler select bit 0
 #define USI_CT_SPIPRSC1   8 // r/w: spi prescaler select bit 1
 #define USI_CT_SPIPRSC2   9 // r/w: spi prescaler select bit 2
-#define USI_CT_SPICS0    10 // r/w: spi direct CS 0, CS is low (active) when bit is set
-#define USI_CT_SPICS1    11 // r/w: spi direct CS 1, CS is low (active) when bit is set
-#define USI_CT_SPICS2    12 // r/w: spi direct CS 2, CS is low (active) when bit is set
-#define USI_CT_SPICS3    13 // r/w: spi direct CS 3, CS is low (active) when bit is set
-#define USI_CT_SPICS4    14 // r/w: spi direct CS 4, CS is low (active) when bit is set
-#define USI_CT_SPICS5    15 // r/w: spi direct CS 5, CS is low (active) when bit is set
+#define USI_CT_SPICS0    10 // r/w: spi direct CS 0, CS is LOW (active) when bit is set
+#define USI_CT_SPICS1    11 // r/w: spi direct CS 1, CS is LOW (active) when bit is set
+#define USI_CT_SPICS2    12 // r/w: spi direct CS 2, CS is LOW (active) when bit is set
+#define USI_CT_SPICS3    13 // r/w: spi direct CS 3, CS is LOW (active) when bit is set
+#define USI_CT_SPICS4    14 // r/w: spi direct CS 4, CS is LOW (active) when bit is set
+#define USI_CT_SPICS5    15 // r/w: spi direct CS 5, CS is LOW (active) when bit is set
 
 // SPI clock prescaler select:
-// 0: CLK/2
-// 1: CLK/4
-// 2: CLK/8
-// 3: CLK/64
-// 4: CLK/128
-// 5: CLK/1024
-// 6: CLK/2048
-// 7: CLK/4096
+#define USI_SPI_PRSC_2    0 // CLK/2
+#define USI_SPI_PRSC_4    1 // CLK/4
+#define USI_SPI_PRSC_8    2 // CLK/8
+#define USI_SPI_PRSC_64   3 // CLK/64
+#define USI_SPI_PRSC_128  4 // CLK/128
+#define USI_SPI_PRSC_1024 5 // CLK/1024
+#define USI_SPI_PRSC_2048 6 // CLK/2048
+#define USI_SPI_PRSC_4096 7 // CLK/4096
 
 
 /* --- Genearl Purpose Inputs/Outputs - GPIO --- */
@@ -163,11 +163,13 @@
 #define GPIO_IRQMASK (*(REG16 0xFFB6)) // -/w: irq mask register
 
 // bits 1:0 of GPIO CTRL reg: Trigger
-// 00: low level
-// 01: high level
-// 10: falling edge
-// 11: rising edge
+//  00: low level
+//  01: high level
+//  10: falling edge
+//  11: rising edge
 // bit 2: General interrupt enable flag
+//  0: interrupts disabled
+//  1: interrupts enabled
 
 
 /* --- High-Precision Timer - TIMER --- */
@@ -184,14 +186,14 @@
 #define TMR_CT_PRSC2 5 // r/w: prescaler select bit 2
 
 // timer clock prescaler select:
-// 0: CLK/2
-// 1: CLK/4
-// 2: CLK/8
-// 3: CLK/64
-// 4: CLK/128
-// 5: CLK/1024
-// 6: CLK/2048
-// 7: CLK/4096
+#define TMR_PRSC_2    0 // CLK/2
+#define TMR_PRSC_4    1 // CLK/4
+#define TMR_PRSC_8    2 // CLK/8
+#define TMR_PRSC_64   3 // CLK/64
+#define TMR_PRSC_128  4 // CLK/128
+#define TMR_PRSC_1024 5 // CLK/1024
+#define TMR_PRSC_2048 6 // CLK/2048
+#define TMR_PRSC_4096 7 // CLK/4096
 
 
 /* --- Watchdog Timer - WTD --- */
@@ -207,14 +209,14 @@
 #define WDT_SYSRST   5 // -/w: set one to generate system hardware reset
 
 // watchdog clock prescaler select:
-// 0: CLK/2
-// 1: CLK/4
-// 2: CLK/8
-// 3: CLK/64
-// 4: CLK/128
-// 5: CLK/1024
-// 6: CLK/2048
-// 7: CLK/4096
+#define WDT_PRSC_2    0 // CLK/2
+#define WDT_PRSC_4    1 // CLK/4
+#define WDT_PRSC_8    2 // CLK/8
+#define WDT_PRSC_64   3 // CLK/64
+#define WDT_PRSC_128  4 // CLK/128
+#define WDT_PRSC_1024 5 // CLK/1024
+#define WDT_PRSC_2048 6 // CLK/2048
+#define WDT_PRSC_4096 7 // CLK/4096
 
 
 /* --- System Configuration - SYSCONFIG --- */

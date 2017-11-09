@@ -335,7 +335,7 @@ void uart_print_bin_dword(uint32_t dw) {
 
 
 /* ------------------------------------------------------------
- * INFO Print 32-bit number as deciaml number
+ * INFO Print 32-bit number as decimal number
  * INFO Slow custom version of itoa
  * PARAM 32-bit value to be printed as decimal number
  * ------------------------------------------------------------ */
