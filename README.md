@@ -32,7 +32,7 @@ This project is intended to work "out of the box". Just synthesize the test
 setup from this project, upload it to your FPGA board of choice and start
 exploring the capabilities of the NEO430 processor. Application program
 generation (and even installation) works by executing a single "make" command.
-Jump to the "Let’s Get It Starte" chapter, which provides a lot of guides and
+Jump to the "Let’s Get It Started" chapter, which provides a lot of guides and
 tutorials to make your first NEO430 setup run:
 https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
