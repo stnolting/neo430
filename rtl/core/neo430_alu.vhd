@@ -1,8 +1,8 @@
 -- #################################################################################################
 -- #  << NEO430 - Arithmetical/Logical Unit >>                                                     #
 -- # ********************************************************************************************* #
--- #  Main data processing ALU and temporal operand registers.                                     #
--- #  Arithmetic operations need 2 cycles, all other operations only take one cycle.               #
+-- #  Main data processing ALU and temporary operand registers.                                    #
+-- #  BCD arithmetic operations need 2 cycles, all other operations only take one cycle.           #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               23.02.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               30.10.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -101,7 +101,7 @@ begin
     -- add/sub control --
     op_b_v := op_b_ff;
     if (ctrl_i(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) = alu_add_c) or 
-       (ctrl_i(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) = alu_addc_c) then-- addition
+       (ctrl_i(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) = alu_addc_c) then -- addition
       op_a_v       := op_a_ff;
       carry_null_v := '0';
     else -- subtraction
@@ -127,12 +127,12 @@ begin
     add_lo_v := std_ulogic_vector(unsigned(a_lo_v) + unsigned(b_lo_v) + unsigned(carry_in_v(0 downto 0)));
     add_hi_v := std_ulogic_vector(unsigned(a_hi_v) + unsigned(b_hi_v) + unsigned(add_lo_v(8 downto 8)));
 
-    -- overflow: plus + plus = minus || minus + minus = plus
+    -- overflow logic: plus + plus = minus || minus + minus = plus --
     ova_16_v := ((not op_a_v(15)) and (not op_b_v(15)) and add_hi_v(7)) or (op_a_v(15) and op_b_v(15) and (not add_hi_v(7)));
     ova_8_v  := ((not op_a_v(7))  and (not op_b_v(7))  and add_lo_v(7)) or (op_a_v(7)  and op_b_v(7)  and (not add_lo_v(7)));
 
     -- output --
-    add_res(15 downto 0) <= add_hi_v(7 downto 0) & add_lo_v(7 downto 0); -- data
+    add_res(15 downto 0) <= add_hi_v(7 downto 0) & add_lo_v(7 downto 0); -- result
     if (ctrl_i(ctrl_alu_bw_c) = '1') then -- byte mode flags
       add_res(16) <= add_lo_v(8);
       add_res(17) <= ova_8_v;
@@ -253,7 +253,7 @@ begin
         flag_o(flag_c_c) <= dadd_res_in(16);
         flag_o(flag_v_c) <= '0';
 
-      when alu_cmp_c => -- b - a (no write back)
+      when alu_cmp_c => -- b - a (no write back, done by ctrl arbiter)
         alu_res <= add_res(15 downto 0);
         flag_o(flag_c_c) <= add_res(16);
         flag_o(flag_v_c) <= add_res(17);
@@ -285,7 +285,7 @@ begin
         flag_o(flag_n_c) <= sreg_i(sreg_n_c);
         flag_o(flag_z_c) <= sreg_i(sreg_z_c);
 
-      when alu_bit_c => -- r <= a & b
+      when alu_bit_c => -- r <= a & b (no write back, done by ctrl arbiter)
         alu_res <= op_a_ff and op_b_ff;
         flag_o(flag_c_c) <= not zero;
         flag_o(flag_v_c) <= '0';

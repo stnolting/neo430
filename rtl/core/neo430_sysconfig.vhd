@@ -44,7 +44,7 @@ entity neo430_sysconfig is
     DADD_USE    : boolean := true;  -- implement DADD instruction?
     CFU_USE     : boolean := false; -- implementcustom function unit?
     WB32_USE    : boolean := true;  -- implement WB32 unit?
-    WDT_USE     : boolean := true;  -- implement WBT?
+    WDT_USE     : boolean := true;  -- implement WDT?
     GPIO_USE    : boolean := true;  -- implement GPIO unit?
     TIMER_USE   : boolean := true;  -- implement timer?
     USART_USE   : boolean := true;  -- implement USART?

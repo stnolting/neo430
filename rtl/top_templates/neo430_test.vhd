@@ -68,7 +68,7 @@ begin
     DADD_USE    => true,              -- implement DADD instruction? (default=true)
     CFU_USE     => false,             -- implement custom function unit? (default=false)
     WB32_USE    => true,              -- implement WB32 unit? (default=true)
-    WDT_USE     => true,              -- implement WBT? (default=true)
+    WDT_USE     => true,              -- implement WDT? (default=true)
     GPIO_USE    => true,              -- implement GPIO unit? (default=true)
     TIMER_USE   => true,              -- implement timer? (default=true)
     USART_USE   => true,              -- implement USART? (default=true)

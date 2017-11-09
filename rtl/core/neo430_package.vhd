@@ -120,7 +120,7 @@ package neo430_package is
   constant wdt_base_c : std_ulogic_vector(15 downto 0) := x"FFD0";
   constant wdt_size_c : natural := 2; -- bytes
 
-  constant wbt_ctrl_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wdt_base_c) + x"0000");
+  constant WDT_ctrl_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wdt_base_c) + x"0000");
 
   -- IO: System Configuration --
   constant sysconfig_base_c : std_ulogic_vector(15 downto 0) := x"FFE0";
@@ -212,8 +212,8 @@ package neo430_package is
   constant alu_subc_c : std_ulogic_vector(3 downto 0) := "0111"; -- r <= b - a - 1 + carry
   constant alu_sub_c  : std_ulogic_vector(3 downto 0) := "1000"; -- r <= b - a
   constant alu_cmp_c  : std_ulogic_vector(3 downto 0) := "1001"; -- b - a (no write back)
-  constant alu_dadd_c : std_ulogic_vector(3 downto 0) := "1010"; -- r <= a + b (decimal)
-  constant alu_bit_c  : std_ulogic_vector(3 downto 0) := "1011"; -- r <= a & b
+  constant alu_dadd_c : std_ulogic_vector(3 downto 0) := "1010"; -- r <= a + b (BCD!)
+  constant alu_bit_c  : std_ulogic_vector(3 downto 0) := "1011"; -- a & b (no write back)
   constant alu_bic_c  : std_ulogic_vector(3 downto 0) := "1100"; -- r <= !a & b
   constant alu_bis_c  : std_ulogic_vector(3 downto 0) := "1101"; -- r <= a | b
   constant alu_xor_c  : std_ulogic_vector(3 downto 0) := "1110"; -- r <= a xor b
@@ -234,7 +234,7 @@ package neo430_package is
       DADD_USE    : boolean := true;  -- implement DADD instruction? (default=true)
       CFU_USE     : boolean := false; -- implement custom function unit? (default=false)
       WB32_USE    : boolean := true;  -- implement WB32 unit? (default=true)
-      WDT_USE     : boolean := true;  -- implement WBT? (default=true)
+      WDT_USE     : boolean := true;  -- implement WDT? (default=true)
       GPIO_USE    : boolean := true;  -- implement GPIO unit? (default=true)
       TIMER_USE   : boolean := true;  -- implement timer? (default=true)
       USART_USE   : boolean := true;  -- implement USART? (default=true)
@@ -562,7 +562,7 @@ package neo430_package is
       DADD_USE    : boolean := true;  -- implement DADD instruction?
       CFU_USE     : boolean := false; -- implementcustom function unit?
       WB32_USE    : boolean := true;  -- implement WB32 unit?
-      WDT_USE     : boolean := true;  -- implement WBT?
+      WDT_USE     : boolean := true;  -- implement WDT?
       GPIO_USE    : boolean := true;  -- implement GPIO unit?
       TIMER_USE   : boolean := true;  -- implement timer?
       USART_USE   : boolean := true;  -- implement USART?

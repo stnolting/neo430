@@ -59,7 +59,7 @@ entity neo430_top is
     DADD_USE    : boolean := true;  -- implement DADD instruction? (default=true)
     CFU_USE     : boolean := false; -- implement custom function unit? (default=false)
     WB32_USE    : boolean := true;  -- implement WB32 unit? (default=true)
-    WDT_USE     : boolean := true;  -- implement WBT? (default=true)
+    WDT_USE     : boolean := true;  -- implement WDT? (default=true)
     GPIO_USE    : boolean := true;  -- implement GPIO unit? (default=true)
     TIMER_USE   : boolean := true;  -- implement timer? (default=true)
     USART_USE   : boolean := true;  -- implement USART? (default=true)
@@ -503,7 +503,7 @@ begin
     DADD_USE    => DADD_USE,        -- implement DADD instruction?
     CFU_USE     => CFU_USE,         -- implementcustom function unit?
     WB32_USE    => WB32_USE,        -- implement WB32 unit?
-    WDT_USE     => WDT_USE,         -- implement WBT?
+    WDT_USE     => WDT_USE,         -- implement WDT?
     GPIO_USE    => GPIO_USE,        -- implement GPIO unit?
     TIMER_USE   => TIMER_USE,       -- implement timer?
     USART_USE   => USART_USE,       -- implement USART?
