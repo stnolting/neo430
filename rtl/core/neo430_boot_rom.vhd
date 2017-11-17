@@ -51,7 +51,7 @@ architecture neo430_boot_rom_rtl of neo430_boot_rom is
   impure function init_boot_rom(init : bootloader_init_image_t) return boot_img_t is
     variable mem_v : boot_img_t;
   begin
-    for i in 0 to (boot_size_c/2-1) loop
+    for i in 0 to boot_size_c/2-1 loop
       mem_v(i) := init(i);
     end loop; -- i
     return mem_v;

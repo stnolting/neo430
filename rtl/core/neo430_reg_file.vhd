@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               13.10.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               11.11.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -61,9 +61,6 @@ architecture neo430_reg_file_rtl of neo430_reg_file is
   --- RAM attribute to inhibit bypass-logic - Altera only! ---
   attribute ramstyle : string;
   attribute ramstyle of reg_file : signal is "no_rw_check";
-
-  -- status flags --
-  signal c_flag, z_flag, n_flag, i_flag, s_flag, v_flag, q_flag, r_flag : std_ulogic;
 
   -- misc --
   signal in_data   : std_ulogic_vector(15 downto 0); -- input selection

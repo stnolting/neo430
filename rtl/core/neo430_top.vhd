@@ -37,7 +37,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               21.07.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               11.11.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -248,7 +248,8 @@ begin
   neo430_imem_inst: neo430_imem
   generic map (
     IMEM_SIZE   => IMEM_SIZE,       -- internal IMEM size in bytes, max 32kB (default=4kB)
-    IMEM_AS_ROM => IMEM_AS_ROM      -- implement IMEM as read-only memory?
+    IMEM_AS_ROM => IMEM_AS_ROM,     -- implement IMEM as read-only memory?
+    BOOTLD_USE  => BOOTLD_USE       -- implement and use bootloader? (default=true)
   )
   port map (
     clk_i  => clk_i,                -- global clock line

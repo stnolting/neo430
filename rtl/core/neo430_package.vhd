@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               28.09.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               17.11.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -385,7 +385,8 @@ package neo430_package is
   component neo430_imem
     generic (
       IMEM_SIZE   : natural := 4*1024; -- internal IMEM size in bytes
-      IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory?
+      IMEM_AS_ROM : boolean := false;  -- implement IMEM as read-only memory?
+      BOOTLD_USE  : boolean := true    -- implement and use bootloader?
     );
     port (
       clk_i  : in  std_ulogic; -- global clock line
