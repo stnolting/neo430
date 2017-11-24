@@ -23,7 +23,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               28.09.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               21.11.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -100,7 +100,6 @@ architecture neo430_usart_rtl of neo430_usart is
   signal spi_prsc_ff  : std_ulogic;
 
   -- uart tx unit --
-  signal uart_tx_start    : std_ulogic;
   signal uart_tx_busy     : std_ulogic;
   signal uart_tx_bitcnt   : std_ulogic_vector(03 downto 0);
   signal uart_tx_sreg     : std_ulogic_vector(09 downto 0);
@@ -110,7 +109,6 @@ architecture neo430_usart_rtl of neo430_usart is
   -- uart rx unit --
   signal uart_rx_sync     : std_ulogic_vector(04 downto 0);
   signal uart_rx_avail    : std_ulogic;
-  signal uart_rx_start    : std_ulogic;
   signal uart_rx_busy     : std_ulogic;
   signal uart_rx_busy_ff  : std_ulogic;
   signal uart_rx_bitcnt   : std_ulogic_vector(03 downto 0);
@@ -187,15 +185,11 @@ begin
         uart_tx_busy     <= '0';
         uart_tx_baud_cnt <= baud(7 downto 0);
         uart_tx_bitcnt   <= "1010"; -- 10 bit
-        if (ctrl(ctrl_usart_en_c) = '0') then
-          uart_tx_start <= '0';
-        elsif (wr_en = '1') and (addr = usart_uart_rtx_addr_c) then
-          uart_tx_sreg  <= '1' & data_i(7 downto 0) & '0'; -- stopbit & data & startbit
-          uart_tx_start <= '1';
+        if (wr_en = '1') and (addr = usart_uart_rtx_addr_c) then
+          uart_tx_sreg <= '1' & data_i(7 downto 0) & '0'; -- stopbit & data & startbit
+          uart_tx_busy <= ctrl(ctrl_usart_en_c);
         end if;
-        uart_tx_busy <= uart_tx_start and uart_clk;
       elsif (uart_clk = '1') then
-        uart_tx_start <= '0';
         if (uart_tx_baud_cnt = x"00") then
           uart_tx_baud_cnt <= baud(7 downto 0);
           uart_tx_bitcnt   <= std_ulogic_vector(unsigned(uart_tx_bitcnt) - 1);
@@ -228,14 +222,11 @@ begin
         uart_rx_baud_cnt <= '0' & baud(7 downto 1); -- half baud rate to sample in middle of bit
         uart_rx_bitcnt   <= "1001"; -- 9 bit (startbit + 8 data bits, ignore stop bit/s)
         if (ctrl(ctrl_usart_en_c) = '0') then
-          uart_rx_start <= '0';
-          uart_rx_reg   <= (others => '0'); -- to ensure defined state when reading
+          uart_rx_reg <= (others => '0'); -- to ensure defined state when reading
         elsif (uart_rx_sync(2 downto 0) = "001") then -- start bit? (falling edge)
-          uart_rx_start <= '1';
+          uart_rx_busy <= '1';
         end if;
-        uart_rx_busy <= uart_rx_start and uart_clk;
       elsif (uart_clk = '1') then
-        uart_rx_start <= '0'; -- done
         if (uart_rx_baud_cnt = x"00") then
           uart_rx_baud_cnt <= baud(7 downto 0);
           uart_rx_bitcnt   <= std_ulogic_vector(unsigned(uart_rx_bitcnt) - 1);
@@ -316,7 +307,7 @@ begin
     end if;
   end process spi_rtx_unit;
 
-  -- direct CS --
+  -- direct user-defined CS --
   spi_cs_o(0) <= not ctrl(ctrl_spi_cs0_c);
   spi_cs_o(1) <= not ctrl(ctrl_spi_cs1_c);
   spi_cs_o(2) <= not ctrl(ctrl_spi_cs2_c);
@@ -342,15 +333,15 @@ begin
       if (rden_i = '1') and (acc_en = '1') then
         case addr is
           when usart_uart_rtx_addr_c =>
-            data_o(7 downto 0) <= uart_rx_reg;
             data_o(15) <= uart_rx_avail;
+            data_o(7 downto 0) <= uart_rx_reg;
           when usart_baud_addr_c =>
             data_o(7 downto 0) <= baud;
             data_o(10 downto 8)<= baud_prsc;
           when usart_ctrl_addr_c =>
             data_o <= ctrl;
             data_o(ctrl_spi_busy_c) <= spi_busy;
-            data_o(ctrl_uart_tx_busy_c) <= uart_tx_busy or uart_tx_start;
+            data_o(ctrl_uart_tx_busy_c) <= uart_tx_busy;
           when others =>
 --        when usart_spi_rtx_addr_c =>
             data_o(7 downto 0) <= spi_rtx_sreg;
