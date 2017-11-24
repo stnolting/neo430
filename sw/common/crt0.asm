@@ -19,7 +19,7 @@
 ; # You should have received a copy of the GNU Lesser General Public License along with this      #
 ; # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 ; # ********************************************************************************************* #
-; #  Stephan Nolting, Hannover, Germany                                               06.10.2017  #
+; #  Stephan Nolting, Hannover, Germany                                               21.11.2017  #
 ; #################################################################################################
 
   .file	"crt0.asm"
@@ -93,13 +93,29 @@ __crt0_cpy_data_end:
 ; -----------------------------------------------------------
 ; Re-init SR and clear all pending IRQs from buffer
 ; -----------------------------------------------------------
-    mov #(1<<14), r2 ; this flag auto clears
+    mov  #(1<<14), r2 ; this flag auto clears
+
+
+; -----------------------------------------------------------
+; Initialize all remaining registers
+; -----------------------------------------------------------
+    mov  #0, r4
+;   mov  #0, r5 ; -- is already initialized
+;   mov  #0, r6 ; -- is already initialized
+;   mov  #0, r7 ; -- is already initialized
+;   mov  #0, r8 ; -- is already initialized
+    mov  #0, r9
+    mov  #0, r10
+    mov  #0, r11
+    mov  #0, r12 ; set argc = 0
+    mov  #0, r13
+    mov  #0, r14
+    mov  #0, r15
 
 
 ; -----------------------------------------------------------
 ; This is where the actual application is started
 ; -----------------------------------------------------------
-    mov   #0, r12 ; set argc = 0
     call  #main
 
 
@@ -107,10 +123,10 @@ __crt0_cpy_data_end:
 ; Go to endless sleep mode if main returns
 ; -----------------------------------------------------------
 __crt0_this_is_the_end:
+    mov  #0, r2 ; deactivate IRQs
     mov  #0x4700, &0xFFD0 ; deactivate watchdog
-    mov  #0, r2 ; deativate IRQ
-    mov  #16, r2 ; set CPU to sleep mode
+    mov  #(1<<4), r2 ; set CPU to sleep mode
     nop
 
 .Lfe0:
-    .size	__crt0_begin,.Lfe0-__crt0_begin
+    .size	__crt0_begin, .Lfe0-__crt0_begin
