@@ -31,6 +31,7 @@
 // prototypes (SPI)
 void spi_cs_en(uint8_t cs);
 void spi_cs_dis(uint8_t cs);
+void spi_cs_dis_all(void);
 uint8_t spi_trans(uint8_t d);
 
 // prototypes (UART)
@@ -70,6 +71,15 @@ void spi_cs_en(uint8_t cs) {
 void spi_cs_dis(uint8_t cs) {
 
   USI_CT &= ~(1 << (USI_CT_SPICS0 + cs));
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Disable all SPI CS lines
+ * ------------------------------------------------------------ */
+void spi_cs_dis_all(void) {
+
+  USI_CT &= 0x03FF;
 }
 
 
