@@ -1,6 +1,8 @@
 -- #################################################################################################
 -- #  << NEO430 - 32-bit Wishbone Interface >>                                                     #
 -- # ********************************************************************************************* #
+-- # 
+-- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
 -- #                                                                                               #
@@ -61,7 +63,6 @@ architecture neo430_wb_interface_rtl of neo430_wb_interface is
   constant ctrl_byte_en1_c : natural :=  1; -- -/w: wishbone data byte enable bit 1
   constant ctrl_byte_en2_c : natural :=  2; -- -/w: wishbone data byte enable bit 2
   constant ctrl_byte_en3_c : natural :=  3; -- -/w: wishbone data byte enable bit 3
-  constant ctrl_pmode_c    : natural :=  4; -- -/w: 0: standard mode, 1: pipelined mode
   constant ctrl_pending_c  : natural := 15; -- r/-: pending wb transfer
 
   -- access control --
@@ -74,7 +75,6 @@ architecture neo430_wb_interface_rtl of neo430_wb_interface is
   signal wb_rdata  : std_ulogic_vector(31 downto 0);
   signal wb_wdata  : std_ulogic_vector(31 downto 0);
   signal pending   : std_ulogic; -- pending transfer?
-  signal pipelined : std_ulogic; -- pipelined mode enable
   signal byte_en   : std_ulogic_vector(03 downto 0);
 
   -- misc --
@@ -119,7 +119,6 @@ begin
                 byte_en(1) <= data_i(ctrl_byte_en1_c);
                 byte_en(2) <= data_i(ctrl_byte_en2_c);
                 byte_en(3) <= data_i(ctrl_byte_en3_c);
-                pipelined  <= data_i(ctrl_pmode_c);
               else
                 NULL;
               end if;
@@ -151,7 +150,7 @@ begin
           pending  <= '1';
         end if;
       else -- transfer in progress
-        wb_stb_o <= not pipelined; -- keep activated if standard/classic cycle 
+        wb_stb_o <= '0'; -- use ONLY standard/classic cycle with single-cycle STB assertion!!
         -- waiting for ACK
         if (wb_ack_i = '1') then
           wb_rdata <= wb_dat_i; -- sample input data
