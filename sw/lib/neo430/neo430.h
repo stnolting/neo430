@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               08.11.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               20.11.2017  #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -54,6 +54,7 @@
 #define REG8  (volatile uint8_t*)
 #define REG16 (volatile uint16_t*)
 #define REG32 (volatile uint32_t*)
+
 
 /* --- Custom Function Unit - CFU --- */
 #define CFU_REG0    (*(REG16 0xFF80)) // ?/? user defined
@@ -103,7 +104,6 @@
 #define WB32_CT_WBSEL1   1 // -/w: wishbone data byte enable bit 1
 #define WB32_CT_WBSEL2   2 // -/w: wishbone data byte enable bit 2
 #define WB32_CT_WBSEL3   3 // -/w: wishbone data byte enable bit 3
-#define WB32_CT_PMODE    4 // -/w: 0: standard transfers, 1: pipelined transfers
 #define WB32_CT_PENDING 15 // r/-: pending transfer
 
 
@@ -206,7 +206,6 @@
 #define WDT_CLKSEL2  2 // r/w: prescaler select bit 2
 #define WDT_ENABLE   3 // r/w: WDT enable
 #define WDT_RCAUSE   4 // r/-: reset cause (0: external, 1: watchdog timeout)
-#define WDT_SYSRST   5 // -/w: set one to generate system hardware reset
 
 // watchdog clock prescaler select:
 #define WDT_PRSC_2    0 // CLK/2

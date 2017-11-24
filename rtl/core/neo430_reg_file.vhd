@@ -53,6 +53,12 @@ end neo430_reg_file;
 
 architecture neo430_reg_file_rtl of neo430_reg_file is
 
+  -- boot address for PC --
+  -- boot from beginning of boot ROM (boot_base_c) if bootloader is used, otherwise boot from beginning of IMEM (imem_base_c)
+  -- By not using a reset-like init of the PC, the whole register file (except for SR and CG)
+  -- can be mapped to distributed RAM saving logic resources
+  constant pc_boot_addr_c : std_ulogic_vector(15 downto 0) := cond_sel_stdulogicvector(BOOTLD_USE, boot_base_c, imem_base_c);
+
   -- register file (including dummy regs) --
   type   reg_file_t is array (15 downto 0) of std_ulogic_vector(15 downto 0);
   signal reg_file : reg_file_t;
@@ -63,24 +69,14 @@ architecture neo430_reg_file_rtl of neo430_reg_file is
   attribute ramstyle of reg_file : signal is "no_rw_check";
 
   -- misc --
-  signal in_data   : std_ulogic_vector(15 downto 0); -- input selection
-  signal boot_addr : std_ulogic_vector(15 downto 0); -- the boot address
+  signal in_data : std_ulogic_vector(15 downto 0); -- input selection
 
 begin
 
-  -- Boot address Selection ---------------------------------------------------
-  -- -----------------------------------------------------------------------------
-  -- Boot from beginning of IMEM if *NO* bootloader is used
-  -- Boot from beginning of boot ROM if bootloader *IS USED*
-  boot_addr <= imem_base_c when (BOOTLD_USE = false) else boot_base_c;
-  -- By not using a reset-like init of the PC, the CP can be mapped into a dedicated
-  -- block RAM saving logic resources ;)
-
-
   -- Input Operand Selection --------------------------------------------------
   -- -----------------------------------------------------------------------------
-  in_data <= boot_addr when (ctrl_i(ctrl_rf_boot_c)   = '1') else
-             addr_i    when (ctrl_i(ctrl_rf_in_sel_c) = '1') else alu_i;
+  in_data <= pc_boot_addr_c when (ctrl_i(ctrl_rf_boot_c)   = '1') else
+             addr_i         when (ctrl_i(ctrl_rf_in_sel_c) = '1') else alu_i;
 
 
   -- Register File Write Access -----------------------------------------------
@@ -151,7 +147,7 @@ begin
         when others => data_o <= x"0000";
       end case;
     else
-      -- register file read access --
+      -- sp / gp register file read access --
       data_o <= reg_file(to_integer(unsigned(ctrl_i(ctrl_rf_adr3_c downto ctrl_rf_adr0_c))));
     end if;
   end process rf_read;

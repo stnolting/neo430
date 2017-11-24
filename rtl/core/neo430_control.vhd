@@ -586,7 +586,7 @@ begin
         ctrl_nxt(ctrl_alu_opa_wr_c) <= '1'; -- write to OpA
         ctrl_nxt(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) <= alu_bic_c; -- output zero
         ctrl_nxt(ctrl_rf_wb_en_c)    <= '1'; -- valid RF write back (clear SR)
-        ctrl_nxt(ctrl_adr_bp_en_c)   <= '1'; -- use address output bypass
+        ctrl_nxt(ctrl_adr_bp_en_c)   <= '1'; -- directly output PC/IRQ vector
         ctrl_nxt(ctrl_adr_ivec_oe_c) <= '1'; -- output IRQ vector
         ctrl_nxt(ctrl_mem_rd_c)      <= '1'; -- Memory read (fast)
         state_nxt <= IRQ_4;

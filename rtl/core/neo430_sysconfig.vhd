@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               09.08.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               20.11.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -75,17 +75,13 @@ architecture neo430_sysconfig_rtl of neo430_sysconfig is
   signal irqv_addr : std_ulogic_vector(01 downto 0);
 
   -- misc --
-  signal rden   : std_ulogic;
-  signal rdata0 : std_ulogic_vector(15 downto 0);
-  signal rdata1 : std_ulogic_vector(15 downto 0);
-  signal rd_sel : std_ulogic;
-  signal f_clk  : std_ulogic_vector(31 downto 0);
+  signal f_clk : std_ulogic_vector(31 downto 0);
 
   -- system information ROM --
   type info_mem_t is array (0 to 7) of std_ulogic_vector(15 downto 0);
   signal sysinfo_mem : info_mem_t; -- ROM
 
-  -- interrupt vectors RAM --
+  -- interrupt vector RAM --
   type irqv_mem_t is array (0 to 3) of std_ulogic_vector(15 downto 0);
   signal irqvec_mem : irqv_mem_t; -- RAM
 
@@ -140,18 +136,22 @@ begin
   rw_access: process(clk_i)
   begin
     if rising_edge(clk_i) then
-      if (wren_i = "11") and (acc_en = '1') and (addr_i(lo_abb_c-1) = '1') then -- write access to IRQ config
+      -- write access (IRQ vectors) --
+      if (wren_i = "11") and (acc_en = '1') and (addr_i(lo_abb_c-1) = '1') then
         irqvec_mem(to_integer(unsigned(irqv_addr))) <= data_i;
       end if;
-      rden   <= rden_i and acc_en;
-      rd_sel <= addr_i(lo_abb_c-1);
-      rdata0 <= sysinfo_mem(to_integer(unsigned(info_addr)));
-      rdata1 <= irqvec_mem(to_integer(unsigned(irqv_addr)));
+      -- read access --
+      if ((rden_i and acc_en) = '1') then
+        if (addr_i(lo_abb_c-1) = '0') then -- read INFOMEM
+          data_o <= sysinfo_mem(to_integer(unsigned(info_addr)));
+        else -- read IRQ vector
+          data_o <= irqvec_mem(to_integer(unsigned(irqv_addr)));
+        end if;
+      else
+        data_o <= x"0000";
+      end if;
     end if;
   end process rw_access;
-
-  -- output gate --
-  data_o <= x"0000" when (rden = '0') else rdata0 when (rd_sel = '0') else rdata1;
 
 
 end neo430_sysconfig_rtl;
