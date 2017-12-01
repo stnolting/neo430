@@ -56,31 +56,16 @@
 #define REG32 (volatile uint32_t*)
 
 
-/* --- Custom Function Unit - CFU --- */
-#define CFU_REG0    (*(REG16 0xFF80)) // ?/? user defined
-#define CFU_REG0_LO (*(REG8  0xFF80)) // ?/? user defined
-#define CFU_REG0_HI (*(REG8  0xFF81)) // ?/? user defined
-#define CFU_REG1    (*(REG16 0xFF82)) // ?/? user defined
-#define CFU_REG1_LO (*(REG8  0xFF82)) // ?/? user defined
-#define CFU_REG1_HI (*(REG8  0xFF83)) // ?/? user defined
-#define CFU_REG2    (*(REG16 0xFF84)) // ?/? user defined
-#define CFU_REG2_LO (*(REG8  0xFF84)) // ?/? user defined
-#define CFU_REG2_HI (*(REG8  0xFF85)) // ?/? user defined
-#define CFU_REG3    (*(REG16 0xFF86)) // ?/? user defined
-#define CFU_REG3_LO (*(REG8  0xFF86)) // ?/? user defined
-#define CFU_REG3_HI (*(REG8  0xFF87)) // ?/? user defined
-#define CFU_REG4    (*(REG16 0xFF88)) // ?/? user defined
-#define CFU_REG4_LO (*(REG8  0xFF88)) // ?/? user defined
-#define CFU_REG4_HI (*(REG8  0xFF89)) // ?/? user defined
-#define CFU_REG5    (*(REG16 0xFF8A)) // ?/? user defined
-#define CFU_REG5_LO (*(REG8  0xFF8A)) // ?/? user defined
-#define CFU_REG5_HI (*(REG8  0xFF8B)) // ?/? user defined
-#define CFU_REG6    (*(REG16 0xFF8C)) // ?/? user defined
-#define CFU_REG6_LO (*(REG8  0xFF8C)) // ?/? user defined
-#define CFU_REG6_HI (*(REG8  0xFF8D)) // ?/? user defined
-#define CFU_REG7    (*(REG16 0xFF8E)) // ?/? user defined
-#define CFU_REG7_LO (*(REG8  0xFF8E)) // ?/? user defined
-#define CFU_REG7_HI (*(REG8  0xFF8F)) // ?/? user defined
+/* --- Multiplier/Divider Unit (MULDIV) --- */
+#define MULDIV_OPA     (*(REG16 0xFF80)) // -/w: operand A (dividend or factor1)
+#define MULDIV_OPB_DIV (*(REG16 0xFF82)) // -/w: operand B (divisor) for division
+#define MULDIV_OPB_MUL (*(REG16 0xFF84)) // -/w: operand B (factor2) for multiplication
+//#define reserved     (*(REG16 0xFF86))
+//#define reserved     (*(REG16 0xFF88))
+//#define reserved     (*(REG16 0xFF8A))
+#define MULDIV_RESX    (*(REG16 0xFF8C)) // r/-: quotient or product low word
+#define MULDIV_RESY    (*(REG16 0xFF8E)) // r/-: remainder or product high word
+#define MULDIV_R32     (*(REG32 (&MULDIV_RESX))) // r/-: read result as 32-bit data word
 
 
 /* --- Wishbone Bus Adapter - WB32 --- */
@@ -90,7 +75,7 @@
 #define WB32_HWA (*(REG16 0xFF96)) // -/w: high address for write transfer (+trigger)
 #define WB32_LD  (*(REG16 0xFF98)) // r/w: low data
 #define WB32_HD  (*(REG16 0xFF9A)) // r/w: high data
-#define WB32_xxx (*(REG16 0xFF9C)) // -/-: reserved
+//#define reserved (*(REG16 0xFF9C)) // -/-: reserved
 #define WB32_CT  (*(REG16 0xFF9E)) // r/w: control register
 
 // WB32 - 32-bit register access
@@ -241,7 +226,7 @@
 #define CLOCKSPEED_32bit (*(REG32 (&CLOCKSPEED_LO))) // r/-: clock speed (in Hz)
 
 // SYS features
-#define SYS_CFU_EN    0 // CFU synthesized
+#define SYS_MULDIV_EN 0 // MULDIV synthesized
 #define SYS_WB32_EN   1 // WB32 synthesized
 #define SYS_WDT_EN    2 // WDT synthesized
 #define SYS_GPIO_EN   3 // GPIO synthesized
@@ -266,6 +251,7 @@
 // Include IO libraries
 // ----------------------------------------------------------------------------
 #include "neo430_cpu.h"
+#include "neo430_muldiv.h"
 #include "neo430_gpio.h"
 #include "neo430_usart.h"
 #include "neo430_wdt.h"

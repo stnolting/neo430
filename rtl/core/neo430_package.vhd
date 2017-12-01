@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               21.11.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               01.12.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -30,7 +30,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0126"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0140"; -- no touchy!
 
   -- Internal Functions ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -64,18 +64,18 @@ package neo430_package is
   constant io_base_c : std_ulogic_vector(15 downto 0) := x"FF80";
   constant io_size_c : natural := 128; -- bytes, fixed!
 
-  -- IO: Custom Functions Unit (CFU) --
-  constant cfu_base_c : std_ulogic_vector(15 downto 0) := x"FF80";
-  constant cfu_size_c : natural := 16; -- bytes
+  -- IO: Multiplier/Divider Unit (MULDIV) --
+  constant muldiv_base_c : std_ulogic_vector(15 downto 0) := x"FF80";
+  constant muldiv_size_c : natural := 16; -- bytes
 
-  constant cfu_reg0_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"0000");
-  constant cfu_reg1_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"0002");
-  constant cfu_reg2_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"0004");
-  constant cfu_reg3_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"0006");
-  constant cfu_reg4_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"0008");
-  constant cfu_reg5_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"000A");
-  constant cfu_reg6_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"000C");
-  constant cfu_reg7_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"000E");
+  constant muldiv_opa_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0000");
+  constant muldiv_opb_div_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0002");
+  constant muldiv_opb_mul_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0004");
+--constant reserved              : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0006");
+--constant reserved              : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0008");
+--constant reserved              : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"000A");
+  constant muldiv_resx_addr_c    : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"000C");
+  constant muldiv_resy_addr_c    : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"000E");
 
   -- IO: Wishbone32 Interface --
   constant wb32_base_c : std_ulogic_vector(15 downto 0) := x"FF90";
@@ -231,13 +231,13 @@ package neo430_package is
       -- additional configuration --
       USER_CODE   : std_ulogic_vector(15 downto 0) := x"0000"; -- custom user code
       -- module configuration --
-      DADD_USE    : boolean := true;  -- implement DADD instruction? (default=true)
-      CFU_USE     : boolean := false; -- implement custom function unit? (default=false)
-      WB32_USE    : boolean := true;  -- implement WB32 unit? (default=true)
-      WDT_USE     : boolean := true;  -- implement WDT? (default=true)
-      GPIO_USE    : boolean := true;  -- implement GPIO unit? (default=true)
-      TIMER_USE   : boolean := true;  -- implement timer? (default=true)
-      USART_USE   : boolean := true;  -- implement USART? (default=true)
+      DADD_USE    : boolean := true; -- implement DADD instruction? (default=true)
+      MULDIV_USE  : boolean := true; -- implement multiplier/divider unit? (default=true)
+      WB32_USE    : boolean := true; -- implement WB32 unit? (default=true)
+      WDT_USE     : boolean := true; -- implement WDT? (default=true)
+      GPIO_USE    : boolean := true; -- implement GPIO unit? (default=true)
+      TIMER_USE   : boolean := true; -- implement timer? (default=true)
+      USART_USE   : boolean := true; -- implement USART? (default=true)
       -- boot configuration --
       BOOTLD_USE  : boolean := true; -- implement and use bootloader? (default=true)
       IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory? (default=false)
@@ -426,9 +426,9 @@ package neo430_package is
     );
   end component;
 
-  -- Component: Custom Functions Unit -------------------------------------------------------
+  -- Component: Multiplier/Divider ----------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  component neo430_cfu
+  component neo430_muldiv
     port (
       -- host access --
       clk_i  : in  std_ulogic; -- global clock line
@@ -437,8 +437,6 @@ package neo430_package is
       addr_i : in  std_ulogic_vector(15 downto 0); -- address
       data_i : in  std_ulogic_vector(15 downto 0); -- data in
       data_o : out std_ulogic_vector(15 downto 0)  -- data out
-      -- custom IOs --
---    ...
     );
   end component;
 
@@ -561,7 +559,7 @@ package neo430_package is
       USER_CODE   : std_ulogic_vector(15 downto 0) := x"0000"; -- custom user code
       -- module configuration --
       DADD_USE    : boolean := true;  -- implement DADD instruction?
-      CFU_USE     : boolean := false; -- implementcustom function unit?
+      MULDIV_USE  : boolean := false; -- implement multiplier/divider unit?
       WB32_USE    : boolean := true;  -- implement WB32 unit?
       WDT_USE     : boolean := true;  -- implement WDT?
       GPIO_USE    : boolean := true;  -- implement GPIO unit?

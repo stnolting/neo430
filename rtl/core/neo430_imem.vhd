@@ -1,7 +1,7 @@
 -- #################################################################################################
 -- #  << NEO430 - Instruction memory ("IMEM") >>                                                   #
 -- # ********************************************************************************************* #
--- #  This file includes the in-place executable image of the application. See the                 #
+-- #  This memory includes the in-place executable image of the application. See the               #
 -- #  processor's documentary to get more information.                                             #
 -- #  Note: IMEM is split up into two 8-bit memories - some EDA tools have problems to synthesize  #
 -- #  an pre-initialized 16-bit memory with byte-enable signals.                                   #
@@ -24,7 +24,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               11.11.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               01.12.2017  #
 -- #################################################################################################
 
 library ieee;

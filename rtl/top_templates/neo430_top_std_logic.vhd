@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               21.07.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               01.12.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -38,13 +38,13 @@ entity neo430_top_std_logic is
     -- additional configuration --
     USER_CODE   : std_logic_vector(15 downto 0) := x"0000"; -- custom user code
     -- module configuration --
-    DADD_USE    : boolean := true;  -- implement DADD instruction? (default=true)
-    CFU_USE     : boolean := false; -- implement custom function unit? (default=false)
-    WB32_USE    : boolean := true;  -- implement WB32 unit? (default=true)
-    WDT_USE     : boolean := true;  -- implement WDT? (default=true)
-    GPIO_USE    : boolean := true;  -- implement GPIO unit? (default=true)
-    TIMER_USE   : boolean := true;  -- implement timer? (default=true)
-    USART_USE   : boolean := true;  -- implement USART? (default=true)
+    DADD_USE    : boolean := true; -- implement DADD instruction? (default=true)
+    MULDIV_USE  : boolean := true; -- implement multiplier/divider unit? (default=true)
+    WB32_USE    : boolean := true; -- implement WB32 unit? (default=true)
+    WDT_USE     : boolean := true; -- implement WDT? (default=true)
+    GPIO_USE    : boolean := true; -- implement GPIO unit? (default=true)
+    TIMER_USE   : boolean := true; -- implement timer? (default=true)
+    USART_USE   : boolean := true; -- implement USART? (default=true)
     -- boot configuration --
     BOOTLD_USE  : boolean := true; -- implement and use bootloader? (default=true)
     IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory? (default=false)
@@ -117,7 +117,7 @@ begin
     USER_CODE   => usrcode_c,         -- custom user code
     -- module configuration --
     DADD_USE    => DADD_USE,          -- implement DADD instruction? (default=true)
-    CFU_USE     => CFU_USE,           -- implement custom function unit? (default=false)
+    MULDIV_USE  => MULDIV_USE,        -- implement multiplier/divider unit? (default=true)
     WB32_USE    => WB32_USE,          -- implement WB32 unit? (default=true)
     WDT_USE     => WDT_USE,           -- implement WDT? (default=true)
     GPIO_USE    => GPIO_USE,          -- implement GPIO unit? (default=true)

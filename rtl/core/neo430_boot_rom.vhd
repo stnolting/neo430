@@ -1,7 +1,7 @@
 -- #################################################################################################
 -- #  << NEO430 - Bootloader ROM >>                                                                #
 -- # ********************************************************************************************* #
--- #  This file includes the in-place executable image of the NEO430 bootloader. See the           #
+-- #  This memory includes the in-place executable image of the NEO430 bootloader. See the         #
 -- #  processor's documentary to get more information.                                             #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               14.02.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               01.12.2017  #
 -- #################################################################################################
 
 library ieee;

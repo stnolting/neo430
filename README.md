@@ -55,7 +55,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Internal DMEN (RAM, for data) and IMEM (RAM or ROM, for code), configurable sizes
 - One external interrupt line
 - Customizable processor hardware configuration
-- Optional custom function unit (CFU) to add your custom memory-mapped functions
+- Optional multiplier/divider unit
 - Optional high-precision timer (TIMER)
 - Optional USART interface; UART and SPI (USART)
 - Optional general purpose parallel IO port (GPIO), 16 inputs, 16 outputs, with pin-change interrupt
@@ -67,7 +67,6 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 ## Differences to TI's original MSP430 processors
 
 - Completely different processor modules with different functionality
-- No hardware multiplier support (but emulated in software)
 - Maximum of 32kB instruction memory and 28kB data memory
 - Specific memory map – included NEO430 linker script and compilation script required
 - Custom binary executable format

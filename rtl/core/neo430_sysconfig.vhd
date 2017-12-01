@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               20.11.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               01.12.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -41,13 +41,13 @@ entity neo430_sysconfig is
     -- additional configuration --
     USER_CODE   : std_ulogic_vector(15 downto 0) := x"0000"; -- custom user code
     -- module configuration --
-    DADD_USE    : boolean := true;  -- implement DADD instruction?
-    CFU_USE     : boolean := false; -- implementcustom function unit?
-    WB32_USE    : boolean := true;  -- implement WB32 unit?
-    WDT_USE     : boolean := true;  -- implement WDT?
-    GPIO_USE    : boolean := true;  -- implement GPIO unit?
-    TIMER_USE   : boolean := true;  -- implement timer?
-    USART_USE   : boolean := true;  -- implement USART?
+    DADD_USE    : boolean := true; -- implement DADD instruction?
+    MULDIV_USE  : boolean := true; -- implementcustom MULDIV unit?
+    WB32_USE    : boolean := true; -- implement WB32 unit?
+    WDT_USE     : boolean := true; -- implement WDT?
+    GPIO_USE    : boolean := true; -- implement GPIO unit?
+    TIMER_USE   : boolean := true; -- implement timer?
+    USART_USE   : boolean := true; -- implement USART?
     -- boot configuration --
     BOOTLD_USE  : boolean := true; -- implement and use bootloader?
     IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory?
@@ -102,7 +102,7 @@ begin
   sysinfo_mem(0) <= hw_version_c; -- HW version
 
   -- CPUID1: System setup (features) --
-  sysinfo_mem(1)(00) <= bool_to_ulogic(CFU_USE);     -- CFU present?
+  sysinfo_mem(1)(00) <= bool_to_ulogic(MULDIV_USE);  -- MULDIV present?
   sysinfo_mem(1)(01) <= bool_to_ulogic(WB32_USE);    -- WB32 present?
   sysinfo_mem(1)(02) <= bool_to_ulogic(WDT_USE);     -- WDT present?
   sysinfo_mem(1)(03) <= bool_to_ulogic(GPIO_USE);    -- GPIO present?
@@ -110,7 +110,7 @@ begin
   sysinfo_mem(1)(05) <= bool_to_ulogic(USART_USE);   -- USART present?
   sysinfo_mem(1)(06) <= bool_to_ulogic(DADD_USE);    -- DADD instruction present?
   sysinfo_mem(1)(07) <= bool_to_ulogic(BOOTLD_USE);  -- bootloader present?
-  sysinfo_mem(1)(08) <= bool_to_ulogic(IMEM_AS_ROM); -- implement IMEM as true ROM?
+  sysinfo_mem(1)(08) <= bool_to_ulogic(IMEM_AS_ROM); -- IMEM implemented as true ROM?
   sysinfo_mem(1)(15 downto 9) <= (others => '0');    -- reserved
 
   -- CPUID2: User code --

@@ -37,10 +37,6 @@ uint8_t wishbone_read8(uint32_t a);
 void wishbone_write8(uint32_t a, uint8_t d);
 
 
-// ************************************************************************************************
-// Blocking functions
-// ************************************************************************************************
-
 /* ------------------------------------------------------------
  * INFO Read 32-bit from Wishbone device (blocking), standard mode, pipelined
  * PARAM 32-bit device address
