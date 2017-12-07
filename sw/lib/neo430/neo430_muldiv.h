@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               01.12.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               07.12.2017  #
 // #################################################################################################
 
 #ifndef neo430_muldiv_h
@@ -121,8 +121,6 @@ uint16_t udiv16(uint16_t dividend, uint16_t divisor) {
  * ------------------------------------------------------------ */
 int16_t div16(int16_t dividend, int16_t divisor) {
 
-  int16_t sign = dividend ^ divisor;
-
   // make positive / unsigned
   if (dividend < 0)
     dividend = 0 - dividend;
@@ -139,7 +137,7 @@ int16_t div16(int16_t dividend, int16_t divisor) {
 
   int16_t r = (int16_t)MULDIV_RESX;
 
-  if (sign < 0)
+  if (dividend < 0)
     return 0 - r;
   else
     return r;
@@ -174,15 +172,15 @@ uint16_t umod16(uint16_t dividend, uint16_t divisor) {
  * ------------------------------------------------------------ */
 int16_t mod16(int16_t dividend, int16_t divisor) {
 
-  int16_t sign = dividend ^ divisor;
+  int16_t dividend_int = dividend;
 
   // make positive / unsigned
-  if (dividend < 0)
-    dividend = 0 - dividend;
+  if (dividend_int < 0)
+    dividend_int = 0 - dividend_int;
   if (divisor < 0)
     divisor = 0 - divisor;
 
-  MULDIV_OPA = (uint16_t)dividend;
+  MULDIV_OPA = (uint16_t)dividend_int;
   MULDIV_OPB_DIV  = (uint16_t)divisor;
 
   // HW processing delay
@@ -192,7 +190,7 @@ int16_t mod16(int16_t dividend, int16_t divisor) {
 
   int16_t r = (int16_t)MULDIV_RESY;
 
-  if (sign < 0)
+  if (dividend < 0)
     return 0 - r;
   else
     return r;
@@ -231,14 +229,15 @@ uint16_t umoddiv16(uint16_t *remainder, uint16_t dividend, uint16_t divisor) {
 int16_t moddiv16(int16_t *remainder, int16_t dividend, int16_t divisor) {
 
   int16_t sign = dividend ^ divisor;
+  int16_t dividend_int = dividend;
 
   // make positive / unsigned
-  if (dividend < 0)
-    dividend = 0 - dividend;
+  if (dividend_int < 0)
+    dividend_int = 0 - dividend_int;
   if (divisor < 0)
     divisor = 0 - divisor;
 
-  MULDIV_OPA = (uint16_t)dividend;
+  MULDIV_OPA = (uint16_t)dividend_int;
   MULDIV_OPB_DIV  = (uint16_t)divisor;
 
   // HW processing delay
@@ -249,14 +248,15 @@ int16_t moddiv16(int16_t *remainder, int16_t dividend, int16_t divisor) {
   int16_t q = (int16_t)MULDIV_RESX;
   int16_t r = (int16_t)MULDIV_RESY;
 
-  if (sign < 0) {
+  if (dividend < 0)
     *remainder = 0 - r;
-    return 0 - q;
-  }
-  else {
+  else
     *remainder = r;
+
+  if (sign < 0)
+    return 0 - q;
+  else
     return q;
-  }
 }
 
 
