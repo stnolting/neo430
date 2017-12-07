@@ -6,21 +6,22 @@
       <db_ref path="neo430_tb_behav.wdb" id="1">
          <top_modules>
             <top_module name="neo430_application_image" />
+            <top_module name="neo430_bootloader_image" />
             <top_module name="neo430_package" />
             <top_module name="neo430_tb" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="299823500000fs"></ZoomStartTime>
-      <ZoomEndTime time="300912500001fs"></ZoomEndTime>
-      <Cursor1Time time="300051500000fs"></Cursor1Time>
+      <ZoomStartTime time="663163520fs"></ZoomStartTime>
+      <ZoomEndTime time="2925467304fs"></ZoomEndTime>
+      <Cursor1Time time="1000000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="145"></NameColumnWidth>
-      <ValueColumnWidth column_width="88"></ValueColumnWidth>
+      <ValueColumnWidth column_width="80"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="93" />
+   <WVObjectSize size="105" />
    <wvobject type="divider" fp_name="divider6">
       <obj_property name="label">Global</obj_property>
       <obj_property name="DisplayName">label</obj_property>
@@ -398,12 +399,65 @@
       <obj_property name="ElementShortName">irqvec_mem[0:3][15:0]</obj_property>
       <obj_property name="ObjectShortName">irqvec_mem[0:3][15:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_cfu_inst_true/neo430_cfu_inst/acc_en" type="logic">
+   <wvobject type="divider" fp_name="divider22">
+      <obj_property name="label">MulDiv</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_muldiv_inst_true/neo430_muldiv_inst/rden_i" type="logic">
+      <obj_property name="ElementShortName">rden_i</obj_property>
+      <obj_property name="ObjectShortName">rden_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_muldiv_inst_true/neo430_muldiv_inst/wr_en" type="logic">
+      <obj_property name="ElementShortName">wr_en</obj_property>
+      <obj_property name="ObjectShortName">wr_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_muldiv_inst_true/neo430_muldiv_inst/acc_en" type="logic">
       <obj_property name="ElementShortName">acc_en</obj_property>
       <obj_property name="ObjectShortName">acc_en</obj_property>
    </wvobject>
-   <wvobject type="divider" fp_name="divider22">
-      <obj_property name="label">CFU</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
+   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_muldiv_inst_true/neo430_muldiv_inst/opa" type="array">
+      <obj_property name="ElementShortName">opa[15:0]</obj_property>
+      <obj_property name="ObjectShortName">opa[15:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_muldiv_inst_true/neo430_muldiv_inst/opb" type="array">
+      <obj_property name="ElementShortName">opb[15:0]</obj_property>
+      <obj_property name="ObjectShortName">opb[15:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_muldiv_inst_true/neo430_muldiv_inst/resx" type="array">
+      <obj_property name="ElementShortName">resx[15:0]</obj_property>
+      <obj_property name="ObjectShortName">resx[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_muldiv_inst_true/neo430_muldiv_inst/resy" type="array">
+      <obj_property name="ElementShortName">resy[15:0]</obj_property>
+      <obj_property name="ObjectShortName">resy[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_muldiv_inst_true/neo430_muldiv_inst/operation" type="logic">
+      <obj_property name="ElementShortName">operation</obj_property>
+      <obj_property name="ObjectShortName">operation</obj_property>
+   </wvobject>
+   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_muldiv_inst_true/neo430_muldiv_inst/start" type="logic">
+      <obj_property name="ElementShortName">start</obj_property>
+      <obj_property name="ObjectShortName">start</obj_property>
+   </wvobject>
+   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_muldiv_inst_true/neo430_muldiv_inst/run" type="logic">
+      <obj_property name="ElementShortName">run</obj_property>
+      <obj_property name="ObjectShortName">run</obj_property>
+   </wvobject>
+   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_muldiv_inst_true/neo430_muldiv_inst/remainder" type="array">
+      <obj_property name="ElementShortName">remainder[15:0]</obj_property>
+      <obj_property name="ObjectShortName">remainder[15:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_muldiv_inst_true/neo430_muldiv_inst/quotient" type="array">
+      <obj_property name="ElementShortName">quotient[15:0]</obj_property>
+      <obj_property name="ObjectShortName">quotient[15:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_muldiv_inst_true/neo430_muldiv_inst/product" type="array">
+      <obj_property name="ElementShortName">product[31:0]</obj_property>
+      <obj_property name="ObjectShortName">product[31:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
 </wave_config>
