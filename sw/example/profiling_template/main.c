@@ -42,7 +42,7 @@
 #define TIMER_PRSC_CLK2048 TMR_PRSC_2048
 #define TIMER_PRSC_CLK4096 TMR_PRSC_4096
 // actual timer prescaler configuration:
-#define TIMER_PRSC TIMER_PRSC_CLK1024
+#define TIMER_PRSC TIMER_PRSC_CLK2
 
 // Function prototypes
 inline void __attribute__((always_inline)) start_profiling(const uint16_t prsc);
@@ -60,8 +60,14 @@ int main(void) {
 
   // intro text
   _printf("\r\nProfiling template\r\n");
-  _printf("Starting profiling...\r\n");
 
+  // check if TIMER unit was synthesized, exit if no TIMER is available
+  if (!(SYS_FEATURES & (1<<SYS_TIMER_EN))) {
+    uart_br_print("Error! No TIMER unit synthesized!");
+    return 1;
+  }
+
+  _printf("Starting profiling...\r\n");
 
   // start runtime profiling
   start_profiling(TIMER_PRSC);
@@ -70,15 +76,20 @@ int main(void) {
 
   // **************************************************************
   // YOUR APPLICATION YOU WANT TO PROFILE REGARDING REAL RUNTIME
-  cpu_delay(22); // ... just a dummy here ...
+  // The code below is just a compute-intensive exemplary dummy...
+  volatile uint32_t a = 0x87654321;
+  volatile uint32_t b = 0x12345678;
+  volatile uint32_t c = (a%b)/27; // use *SW* division and multiplication here
+  GPIO_IN = (uint16_t)c; // store result to a read-only register so the compiler does not complain -> dismiss result ;)
   // **************************************************************
 
 
 
   // stop runtime profiling
   uint32_t runtime = 0;
-  if (stop_profiling(&runtime, TIMER_PRSC) != 0) // use SAME prescaler as in "start_time"
+  if (stop_profiling(&runtime, TIMER_PRSC) != 0) { // use SAME prescaler as in "start_time"
     _printf("Timer overflow! Use a greater prescaler!\r\n\r\n");
+  }
 
 
   // print results
