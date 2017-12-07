@@ -68,14 +68,14 @@ package neo430_package is
   constant muldiv_base_c : std_ulogic_vector(15 downto 0) := x"FF80";
   constant muldiv_size_c : natural := 16; -- bytes
 
-  constant muldiv_opa_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0000");
-  constant muldiv_opb_div_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0002");
-  constant muldiv_opb_mul_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0004");
---constant reserved              : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0006");
---constant reserved              : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0008");
---constant reserved              : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"000A");
-  constant muldiv_resx_addr_c    : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"000C");
-  constant muldiv_resy_addr_c    : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"000E");
+  constant muldiv_opa_addr_c      : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0000");
+  constant muldiv_opb_div_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0002");
+  constant muldiv_opb_mul_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0004");
+--constant reserved               : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0006");
+--constant reserved               : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0008");
+--constant reserved               : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"000A");
+  constant muldiv_resx_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"000C");
+  constant muldiv_resy_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"000E");
 
   -- IO: Wishbone32 Interface --
   constant wb32_base_c : std_ulogic_vector(15 downto 0) := x"FF90";
@@ -110,11 +110,12 @@ package neo430_package is
 
   -- IO: High-Precision Timer --
   constant timer_base_c : std_ulogic_vector(15 downto 0) := x"FFC0";
-  constant timer_size_c : natural := 6; -- bytes
+  constant timer_size_c : natural := 8; -- bytes
 
   constant timer_tcnt_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0000");
   constant timer_thres_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0002");
   constant timer_tctrl_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0004");
+--constant reserved           : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0008");
 
   -- IO: Watchdog Timer --
   constant wdt_base_c : std_ulogic_vector(15 downto 0) := x"FFD0";

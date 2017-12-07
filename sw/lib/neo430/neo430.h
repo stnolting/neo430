@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               20.11.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               04.12.2017  #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -56,7 +56,7 @@
 #define REG32 (volatile uint32_t*)
 
 
-/* --- Multiplier/Divider Unit (MULDIV) --- */
+/* --- Unsigned Multiplier/Divider Unit (MULDIV) --- */
 #define MULDIV_OPA     (*(REG16 0xFF80)) // -/w: operand A (dividend or factor1)
 #define MULDIV_OPB_DIV (*(REG16 0xFF82)) // -/w: operand B (divisor) for division
 #define MULDIV_OPB_MUL (*(REG16 0xFF84)) // -/w: operand B (factor2) for multiplication
