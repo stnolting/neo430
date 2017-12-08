@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               15.08.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               07.12.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -62,7 +62,7 @@ architecture neo430_control_rtl of neo430_control is
   signal branch_taken : std_ulogic;
 
   -- state machine --
-  type state_t is (RESET, IFETCH_0, IFETCH_1, DECODE, BRANCH,
+  type state_t is (RESET, IFETCH_0, IFETCH_1, DECODE,
     TRANS_0, TRANS_1, TRANS_3, TRANS_4, TRANS_6, TRANS_7, TRANS_8, TRANS_9,
     PUSHCALL_0, PUSHCALL_1, PUSHCALL_2,
     RETI_0, RETI_1, RETI_2, RETI_3, RETI_4,
@@ -83,9 +83,9 @@ begin
 
   -- Branch Condition Check ---------------------------------------------------
   -- -----------------------------------------------------------------------------
-  cond_check: process(ir, sreg_i)
+  cond_check: process(instr_i, sreg_i)
   begin
-    case ir(12 downto 10) is -- condition
+    case instr_i(12 downto 10) is -- condition
       when cond_ne_c => branch_taken <= not sreg_i(sreg_z_c); -- JNE/JNZ
       when cond_eq_c => branch_taken <= sreg_i(sreg_z_c); -- JEQ/JZ
       when cond_lo_c => branch_taken <= not sreg_i(sreg_c_c); -- JNC/JLO
@@ -98,7 +98,7 @@ begin
     end case;
   end process cond_check;
 
-  -- branch offset (sign-extended) --
+  -- branch offset (sign-extended) from instruction REGISTER --
   imm_o <= ir(9) & ir(9) & ir(9) & ir(9) & ir(9) & ir(9 downto 0) & '0';
 
 
@@ -129,7 +129,7 @@ begin
     end if;
   end process arbiter_sync1;
 
-  -- control output --
+  -- control bus output --
   ctrl_o <= ctrl;
 
 
@@ -211,8 +211,13 @@ begin
         if (instr_i(15 downto 14) = "00") then -- branch or format II instruction
           if (instr_i(13) = '1') then -- BRANCH INSTRUCTION
           -- ------------------------------------------------------------
-            state_nxt <= BRANCH;
-          elsif (instr_i(12) = '1') then -- FORMAT II INSTRUCTION
+            ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_pc_c; -- source/destination: PC
+            ctrl_nxt(ctrl_adr_off1_c downto ctrl_adr_off0_c) <= "00"; -- add immediate offset
+            ctrl_nxt(ctrl_adr_imm_en_c) <= '1'; -- add immediate
+            ctrl_nxt(ctrl_rf_in_sel_c)  <= '1'; -- select addr feedback
+            ctrl_nxt(ctrl_rf_wb_en_c)   <= branch_taken; -- valid RF write back if branch taken
+            state_nxt <= IFETCH_0;
+          else -- FORMAT II INSTRUCTION
             -- ------------------------------------------------------------
             am_nxt(0) <= instr_i(4) or instr_i(5); -- dst addressing mode
             am_nxt(3) <= '0'; -- class II
@@ -233,9 +238,6 @@ begin
               when "111"  => state_nxt <= IFETCH_0; -- undefined
               when others => state_nxt <= TRANS_0; -- single ALU OP
             end case;
-          else -- UNDEFINED
-            -- ------------------------------------------------------------
-            state_nxt <= IFETCH_0;
           end if;
         else -- FORMAT I INSTRUCTION
         -- ------------------------------------------------------------
@@ -251,16 +253,6 @@ begin
           src_nxt   <= instr_i(11 downto 8);
           state_nxt <= TRANS_0;
         end if;
-
-
-      when BRANCH => -- branch operation
-      -- ------------------------------------------------------------
-        ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_pc_c; -- source/destination: PC
-        ctrl_nxt(ctrl_adr_off1_c downto ctrl_adr_off0_c) <= "00"; -- add immediate offset
-        ctrl_nxt(ctrl_adr_imm_en_c) <= '1'; -- add immediate
-        ctrl_nxt(ctrl_rf_in_sel_c)  <= '1'; -- select addr feedback
-        ctrl_nxt(ctrl_rf_wb_en_c)   <= branch_taken; -- valid RF write back if branch taken
-        state_nxt <= IFETCH_0;
 
 
       when TRANS_0 => -- operand transfer cycle 0

@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               01.12.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               07.12.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -30,7 +30,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0140"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0141"; -- no touchy!
 
   -- Internal Functions ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -588,9 +588,6 @@ package body neo430_package is
   -- -------------------------------------------------------------------------------------------
   function index_size(input : natural) return natural is
   begin
-    if (input = 0) then
-      return 0;
-    end if;
     for i in 0 to natural'high loop
       if (2**i >= input) then
         return i;
