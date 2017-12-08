@@ -4,7 +4,7 @@
 -- #  This memory includes the in-place executable image of the application. See the               #
 -- #  processor's documentary to get more information.                                             #
 -- #  Note: IMEM is split up into two 8-bit memories - some EDA tools have problems to synthesize  #
--- #  an pre-initialized 16-bit memory with byte-enable signals.                                   #
+-- #  a pre-initialized 16-bit memory with byte-enable signals.                                    #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #

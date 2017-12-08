@@ -72,7 +72,7 @@ begin
   dmem_file_access: process(clk_i)
   begin
     if rising_edge(clk_i) then
-      rden  <= rden_i and acc_en;
+      rden <= rden_i and acc_en;
 
       -- write access LOW byte --
       if (acc_en = '1') and (wren_i(0) = '1') then -- write low byte
