@@ -19,7 +19,7 @@
 ; # You should have received a copy of the GNU Lesser General Public License along with this      #
 ; # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 ; # ********************************************************************************************* #
-; #  Stephan Nolting, Hannover, Germany                                               21.11.2017  #
+; #  Stephan Nolting, Hannover, Germany                                               23.12.2017  #
 ; #################################################################################################
 
   .file	"crt0.asm"
@@ -45,22 +45,19 @@ __crt0_begin:
 
 
 ; -----------------------------------------------------------
-; Setup of peripheral modules
+; Initialize all IO device registers (set to zero)
 ; -----------------------------------------------------------
-    mov  #0, &0xFF9E ; clear WB control register
-    mov  #0, &0xFFA6 ; clear USI control register
-    mov  #0, &0xFFB4 ; clear PIO control register
-    mov  #0, &0xFFB2 ; clear PIO.OUT register
-    mov  #0, &0xFFC4 ; clear TIMER control register
-
-
-; -----------------------------------------------------------
-; Set all interrupt vectors to 0x0000 (reset)
-; -----------------------------------------------------------
-    mov  #0, &0xFFF8 ; timer match IRQ vector
-    mov  #0, &0xFFFA ; uart rx avail / uart tx done / spi rtx done IRQ vector
-    mov  #0, &0xFFFC ; pio pin change IRQ vector
-    mov  #0, &0xFFFE ; external IRQ vector
+    mov  #0xFF80, r9 ; beginning of IO section
+__crt0_clr_io:
+      tst  r9 ; until the end...
+      jeq  __crt0_clr_io_end
+      mov  #0, 0(r9) ; clear entry
+      incd r9
+      jmp  __crt0_clr_io
+__crt0_clr_io_end:
+; this loop does not trigger any operations as the CTRL registers, which are located
+; at offset 0 of the according device, are set to zero resulting in disabling the
+; specific device
 
 
 ; -----------------------------------------------------------
@@ -76,7 +73,7 @@ __crt0_clr_dmem_end:
 
 
 ; -----------------------------------------------------------
-; Copy .data section from ROM to RAM
+; Copy initialized .data section from ROM to RAM
 ; -----------------------------------------------------------
     mov  #__data_start_rom, r5
     mov  #__data_end_rom, r6
@@ -104,7 +101,7 @@ __crt0_cpy_data_end:
 ;   mov  #0, r6 ; -- is already initialized
 ;   mov  #0, r7 ; -- is already initialized
 ;   mov  #0, r8 ; -- is already initialized
-    mov  #0, r9
+;   mov  #0, r9 ; -- is already initialized
     mov  #0, r10
     mov  #0, r11
     mov  #0, r12 ; set argc = 0
