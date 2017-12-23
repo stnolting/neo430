@@ -108,7 +108,7 @@ int main(void) {
   USI_CT = (1<<USI_CT_EN);
 
   // configure time base
-  uint32_t clock = ((uint32_t)CLOCKSPEED_HI << 16) | (uint32_t)CLOCKSPEED_LO;
+  uint32_t clock = CLOCKSPEED_32bit;
   time_base = 0;
   while (clock >= TIME_PRSC) {
     clock = clock - TIME_PRSC;

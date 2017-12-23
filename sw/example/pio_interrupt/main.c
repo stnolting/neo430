@@ -78,7 +78,7 @@ int main(void) {
   // f_tick = 5Hz = f_clock / (PRSC * (TMR_THRES + 1))
   // TMR_THRES = f_clock / (f_tick * PRSC) - 1
   //           = f_clock / (5 * 4096) - 1
-  uint32_t f_clock = ((uint32_t)CLOCKSPEED_HI<<16) | (uint32_t)CLOCKSPEED_LO;
+  uint32_t f_clock = CLOCKSPEED_32bit;
   TMR_THRES = (uint16_t)((f_clock / (uint32_t)(20480)) - 1);
 
   // configure timer operation

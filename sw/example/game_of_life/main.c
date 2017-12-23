@@ -28,8 +28,8 @@
 #include "../../lib/neo430/neo430.h"
 
 // Configuration
-#define NUM_CELLS_X 128 // must be a multiple of 8
-#define NUM_CELLS_Y 32
+#define NUM_CELLS_X 160 // must be a multiple of 8
+#define NUM_CELLS_Y 40
 #define BAUD_RATE   19200
 
 // Global variables

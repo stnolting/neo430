@@ -58,7 +58,7 @@ int main(void) {
   _printf("\nUser code: 0x%x", USER_CODE);
   
   // Clock speed
-  uint32_t clock = ((uint32_t)CLOCKSPEED_HI << 16) | (uint32_t)CLOCKSPEED_LO;
+  uint32_t clock = CLOCKSPEED_32bit;
   _printf("\nClock speed: %n Hz\n", clock);
 
   // ROM/IMEM

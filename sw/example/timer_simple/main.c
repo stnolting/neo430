@@ -64,7 +64,7 @@ int main(void) {
   // set timer threshold value
   // f_tick = 1Hz @ PRSC = 4096
   // THRES = f_main / (1Hz * 4096) = f_main >> 12
-  uint32_t f_clock = ((uint32_t)CLOCKSPEED_HI<<16) | (uint32_t)CLOCKSPEED_LO;
+  uint32_t f_clock = CLOCKSPEED_32bit;
   TMR_THRES = (uint16_t)(f_clock >> 12);
 
   // clear timer counter
