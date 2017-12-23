@@ -1,7 +1,5 @@
 -- #################################################################################################
--- #  << NEO430 - 32-bit Wishbone Interface >>                                                     #
--- # ********************************************************************************************* #
--- # 
+-- # << NEO430 - 32-bit Wishbone Bus Interface Adapter >>                                          #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #

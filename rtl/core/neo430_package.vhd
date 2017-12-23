@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               07.12.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               23.12.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -30,7 +30,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0141"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0142"; -- no touchy!
 
   -- Internal Functions ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -61,6 +61,7 @@ package neo430_package is
 
   -- IO: Peripheral Devices ("IO") Area --
   -- Each internal IO device (except sysconfig) must not use more than 16 bytes address space!
+  -- CONTROL register (including the device enable) must be located at the base address of the device!
   constant io_base_c : std_ulogic_vector(15 downto 0) := x"FF80";
   constant io_size_c : natural := 128; -- bytes, fixed!
 
@@ -81,40 +82,40 @@ package neo430_package is
   constant wb32_base_c : std_ulogic_vector(15 downto 0) := x"FF90";
   constant wb32_size_c : natural := 16; -- bytes
 
-  constant wb32_rd_adr_lo_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"0000");
-  constant wb32_rd_adr_hi_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"0002");
-  constant wb32_wr_adr_lo_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"0004");
-  constant wb32_wr_adr_hi_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"0006");
-  constant wb32_data_lo_addr_c   : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"0008");
-  constant wb32_data_hi_addr_c   : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"000A");
---constant reserved              : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"000C");
-  constant wb32_ctrl_addr_c      : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"000E");
+  constant wb32_ctrl_addr_c      : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"0000");
+  constant wb32_rd_adr_lo_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"0002");
+  constant wb32_rd_adr_hi_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"0004");
+  constant wb32_wr_adr_lo_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"0006");
+  constant wb32_wr_adr_hi_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"0008");
+  constant wb32_data_lo_addr_c   : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"000A");
+  constant wb32_data_hi_addr_c   : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"000C");
+--constant reserved              : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"000E");
 
   -- IO: USART --
   constant usart_base_c : std_ulogic_vector(15 downto 0) := x"FFA0";
   constant usart_size_c : natural := 8; -- bytes
 
-  constant usart_spi_rtx_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(usart_base_c) + x"0000");
-  constant usart_uart_rtx_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(usart_base_c) + x"0002");
-  constant usart_baud_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(usart_base_c) + x"0004");
-  constant usart_ctrl_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(usart_base_c) + x"0006");
+  constant usart_ctrl_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(usart_base_c) + x"0000");
+  constant usart_spi_rtx_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(usart_base_c) + x"0002");
+  constant usart_uart_rtx_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(usart_base_c) + x"0004");
+  constant usart_baud_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(usart_base_c) + x"0006");
 
   -- IO: GPIO  --
   constant gpio_base_c : std_ulogic_vector(15 downto 0) := x"FFB0";
   constant gpio_size_c : natural := 8; -- bytes
 
-  constant gpio_in_addr_c      : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0000");
-  constant gpio_out_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0002");
-  constant gpio_ctrl_addr_c    : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0004");
+  constant gpio_ctrl_addr_c    : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0000");
+  constant gpio_in_addr_c      : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0002");
+  constant gpio_out_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0004");
   constant gpio_irqmask_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0006");
 
   -- IO: High-Precision Timer --
   constant timer_base_c : std_ulogic_vector(15 downto 0) := x"FFC0";
   constant timer_size_c : natural := 8; -- bytes
 
-  constant timer_tcnt_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0000");
-  constant timer_thres_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0002");
-  constant timer_tctrl_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0004");
+  constant timer_ctrl_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0000");
+  constant timer_cnt_addr_c   : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0002");
+  constant timer_thres_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0004");
 --constant reserved           : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0008");
 
   -- IO: Watchdog Timer --

@@ -21,15 +21,15 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               15.06.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               23.12.2017  #
 -- #################################################################################################
 
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library work;
-use work.neo430_package.all;
+library neo430;
+use neo430.neo430_package.all;
 
 entity neo430_timer is
   port (
@@ -55,12 +55,12 @@ architecture neo430_timer_rtl of neo430_timer is
   constant lo_abb_c : natural := index_size(timer_size_c); -- low address boundary bit
 
   -- control reg bits --
-  constant tctrl_en_bit_c     : natural := 0; -- r/w: timer enable
-  constant tctrl_arst_bit_c   : natural := 1; -- r/w: auto reset on match
-  constant tctrl_irq_en_bit_c : natural := 2; -- r/w: interrupt enable
-  constant tctrl_prsc0_bit_c  : natural := 3; -- r/w: prescaler select bit 0
-  constant tctrl_prsc1_bit_c  : natural := 4; -- r/w: prescaler select bit 1
-  constant tctrl_prsc2_bit_c  : natural := 5; -- r/w: prescaler select bit 2
+  constant ctrl_en_bit_c     : natural := 0; -- r/w: timer enable
+  constant ctrl_arst_bit_c   : natural := 1; -- r/w: auto reset on match
+  constant ctrl_irq_en_bit_c : natural := 2; -- r/w: interrupt enable
+  constant ctrl_prsc0_bit_c  : natural := 3; -- r/w: prescaler select bit 0
+  constant ctrl_prsc1_bit_c  : natural := 4; -- r/w: prescaler select bit 1
+  constant ctrl_prsc2_bit_c  : natural := 5; -- r/w: prescaler select bit 2
 
   -- access control --
   signal acc_en : std_ulogic; -- module access enable
@@ -68,15 +68,15 @@ architecture neo430_timer_rtl of neo430_timer is
   signal wr_en  : std_ulogic; -- word write enable
 
   -- timer regs --
-  signal tcnt  : std_ulogic_vector(15 downto 0);
+  signal cnt  : std_ulogic_vector(15 downto 0);
   signal thres : std_ulogic_vector(15 downto 0);
-  signal tctrl : std_ulogic_vector(05 downto 0);
+  signal ctrl : std_ulogic_vector(05 downto 0);
 
   -- prescaler clock generator --
   signal prsc_tick, prsc_sel, prsc_sel_ff : std_ulogic;
 
   -- timer control --
-  signal match       : std_ulogic; -- thres = tcnt
+  signal match       : std_ulogic; -- thres = cnt
   signal irq_fire    : std_ulogic;
   signal irq_fire_ff : std_ulogic;
 
@@ -99,13 +99,13 @@ begin
       -- tick generator --
       prsc_sel_ff <= prsc_sel;
       -- timer reg --
-      if (wr_en = '1') and (addr = timer_tcnt_addr_c) then
-        tcnt <= data_i;
-      elsif (tctrl(tctrl_en_bit_c) = '1') then
-        if (match = '1') and (tctrl(tctrl_arst_bit_c) = '1') then -- match?
-          tcnt <= x"0000";
+      if (wr_en = '1') and (addr = timer_cnt_addr_c) then
+        cnt <= data_i;
+      elsif (ctrl(ctrl_en_bit_c) = '1') then
+        if (match = '1') and (ctrl(ctrl_arst_bit_c) = '1') then -- match?
+          cnt <= x"0000";
         elsif (match = '0') and (prsc_tick = '1') then -- count++ if no match
-          tcnt <= std_ulogic_vector(unsigned(tcnt) + 1);
+          cnt <= std_ulogic_vector(unsigned(cnt) + 1);
         end if;
       end if;
       -- control & threshold --
@@ -113,13 +113,13 @@ begin
         case addr is
           when timer_thres_addr_c =>
             thres <= data_i;
-          when timer_tctrl_addr_c =>
-            tctrl(tctrl_en_bit_c)     <= data_i(tctrl_en_bit_c);
-            tctrl(tctrl_arst_bit_c)   <= data_i(tctrl_arst_bit_c);
-            tctrl(tctrl_irq_en_bit_c) <= data_i(tctrl_irq_en_bit_c);
-            tctrl(tctrl_prsc0_bit_c)  <= data_i(tctrl_prsc0_bit_c);
-            tctrl(tctrl_prsc1_bit_c)  <= data_i(tctrl_prsc1_bit_c);
-            tctrl(tctrl_prsc2_bit_c)  <= data_i(tctrl_prsc2_bit_c);
+          when timer_ctrl_addr_c =>
+            ctrl(ctrl_en_bit_c)     <= data_i(ctrl_en_bit_c);
+            ctrl(ctrl_arst_bit_c)   <= data_i(ctrl_arst_bit_c);
+            ctrl(ctrl_irq_en_bit_c) <= data_i(ctrl_irq_en_bit_c);
+            ctrl(ctrl_prsc0_bit_c)  <= data_i(ctrl_prsc0_bit_c);
+            ctrl(ctrl_prsc1_bit_c)  <= data_i(ctrl_prsc1_bit_c);
+            ctrl(ctrl_prsc2_bit_c)  <= data_i(ctrl_prsc2_bit_c);
           when others => NULL;
         end case;
       end if;
@@ -127,17 +127,17 @@ begin
   end process wr_access;
 
   -- timer clock select / edge detection --
-  prsc_sel  <= clkgen_i(to_integer(unsigned(tctrl(tctrl_prsc2_bit_c downto tctrl_prsc0_bit_c))));
+  prsc_sel  <= clkgen_i(to_integer(unsigned(ctrl(ctrl_prsc2_bit_c downto ctrl_prsc0_bit_c))));
   prsc_tick <= prsc_sel_ff and (not prsc_sel); -- edge detector
 
   -- enable external clock generator --
-  clkgen_en_o <= tctrl(tctrl_en_bit_c);
+  clkgen_en_o <= ctrl(ctrl_en_bit_c);
 
   -- match --
-  match <= '1' when (tcnt = thres) else '0';
+  match <= '1' when (cnt = thres) else '0';
 
   -- interrupt line --
-  irq_fire <= match and tctrl(tctrl_en_bit_c) and tctrl(tctrl_irq_en_bit_c);
+  irq_fire <= match and ctrl(ctrl_en_bit_c) and ctrl(ctrl_irq_en_bit_c);
 
   -- edge detector --
   irq_o <= irq_fire and (not irq_fire_ff);
@@ -151,15 +151,15 @@ begin
       data_o <= (others => '0');
       if (rden_i = '1') and (acc_en = '1') then
         case addr is
-          when timer_tctrl_addr_c =>
-            data_o(tctrl_en_bit_c)     <= tctrl(tctrl_en_bit_c);
-            data_o(tctrl_arst_bit_c)   <= tctrl(tctrl_arst_bit_c);
-            data_o(tctrl_irq_en_bit_c) <= tctrl(tctrl_irq_en_bit_c);
-            data_o(tctrl_prsc0_bit_c)  <= tctrl(tctrl_prsc0_bit_c);
-            data_o(tctrl_prsc1_bit_c)  <= tctrl(tctrl_prsc1_bit_c);
-            data_o(tctrl_prsc2_bit_c)  <= tctrl(tctrl_prsc2_bit_c);
-          when timer_tcnt_addr_c =>
-            data_o <= tcnt;
+          when timer_ctrl_addr_c =>
+            data_o(ctrl_en_bit_c)     <= ctrl(ctrl_en_bit_c);
+            data_o(ctrl_arst_bit_c)   <= ctrl(ctrl_arst_bit_c);
+            data_o(ctrl_irq_en_bit_c) <= ctrl(ctrl_irq_en_bit_c);
+            data_o(ctrl_prsc0_bit_c)  <= ctrl(ctrl_prsc0_bit_c);
+            data_o(ctrl_prsc1_bit_c)  <= ctrl(ctrl_prsc1_bit_c);
+            data_o(ctrl_prsc2_bit_c)  <= ctrl(ctrl_prsc2_bit_c);
+          when timer_cnt_addr_c =>
+            data_o <= cnt;
           when others =>
         --when timer_thres_addr_c =>
             data_o <= thres;

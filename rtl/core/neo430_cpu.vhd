@@ -28,8 +28,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library work;
-use work.neo430_package.all;
+library neo430;
+use neo430.neo430_package.all;
 
 entity neo430_cpu is
   generic (

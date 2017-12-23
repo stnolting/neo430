@@ -28,8 +28,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library work;
-use work.neo430_package.all;
+library neo430;
+use neo430.neo430_package.all;
 
 entity neo430_control is
   generic (
@@ -94,7 +94,7 @@ begin
       when cond_ge_c => branch_taken <= not (sreg_i(sreg_n_c) xor sreg_i(sreg_v_c)); -- JGE
       when cond_le_c => branch_taken <= sreg_i(sreg_n_c) xor sreg_i(sreg_v_c); -- JL
       when cond_al_c => branch_taken <= '1'; -- JMP (always)
-      when others    => branch_taken <= '0';
+      when others    => branch_taken <= '0'; -- undefined
     end case;
   end process cond_check;
 

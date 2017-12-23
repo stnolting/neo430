@@ -1,5 +1,5 @@
 -- #################################################################################################
--- #  << NEO430 - Watchdog Timer >>                                                                #
+-- # << NEO430 - Watchdog Timer >>                                                                 #
 -- # ********************************************************************************************* #
 -- # The internal counter is 16 bit wide and triggers a HW reset when overflowing. The clock is    #
 -- # selected via the clk_sel bits of the control register. The WDT can only operate when the      #
@@ -25,15 +25,15 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               22.02.1017  #
+-- # Stephan Nolting, Hannover, Germany                                                 22.02.1017 #
 -- #################################################################################################
 
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library work;
-use work.neo430_package.all;
+library neo430;
+use neo430.neo430_package.all;
 
 entity neo430_wdt is
   port (

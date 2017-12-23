@@ -4,6 +4,7 @@
 -- #  Synchronous & asynchronous serial transceivers.                                              #
 -- #  UART: 8-bit, no parity bit, 1 stop bit, variable BAUD rate.                                  #
 -- #  SPI: 8-bit, MSB first, 2 clock modes, 8 clock speeds, 6 dedicated CS lines.                  #
+-- #  Interrupt: SPI_transfer_done [OR] UART_RX_available                                          #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -23,15 +24,15 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               21.11.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               16.12.2017  #
 -- #################################################################################################
 
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library work;
-use work.neo430_package.all;
+library neo430;
+use neo430.neo430_package.all;
 
 entity neo430_usart is
   port (
@@ -71,11 +72,11 @@ architecture neo430_usart_rtl of neo430_usart is
   -- control reg bits --
   constant ctrl_usart_en_c     : natural :=  0; -- r/w: USART enable
   constant ctrl_uart_rx_irq_c  : natural :=  1; -- r/w: uart rx done interrupt enable
-  constant ctrl_uart_tx_irq_c  : natural :=  2; -- r/w: uart tx done interrupt enable
-  constant ctrl_uart_tx_busy_c : natural :=  3; -- r:   uart transmitter is busy
+  constant ctrl_uart_rxavail_c : natural :=  2; -- r/-: uart rx data available
+  constant ctrl_uart_tx_busy_c : natural :=  3; -- r/-: uart transmitter is busy
   constant ctrl_spi_cpha_c     : natural :=  4; -- r/w: spi clock phase
   constant ctrl_spi_irq_en_c   : natural :=  5; -- r/w: spi transmission done interrupt enable
-  constant ctrl_spi_busy_c     : natural :=  6; -- r:   spi transceiver is busy
+  constant ctrl_spi_busy_c     : natural :=  6; -- r/-: spi transceiver is busy
   constant ctrl_spi_prsc0_c    : natural :=  7; -- r/w: spi prescaler select bit 0
   constant ctrl_spi_prsc1_c    : natural :=  8; -- r/w: spi prescaler select bit 1
   constant ctrl_spi_prsc2_c    : natural :=  9; -- r/w: spi prescaler select bit 2
@@ -90,6 +91,7 @@ architecture neo430_usart_rtl of neo430_usart is
   signal acc_en : std_ulogic; -- module access enable
   signal addr   : std_ulogic_vector(15 downto 0); -- access address
   signal wr_en  : std_ulogic; -- word write enable
+  signal rd_en  : std_ulogic; -- read enable
 
   -- clock generators --
   signal uart_clk     : std_ulogic;
@@ -104,7 +106,6 @@ architecture neo430_usart_rtl of neo430_usart is
   signal uart_tx_bitcnt   : std_ulogic_vector(03 downto 0);
   signal uart_tx_sreg     : std_ulogic_vector(09 downto 0);
   signal uart_tx_baud_cnt : std_ulogic_vector(07 downto 0);
-  signal uart_tx_done     : std_ulogic;
 
   -- uart rx unit --
   signal uart_rx_sync     : std_ulogic_vector(04 downto 0);
@@ -133,6 +134,7 @@ begin
   acc_en <= '1' when (addr_i(hi_abb_c downto lo_abb_c) = usart_base_c(hi_abb_c downto lo_abb_c)) else '0';
   addr   <= usart_base_c(15 downto lo_abb_c) & addr_i(lo_abb_c-1 downto 1) & '0'; -- word aligned
   wr_en  <= acc_en and wren_i(1) and wren_i(0);
+  rd_en  <= acc_en and rden_i;
 
 
   -- Write access -------------------------------------------------------------
@@ -180,7 +182,6 @@ begin
   uart_tx_unit: process(clk_i)
   begin
     if rising_edge(clk_i) then
-      uart_tx_done <= '0';
       if (uart_tx_busy = '0') or (ctrl(ctrl_usart_en_c) = '0') then -- idle or disabled
         uart_tx_busy     <= '0';
         uart_tx_baud_cnt <= baud(7 downto 0);
@@ -196,7 +197,6 @@ begin
           uart_tx_sreg     <= '1' & uart_tx_sreg(9 downto 1);
           if (uart_tx_bitcnt = "0000") then
             uart_tx_busy <= '0'; -- done
-            uart_tx_done <= '1';
           end if;
         else
           uart_tx_baud_cnt <= std_ulogic_vector(unsigned(uart_tx_baud_cnt) - 1);
@@ -239,21 +239,16 @@ begin
           uart_rx_baud_cnt <= std_ulogic_vector(unsigned(uart_rx_baud_cnt) - 1);
         end if;
       end if;
-    end if;
-  end process uart_rx_unit;
 
-  -- RX available arbiter --
-  uart_rx_avail_arb: process(clk_i)
-  begin
-    if rising_edge(clk_i) then
+      -- RX available flag --
       uart_rx_busy_ff <= uart_rx_busy;
-      if (ctrl(ctrl_usart_en_c) = '0') or ((uart_rx_avail = '1') and (rden_i = '1') and (acc_en = '1') and (addr = usart_uart_rtx_addr_c)) then
+      if (ctrl(ctrl_usart_en_c) = '0') or ((uart_rx_avail = '1') and (rd_en = '1') and (addr = usart_uart_rtx_addr_c)) then
         uart_rx_avail <= '0';
       elsif (uart_rx_busy_ff = '1') and (uart_rx_busy = '0') then
         uart_rx_avail <= '1';
       end if;
     end if;
-  end process uart_rx_avail_arb;
+  end process uart_rx_unit;
 
 
   -- SPI transceiver ----------------------------------------------------------
@@ -287,7 +282,7 @@ begin
             if (ctrl(ctrl_spi_cpha_c) = '0') then
               spi_rtx_sreg <= spi_rtx_sreg(6 downto 0) & spi_miso_ff1; -- MSB first
             end if;
-            spi_bitcnt   <= std_ulogic_vector(unsigned(spi_bitcnt) - 1);
+            spi_bitcnt <= std_ulogic_vector(unsigned(spi_bitcnt) - 1);
           end if;
         else -- second half of transmission
           spi_sclk_o <= not ctrl(ctrl_spi_cpha_c);
@@ -318,9 +313,8 @@ begin
 
   -- Interrupt ----------------------------------------------------------------
   -- -----------------------------------------------------------------------------
-  -- UART Rx data available [OR] UART Tx complete [OR] SPI transmission done
+  -- UART Rx data available [OR] SPI transmission done
   usart_irq_o <= (uart_rx_busy_ff and (not uart_rx_busy) and ctrl(ctrl_uart_rx_irq_c)) or
-                 (uart_tx_done and ctrl(ctrl_uart_tx_irq_c)) or
                  (spi_irq and ctrl(ctrl_spi_irq_en_c));
 
 
@@ -330,17 +324,18 @@ begin
   begin
     if rising_edge(clk_i) then
       data_o <= (others => '0');
-      if (rden_i = '1') and (acc_en = '1') then
+      if (rd_en = '1') then
         case addr is
           when usart_uart_rtx_addr_c =>
             data_o(15) <= uart_rx_avail;
             data_o(7 downto 0) <= uart_rx_reg;
           when usart_baud_addr_c =>
-            data_o(7 downto 0) <= baud;
-            data_o(10 downto 8)<= baud_prsc;
+            data_o(07 downto 0) <= baud;
+            data_o(10 downto 8) <= baud_prsc;
           when usart_ctrl_addr_c =>
             data_o <= ctrl;
-            data_o(ctrl_spi_busy_c) <= spi_busy;
+            data_o(ctrl_spi_busy_c)     <= spi_busy;
+            data_o(ctrl_uart_rxavail_c) <= uart_rx_avail;
             data_o(ctrl_uart_tx_busy_c) <= uart_tx_busy;
           when others =>
 --        when usart_spi_rtx_addr_c =>
