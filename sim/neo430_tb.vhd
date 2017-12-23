@@ -30,8 +30,8 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
 
-library work;
-use work.neo430_package.all;
+library neo430;
+use neo430.neo430_package.all;
 use std.textio.all;
 
 entity neo430_tb is
@@ -99,7 +99,7 @@ begin
     TIMER_USE   => true,              -- implement timer? (default=true)
     USART_USE   => true,              -- implement USART? (default=true)
     -- boot configuration --
-    BOOTLD_USE  => true,              -- implement and use bootloader? (default=true)
+    BOOTLD_USE  => false,             -- implement and use bootloader? (default=true)
     IMEM_AS_ROM => false              -- implement IMEM as read-only memory? (default=false)
   )
   port map (

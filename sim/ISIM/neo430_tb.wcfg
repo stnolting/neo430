@@ -6,22 +6,21 @@
       <db_ref path="neo430_tb_behav.wdb" id="1">
          <top_modules>
             <top_module name="neo430_application_image" />
-            <top_module name="neo430_bootloader_image" />
             <top_module name="neo430_package" />
             <top_module name="neo430_tb" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="663163520fs"></ZoomStartTime>
-      <ZoomEndTime time="2925467304fs"></ZoomEndTime>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="23498079870fs"></ZoomEndTime>
       <Cursor1Time time="1000000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="145"></NameColumnWidth>
-      <ValueColumnWidth column_width="80"></ValueColumnWidth>
+      <ValueColumnWidth column_width="76"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="105" />
+   <WVObjectSize size="103" />
    <wvobject type="divider" fp_name="divider6">
       <obj_property name="label">Global</obj_property>
       <obj_property name="DisplayName">label</obj_property>
@@ -272,23 +271,18 @@
       <obj_property name="label">IO: Timer</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_timer_inst_true/neo430_timer_inst/tctrl" type="array">
-      <obj_property name="ElementShortName">tctrl[5:0]</obj_property>
-      <obj_property name="ObjectShortName">tctrl[5:0]</obj_property>
-   </wvobject>
    <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_timer_inst_true/neo430_timer_inst/thres" type="array">
       <obj_property name="ElementShortName">thres[15:0]</obj_property>
       <obj_property name="ObjectShortName">thres[15:0]</obj_property>
       <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_timer_inst_true/neo430_timer_inst/tcnt" type="array">
-      <obj_property name="ElementShortName">tcnt[15:0]</obj_property>
-      <obj_property name="ObjectShortName">tcnt[15:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
    <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_timer_inst_true/neo430_timer_inst/irq_o" type="logic">
       <obj_property name="ElementShortName">irq_o</obj_property>
       <obj_property name="ObjectShortName">irq_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_timer_inst_true/neo430_timer_inst/cnt" type="array">
+      <obj_property name="ElementShortName">cnt[15:0]</obj_property>
+      <obj_property name="ObjectShortName">cnt[15:0]</obj_property>
    </wvobject>
    <wvobject type="divider" fp_name="divider22">
       <obj_property name="label">IO: GPIO</obj_property>
@@ -309,10 +303,6 @@
    <wvobject type="divider" fp_name="divider22">
       <obj_property name="label">IO: Watchdog</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_wdt_inst_true/neo430_wdt_inst/wren" type="logic">
-      <obj_property name="ElementShortName">wren</obj_property>
-      <obj_property name="ObjectShortName">wren</obj_property>
    </wvobject>
    <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_wdt_inst_true/neo430_wdt_inst/enable" type="logic">
       <obj_property name="ElementShortName">enable</obj_property>
