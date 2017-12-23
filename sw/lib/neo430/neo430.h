@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               04.12.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               23.12.2017  #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -69,14 +69,14 @@
 
 
 /* --- Wishbone Bus Adapter - WB32 --- */
-#define WB32_LRA (*(REG16 0xFF90)) // -/w: low address for read transfer
-#define WB32_HRA (*(REG16 0xFF92)) // -/w: high address for read transfer (+trigger)
-#define WB32_LWA (*(REG16 0xFF94)) // -/w: low address for write transfer
-#define WB32_HWA (*(REG16 0xFF96)) // -/w: high address for write transfer (+trigger)
-#define WB32_LD  (*(REG16 0xFF98)) // r/w: low data
-#define WB32_HD  (*(REG16 0xFF9A)) // r/w: high data
-//#define reserved (*(REG16 0xFF9C)) // -/-: reserved
-#define WB32_CT  (*(REG16 0xFF9E)) // r/w: control register
+#define WB32_CT  (*(REG16 0xFF90)) // r/w: control register
+#define WB32_LRA (*(REG16 0xFF92)) // -/w: low address for read transfer
+#define WB32_HRA (*(REG16 0xFF94)) // -/w: high address for read transfer (+trigger)
+#define WB32_LWA (*(REG16 0xFF96)) // -/w: low address for write transfer
+#define WB32_HWA (*(REG16 0xFF98)) // -/w: high address for write transfer (+trigger)
+#define WB32_LD  (*(REG16 0xFF9A)) // r/w: low data
+#define WB32_HD  (*(REG16 0xFF9C)) // r/w: high data
+//#define reserved (*(REG16 0xFF9E)) // -/-: reserved
 
 // WB32 - 32-bit register access
 #define WB32_RA_32bit (*(REG32 (&WB32_LRA))) // -/w: address for read transfer (+trigger)
@@ -93,10 +93,10 @@
 
 
 /* --- Universal Serial Transceiver - USART/USI --- */
-#define USI_SPIRTX  (*(REG16 0xFFA0)) // r/w: spi receive/transmit register
-#define USI_UARTRTX (*(REG16 0xFFA2)) // r/w: uart receive/transmit register
-#define USI_BAUD    (*(REG16 0xFFA4)) // r/w: uart baud rate generator value
-#define USI_CT      (*(REG16 0xFFA6)) // r/w: control register
+#define USI_CT      (*(REG16 0xFFA0)) // r/w: control register
+#define USI_SPIRTX  (*(REG16 0xFFA2)) // r/w: spi receive/transmit register
+#define USI_UARTRTX (*(REG16 0xFFA4)) // r/w: uart receive/transmit register
+#define USI_BAUD    (*(REG16 0xFFA6)) // r/w: uart baud rate generator value
 
 // UART USI_BAUD[7:0]:  baud rate value (remainder)
 // UART USI_BAUD[10:8]: baud prescaler select:
@@ -115,7 +115,7 @@
 // USART control register
 #define USI_CT_EN         0 // r/w: USART enable
 #define USI_CT_UARTRXIRQ  1 // r/w: uart rx done interrupt enable
-#define USI_CT_UARTTXIRQ  2 // r/w: uart tx done interrupt enable
+#define USI_CT_RXAVAIL    2 // r/-: uart receiver data available
 #define USI_CT_UARTTXBSY  3 // r/-: uart transmitter is busy
 #define USI_CT_SPICPHA    4 // r/w: spi clock phase (idle polarity = '0')
 #define USI_CT_SPIIRQ     5 // r/w: spi transmission done interrupt enable
@@ -142,9 +142,9 @@
 
 
 /* --- Genearl Purpose Inputs/Outputs - GPIO --- */
-#define GPIO_IN      (*(REG16 0xFFB0)) // r/-: parallel input
-#define GPIO_OUT     (*(REG16 0xFFB2)) // r/w: parallel output
-#define GPIO_CTRL    (*(REG16 0xFFB4)) // -/w: control register
+#define GPIO_CTRL    (*(REG16 0xFFB0)) // -/w: control register
+#define GPIO_IN      (*(REG16 0xFFB2)) // r/-: parallel input
+#define GPIO_OUT     (*(REG16 0xFFB4)) // r/w: parallel output
 #define GPIO_IRQMASK (*(REG16 0xFFB6)) // -/w: irq mask register
 
 // bits 1:0 of GPIO CTRL reg: Trigger
@@ -158,9 +158,10 @@
 
 
 /* --- High-Precision Timer - TIMER --- */
-#define TMR_CNT   (*(REG16 0xFFC0)) // r/w: counter register
-#define TMR_THRES (*(REG16 0xFFC2)) // r/w: threshold register
-#define TMR_CT    (*(REG16 0xFFC4)) // r/w: control register
+#define TMR_CT    (*(REG16 0xFFC0)) // r/w: control register
+#define TMR_CNT   (*(REG16 0xFFC2)) // r/w: counter register
+#define TMR_THRES (*(REG16 0xFFC4)) // r/w: threshold register
+//#define reserved     (*(REG16 0xFFC6))
 
 // Timer control register
 #define TMR_CT_EN    0 // r/w: timer enable
