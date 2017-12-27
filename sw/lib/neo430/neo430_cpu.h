@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               14.10.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               27.12.2017  #
 // #################################################################################################
 
 #ifndef neo430_cpu_h
@@ -34,9 +34,6 @@ inline void set_sreg(uint16_t d);
 inline void sleep(void);
 inline void clear_irq_buffer(void);
 void cpu_delay(uint16_t t);
-void __memset(uint8_t *dst, uint8_t data, uint16_t num);
-uint8_t __memcmp(uint8_t *dst, uint8_t *src, uint16_t num);
-void __memcpy(uint8_t *dst, uint8_t *src, uint16_t num);
 inline void soft_reset(void);
 inline void jump_address(uint16_t addr);
 inline void call_address(uint16_t addr);
@@ -121,7 +118,7 @@ inline void clear_irq_buffer(void){
 
 /* ------------------------------------------------------------
  * INFO Simple wait function
- * PARAM Amount of ~2^16 cycles to wait
+ * PARAM Amount of ~2^16 machine cycles to wait
  * ------------------------------------------------------------ */
 void cpu_delay(uint16_t t) {
 
@@ -130,49 +127,6 @@ void cpu_delay(uint16_t t) {
     for (i=0; i<0xFFFF; i++)
       asm volatile ("nop");
   }
-}
-
-
-/* ------------------------------------------------------------
- * INFO Memory initialization
- * PARAM dst: Pointer to beginning of target memory space
- * PARAM data: Init data
- * PARAM num: Number of bytes to initialize
- * ------------------------------------------------------------ */
-void __memset(uint8_t *dst, uint8_t data, uint16_t num) {
-
-  while (num--)
-    *dst++ = data;
-}
-
-
-/* ------------------------------------------------------------
- * INFO Compare memory to memory
- * PARAM dst: Pointer to beginning of first memory space
- * PARAM src: Pointer to beginning of second memory space
- * PARAM num: Number of bytes to compare
- * RETURN 0 if src == dst
- * ------------------------------------------------------------ */
-uint8_t __memcmp(uint8_t *dst, uint8_t *src, uint16_t num) {
-
-  while (num--) {
-    if ((*dst++ - *src++) != 0)
-      return 1;
-  }
-  return 0;
-}
-
-
-/* ------------------------------------------------------------
- * INFO Copy memory space SRC to DST (byte by byte)
- * PARAM dst: Pointer to beginning destination memory space
- * PARAM src: Pointer to beginning source memory space
- * PARAM num: Number of bytes to copy
- * ------------------------------------------------------------ */
-void __memcpy(uint8_t *dst, uint8_t *src, uint16_t num) {
-
-  while (num--)
-    *dst++ = *src++;
 }
 
 
@@ -229,6 +183,7 @@ inline uint16_t __bswap(uint16_t a) {
 inline uint16_t __dadd(uint16_t a, uint16_t b) {
 
   register uint16_t z = a;
+  asm volatile ("clrc");
   asm volatile ("dadd %[b], %[z]" : [z] "=r" (z) : "[z]" (z), [b] "r" (b));
   return z;
 }
