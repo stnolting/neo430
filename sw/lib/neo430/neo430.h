@@ -2,8 +2,8 @@
 // #  < neo430.h - MAIN NEO430 INCLUDE FILE >                                                      #
 // # ********************************************************************************************* #
 // #  This file is crucial for all NEO430 software projects!                                       #
-// #  You only need to include this file into your project code (all sub-libraries are included    #
-// #  in this library file).                                                                       #
+// #  You only need to include THIS file into your project code (all sub-libraries are included    #
+// #  within this library file).                                                                   #
 // # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 // # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               23.12.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               27.12.2017  #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -257,6 +257,7 @@
 #include "neo430_usart.h"
 #include "neo430_wdt.h"
 #include "neo430_wishbone.h"
+#include "neo430_aux.h"
 
 
 #endif // neo430_h
