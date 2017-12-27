@@ -171,7 +171,7 @@ uint8_t uart_fifo_put(volatile struct uart_fifo *fifo, uint8_t c) {
 
 
 /* ------------------------------------------------------------
- * INFO Read from UART RTX buffer, retunrs 0 if success
+ * INFO Read from UART RTX buffer, returns 0 if success
  * ------------------------------------------------------------ */
 uint8_t uart_fifo_get(volatile struct uart_fifo *fifo, uint8_t *c) {
 
