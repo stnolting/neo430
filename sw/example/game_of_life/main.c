@@ -41,7 +41,6 @@ void set_cell(uint8_t u, int16_t x, int16_t y);
 uint8_t get_cell(uint8_t u, int16_t x, int16_t y);
 uint8_t get_neighborhood(uint8_t u, int16_t x, int16_t y);
 void print_universe(uint8_t u);
-uint32_t xorshift32(void);
 uint16_t pop_count(uint8_t u);
 
 
@@ -70,13 +69,13 @@ int main(void) {
 
   // randomize until key pressed
   while (uart_char_received() == 0) {
-    xorshift32();
+    __xorshift32();
   }
 
   // initialize universe using random data
   for (x=0; x<NUM_CELLS_X/8; x++) {
     for (y=0; y<NUM_CELLS_Y; y++) {
-      universe[0][x][y] = (uint8_t)xorshift32();
+      universe[0][x][y] = (uint8_t)__xorshift32();
     }
   }
 
@@ -218,8 +217,8 @@ uint8_t get_cell(uint8_t u, int16_t x, int16_t y){
 
 
 /* ------------------------------------------------------------
- * INFO Get number of alive cells in direct neigbourhood
- * RETURN Number of set cells in neigbourhood
+ * INFO Get number of alive cells in direct neigborhood
+ * RETURN Number of set cells in neigborhood
  * ------------------------------------------------------------ */
 uint8_t get_neighborhood(uint8_t u, int16_t x, int16_t y){
 
@@ -239,22 +238,6 @@ uint8_t get_neighborhood(uint8_t u, int16_t x, int16_t y){
   num += get_cell(u, x+1, y+1); // 7
 
   return num;
-}
-
-
-/* ------------------------------------------------------------
- * INFO Pseudo-random number generator
- * RETURN 32-bit random data
- * ------------------------------------------------------------ */
-uint32_t xorshift32(void) {
-
-  static uint32_t x32 = 314159265;
-
-  x32 ^= x32 << 13;
-  x32 ^= x32 >> 17;
-  x32 ^= x32 << 5;
-
-  return x32;
 }
 
 
