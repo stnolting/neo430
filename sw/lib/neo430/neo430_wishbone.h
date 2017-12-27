@@ -20,7 +20,7 @@
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
 // #  Thanks to Edward Sherriff!                                                                   #
-// #  Stephan Nolting, Hannover, Germany                                               21.11.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               27.12.2017  #
 // #################################################################################################
 
 #ifndef neo430_wishbone_h
@@ -137,13 +137,7 @@ void wishbone_write16(uint32_t a, uint16_t d) {
 uint8_t wishbone_read8(uint32_t a) {
 
   // 8-bit transfer
-  switch (((uint8_t)a) & 3) {
-    case 0: WB32_CT = 0b0001; break;
-    case 1: WB32_CT = 0b0010; break;
-    case 2: WB32_CT = 0b0100; break;
-    case 3: WB32_CT = 0b1000; break;
-  }
-//WB32_CT = 1 << (((uint8_t)a) & 3); // corresponding byte enable
+  WB32_CT = 1 << (a & 3); // corresponding byte enable
 
   // device address aligned to 8-bit + transfer trigger
   WB32_RA_32bit = a;
@@ -165,13 +159,7 @@ uint8_t wishbone_read8(uint32_t a) {
 void wishbone_write8(uint32_t a, uint8_t d) {
 
   // 8-bit transfer
-  switch (((uint8_t)a) & 3) {
-    case 0: WB32_CT = 0b0001; break;
-    case 1: WB32_CT = 0b0010; break;
-    case 2: WB32_CT = 0b0100; break;
-    case 3: WB32_CT = 0b1000; break;
-  }
-//WB32_CT = 1 << (((uint8_t)a) & 3); // corresponding byte enable
+  WB32_CT = 1 << (a & 3); // corresponding byte enable
 
   // select correct byte to be written
   volatile uint8_t* out = (uint8_t*)(&WB32_D_8bit + ((uint8_t)a & 3));
