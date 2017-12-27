@@ -19,7 +19,7 @@
 ; # You should have received a copy of the GNU Lesser General Public License along with this      #
 ; # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 ; # ********************************************************************************************* #
-; #  Stephan Nolting, Hannover, Germany                                               17.02.2017  #
+; #  Stephan Nolting, Hannover, Germany                                               27.12.2017  #
 ; #################################################################################################
 
     .file	"boot_crt0.asm"
@@ -27,8 +27,6 @@
     .p2align 1,0
 
 __boot_crt0:
-    nop ; for internal init of CPU
-
 ; -----------------------------------------------------------
 ; Minimal required hardware setup
 ; -----------------------------------------------------------

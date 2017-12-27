@@ -29,7 +29,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               18.11.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               27.12.2017  #
 // #################################################################################################
 
 // Libraries
@@ -42,8 +42,8 @@
 
 // Configuration
 #define BAUD_RATE        19200 // default UART baud rate
-#define AUTOBOOT_TIMEOUT     8 // countdown (seconds) to auto boot
-#define STATUS_LED           0 // GPIO.out(0) is status LED
+#define AUTOBOOT_TIMEOUT 8     // countdown (seconds) to auto boot
+#define STATUS_LED       0     // GPIO.out(0) is status LED
 
 // 25LC512 EEPROM
 #define BOOT_EEP_CS      0    // boot EEPROM CS (SPI.CS0)
@@ -64,7 +64,7 @@
 #define ERROR_CHECKSUM   0x08 // checksum error
 #define ERROR_UNKNOWN    0xFF // unknown error
 
-// Scratch register for timeout counter & valid image flag - abuse unused IRQ vectors for this
+// Scratch registers - abuse unused IRQ vectors for this ;)
 #define TIMEOUT_CNT IRQVEC_GPIO
 #define VALID_IMAGE IRQVEC_USART
 
@@ -103,14 +103,14 @@ int main(void) {
   WB32_CT = 0;
 
   // no valid boot image in IMEM yet
-  IRQVEC_USART = 0;
+  VALID_IMAGE = 0;
 
   // init timer interrupt vector
   IRQVEC_TIMER = (uint16_t)(&timer_irq_handler); // timer match
 
   // init GPIO
   gpio_port_set(1<<STATUS_LED); // activate status LED
-  GPIO_CTRL = 0; // disable all pin change IRQs
+  GPIO_CT = 0; // disable all pin change IRQs
 
   // set Baud rate & init USART control register:
   // enable USART, no IRQs, SPI clock mode 0, 1/1024 SPI speed, disable all 6 SPI CS lines (set high)
@@ -137,7 +137,7 @@ int main(void) {
   // ****************************************************************
   // Show bootloader intro and system information
   // ****************************************************************
-  uart_br_print("\n\nNEO430 Bootloader V20171118 by Stephan Nolting\n\n"
+  uart_br_print("\n\nNEO430 Bootloader V20171227 by Stephan Nolting\n\n"
                 "HWV: 0x");
   uart_print_hex_word(HW_VERSION);
   uart_br_print("\nCLK: 0x");
@@ -214,12 +214,12 @@ void __attribute__((__interrupt__)) timer_irq_handler(void) {
 
 
 /* ------------------------------------------------------------
- * INFO Start application
+ * INFO Start application in IMEM
  * ------------------------------------------------------------ */
 void start_app(void) {
 
   // valid image in IMEM?
-  if (IRQVEC_USART == 0) {
+  if (VALID_IMAGE == 0) {
     uart_br_print("No valid image! Boot anyway (y/n)? ");
     if (uart_getc() != 'y')
       return;
@@ -231,7 +231,7 @@ void start_app(void) {
   uart_br_print("Booting...\n");
 
   // wait for UART to finish transmitting
-  while(USI_CT & (1<<USI_CT_UARTTXBSY));
+  while ((USI_CT & (1<<USI_CT_UARTTXBSY)) != 0);
 
   // start app in IMEM at address 0x0000
   while (1) {
@@ -446,7 +446,7 @@ void get_image(uint8_t src) {
   // error during transfer?
   if (checksum == check) {
     uart_br_print("OK");
-    IRQVEC_USART |= 1;
+    VALID_IMAGE = 1;
   }
   else
     system_error(ERROR_CHECKSUM);
