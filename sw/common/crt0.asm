@@ -19,7 +19,7 @@
 ; # You should have received a copy of the GNU Lesser General Public License along with this      #
 ; # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 ; # ********************************************************************************************* #
-; #  Stephan Nolting, Hannover, Germany                                               23.12.2017  #
+; #  Stephan Nolting, Hannover, Germany                                               27.12.2017  #
 ; #################################################################################################
 
   .file	"crt0.asm"
@@ -27,8 +27,6 @@
   .p2align 1,0
 
 __crt0_begin:
-    nop
-
 ; -----------------------------------------------------------
 ; Get required system info
 ; -----------------------------------------------------------
@@ -47,17 +45,17 @@ __crt0_begin:
 ; -----------------------------------------------------------
 ; Initialize all IO device registers (set to zero)
 ; -----------------------------------------------------------
+; This loop does not trigger any operations as the CTRL registers, which are located
+; at offset 0 of the according device, are set to zero resulting in disabling the
+; specific device.
     mov  #0xFF80, r9 ; beginning of IO section
 __crt0_clr_io:
-      tst  r9 ; until the end...
+      tst  r9 ; until the end -> wrap-arounf to 0
       jeq  __crt0_clr_io_end
       mov  #0, 0(r9) ; clear entry
       incd r9
       jmp  __crt0_clr_io
 __crt0_clr_io_end:
-; this loop does not trigger any operations as the CTRL registers, which are located
-; at offset 0 of the according device, are set to zero resulting in disabling the
-; specific device
 
 
 ; -----------------------------------------------------------
@@ -113,6 +111,7 @@ __crt0_cpy_data_end:
 ; -----------------------------------------------------------
 ; This is where the actual application is started
 ; -----------------------------------------------------------
+__crt0_start_main:
     call  #main
 
 
