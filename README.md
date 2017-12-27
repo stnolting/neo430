@@ -78,8 +78,9 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Internal bootloader with text interface (via UART serial port)
 
 
-## Implementation results (for HW version 0x0140, defualt configuration)
+## Implementation results
 
+Generated for HW version 0x0140, default (full) configuration:
 - Xilinx Virtex-6: 1154 LUTs, 731 FFs, 2 BRAMs, f_max = 170MHz
 - Altera Cyclone IV: 1498 LUTs, 789 FFs, 69888 memorz bits, f_max = 119MHz
 
