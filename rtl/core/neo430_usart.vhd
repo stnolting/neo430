@@ -24,7 +24,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               16.12.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               27.12.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -186,9 +186,9 @@ begin
         uart_tx_busy     <= '0';
         uart_tx_baud_cnt <= baud(7 downto 0);
         uart_tx_bitcnt   <= "1010"; -- 10 bit
-        if (wr_en = '1') and (addr = usart_uart_rtx_addr_c) then
+        if (wr_en = '1') and (ctrl(ctrl_usart_en_c) = '1') and (addr = usart_uart_rtx_addr_c) then
           uart_tx_sreg <= '1' & data_i(7 downto 0) & '0'; -- stopbit & data & startbit
-          uart_tx_busy <= ctrl(ctrl_usart_en_c);
+          uart_tx_busy <= '1';
         end if;
       elsif (uart_clk = '1') then
         if (uart_tx_baud_cnt = x"00") then
@@ -202,11 +202,10 @@ begin
           uart_tx_baud_cnt <= std_ulogic_vector(unsigned(uart_tx_baud_cnt) - 1);
         end if;
       end if;
+      -- transmitter output --
+      uart_txd_o <= uart_tx_sreg(0);
     end if;
   end process uart_tx_unit;
-
-  -- transmitter output --
-  uart_txd_o <= uart_tx_sreg(0);
 
 
   -- UART receiver ------------------------------------------------------------
