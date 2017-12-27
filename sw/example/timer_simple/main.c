@@ -1,7 +1,7 @@
 // #################################################################################################
 // #  < simple timer usage example >                                                               #
 // # ********************************************************************************************* #
-// # Prints "TICK" every second (1Hz) using the timer module.                                      #
+// # Flashes LED using the timer interrupt.                                                        #
 // # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 // # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -21,7 +21,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               06.10.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               27.12.2017  #
 // #################################################################################################
 
 
@@ -29,8 +29,14 @@
 #include <stdint.h>
 #include "../../lib/neo430/neo430.h"
 
+// Macros
+#define xstr(a) str(a)
+#define str(a) #a
+
 // Configuration
-#define BAUD_RATE 19200
+#define BAUD_RATE  19200
+#define BLINK_LED  0 // pin 0 on GPIO.out
+#define BLINK_FREQ 4 // in Hz
 
 // Function prototypes
 void __attribute__((__interrupt__)) timer_irq_handler(void);
@@ -51,30 +57,19 @@ int main(void) {
     return 1;
   }
 
-  // intro text
-  uart_br_print("\nSimple timer example.\n"
-                "Press any key to start.\n\n");
+  gpio_pin_clr(BLINK_LED); // clear LED
 
-  // wait for key input
-  while(!uart_char_received());
+  // intro text
+  uart_br_print("\nTimer blinking status LED at "xstr(BLINK_FREQ)" Hz.\n");
 
   // set address of timer IRQ handler
   IRQVEC_TIMER = (uint16_t)(&timer_irq_handler);
 
-  // set timer threshold value
-  // f_tick = 1Hz @ PRSC = 4096
-  // THRES = f_main / (1Hz * 4096) = f_main >> 12
-  uint32_t f_clock = CLOCKSPEED_32bit;
-  TMR_THRES = (uint16_t)(f_clock >> 12);
+  // configure timer frequency
+  if (config_timer_period(BLINK_FREQ))
+    uart_br_print("Invalid TIMER frequency!\n");
 
-  // clear timer counter
-  TMR_CNT = 0;
-
-  // configure timer operation
-  TMR_CT = (1<<TMR_CT_EN) |   // enable timer
-           (1<<TMR_CT_ARST) | // auto reset on threshold match
-           (1<<TMR_CT_IRQ) |  // enable IRQ
-           (7<<TMR_CT_PRSC0); // PRSC = 7 -> prescaler =4096
+  TMR_CT |= (1<<TMR_CT_EN) | (1<<TMR_CT_ARST) | (1<<TMR_CT_IRQ); // enable timer, auto-reset, irq enabled
 
   // enable global IRQs
   eint();
@@ -93,5 +88,6 @@ int main(void) {
  * ------------------------------------------------------------ */
 void __attribute__((__interrupt__)) timer_irq_handler(void) {
 
-  uart_br_print("TICK\n");
+  gpio_pin_toggle(BLINK_LED);
 }
+
