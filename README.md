@@ -50,7 +50,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Application compilation scripts for Windows and Linux/Cygwin
 - Completely described in behavioral, platform-independent VHDL
 - Fully synchronous design, no latches, no gated clocks
-- Operates at high frequencies (150 MHz) - no clock-domain crossing required for integration
+- Operates at high frequencies (150 MHz)
 - Very small outline and high operating frequency compared to other implementations ;)
 - Internal DMEN (RAM, for data) and IMEM (RAM or ROM, for code), configurable sizes
 - One external interrupt line
@@ -76,6 +76,12 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Only one power-down (sleep) mode
 - Wishbone-compatible interface to attach custom IP
 - Internal bootloader with text interface (via UART serial port)
+
+
+## Implementation results (for HW version 0x0140, defualt configuration)
+
+- Xilinx Virtex-6: 1154 LUTs, 731 FFs, 2 BRAMs, f_max = 170MHz
+- Altera Cyclone IV: 1498 LUTs, 789 FFs, 69888 memorz bits, f_max = 119MHz
 
 
 ## Let's Get It Started!
