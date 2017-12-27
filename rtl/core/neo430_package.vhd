@@ -45,6 +45,7 @@ package neo430_package is
   function bin_to_gray(input : std_ulogic_vector) return std_ulogic_vector;
   function gray_to_bin(input : std_ulogic_vector) return std_ulogic_vector;
   function int_to_hexchar(input : integer) return character;
+  function bcd_add4(a : std_ulogic_vector; b : std_ulogic_vector; c : std_ulogic) return std_ulogic_vector;
 
   -- Address Space Layout -------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -733,5 +734,24 @@ package body neo430_package is
     end case;
     return output_v;
   end function int_to_hexchar;
+
+  -- Function: 4-bit BCD addition with carry ------------------------------------------------
+  -- -------------------------------------------------------------------------------------------
+  function bcd_add4(a : std_ulogic_vector; b : std_ulogic_vector; c : std_ulogic) return std_ulogic_vector is
+    variable tmp_v : unsigned(4 downto 0);
+    variable res_v : unsigned(3 downto 0);
+    variable cry_v : std_ulogic;
+  begin
+    tmp_v := ('0' & unsigned(a)) + ('0' & unsigned(b)) + ("0000" & c); 
+    if (tmp_v > 9) then
+      res_v := resize((tmp_v + "00110"), 4);
+      cry_v := '1';
+    else
+      res_v := tmp_v(3 downto 0);
+      cry_v := '0';
+    end if;
+    return std_ulogic_vector(cry_v & res_v);
+  end function bcd_add4;
+
 
 end neo430_package;

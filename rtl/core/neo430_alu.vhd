@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               30.10.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               27.12.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -146,59 +146,21 @@ begin
   -- Decimal Arithmetic Core --------------------------------------------------
   -- -----------------------------------------------------------------------------
   decimal_arithmetic_core: process(op_a_ff, op_b_ff, sreg_i)
-    variable dtmp_ll_v, dtmp_lh_v : unsigned(4 downto 0);
-    variable dsum_ll_v, dsum_lh_v : unsigned(3 downto 0);
-    variable dtmp_hl_v, dtmp_hh_v : unsigned(4 downto 0);
-    variable dsum_hl_v, dsum_hh_v : unsigned(3 downto 0);
-    variable cry_ll_v,  cry_lh_v  : std_ulogic;
-    variable cry_hl_v,  cry_hh_v  : std_ulogic;
+    variable dsum_ll_v, dsum_lh_v : std_ulogic_vector(4 downto 0);
+    variable dsum_hl_v, dsum_hh_v : std_ulogic_vector(4 downto 0);
   begin
-    -- adder LL --
-    dtmp_ll_v := ('0' & unsigned(op_a_ff(3 downto 0))) + ('0' & unsigned(op_b_ff(3 downto 0))) + ("0000" & sreg_i(sreg_c_c)); 
-    if (dtmp_ll_v > 9) then
-      dsum_ll_v := resize((dtmp_ll_v + "00110"), 4);
-      cry_ll_v  := '1';
-    else
-      dsum_ll_v := dtmp_ll_v(3 downto 0);
-      cry_ll_v  := '0';
-    end if;
-
-    -- adder LH --
-    dtmp_lh_v := ('0' & unsigned(op_a_ff(7 downto 4))) + ('0' & unsigned(op_b_ff(7 downto 4))) + ("0000" & cry_ll_v); 
-    if (dtmp_lh_v > 9) then
-      dsum_lh_v := resize((dtmp_lh_v + "00110"), 4);
-      cry_lh_v  := '1';
-    else
-      dsum_lh_v := dtmp_lh_v(3 downto 0);
-      cry_lh_v  := '0';
-    end if;
-
-    -- adder HL --
-    dtmp_hl_v := ('0' & unsigned(op_a_ff(11 downto 8))) + ('0' & unsigned(op_b_ff(11 downto 8))) + ("0000" & cry_lh_v); 
-    if (dtmp_hl_v > 9) then
-      dsum_hl_v := resize((dtmp_hl_v + "00110"), 4);
-      cry_hl_v  := '1';
-    else
-      dsum_hl_v := dtmp_hl_v(3 downto 0);
-      cry_hl_v  := '0';
-    end if;
-
-    -- adder HH --
-    dtmp_hh_v := ('0' & unsigned(op_a_ff(15 downto 12))) + ('0' & unsigned(op_b_ff(15 downto 12))) + ("0000" & cry_hl_v); 
-    if (dtmp_hh_v > 9) then
-      dsum_hh_v := resize((dtmp_hh_v + "00110"), 4);
-      cry_hh_v  := '1';
-    else
-      dsum_hh_v := dtmp_hh_v(3 downto 0);
-      cry_hh_v  := '0';
-    end if;
+    -- four 4-bit CBD adders --
+    dsum_ll_v := bcd_add4(op_a_ff(03 downto 00), op_b_ff(03 downto 00), sreg_i(sreg_c_c));
+    dsum_lh_v := bcd_add4(op_a_ff(07 downto 04), op_b_ff(07 downto 04), dsum_ll_v(4));
+    dsum_hl_v := bcd_add4(op_a_ff(11 downto 08), op_b_ff(11 downto 08), dsum_lh_v(4));
+    dsum_hh_v := bcd_add4(op_a_ff(15 downto 12), op_b_ff(15 downto 12), dsum_hl_v(4));
 
     -- output --
-    dadd_res(03 downto 00) <= std_ulogic_vector(dsum_ll_v);
-    dadd_res(07 downto 04) <= std_ulogic_vector(dsum_lh_v);
-    dadd_res(11 downto 08) <= std_ulogic_vector(dsum_hl_v);
-    dadd_res(15 downto 12) <= std_ulogic_vector(dsum_hh_v);
-    dadd_res(16) <= cry_hh_v;
+    dadd_res(03 downto 00) <= dsum_ll_v(3 downto 0);
+    dadd_res(07 downto 04) <= dsum_lh_v(3 downto 0);
+    dadd_res(11 downto 08) <= dsum_hl_v(3 downto 0);
+    dadd_res(15 downto 12) <= dsum_hh_v(3 downto 0);
+    dadd_res(16) <= dsum_hh_v(4);
   end process decimal_arithmetic_core;
 
 

@@ -109,7 +109,7 @@ begin
     addr_i     => addr_fb,    -- data from addr unit
     flag_i     => alu_flags,  -- new ALU flags
     -- control --
-    ctrl_i     => ctrl_bus,
+    ctrl_i     => ctrl_bus,   -- control signals
     -- data output --
     data_o     => rf_read,    -- read data
     sreg_o     => sreg        -- current SR
@@ -130,7 +130,7 @@ begin
     mem_i      => mdi,        -- data from memory
     sreg_i     => sreg,       -- current SR
     -- control --
-    ctrl_i     => ctrl_bus,
+    ctrl_i     => ctrl_bus,   -- control signals
     -- results --
     data_o     => alu_res,    -- result
     flag_o     => alu_flags   -- new ALU flags
@@ -149,7 +149,7 @@ begin
     imm_i      => imm,        -- branch offset
     irq_sel_i  => irq_sel,    -- IRQ vector
     -- control --
-    ctrl_i     => ctrl_bus,
+    ctrl_i     => ctrl_bus,   -- control signals
     -- data output --
     mem_addr_o => mem_addr,   -- memory address
     dwb_o      => addr_fb     -- data write back output

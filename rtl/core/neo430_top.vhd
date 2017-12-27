@@ -142,7 +142,7 @@ architecture neo430_top_rtl of neo430_top is
   signal timer_irq : std_ulogic;
   signal usart_irq : std_ulogic;
   signal gpio_irq  : std_ulogic;
-  signal xirq_sync : std_ulogic_vector(01 downto 0);
+  signal xirq_sync : std_ulogic;
 
   -- misc --
   signal imem_up_en : std_ulogic;
@@ -228,15 +228,15 @@ begin
   external_irq_sync: process(clk_i)
   begin
     if rising_edge(clk_i) then
-      xirq_sync <= xirq_sync(0) & irq_i;
+      xirq_sync <= irq_i;
     end if;
   end process external_irq_sync;
 
   -- interrupt priority assignment --
-  irq(0) <= timer_irq;    -- timer match (highest priority)
-  irq(1) <= usart_irq;    -- UART Rx available | UART Tx done | SPI RTX done
-  irq(2) <= gpio_irq;     -- GPIO input pin change
-  irq(3) <= xirq_sync(1); -- external interrupt request (lowest priority)
+  irq(0) <= timer_irq; -- timer match (highest priority)
+  irq(1) <= usart_irq; -- UART Rx available | UART Tx done | SPI RTX done
+  irq(2) <= gpio_irq;  -- GPIO input pin change
+  irq(3) <= xirq_sync; -- external interrupt request (lowest priority)
 
   -- external interrupt acknowledge --
   irq_ack_o <= irq_ack(3);
