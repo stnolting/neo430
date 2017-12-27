@@ -42,7 +42,7 @@ uint32_t time_base;
 // Prototypes
 void send_morse(char *s);
 
-// Morse alphabet
+// Morse alphabet (ASCII order)
 char morse_code[][7] = {
   "--..--", // ,
   "-....-", // -

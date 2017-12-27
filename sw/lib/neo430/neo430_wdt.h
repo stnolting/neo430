@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               24.04.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               27.12.2017  #
 // #################################################################################################
 
 #ifndef neo430_wdt_h
@@ -38,7 +38,7 @@ void wdt_force_hw_reset(void);
  * ------------------------------------------------------------ */
 void wdt_enable(uint8_t prsc) {
 
-  WDT_CTRL = (WDT_PASSWORD<<8) | (1<<WDT_ENABLE) | (prsc & 0x07);
+  WDT_CT = (WDT_PASSWORD<<8) | (1<<WDT_ENABLE) | (prsc & 0x07);
 }
 
 
@@ -47,7 +47,7 @@ void wdt_enable(uint8_t prsc) {
  * ------------------------------------------------------------ */
 void wdt_disable(void) {
 
-  WDT_CTRL = (WDT_PASSWORD<<8) | (0<<WDT_ENABLE);
+  WDT_CT = (WDT_PASSWORD<<8) | (0<<WDT_ENABLE);
 }
 
 
@@ -56,7 +56,7 @@ void wdt_disable(void) {
  * ------------------------------------------------------------ */
 void wdt_reset(void) {
 
-  WDT_CTRL = WDT_CTRL | (WDT_PASSWORD<<8);
+  WDT_CT = WDT_CT | (WDT_PASSWORD<<8);
 }
 
 
@@ -66,8 +66,8 @@ void wdt_reset(void) {
  * ------------------------------------------------------------ */
 void wdt_force_hw_reset(void) {
 
-  WDT_CTRL = (WDT_PASSWORD<<8) | (1<<WDT_ENABLE);
-  WDT_CTRL = 0; // invalid access -> triggers reset
+  WDT_CT = (WDT_PASSWORD<<8) | (1<<WDT_ENABLE);
+  WDT_CT = 0; // invalid access -> triggers reset
 }
 
 

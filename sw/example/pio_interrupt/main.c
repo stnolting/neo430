@@ -69,7 +69,7 @@ int main(void) {
   IRQVEC_TIMER = (uint16_t)(&timer_irq_handler);
 
   // configure GPIO module
-  GPIO_CTRL    = (1<<2) | (3<<0); // enable IRQs and trigger on rising edge
+  GPIO_CT      = (1<<2) | (3<<0); // enable IRQs and trigger on rising edge
   GPIO_IRQMASK = 0xFFFF; // use all input pins as trigger
 
   // set timer period:

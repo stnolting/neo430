@@ -142,7 +142,7 @@
 
 
 /* --- Genearl Purpose Inputs/Outputs - GPIO --- */
-#define GPIO_CTRL    (*(REG16 0xFFB0)) // -/w: control register
+#define GPIO_CT      (*(REG16 0xFFB0)) // -/w: control register
 #define GPIO_IN      (*(REG16 0xFFB2)) // r/-: parallel input
 #define GPIO_OUT     (*(REG16 0xFFB4)) // r/w: parallel output
 #define GPIO_IRQMASK (*(REG16 0xFFB6)) // -/w: irq mask register
@@ -152,7 +152,7 @@
 //  01: high level
 //  10: falling edge
 //  11: rising edge
-// bit 2: General interrupt enable flag
+// bit 2 of GPIO CTRL reg: General interrupt enable flag
 //  0: interrupts disabled
 //  1: interrupts enabled
 
@@ -183,7 +183,7 @@
 
 
 /* --- Watchdog Timer - WTD --- */
-#define WDT_CTRL (*(REG16 0xFFD0)) // r/w: Watchdog control register
+#define WDT_CT (*(REG16 0xFFD0)) // r/w: Watchdog control register
 
 // Watchdog control register
 #define WDT_PASSWORD 0x47 // must be set in the upper 8 bits of the WDT CTRL register

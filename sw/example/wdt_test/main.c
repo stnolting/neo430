@@ -50,7 +50,7 @@ int main(void) {
   }
 
   uart_br_print("Cause of last processor reset: ");
-  if ((WDT_CTRL & (1<<WDT_RCAUSE)) == 0)
+  if ((WDT_CT & (1<<WDT_RCAUSE)) == 0)
     uart_br_print("EXTERNAL RESET");
   else
     uart_br_print("WATCHDOG");
