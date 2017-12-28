@@ -52,20 +52,20 @@ int main(void) {
   // General information
   // --------------------------------------------
   // HW version
-  _printf("Hardware version: 0x%x", HW_VERSION);
+  _printf("Hardware version: 0x%x\n", HW_VERSION);
 
   // HW user code
-  _printf("\nUser code: 0x%x", USER_CODE);
+  _printf("User code:        0x%x\n", USER_CODE);
   
   // Clock speed
   uint32_t clock = CLOCKSPEED_32bit;
-  _printf("\nClock speed: %n Hz\n", clock);
+  _printf("Clock speed:      %n Hz\n", clock);
 
   // ROM/IMEM
-  _printf("IMEM/ROM: %u bytes @ 0x0000\n", IMEM_SIZE);
+  _printf("IMEM/ROM:         %u bytes @ 0x0000\n", IMEM_SIZE);
 
   // RAM/DMEM
-  _printf("DMEM/RAM: %u bytes @ 0x%x\n", DMEM_SIZE, DMEM_BASE);
+  _printf("DMEM/RAM:         %u bytes @ 0x%x\n", DMEM_SIZE, DMEM_BASE);
 
   // UART baud rate
   uint16_t baud = USI_BAUD & 0x00FF;
@@ -82,7 +82,7 @@ int main(void) {
     default: prsc = 0; break;
   }
   uint32_t baud_value = clock / (uint32_t)(prsc * baud);
-  _printf("UART Baud rate: %n\n", baud_value);
+  _printf("UART Baud rate:   %n\n", baud_value);
 
 
   // Interrupt vectors
@@ -131,7 +131,7 @@ int main(void) {
 
 
 /* ------------------------------------------------------------
- * INFO prints 'EN' if arg is != 0, prints 'DIS' otherwise
+ * INFO print state
  * ------------------------------------------------------------ */
 void print_state(uint16_t d) {
 

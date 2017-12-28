@@ -61,7 +61,7 @@ int main(void) {
                 "[----------------------------------------------------------------]\n ");
 
   // init watchdog: third largest period
-  wdt_enable(5);
+  wdt_enable(WDT_PRSC_1024);
 
   uint8_t i;
   for (i=0; i<64; i++) {
