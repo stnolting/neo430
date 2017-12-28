@@ -19,7 +19,7 @@
 ; # You should have received a copy of the GNU Lesser General Public License along with this      #
 ; # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 ; # ********************************************************************************************* #
-; #  Stephan Nolting, Hannover, Germany                                               27.12.2017  #
+; #  Stephan Nolting, Hannover, Germany                                               28.12.2017  #
 ; #################################################################################################
 
     .file	"boot_crt0.asm"
@@ -30,18 +30,16 @@ __boot_crt0:
 ; -----------------------------------------------------------
 ; Minimal required hardware setup
 ; -----------------------------------------------------------
-    clr  r2 ; clear status register & disable interrupts
-    
+    mov  #0x4700, &0xFFD0 ; deactivate watchdog
+
     mov  &0xFFE8, r1 ; DMEM (RAM) base address
     add  &0xFFEA, r1 ; add DMEM (RAM) size in bytes to SP
-
-    mov  #0x4700, &0xFFD0 ; deactivate watchdog
 
 
 ; -----------------------------------------------------------
 ; This is where the actual application is started
 ; -----------------------------------------------------------
-    jmp  main
+    jmp  main ; do a simple jump, as we will not return here
 
 .Lfe0:
     .size	__boot_crt0,.Lfe0-__boot_crt0

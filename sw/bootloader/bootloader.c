@@ -29,7 +29,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               27.12.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               28.12.2017  #
 // #################################################################################################
 
 // Libraries
@@ -96,8 +96,8 @@ int main(void) {
   // disable watchdog timer
   // -> done in boot_crt0.asm
 
-  // clear status register and disable interrupts, just enable write access to IMEM
-  asm volatile ("mov %0, r2" : : "i" (1<<R_FLAG));
+  // clear status register and disable interrupts, clear interrupt buffer, enable write access to IMEM
+  asm volatile ("mov %0, r2" : : "i" ((1<<R_FLAG) | (1<<Q_FLAG)));
 
   // disable Wishbone interface
   WB32_CT = 0;
@@ -109,8 +109,8 @@ int main(void) {
   IRQVEC_TIMER = (uint16_t)(&timer_irq_handler); // timer match
 
   // init GPIO
-  gpio_port_set(1<<STATUS_LED); // activate status LED
-  GPIO_CT = 0; // disable all pin change IRQs
+  gpio_port_set(1<<STATUS_LED); // activate status LED, clear all others
+//GPIO_CT = 0; // disable all pin change IRQs
 
   // set Baud rate & init USART control register:
   // enable USART, no IRQs, SPI clock mode 0, 1/1024 SPI speed, disable all 6 SPI CS lines (set high)
@@ -123,12 +123,12 @@ int main(void) {
   // Timeout counter: init timer, irq tick @ ~1Hz (prescaler = 4096)
   // THR = f_main / (1Hz + 4096) -1
   TMR_CT = 0; // reset timer
-  //uint32_t clock = (((uint32_t)CLOCKSPEED_HI<<16) | (uint32_t)CLOCKSPEED_LO) >> 14; // divide by 4096
+  //uint32_t clock = CLOCKSPEED_32bit >> 14; // divide by 4096
   TMR_THRES = (CLOCKSPEED_HI << 2) -1; // "fake" ;D
-  TIMEOUT_CNT = 0; // timeout ticker
   // enable timer, auto reset, enable IRQ, prsc = 1:2^16
   TMR_CT = (1<<TMR_CT_EN) | (1<<TMR_CT_ARST) | (1<<TMR_CT_IRQ) | ((16-1)<<TMR_CT_PRSC0);
   TMR_CNT = 0;
+  TIMEOUT_CNT = 0; // timeout ticker
 
   clear_irq_buffer(); // clear all pending interrupts
   eint(); // enable global interrupts
@@ -137,7 +137,7 @@ int main(void) {
   // ****************************************************************
   // Show bootloader intro and system information
   // ****************************************************************
-  uart_br_print("\n\nNEO430 Bootloader V20171227 by Stephan Nolting\n\n"
+  uart_br_print("\n\nNEO430 Bootloader V20171228 by Stephan Nolting\n\n"
                 "HWV: 0x");
   uart_print_hex_word(HW_VERSION);
   uart_br_print("\nCLK: 0x");
@@ -220,7 +220,7 @@ void start_app(void) {
 
   // valid image in IMEM?
   if (VALID_IMAGE == 0) {
-    uart_br_print("No valid image! Boot anyway (y/n)? ");
+    uart_br_print("Potentially invalid image. Boot anyway (y/n)? ");
     if (uart_getc() != 'y')
       return;
   }
@@ -228,7 +228,7 @@ void start_app(void) {
   // deactivate IRQs, no more write access to IMEM, clear all pending IRQs
   asm volatile ("mov %0, r2" : : "i" (1<<Q_FLAG));
 
-  uart_br_print("Booting...\n");
+  uart_br_print("Booting...\n\n");
 
   // wait for UART to finish transmitting
   while ((USI_CT & (1<<USI_CT_UARTTXBSY)) != 0);
@@ -245,13 +245,14 @@ void start_app(void) {
  * ------------------------------------------------------------ */
 void print_help(void) {
 
-  uart_br_print("d: Dump\n"
-                "e: Load EEPROM\n"
-                "h: Help\n"
-                "p: Store EEPROM\n"
-                "r: Restart\n"
-                "s: Start app\n"
-                "u: Upload");
+  uart_br_print("Commands:\n"
+                " d: Dump MEM\n"
+                " e: Load EEPROM\n"
+                " h: Help\n"
+                " p: Store EEPROM\n"
+                " r: Restart\n"
+                " s: Start app\n"
+                " u: Upload");
 }
 
 
@@ -394,7 +395,7 @@ uint16_t eeprom_read(uint16_t a) {
   uint8_t b1 = spi_trans(0x00);
   spi_cs_dis(BOOT_EEP_CS);
 
-  return ((uint16_t)b0 << 8) | (uint16_t)b1;
+  return __combine_bytes(b0, b1);
 }
 
 
@@ -467,7 +468,7 @@ uint16_t get_image_word(uint16_t a, uint8_t src) {
   if (src == UART_IMAGE) { // get image data via UART
     uint8_t c0 = (uint8_t)uart_getc();
     uint8_t c1 = (uint8_t)uart_getc();
-    d = ((uint16_t)c0 << 8) | (uint16_t)c1;
+    d = __combine_bytes(c0, c1);
   }
   else //if (src == EEPROM_IMAGE) // get image data from EEPROM
     d = eeprom_read(a);
@@ -482,7 +483,7 @@ uint16_t get_image_word(uint16_t a, uint8_t src) {
  * ------------------------------------------------------------ */
 void system_error(uint8_t err_code){
 
-  uart_br_print("\n\aERROR ");
+  uart_br_print("\a\nERROR ");
   uart_print_hex_byte(err_code);
 
   asm volatile ("mov #0, r2"); // deactivate IRQs, no more write access to IMEM
