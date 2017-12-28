@@ -1,4 +1,4 @@
--- NEO430 Processor, by Stephan Nolting
+-- The NEO430 Processor Project, by Stephan Nolting
 -- Auto-generated memory init file (for APPLICATION)
 
 library ieee;
@@ -294,7 +294,7 @@ package neo430_application_image is
     000283 => x"657a",
     000284 => x"2164",
     000285 => x"0000",
-    others => x"0000" -- nop
+    others => x"0000"
   );
 
 end neo430_application_image;
