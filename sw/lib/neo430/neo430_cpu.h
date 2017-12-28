@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               27.12.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               28.12.2017  #
 // #################################################################################################
 
 #ifndef neo430_cpu_h
@@ -38,6 +38,7 @@ inline void soft_reset(void);
 inline void jump_address(uint16_t addr);
 inline void call_address(uint16_t addr);
 inline uint16_t __bswap(uint16_t a);
+inline uint16_t __combine_bytes(uint8_t hi, uint8_t lo);
 inline uint16_t __dadd(uint16_t a, uint16_t b);
 
 
@@ -171,6 +172,19 @@ inline uint16_t __bswap(uint16_t a) {
   register uint16_t r = a;
   asm volatile ("swpb %0, %1" : "=r" (r) : "r" (r));
   return r;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Combine two bytes into one word
+ * PARAM hi will be put in result's high byte
+ * PARAM lo will be put in result's low byte
+ * RETURN 16-bit combined word
+ * ------------------------------------------------------------ */
+inline uint16_t __combine_bytes(uint8_t hi, uint8_t lo) {
+
+  uint16_t r = __bswap((uint16_t)hi);
+  return r | (uint16_t)lo;
 }
 
 
