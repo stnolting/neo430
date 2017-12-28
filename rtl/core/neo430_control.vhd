@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               07.12.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               28.12.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -217,7 +217,7 @@ begin
             ctrl_nxt(ctrl_rf_in_sel_c)  <= '1'; -- select addr feedback
             ctrl_nxt(ctrl_rf_wb_en_c)   <= branch_taken; -- valid RF write back if branch taken
             state_nxt <= IFETCH_0;
-          else -- FORMAT II INSTRUCTION
+          elsif (instr_i(12 downto 10) = "100") then -- FORMAT II INSTRUCTION
             -- ------------------------------------------------------------
             am_nxt(0) <= instr_i(4) or instr_i(5); -- dst addressing mode
             am_nxt(3) <= '0'; -- class II
@@ -238,6 +238,9 @@ begin
               when "111"  => state_nxt <= IFETCH_0; -- undefined
               when others => state_nxt <= TRANS_0; -- single ALU OP
             end case;
+          else -- Undefined
+            -- ------------------------------------------------------------
+            state_nxt <= IFETCH_0;
           end if;
         else -- FORMAT I INSTRUCTION
         -- ------------------------------------------------------------
