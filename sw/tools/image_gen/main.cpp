@@ -36,27 +36,12 @@ int main(int argc, char *argv[]) {
 	       " -app_bin : Generate application executable binary (with header!) \n"
 	       " -app_img : Generate application raw executable memory image (text file, no header!)\n"
 	       " -bld_img : Generate bootloader raw executable memory image (text file, no header!)\n"
-		   "2nd: Input file (raw binary image)\n"
-		   "3rd: Output file (as selected)\n");
+		     "2nd: Input file (raw binary image)\n"
+		     "3rd: Output file (as selected)\n");
   	return 1;
   }
 
   FILE *input, *output;
-
-  // open input file
-  input = fopen(argv[2], "rb");
-  if(input == NULL){
-    printf("Input file error!");
-    exit(-1);
-  }
-
-  // open output file
-  output = fopen(argv[3], "wb");
-  if(output == NULL){
-    printf("Output file error!");
-    exit(-2);
-  }
-
   unsigned char buffer[2];
   char tmp_string[512];
   uint16_t tmp = 0, size = 0, checksum = 0;
@@ -72,6 +57,20 @@ int main(int argc, char *argv[]) {
   else {
   	printf("Invalid option!");
   	return 2;
+  }
+
+  // open input file
+  input = fopen(argv[2], "rb");
+  if(input == NULL){
+    printf("Input file error!");
+    return 3;
+  }
+
+  // open output file
+  output = fopen(argv[3], "wb");
+  if(output == NULL){
+    printf("Output file error!");
+    return 4;
   }
 
 
@@ -118,7 +117,7 @@ int main(int argc, char *argv[]) {
   if (option == 2) {
 
 	// header
-    sprintf(tmp_string, "-- NEO430 Processor, by Stephan Nolting\r\n"
+    sprintf(tmp_string, "-- The NEO430 Processor Project, by Stephan Nolting\r\n"
 	 					"-- Auto-generated memory init file (for APPLICATION)\r\n"
 						"\r\n"
 						"library ieee;\r\n"
@@ -143,7 +142,7 @@ int main(int argc, char *argv[]) {
       i++;
     }
 
-    sprintf(tmp_string, "    others => x\"0000\" -- nop\r\n");
+    sprintf(tmp_string, "    others => x\"0000\"\r\n");
     fputs(tmp_string, output);
 
 	// end
@@ -160,7 +159,7 @@ int main(int argc, char *argv[]) {
   if (option == 3) {
 
 	// header
-    sprintf(tmp_string, "-- NEO430 Processor, by Stephan Nolting\r\n"
+    sprintf(tmp_string, "-- The NEO430 Processor Project, by Stephan Nolting\r\n"
 	 					"-- Auto-generated memory init file (for BOOTLOADER)\r\n"
 						"\r\n"
 						"library ieee;\r\n"
@@ -185,7 +184,7 @@ int main(int argc, char *argv[]) {
       i++;
     }
 
-    sprintf(tmp_string, "    others => x\"0000\" -- nop\r\n");
+    sprintf(tmp_string, "    others => x\"0000\"\r\n");
     fputs(tmp_string, output);
 
 	// end
