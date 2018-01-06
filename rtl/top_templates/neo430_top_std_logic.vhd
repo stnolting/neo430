@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               01.12.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               29.12.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -45,6 +45,8 @@ entity neo430_top_std_logic is
     GPIO_USE    : boolean := true; -- implement GPIO unit? (default=true)
     TIMER_USE   : boolean := true; -- implement timer? (default=true)
     USART_USE   : boolean := true; -- implement USART? (default=true)
+    CRC_USE     : boolean := true; -- implement CRC unit? (default=true)
+    CFU_USE     : boolean := false; -- implement custom functions unit? (default=false)
     -- boot configuration --
     BOOTLD_USE  : boolean := true; -- implement and use bootloader? (default=true)
     IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory? (default=false)
@@ -123,6 +125,8 @@ begin
     GPIO_USE    => GPIO_USE,          -- implement GPIO unit? (default=true)
     TIMER_USE   => TIMER_USE,         -- implement timer? (default=true)
     USART_USE   => USART_USE,         -- implement USART? (default=true)
+    CRC_USE     => CRC_USE,           -- implement CRC unit? (default=true)
+    CFU_USE     => CFU_USE,           -- implement CF unit? (default=false)
     -- boot configuration --
     BOOTLD_USE  => BOOTLD_USE,        -- implement and use bootloader? (default=true)
     IMEM_AS_ROM => IMEM_AS_ROM        -- implement IMEM as read-only memory? (default=false)

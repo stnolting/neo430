@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               27.12.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               06.01.2018  #
 -- #################################################################################################
 
 library ieee;
@@ -30,7 +30,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0143"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0150"; -- no touchy!
 
   -- Internal Functions ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -61,7 +61,7 @@ package neo430_package is
   constant boot_size_c : natural := 2048; -- bytes, max 2048 bytes!
 
   -- IO: Peripheral Devices ("IO") Area --
-  -- Each internal IO device (except sysconfig) must not use more than 16 bytes address space!
+  -- Each device must use 2 bytes or a multiple of 2 bytes as address space!
   -- CONTROL register (including the device enable) must be located at the base address of the device!
   constant io_base_c : std_ulogic_vector(15 downto 0) := x"FF80";
   constant io_size_c : natural := 128; -- bytes, fixed!
@@ -79,7 +79,7 @@ package neo430_package is
   constant muldiv_resx_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"000C");
   constant muldiv_resy_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"000E");
 
-  -- IO: Wishbone32 Interface --
+  -- IO: Wishbone32 Interface (WB32) --
   constant wb32_base_c : std_ulogic_vector(15 downto 0) := x"FF90";
   constant wb32_size_c : natural := 16; -- bytes
 
@@ -92,7 +92,7 @@ package neo430_package is
   constant wb32_data_hi_addr_c   : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"000C");
 --constant reserved              : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"000E");
 
-  -- IO: USART --
+  -- IO: Universal synchronous/asynchronous receiver and transmitter (USART) --
   constant usart_base_c : std_ulogic_vector(15 downto 0) := x"FFA0";
   constant usart_size_c : natural := 8; -- bytes
 
@@ -101,8 +101,8 @@ package neo430_package is
   constant usart_uart_rtx_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(usart_base_c) + x"0004");
   constant usart_baud_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(usart_base_c) + x"0006");
 
-  -- IO: GPIO  --
-  constant gpio_base_c : std_ulogic_vector(15 downto 0) := x"FFB0";
+  -- IO: General purpose input/output port (GPIO)  --
+  constant gpio_base_c : std_ulogic_vector(15 downto 0) := x"FFA8";
   constant gpio_size_c : natural := 8; -- bytes
 
   constant gpio_ctrl_addr_c    : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0000");
@@ -110,20 +110,46 @@ package neo430_package is
   constant gpio_out_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0004");
   constant gpio_irqmask_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0006");
 
-  -- IO: High-Precision Timer --
-  constant timer_base_c : std_ulogic_vector(15 downto 0) := x"FFC0";
+  -- IO: High-Precision Timer (TIMER) --
+  constant timer_base_c : std_ulogic_vector(15 downto 0) := x"FFB0";
   constant timer_size_c : natural := 8; -- bytes
 
   constant timer_ctrl_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0000");
   constant timer_cnt_addr_c   : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0002");
   constant timer_thres_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0004");
---constant reserved           : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0008");
+--constant reserved           : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0006");
 
-  -- IO: Watchdog Timer --
-  constant wdt_base_c : std_ulogic_vector(15 downto 0) := x"FFD0";
+  -- IO: Watchdog Timer (WDT) --
+  constant wdt_base_c : std_ulogic_vector(15 downto 0) := x"FFB8";
   constant wdt_size_c : natural := 2; -- bytes
 
   constant WDT_ctrl_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wdt_base_c) + x"0000");
+
+  -- IO: Cyclic redundancy check (CRC) --
+  constant crc_base_c : std_ulogic_vector(15 downto 0) := x"FFC0";
+  constant crc_size_c : natural := 16; -- bytes
+
+  constant crc_poly_lo_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0000");
+  constant crc_poly_hi_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0002");
+  constant crc_crc16_in_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0004");
+  constant crc_crc32_in_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0006");
+--constant reserved            : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0008");
+--constant reserved            : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"000A");
+  constant crc_resx_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"000C");
+  constant crc_resy_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"000E");
+
+  -- IO: Custom Functions Unit (CFU) --
+  constant cfu_base_c : std_ulogic_vector(15 downto 0) := x"FFD0";
+  constant cfu_size_c : natural := 16; -- bytes
+
+  constant cfu_reg0_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"0000");
+  constant cfu_reg1_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"0002");
+  constant cfu_reg2_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"0004");
+  constant cfu_reg3_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"0006");
+  constant cfu_reg4_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"0008");
+  constant cfu_reg5_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"000A");
+  constant cfu_reg6_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"000C");
+  constant cfu_reg7_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"000E");
 
   -- IO: System Configuration --
   constant sysconfig_base_c : std_ulogic_vector(15 downto 0) := x"FFE0";
@@ -241,6 +267,8 @@ package neo430_package is
       GPIO_USE    : boolean := true; -- implement GPIO unit? (default=true)
       TIMER_USE   : boolean := true; -- implement timer? (default=true)
       USART_USE   : boolean := true; -- implement USART? (default=true)
+      CRC_USE     : boolean := true; -- implement CRC unit? (default=true)
+      CFU_USE     : boolean := false; -- implement custom functions unit? (default=false)
       -- boot configuration --
       BOOTLD_USE  : boolean := true; -- implement and use bootloader? (default=true)
       IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory? (default=false)
@@ -550,6 +578,36 @@ package neo430_package is
     );
   end component;
 
+  -- Component: CRC Module ------------------------------------------------------------------
+  -- -------------------------------------------------------------------------------------------
+  component neo430_crc
+    port (
+      -- host access --
+      clk_i  : in  std_ulogic; -- global clock line
+      rden_i : in  std_ulogic; -- read enable
+      wren_i : in  std_ulogic_vector(01 downto 0); -- write enable
+      addr_i : in  std_ulogic_vector(15 downto 0); -- address
+      data_i : in  std_ulogic_vector(15 downto 0); -- data in
+      data_o : out std_ulogic_vector(15 downto 0)  -- data out
+    );
+  end component;
+
+  -- Component: Custom Functions Unit -------------------------------------------------------
+  -- -------------------------------------------------------------------------------------------
+  component neo430_cfu
+    port (
+      -- host access --
+      clk_i  : in  std_ulogic; -- global clock line
+      rden_i : in  std_ulogic; -- read enable
+      wren_i : in  std_ulogic_vector(01 downto 0); -- write enable
+      addr_i : in  std_ulogic_vector(15 downto 0); -- address
+      data_i : in  std_ulogic_vector(15 downto 0); -- data in
+      data_o : out std_ulogic_vector(15 downto 0)  -- data out
+      -- custom IOs --
+--    ...
+    );
+  end component;
+
   -- Component: System Configuration --------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_sysconfig
@@ -561,13 +619,15 @@ package neo430_package is
       -- additional configuration --
       USER_CODE   : std_ulogic_vector(15 downto 0) := x"0000"; -- custom user code
       -- module configuration --
-      DADD_USE    : boolean := true;  -- implement DADD instruction?
-      MULDIV_USE  : boolean := false; -- implement multiplier/divider unit?
-      WB32_USE    : boolean := true;  -- implement WB32 unit?
-      WDT_USE     : boolean := true;  -- implement WDT?
-      GPIO_USE    : boolean := true;  -- implement GPIO unit?
-      TIMER_USE   : boolean := true;  -- implement timer?
-      USART_USE   : boolean := true;  -- implement USART?
+      DADD_USE    : boolean := true; -- implement DADD instruction?
+      MULDIV_USE  : boolean := true; -- implement multiplier/divider unit?
+      WB32_USE    : boolean := true; -- implement WB32 unit?
+      WDT_USE     : boolean := true; -- implement WDT?
+      GPIO_USE    : boolean := true; -- implement GPIO unit?
+      TIMER_USE   : boolean := true; -- implement timer?
+      USART_USE   : boolean := true; -- implement USART?
+      CRC_USE     : boolean := true; -- implement CRC unit?
+      CFU_USE     : boolean := true; -- implement CF unit?
       -- boot configuration --
       BOOTLD_USE  : boolean := true; -- implement and use bootloader?
       IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory?

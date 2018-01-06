@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hanover, Germany                                                01.12.2017  #
+-- #  Stephan Nolting, Hanover, Germany                                                29.12.2017  #
 -- #################################################################################################
 
 library ieee;
@@ -98,6 +98,8 @@ begin
     GPIO_USE    => true,              -- implement GPIO unit? (default=true)
     TIMER_USE   => true,              -- implement timer? (default=true)
     USART_USE   => true,              -- implement USART? (default=true)
+    CRC_USE     => true,              -- implement CRC unit? (default=true)
+    CFU_USE     => true,              -- implement custom functions unit? (default=false)
     -- boot configuration --
     BOOTLD_USE  => false,             -- implement and use bootloader? (default=true)
     IMEM_AS_ROM => false              -- implement IMEM as read-only memory? (default=false)

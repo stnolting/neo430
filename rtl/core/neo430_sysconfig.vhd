@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               01.12.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               06.01.2018  #
 -- #################################################################################################
 
 library ieee;
@@ -42,12 +42,14 @@ entity neo430_sysconfig is
     USER_CODE   : std_ulogic_vector(15 downto 0) := x"0000"; -- custom user code
     -- module configuration --
     DADD_USE    : boolean := true; -- implement DADD instruction?
-    MULDIV_USE  : boolean := true; -- implementcustom MULDIV unit?
+    MULDIV_USE  : boolean := true; -- implement multiplier/divider unit?
     WB32_USE    : boolean := true; -- implement WB32 unit?
     WDT_USE     : boolean := true; -- implement WDT?
     GPIO_USE    : boolean := true; -- implement GPIO unit?
     TIMER_USE   : boolean := true; -- implement timer?
     USART_USE   : boolean := true; -- implement USART?
+    CRC_USE     : boolean := true; -- implement CRC unit?
+    CFU_USE     : boolean := true; -- implement CF unit?
     -- boot configuration --
     BOOTLD_USE  : boolean := true; -- implement and use bootloader?
     IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory?
@@ -111,7 +113,9 @@ begin
   sysinfo_mem(1)(06) <= bool_to_ulogic(DADD_USE);    -- DADD instruction present?
   sysinfo_mem(1)(07) <= bool_to_ulogic(BOOTLD_USE);  -- bootloader present?
   sysinfo_mem(1)(08) <= bool_to_ulogic(IMEM_AS_ROM); -- IMEM implemented as true ROM?
-  sysinfo_mem(1)(15 downto 9) <= (others => '0');    -- reserved
+  sysinfo_mem(1)(09) <= bool_to_ulogic(CRC_USE);     -- CRC present?
+  sysinfo_mem(1)(10) <= bool_to_ulogic(CFU_USE);     -- CFU present?
+  sysinfo_mem(1)(15 downto 11) <= (others => '0');   -- reserved
 
   -- CPUID2: User code --
   sysinfo_mem(2) <= USER_CODE;
