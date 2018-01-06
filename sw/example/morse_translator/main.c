@@ -40,10 +40,10 @@
 uint32_t time_base;
 
 // Prototypes
-void send_morse(char *s);
+void send_morse(const char *s);
 
 // Morse alphabet (ASCII order)
-char morse_code[][7] = {
+const char morse_code[][7] = {
   "--..--", // ,
   "-....-", // -
   ".-.-.-", // .
@@ -170,7 +170,7 @@ int main(void) {
  * INFO Send morse code via LED pin
  * PARAM *s pointer to source morse symbol string
  * ------------------------------------------------------------ */
-void send_morse(char *s){
+void send_morse(const char *s){
 
   char c = 0;
   uint32_t time = 0;

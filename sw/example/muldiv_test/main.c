@@ -29,9 +29,6 @@
 // Configuration
 #define BAUD_RATE 19200
 
-// Prototypes
-uint32_t xorshift32(void);
-
 
 /* ------------------------------------------------------------
  * INFO Main function
@@ -58,8 +55,8 @@ int main(void) {
   for (i=0; i<0xFFFF; i++) {
 
     // get "random" operands
-    a = (uint16_t)xorshift32();
-    b = (uint16_t)xorshift32();
+    a = (uint16_t)__xorshift32();
+    b = (uint16_t)__xorshift32();
 
     // multiply test
     prod_ref = (uint32_t)a * (uint32_t)b;
@@ -76,8 +73,8 @@ int main(void) {
 
 
     // get "random" operands
-    sa = (int16_t)xorshift32();
-    sb = (int16_t)xorshift32();
+    sa = (int16_t)__xorshift32();
+    sb = (int16_t)__xorshift32();
 
     // division test - signed
     if (sb == 0) // dont divide by zero
@@ -85,12 +82,12 @@ int main(void) {
     squot_ref = sa / sb;
     srem_ref  = sa % sb;
     squot = moddiv16(&srem, sa, sb);
-    _printf("SIGNED %u: %i / %i  =  %i & %i  vs ref.  %i & %i\n", i, sa, sb, squot, srem, squot_ref, srem_ref);
+    _printf("SIGNED   %u: %i / %i  =  %i & %i  vs ref.  %i & %i\n", i, sa, sb, squot, srem, squot_ref, srem_ref);
 
     // multiply test - signed
     sprod_ref = (int32_t)sa * (int32_t)sb;
     sprod = mul32(sa, sb);
-    _printf("SIGNED %u: %i * %i  =  %l  vs ref.  %l\n", i, sa, sb, sprod, sprod_ref);
+    _printf("SIGNED   %u: %i * %i  =  %l  vs ref.  %l\n", i, sa, sb, sprod, sprod_ref);
 
 
     // all correct?
@@ -106,18 +103,3 @@ int main(void) {
   return 0;  
 }
 
-
-/* ------------------------------------------------------------
- * INFO Pseudo-random number generator
- * RETURN 32-bit random data
- * ------------------------------------------------------------ */
-uint32_t xorshift32(void) {
-
-  static uint32_t x32 = 314159265;
-
-  x32 ^= x32 << 13;
-  x32 ^= x32 >> 17;
-  x32 ^= x32 << 5;
-
-  return x32;
-}

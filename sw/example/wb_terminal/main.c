@@ -39,7 +39,6 @@ void setup_wb(void);
 void read_wb_address(void);
 void write_wb_address(void);
 void dump_wb(void);
-uint32_t hex_str_to_uint32(char *buffer);
 
 // Configuration
 #define MAX_CMD_LENGTH 16
@@ -193,7 +192,7 @@ void read_wb_address(void) {
 
   uart_br_print("Enter hexadecimal target address: 0x");
   uart_scan(buffer, 9); // 8 hex chars for address plus '\0'
-  uint32_t address = hex_str_to_uint32(buffer);
+  uint32_t address = hexstr_to_uint(buffer, strlen(buffer));
 
   uart_br_print("\nReading from [0x");
   uart_print_hex_dword(address);
@@ -232,11 +231,11 @@ void write_wb_address(void) {
 
   uart_br_print("Enter hexadecimal target address: 0x");
   uart_scan(buffer, 9); // 8 hex chars for address plus '\0'
-  uint32_t address = hex_str_to_uint32(buffer);
+  uint32_t address = hexstr_to_uint(buffer, strlen(buffer));
 
   uart_br_print("\nEnter hexadecimal write data: 0x");
   uart_scan(buffer, wb_config*2+1); // get right number of hex chars for data plus '\0'
-  uint32_t data = hex_str_to_uint32(buffer);
+  uint32_t data = hexstr_to_uint(buffer, strlen(buffer));
 
   uart_br_print("\nWriting '0x");
   uart_print_hex_dword(data);
@@ -270,7 +269,7 @@ void dump_wb(void) {
 
   uart_br_print("Enter hexadecimal start address: 0x");
   uart_scan(buffer, 9); // 8 hex chars for address plus '\0'
-  uint32_t address = hex_str_to_uint32(buffer);
+  uint32_t address = hexstr_to_uint(buffer, strlen(buffer));
 
   uart_br_print("\nPress any key to start.\n"
                 "You can abort dumping by pressing any key.\n");
@@ -317,33 +316,3 @@ void dump_wb(void) {
   }
 }
 
-
-/* ------------------------------------------------------------
- * INFO Hex-char-string conversion function
- * PARAM String with hex-chars (zero-terminated)
- * not case-sensitive, non-hex chars are treated as '0'
- * RETURN Conversion result (32-bit)
- * ------------------------------------------------------------ */
-uint32_t hex_str_to_uint32(char *buffer) {
-
-  uint16_t length = strlen(buffer);
-  uint32_t res = 0, d = 0;
-  char c = 0;
-
-  while (length--) {
-    c = *buffer++;
-
-    if ((c >= '0') && (c <= '9'))
-      d = (uint32_t)(c - '0');
-    else if ((c >= 'a') && (c <= 'f'))
-      d = (uint32_t)((c - 'a') + 10);
-    else if ((c >= 'A') && (c <= 'F'))
-      d = (uint32_t)((c - 'A') + 10);
-    else
-      d = 0;
-
-    res = res + (d << (length*4));
-  }
-
-  return res;
-}

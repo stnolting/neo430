@@ -21,7 +21,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               01.12.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               29.12.2017  #
 // #################################################################################################
 
 
@@ -125,6 +125,12 @@ int main(void) {
   // is IMEM true ROM?
   _printf("- IMEM as true ROM:      ");
   print_state(ft & (1<<SYS_IROM_EN));
+  // CRC
+  _printf("- CRC16/CRC32:           ");
+  print_state(ft & (1<<SYS_CRC_EN));
+  // CFU
+  _printf("- Custom Functions Unit: ");
+  print_state(ft & (1<<SYS_CFU_EN));
 
   return 0;
 }
