@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               27.12.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               29.12.2017  #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -65,7 +65,7 @@
 //#define reserved     (*(REG16 0xFF8A))
 #define MULDIV_RESX    (*(REG16 0xFF8C)) // r/-: quotient or product low word
 #define MULDIV_RESY    (*(REG16 0xFF8E)) // r/-: remainder or product high word
-#define MULDIV_R32     (*(REG32 (&MULDIV_RESX))) // r/-: read result as 32-bit data word
+#define MULDIV_R32bit  (*(REG32 (&MULDIV_RESX))) // r/-: read result as 32-bit data word
 
 
 /* --- Wishbone Bus Adapter - WB32 --- */
@@ -142,10 +142,10 @@
 
 
 /* --- Genearl Purpose Inputs/Outputs - GPIO --- */
-#define GPIO_CT      (*(REG16 0xFFB0)) // -/w: control register
-#define GPIO_IN      (*(REG16 0xFFB2)) // r/-: parallel input
-#define GPIO_OUT     (*(REG16 0xFFB4)) // r/w: parallel output
-#define GPIO_IRQMASK (*(REG16 0xFFB6)) // -/w: irq mask register
+#define GPIO_CT      (*(REG16 0xFFA8)) // -/w: control register
+#define GPIO_IN      (*(REG16 0xFFAA)) // r/-: parallel input
+#define GPIO_OUT     (*(REG16 0xFFAC)) // r/w: parallel output
+#define GPIO_IRQMASK (*(REG16 0xFFAE)) // -/w: irq mask register
 
 // bits 1:0 of GPIO CTRL reg: Trigger
 //  00: low level
@@ -158,10 +158,10 @@
 
 
 /* --- High-Precision Timer - TIMER --- */
-#define TMR_CT    (*(REG16 0xFFC0)) // r/w: control register
-#define TMR_CNT   (*(REG16 0xFFC2)) // r/w: counter register
-#define TMR_THRES (*(REG16 0xFFC4)) // r/w: threshold register
-//#define reserved     (*(REG16 0xFFC6))
+#define TMR_CT    (*(REG16 0xFFB0)) // r/w: control register
+#define TMR_CNT   (*(REG16 0xFFB2)) // r/w: counter register
+#define TMR_THRES (*(REG16 0xFFB4)) // r/w: threshold register
+//#define reserved     (*(REG16 0xFFB6))
 
 // Timer control register
 #define TMR_CT_EN    0 // r/w: timer enable
@@ -183,7 +183,7 @@
 
 
 /* --- Watchdog Timer - WTD --- */
-#define WDT_CT (*(REG16 0xFFD0)) // r/w: Watchdog control register
+#define WDT_CT (*(REG16 0xFFB8)) // r/w: Watchdog control register
 
 // Watchdog control register
 #define WDT_PASSWORD 0x47 // must be set in the upper 8 bits of the WDT CTRL register
@@ -204,6 +204,31 @@
 #define WDT_PRSC_4096 7 // CLK/4096
 
 
+/* --- Cyclic Redundancy Check - CRC --- */
+#define CRC_POLY_LO (*(REG16 0xFFC0)) // -/w: low part of polynomial
+#define CRC_POLY_HI (*(REG16 0xFFC2)) // -/w: high part of polynomial
+#define CRC_CRC16IN (*(REG16 0xFFC4)) // -/w: input for CRC16
+#define CRC_CRC32IN (*(REG16 0xFFC6)) // -/w: input for CRC32
+//#define ???       (*(REG16 0xFFC8)) // -/-: reserved
+//#define ???       (*(REG16 0xFFCA)) // -/-: reserved
+#define CRC_RESX    (*(REG16 0xFFCC)) // r/w: crc shift register low
+#define CRC_RESY    (*(REG16 0xFFCE)) // r/w: crc shift register high
+
+#define CRC_POLY32bit (*(REG32 (&CRC_POLY_LO))) // -/w: write polynomial as 32-bit data word
+#define CRC_R32bit    (*(REG32 (&CRC_RESX)))    // r/w: crc shift register as 32-bit data word
+
+
+/* --- Custom Functions Unit - CFU --- */
+#define CFU_REG0 (*(REG16 0xFFD0)) // r/w: user defined...
+#define CFU_REG1 (*(REG16 0xFFD2)) // r/w: user defined...
+#define CFU_REG2 (*(REG16 0xFFD4)) // r/w: user defined...
+#define CFU_REG3 (*(REG16 0xFFD6)) // r/w: user defined...
+#define CFU_REG4 (*(REG16 0xFFD8)) // r/w: user defined...
+#define CFU_REG5 (*(REG16 0xFFDA)) // r/w: user defined...
+#define CFU_REG6 (*(REG16 0xFFDC)) // r/w: user defined...
+#define CFU_REG7 (*(REG16 0xFFDE)) // r/w: user defined...
+
+
 /* --- System Configuration - SYSCONFIG --- */
 #define CPUID0 (*(REG16 0xFFE0)) // r/-: HW version
 #define CPUID1 (*(REG16 0xFFE2)) // r/-: system configuration
@@ -213,8 +238,9 @@
 #define CPUID5 (*(REG16 0xFFEA)) // r/-: DMEM/RAM size in bytes
 #define CPUID6 (*(REG16 0xFFEC)) // r/-: clock speed lo
 #define CPUID7 (*(REG16 0xFFEE)) // r/-: clock speed hi
+
 // Aliases
-#define HW_VERSION    CPUID0 // r/-: HW verison number
+#define HW_VERSION    CPUID0 // r/-: HW version number
 #define SYS_FEATURES  CPUID1 // r/-: synthesized system features
 #define USER_CODE     CPUID2 // r/-: custom user code
 #define IMEM_SIZE     CPUID3 // r/-: IMEM/ROM size in bytes
@@ -236,6 +262,8 @@
 #define SYS_DADD_EN   6 // DADD instruction synthesized
 #define SYS_BTLD_EN   7 // Bootloader installed and enabled?
 #define SYS_IROM_EN   8 // Implement IMEM as true ROM?
+#define SYS_CRC_EN    9 // CRC synthesized
+#define SYS_CFU_EN   10 // CFU synthesized
 
 // Interrupt vectors (mirrored 2x times)
 //#define IRQVEC_TIMER (*(REG16 0xFFF0)) // r/w: mirrored IRQ vector register
@@ -251,13 +279,14 @@
 // ----------------------------------------------------------------------------
 // Include IO libraries
 // ----------------------------------------------------------------------------
+#include "neo430_aux.h"
 #include "neo430_cpu.h"
-#include "neo430_muldiv.h"
+#include "neo430_crc.h"
 #include "neo430_gpio.h"
+#include "neo430_muldiv.h"
 #include "neo430_usart.h"
 #include "neo430_wdt.h"
 #include "neo430_wishbone.h"
-#include "neo430_aux.h"
 
 
 #endif // neo430_h

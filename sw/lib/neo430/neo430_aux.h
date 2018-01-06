@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               27.12.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               29.12.2017  #
 // #################################################################################################
 
 #ifndef neo430_aux_h
@@ -32,6 +32,7 @@ void __memcpy(uint8_t *dst, uint8_t *src, uint16_t num);
 uint16_t __bit_rev16(uint16_t x);
 uint32_t __xorshift32(void);
 uint8_t config_timer_period(uint32_t f_timer);
+uint32_t hexstr_to_uint(char *buffer, uint8_t length);
 
 
 
@@ -150,6 +151,36 @@ uint8_t config_timer_period(uint32_t f_timer) {
   TMR_CNT = 0;
 
   return 0;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Convert N hex chars into uint32
+ * PARAM Pointer to buffer with hex chars
+ * PARAM Number of hex chars to convert (1..8)
+ * RETURN Conversion result
+ * ------------------------------------------------------------ */
+uint32_t hexstr_to_uint(char *buffer, uint8_t length) {
+
+  uint32_t res = 0, d = 0;
+  char c = 0;
+
+  while (length--) {
+    c = *buffer++;
+
+    if ((c >= '0') && (c <= '9'))
+      d = (uint32_t)(c - '0');
+    else if ((c >= 'a') && (c <= 'f'))
+      d = (uint32_t)((c - 'a') + 10);
+    else if ((c >= 'A') && (c <= 'F'))
+      d = (uint32_t)((c - 'A') + 10);
+    else
+      d = 0;
+
+    res = res + (d << (length*4));
+  }
+
+  return res;
 }
 
 

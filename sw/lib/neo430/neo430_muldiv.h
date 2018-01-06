@@ -56,7 +56,7 @@ uint32_t umul32(uint16_t a, uint16_t b) {
   asm volatile("nop");
   asm volatile("nop");
 
-  return MULDIV_R32;
+  return MULDIV_R32bit;
 }
 
 
@@ -84,7 +84,7 @@ int32_t mul32(int16_t a, int16_t b) {
   asm volatile("nop");
   asm volatile("nop");
 
-  int32_t r = (int32_t)MULDIV_R32;
+  int32_t r = (int32_t)MULDIV_R32bit;
 
   if (sign < 0)
     return 0 - r;
