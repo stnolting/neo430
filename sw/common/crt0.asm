@@ -39,7 +39,7 @@ __crt0_begin:
 ; -----------------------------------------------------------
     mov  #0, r2           ; clear status register & disable interrupts
     add  r8, r1           ; r1 = stack pointer = end of RAM
-    mov  #0x4700, &0xFFD0 ; deactivate watchdog
+    mov  #0x4700, &0xFFB8 ; deactivate watchdog
 
 
 ; -----------------------------------------------------------
@@ -120,7 +120,7 @@ __crt0_start_main:
 ; -----------------------------------------------------------
 __crt0_this_is_the_end:
     mov  #0, r2 ; deactivate IRQs
-    mov  #0x4700, &0xFFD0 ; deactivate watchdog
+    mov  #0x4700, &0xFFB8 ; deactivate watchdog
     mov  #(1<<4), r2 ; set CPU to sleep mode
     nop
 
