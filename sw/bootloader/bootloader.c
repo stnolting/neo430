@@ -84,17 +84,17 @@ void system_error(uint8_t err_code);
 /* ------------------------------------------------------------
  * INFO Bootloader main
  * ------------------------------------------------------------ */
-int main(void) {
+int  main(void) {
 
   // ****************************************************************
   // Processor hardware initialization
   // ****************************************************************
 
   // stack setup
-  // -> done in boot_crt0.asm
+  // -> done in boot_crt0
 
   // disable watchdog timer
-  // -> done in boot_crt0.asm
+  wdt_disable();
 
   // clear status register and disable interrupts, clear interrupt buffer, enable write access to IMEM
   asm volatile ("mov %0, r2" : : "i" ((1<<R_FLAG) | (1<<Q_FLAG)));
