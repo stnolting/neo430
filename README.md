@@ -50,18 +50,19 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Application compilation scripts for Windows and Linux/Cygwin
 - Completely described in behavioral, platform-independent VHDL
 - Fully synchronous design, no latches, no gated clocks
-- Operates at high frequencies (150 MHz)
 - Very small outline and high operating frequency compared to other implementations ;)
 - Internal DMEN (RAM, for data) and IMEM (RAM or ROM, for code), configurable sizes
 - One external interrupt line
 - Customizable processor hardware configuration
 - Optional multiplier/divider unit
 - Optional high-precision timer (TIMER)
-- Optional USART interface; UART and SPI (USART)
+- Optional USART interface; UART and SPI in parallel (USART)
 - Optional general purpose parallel IO port (GPIO), 16 inputs, 16 outputs, with pin-change interrupt
 - Optional 32-bit Wishbone bus interface adapter (WB32)
 - Optional watchdog timer (WDT)
-- Optional internal bootloader (2kB ROM)
+- Optional cyclic redundancy check unit (CRC16/32)
+- Optional custom functions unit (CFU) for user-defined processor extensions
+- Optional internal bootloader (2kB ROM) with serial user console and automatic boot from external EEPROM
 
 
 ## Differences to TI's original MSP430 processors
@@ -82,7 +83,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 Generated for HW version 0x0140, default (full) configuration:
 - Xilinx Virtex-6: 1154 LUTs, 731 FFs, 2 BRAMs, f_max = 170MHz
-- Altera Cyclone IV: 1498 LUTs, 789 FFs, 69888 memorz bits, f_max = 119MHz
+- Altera Cyclone IV: 1498 LUTs, 789 FFs, 69888 memory bits, f_max = 119MHz
 
 
 ## Let's Get It Started!
