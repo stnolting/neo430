@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               01.12.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               06.02.2018  #
 -- #################################################################################################
 
 library ieee;
@@ -45,6 +45,8 @@ entity neo430_top_avm is
     GPIO_USE        : boolean := true; -- implement GPIO unit? (default=true)
     TIMER_USE       : boolean := true; -- implement timer? (default=true)
     USART_USE       : boolean := true; -- implement USART? (default=true)
+    CRC_USE         : boolean := true; -- implement CRC unit? (default=true)
+    CFU_USE         : boolean := false; -- implement custom functions unit? (default=false)
     -- boot configuration --
     BOOTLD_USE      : boolean := true; -- implement and use bootloader? (default=true)
     IMEM_AS_ROM     : boolean := false -- implement IMEM as read-only memory? (default=false)
@@ -68,7 +70,6 @@ entity neo430_top_avm is
     irq_i           : in  std_logic; -- external interrupt request line
     irq_ack_o       : out std_logic; -- external interrupt request acknowledge
     -- Avalon slave interface --
-	  avm_chipselect  : out std_logic;
 	  avm_address     : out std_logic_vector(31 downto 0);
 	  avm_readdata    : in  std_logic_vector(31 downto 0);
 	  avm_writedata   : out std_logic_vector(31 downto 0);
@@ -122,6 +123,9 @@ architecture neo430_top_avm_rtl of neo430_top_avm is
   signal irq_ack_o_int  : std_ulogic;
   constant usrcode_c    : std_ulogic_vector(15 downto 0) := std_ulogic_vector(USER_CODE);
 
+  -- misc --
+  signal trans_en : std_logic;
+
 begin
 
   -- CPU ----------------------------------------------------------------------
@@ -142,6 +146,8 @@ begin
     GPIO_USE    => GPIO_USE,          -- implement GPIO unit? (default=true)
     TIMER_USE   => TIMER_USE,         -- implement timer? (default=true)
     USART_USE   => USART_USE,         -- implement USART? (default=true)
+    CRC_USE     => CRC_USE,           -- implement CRC unit? (default=true)
+    CFU_USE     => CFU_USE,           -- implement CF unit? (default=false)
     -- boot configuration --
     BOOTLD_USE  => BOOTLD_USE,        -- implement and use bootloader? (default=true)
     IMEM_AS_ROM => IMEM_AS_ROM        -- implement IMEM as read-only memory? (default=false)
@@ -205,13 +211,19 @@ begin
   wb_core.di     <= std_ulogic_vector(wb_conv.di);
   wb_core.ack    <= std_ulogic(wb_conv.ack);
 
+  active_transfer: process(clk_i_int)
+  begin
+    if rising_edge(clk_i_int) then
+      trans_en <= wb_conv.cyc and (trans_en or wb_conv.stb); -- keep STB virtually alive
+    end if;
+  end process active_transfer;
+
   -- Wishbone -> Avalon
   avm_address    <= wb_conv.adr;
   avm_writedata  <= wb_conv.do;
   avm_byteenable <= wb_conv.sel;
-  avm_chipselect <= wb_conv.cyc;
-  avm_write      <= wb_conv.cyc and wb_conv.stb and wb_conv.we;
-  avm_read       <= wb_conv.cyc and wb_conv.stb and (not wb_conv.we);
+  avm_write      <= wb_conv.cyc and (wb_conv.stb or trans_en) and wb_conv.we;
+  avm_read       <= wb_conv.cyc and (wb_conv.stb or trans_en) and (not wb_conv.we);
 
   -- Avalon -> Wishbone
   wb_conv.di     <= avm_readdata;
