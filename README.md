@@ -81,9 +81,17 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 ## Implementation results
 
-Generated for HW version 0x0140, default (full) configuration:
-- Xilinx Virtex-6: 1154 LUTs, 731 FFs, 2 BRAMs, f_max = 170MHz
-- Altera Cyclone IV: 1498 LUTs, 789 FFs, 69888 memory bits, f_max = 119MHz
+Mapping results generated for HW version 0x0150. 
+
+| __Xilinx Virtex-6__                 | LUTs | FFs | BRAMs | f_max   |
+|-------------------------------------|:----:|-----|-------|---------|
+| Full (default) configuration:       | 1127 | 826 | 2     | 166 MHz |
+| Minimal configuration (CPU + GPIO): | 499  | 260 | 2     | 198 MHz |
+
+| __Intel/Altera Cyclone IV__         | LUTs | FFs | Memory bits | f_max   |
+|-------------------------------------|:----:|-----|-------------|---------|
+| Full (default) configuration:       | 1593 | 881 | 65792       | 113 MHz |
+| Minimal configuration (CPU + GPIO): | 728  | 317 | 49408       | 120 MHz |
 
 
 ## Let's Get It Started!
