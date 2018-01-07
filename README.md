@@ -6,7 +6,7 @@ You need a small but still powerful, customizable and microcontroller-like
 processor system for your next FPGA design? Then the NEO430 is the perfect
 choice for you!
 
-This processor is based on the Texas Instruments MSP430 ISA and provides 100%
+This processor is based on the Texas Instruments MSP430(TM) ISA and provides 100%
 compatibility with the original instruction set. The NEO430 is not an MSP430
 clone – it is more a complete new implementation from the bottom up. The
 processor features a very small outline, already implementing standard
@@ -65,7 +65,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Optional internal bootloader (2kB ROM) with serial user console and automatic boot from external EEPROM
 
 
-## Differences to TI's original MSP430 processors
+## Differences to TI's Original MSP430(TM) Processors
 
 - Completely different processor modules with different functionality
 - Maximum of 32kB instruction memory and 28kB data memory
@@ -79,7 +79,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Internal bootloader with text interface (via UART serial port)
 
 
-## Implementation results
+## Implementation Results
 
 Mapping results generated for HW version 0x0150. 
 
@@ -126,6 +126,15 @@ Mapping results generated for HW version 0x0150.
 If you have any questions, bug reports, ideas or if you are facing problems with the NEO430, feel free to drop me a line:
 
   stnolting@gmail.com
+
+
+## Proprietary Notice
+
+"MSP430" is a trademark of Texas Instruments Corporation.
+
+"Virtex" is a trademarks of Xilinx Inc.
+
+"Cyclone" is a trademarks of Intel Corporation.
 
 
 
