@@ -265,13 +265,13 @@
 #define SYS_CRC_EN    9 // CRC synthesized
 #define SYS_CFU_EN   10 // CFU synthesized
 
-// Interrupt vectors (mirrored 2x times)
+// Interrupt vectors
 //#define IRQVEC_TIMER (*(REG16 0xFFF0)) // r/w: mirrored IRQ vector register
 //#define IRQVEC_USART (*(REG16 0xFFF2)) // r/w: mirrored IRQ vector register
 //#define IRQVEC_GPIO  (*(REG16 0xFFF4)) // r/w: mirrored IRQ vector register
 //#define IRQVEC_EXT   (*(REG16 0xFFF6)) // r/w: mirrored IRQ vector register
 #define IRQVEC_TIMER (*(REG16 0xFFF8)) // r/w: timer match
-#define IRQVEC_USART (*(REG16 0xFFFA)) // r/w: uart rx avail / uart tx done / spi rtx done
+#define IRQVEC_USART (*(REG16 0xFFFA)) // r/w: uart rx avail / spi rtx done
 #define IRQVEC_GPIO  (*(REG16 0xFFFC)) // r/w: gpio pin change
 #define IRQVEC_EXT   (*(REG16 0xFFFE)) // r/w: external IRQ
 

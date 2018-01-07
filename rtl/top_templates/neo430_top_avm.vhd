@@ -70,13 +70,13 @@ entity neo430_top_avm is
     irq_i           : in  std_logic; -- external interrupt request line
     irq_ack_o       : out std_logic; -- external interrupt request acknowledge
     -- Avalon slave interface --
-	  avm_address     : out std_logic_vector(31 downto 0);
-	  avm_readdata    : in  std_logic_vector(31 downto 0);
-	  avm_writedata   : out std_logic_vector(31 downto 0);
-	  avm_byteenable  : out std_logic_vector(03 downto 0);
-	  avm_write       : out std_logic;
-	  avm_read        : out std_logic;
-	  avm_waitrequest : in  std_logic
+    avm_address     : out std_logic_vector(31 downto 0);
+    avm_readdata    : in  std_logic_vector(31 downto 0);
+    avm_writedata   : out std_logic_vector(31 downto 0);
+    avm_byteenable  : out std_logic_vector(03 downto 0);
+    avm_write       : out std_logic;
+    avm_read        : out std_logic;
+    avm_waitrequest : in  std_logic
   );
 end neo430_top_avm;
 

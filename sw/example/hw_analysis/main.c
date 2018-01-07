@@ -21,7 +21,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               29.12.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               06.01.2018  #
 // #################################################################################################
 
 
@@ -85,15 +85,6 @@ int main(void) {
   _printf("UART Baud rate:   %n\n", baud_value);
 
 
-  // Interrupt vectors
-  // --------------------------------------------
-  _printf("\nInterrupt Vectors");
-  _printf("\n(0) IRQVEC_TIMER -> 0x%x", IRQVEC_TIMER);
-  _printf("\n(1) IRQVEC_USART -> 0x%x", IRQVEC_USART);
-  _printf("\n(2) IRQVEC_GPIO  -> 0x%x", IRQVEC_GPIO);
-  _printf("\n(3) IRQVEC_EXT   -> 0x%x", IRQVEC_EXT);
-
-
   // System features
   // --------------------------------------------
   uint16_t ft = SYS_FEATURES;
@@ -131,6 +122,17 @@ int main(void) {
   // CFU
   _printf("- Custom Functions Unit: ");
   print_state(ft & (1<<SYS_CFU_EN));
+
+
+  // Exit
+  // --------------------------------------------
+  _printf("\n\nPress any key to return to bootloader.\n");
+  while(!uart_char_received());
+
+  if (!(SYS_FEATURES & (1<<SYS_BTLD_EN)))
+    uart_br_print("No bootloader installed!\n");
+  else
+    asm volatile ("mov #0xF000, r0");
 
   return 0;
 }
