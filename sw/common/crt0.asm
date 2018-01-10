@@ -19,7 +19,7 @@
 ; # You should have received a copy of the GNU Lesser General Public License along with this      #
 ; # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 ; # ********************************************************************************************* #
-; #  Stephan Nolting, Hannover, Germany                                               27.12.2017  #
+; #  Stephan Nolting, Hannover, Germany                                               10.01.2018  #
 ; #################################################################################################
 
   .file	"crt0.asm"
@@ -30,8 +30,8 @@ __crt0_begin:
 ; -----------------------------------------------------------
 ; Get required system info
 ; -----------------------------------------------------------
-    mov  &0xFFE8, r8 ; = DMEM (RAM) base address
-    mov  &0xFFEA, r1 ; = DMEM (RAM) size in byte
+    mov  &0xFFF8, r8 ; = DMEM (RAM) base address
+    mov  &0xFFFA, r1 ; = DMEM (RAM) size in byte
 
 
 ; -----------------------------------------------------------
@@ -50,7 +50,7 @@ __crt0_begin:
 ; specific device.
     mov  #0xFF80, r9 ; beginning of IO section
 __crt0_clr_io:
-      tst  r9 ; until the end -> wrap-arounf to 0
+      tst  r9 ; until the end -> wrap-around to 0
       jeq  __crt0_clr_io_end
       mov  #0, 0(r9) ; clear entry
       incd r9

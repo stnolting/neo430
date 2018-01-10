@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               29.12.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               10.01.2018  #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -44,6 +44,21 @@
 #define V_FLAG 8  // r/w: overflow
 #define Q_FLAG 14 // -/w: clear pending IRQ buffer when set
 #define R_FLAG 15 // r/w: allow write-access to IMEM
+
+
+// ----------------------------------------------------------------------------
+// Start of data memory (DMEN)
+// ----------------------------------------------------------------------------
+#define DMEM_ADDR_BASE 0x8000
+
+
+// ----------------------------------------------------------------------------
+// Interrupt vectors, located at the beginning of DMEM
+// ----------------------------------------------------------------------------
+#define IRQVEC_TIMER (*(REG16 (DMEM_ADDR_BASE + 0))) // r/w: timer match
+#define IRQVEC_USART (*(REG16 (DMEM_ADDR_BASE + 2))) // r/w: uart rx avail / spi rtx done
+#define IRQVEC_GPIO  (*(REG16 (DMEM_ADDR_BASE + 4))) // r/w: gpio pin change
+#define IRQVEC_EXT   (*(REG16 (DMEM_ADDR_BASE + 6))) // r/w: external IRQ
 
 
 // ----------------------------------------------------------------------------
@@ -229,15 +244,26 @@
 #define CFU_REG7 (*(REG16 0xFFDE)) // r/w: user defined...
 
 
+/* --- Reserved --- */
+//#define ? (*(REG16 0xFFE0))
+//#define ? (*(REG16 0xFFE2))
+//#define ? (*(REG16 0xFFE4))
+//#define ? (*(REG16 0xFFE6))
+//#define ? (*(REG16 0xFFE8))
+//#define ? (*(REG16 0xFFEA))
+//#define ? (*(REG16 0xFFEC))
+//#define ? (*(REG16 0xFFEE))
+
+
 /* --- System Configuration - SYSCONFIG --- */
-#define CPUID0 (*(REG16 0xFFE0)) // r/-: HW version
-#define CPUID1 (*(REG16 0xFFE2)) // r/-: system configuration
-#define CPUID2 (*(REG16 0xFFE4)) // r/-: CPU identifier
-#define CPUID3 (*(REG16 0xFFE6)) // r/-: IMEM/ROM size in bytes
-#define CPUID4 (*(REG16 0xFFE8)) // r/-: DMEM/RAM base address
-#define CPUID5 (*(REG16 0xFFEA)) // r/-: DMEM/RAM size in bytes
-#define CPUID6 (*(REG16 0xFFEC)) // r/-: clock speed lo
-#define CPUID7 (*(REG16 0xFFEE)) // r/-: clock speed hi
+#define CPUID0 (*(REG16 0xFFF0)) // r/-: HW version
+#define CPUID1 (*(REG16 0xFFF2)) // r/-: system configuration
+#define CPUID2 (*(REG16 0xFFF4)) // r/-: CPU identifier
+#define CPUID3 (*(REG16 0xFFF6)) // r/-: IMEM/ROM size in bytes
+#define CPUID4 (*(REG16 0xFFF8)) // r/-: DMEM/RAM base address
+#define CPUID5 (*(REG16 0xFFFA)) // r/-: DMEM/RAM size in bytes
+#define CPUID6 (*(REG16 0xFFFC)) // r/-: clock speed lo
+#define CPUID7 (*(REG16 0xFFFE)) // r/-: clock speed hi
 
 // Aliases
 #define HW_VERSION    CPUID0 // r/-: HW version number
@@ -264,16 +290,6 @@
 #define SYS_IROM_EN   8 // Implement IMEM as true ROM?
 #define SYS_CRC_EN    9 // CRC synthesized
 #define SYS_CFU_EN   10 // CFU synthesized
-
-// Interrupt vectors
-//#define IRQVEC_TIMER (*(REG16 0xFFF0)) // r/w: mirrored IRQ vector register
-//#define IRQVEC_USART (*(REG16 0xFFF2)) // r/w: mirrored IRQ vector register
-//#define IRQVEC_GPIO  (*(REG16 0xFFF4)) // r/w: mirrored IRQ vector register
-//#define IRQVEC_EXT   (*(REG16 0xFFF6)) // r/w: mirrored IRQ vector register
-#define IRQVEC_TIMER (*(REG16 0xFFF8)) // r/w: timer match
-#define IRQVEC_USART (*(REG16 0xFFFA)) // r/w: uart rx avail / spi rtx done
-#define IRQVEC_GPIO  (*(REG16 0xFFFC)) // r/w: gpio pin change
-#define IRQVEC_EXT   (*(REG16 0xFFFE)) // r/w: external IRQ
 
 
 // ----------------------------------------------------------------------------

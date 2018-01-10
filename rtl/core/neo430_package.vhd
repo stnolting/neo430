@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               06.01.2018  #
+-- #  Stephan Nolting, Hannover, Germany                                               10.01.2018  #
 -- #################################################################################################
 
 library ieee;
@@ -30,7 +30,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0150"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0154"; -- no touchy!
 
   -- Internal Functions ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -151,9 +151,22 @@ package neo430_package is
   constant cfu_reg6_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"000C");
   constant cfu_reg7_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"000E");
 
+  -- IO: RESERVED --
+--constant ???_base_c : std_ulogic_vector(15 downto 0) := x"FFE0";
+--constant ???_size_c : natural := 16; -- bytes
+
+--constant ???_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0000");
+--constant ???_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0002");
+--constant ???_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0004");
+--constant ???_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0006");
+--constant ???_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0008");
+--constant ???_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"000A");
+--constant ???_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"000C");
+--constant ???_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"000E");
+
   -- IO: System Configuration --
-  constant sysconfig_base_c : std_ulogic_vector(15 downto 0) := x"FFE0";
-  constant sysconfig_size_c : natural := 32; -- bytes
+  constant sysconfig_base_c : std_ulogic_vector(15 downto 0) := x"FFF0";
+  constant sysconfig_size_c : natural := 16; -- bytes
 
   -- Register Addresses ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------

@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               06.01.2018  #
+-- #  Stephan Nolting, Hannover, Germany                                               10.01.2018  #
 -- #################################################################################################
 
 library ieee;
@@ -73,8 +73,8 @@ architecture neo430_sysconfig_rtl of neo430_sysconfig is
   -- access control --
   signal acc_en    : std_ulogic; -- access enable
   signal addr      : std_ulogic_vector(15 downto 0);
+  signal rden      : std_ulogic;
   signal info_addr : std_ulogic_vector(02 downto 0);
-  signal irqv_addr : std_ulogic_vector(01 downto 0);
 
   -- misc --
   signal f_clk : std_ulogic_vector(31 downto 0);
@@ -83,22 +83,18 @@ architecture neo430_sysconfig_rtl of neo430_sysconfig is
   type info_mem_t is array (0 to 7) of std_ulogic_vector(15 downto 0);
   signal sysinfo_mem : info_mem_t; -- ROM
 
-  -- interrupt vector RAM --
-  type irqv_mem_t is array (0 to 3) of std_ulogic_vector(15 downto 0);
-  signal irqvec_mem : irqv_mem_t; -- RAM
-
 begin
 
   -- Access Control -----------------------------------------------------------
   -- -----------------------------------------------------------------------------
   acc_en <= '1' when (addr_i(hi_abb_c downto lo_abb_c) = sysconfig_base_c(hi_abb_c downto lo_abb_c)) else '0';
   addr   <= sysconfig_base_c(15 downto lo_abb_c) & addr_i(lo_abb_c-1 downto 1) & '0'; -- word aligned
+  rden   <= acc_en and rden_i;
 
-  info_addr <= addr(index_size(sysconfig_size_c/2)-1 downto 1);
-  irqv_addr <= addr(index_size(sysconfig_size_c/4)-1 downto 1);
+  info_addr <= addr(index_size(sysconfig_size_c)-1 downto 1);
   
 
-  -- Construct Info Mem -------------------------------------------------------
+  -- Construct Info ROM -------------------------------------------------------
   -- -----------------------------------------------------------------------------
   -- CPUID0: HW version --
   sysinfo_mem(0) <= hw_version_c; -- HW version
@@ -135,27 +131,18 @@ begin
   sysinfo_mem(7) <= f_clk(31 downto 16); -- clock speed HI
 
 
-  -- Read/Write Access --------------------------------------------------------
+  -- Read Access --------------------------------------------------------------
   -- -----------------------------------------------------------------------------
-  rw_access: process(clk_i)
+  read_access: process(clk_i)
   begin
     if rising_edge(clk_i) then
-      -- write access (IRQ vectors) --
-      if (wren_i = "11") and (acc_en = '1') and (addr_i(lo_abb_c-1) = '1') then
-        irqvec_mem(to_integer(unsigned(irqv_addr))) <= data_i;
-      end if;
-      -- read access --
-      if ((rden_i and acc_en) = '1') then
-        if (addr_i(lo_abb_c-1) = '0') then -- read INFOMEM
-          data_o <= sysinfo_mem(to_integer(unsigned(info_addr)));
-        else -- read IRQ vector
-          data_o <= irqvec_mem(to_integer(unsigned(irqv_addr)));
-        end if;
+      if (rden = '1') then
+        data_o <= sysinfo_mem(to_integer(unsigned(info_addr)));
       else
-        data_o <= x"0000";
+        data_o <= (others => '0');
       end if;
     end if;
-  end process rw_access;
+  end process read_access;
 
 
 end neo430_sysconfig_rtl;

@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               14.02.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               10.01.2018  #
 -- #################################################################################################
 
 library ieee;
@@ -99,8 +99,9 @@ begin
   memory_addr_out: process(ctrl_i, irq_sel_i, reg_i, mem_addr_reg)
   begin
     if (ctrl_i(ctrl_adr_bp_en_c) = '1') then
-      if (ctrl_i(ctrl_adr_ivec_oe_c) = '1') then
-        mem_addr_o <= x"FFF" & '1' & irq_sel_i & '0'; -- form a word-aligned address
+      if (ctrl_i(ctrl_adr_ivec_oe_c) = '1') then -- interrupt handler call
+        mem_addr_o <= dmem_base_c; -- IRQ vectors are located at the beginning of the DMEM
+        mem_addr_o(2 downto 1) <= irq_sel_i; -- select according WORD entry
       else -- direct output of reg file (for instruction fetch only)
         mem_addr_o <= reg_i;
       end if;

@@ -29,7 +29,7 @@ OUTPUT_ARCH(msp430)
 MEMORY
 {
   rom  (rx) : ORIGIN = 0x0000, LENGTH = 0x1000
-  ram (rwx) : ORIGIN = 0x8000, LENGTH = 0x0800
+  ram (rwx) : ORIGIN = 0x8008, LENGTH = 0x0800 - 8
 }
 
 /* Final executable layout */
