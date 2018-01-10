@@ -81,17 +81,17 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 ## Implementation Results
 
-Mapping results generated for HW version 0x0150. 
+Mapping results generated for HW version 0x0154. 
 
 | __Xilinx Virtex-6__                 | LUTs | FFs | BRAMs | f_max   |
 |-------------------------------------|:----:|-----|-------|---------|
-| Full (default) configuration:       | 1127 | 826 | 2     | 166 MHz |
-| Minimal configuration (CPU + GPIO): | 499  | 260 | 2     | 198 MHz |
+| Full (default) configuration:       | TBA  | TBA | TBA   | TBA MHz |
+| Minimal configuration (CPU + GPIO): | TBA  | TBA | TBA   | TBA MHz |
 
 | __Intel/Altera Cyclone IV__         | LUTs | FFs | Memory bits | f_max   |
 |-------------------------------------|:----:|-----|-------------|---------|
-| Full (default) configuration:       | 1593 | 881 | 65792       | 113 MHz |
-| Minimal configuration (CPU + GPIO): | 728  | 317 | 49408       | 120 MHz |
+| Full (default) configuration:       | 1512 | 813 | 65792       | 115 MHz |
+| Minimal configuration (CPU + GPIO): | 645  | 248 | 49408       | 116 MHz |
 
 
 ## Let's Get It Started!
