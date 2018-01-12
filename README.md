@@ -54,15 +54,15 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Internal DMEN (RAM, for data) and IMEM (RAM or ROM, for code), configurable sizes
 - One external interrupt line
 - Customizable processor hardware configuration
-- Optional multiplier/divider unit
-- Optional high-precision timer (TIMER)
-- Optional USART interface; UART and SPI in parallel (USART)
-- Optional general purpose parallel IO port (GPIO), 16 inputs, 16 outputs, with pin-change interrupt
-- Optional 32-bit Wishbone bus interface adapter (WB32)
-- Optional watchdog timer (WDT)
-- Optional cyclic redundancy check unit (CRC16/32)
-- Optional custom functions unit (CFU) for user-defined processor extensions
-- Optional internal bootloader (2kB ROM) with serial user console and automatic boot from external EEPROM
+- __Optional__ multiplier/divider unit (MULDIV)
+- __Optional__ high-precision timer (TIMER)
+- __Optional__ USART interface; UART and SPI in parallel (USART)
+- __Optional__ general purpose parallel IO port (GPIO), 16 inputs, 16 outputs, with pin-change interrupt
+- __Optional__ 32-bit Wishbone bus interface adapter (WB32)
+- __Optional__ watchdog timer (WDT)
+- __Optional__ cyclic redundancy check unit (CRC16/32)
+- __Optional__ custom functions unit (CFU) for user-defined processor extensions
+- __Optional__ internal bootloader (2kB ROM) with serial user console and automatic boot from external EEPROM
 
 
 ## Differences to TI's Original MSP430(TM) Processors
@@ -83,15 +83,15 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 Mapping results generated for HW version 0x0154. 
 
-| __Xilinx Virtex-6__                 | LUTs | FFs | BRAMs | f_max   |
-|-------------------------------------|:----:|-----|-------|---------|
-| Full (default) configuration:       | TBA  | TBA | TBA   | TBA MHz |
-| Minimal configuration (CPU + GPIO): | TBA  | TBA | TBA   | TBA MHz |
+| __Xilinx Virtex-6__                 | LUTs | FFs | BRAMs | DSPs | f_max   |
+|-------------------------------------|:----:|-----|-------|------|---------|
+| Full (default) configuration:       | 1127 | 819 | 4     | 0    | 172 MHz |
+| Minimal configuration (CPU + GPIO): | 485  | 250 | 3     | 0    | 198 MHz |
 
-| __Intel/Altera Cyclone IV__         | LUTs | FFs | Memory bits | f_max   |
-|-------------------------------------|:----:|-----|-------------|---------|
-| Full (default) configuration:       | 1512 | 813 | 65792       | 115 MHz |
-| Minimal configuration (CPU + GPIO): | 645  | 248 | 49408       | 116 MHz |
+| __Intel/Altera Cyclone IV__         | LUTs | FFs | Memory bits | DSPs | f_max   |
+|-------------------------------------|:----:|-----|-------------|------|---------|
+| Full (default) configuration:       | 1512 | 813 | 65792       | 0    | 115 MHz |
+| Minimal configuration (CPU + GPIO): | 645  | 248 | 49408       | 0    | 116 MHz |
 
 
 ## Let's Get It Started!
