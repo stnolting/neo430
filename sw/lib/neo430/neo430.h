@@ -83,7 +83,7 @@
 #define MULDIV_R32bit  (*(REG32 (&MULDIV_RESX))) // r/-: read result as 32-bit data word
 
 
-/* --- Wishbone Bus Adapter - WB32 --- */
+/* --- Wishbone Bus Adapter (WB32) --- */
 #define WB32_CT  (*(REG16 0xFF90)) // r/w: control register
 #define WB32_LRA (*(REG16 0xFF92)) // -/w: low address for read transfer
 #define WB32_HRA (*(REG16 0xFF94)) // -/w: high address for read transfer (+trigger)
@@ -107,7 +107,7 @@
 #define WB32_CT_PENDING 15 // r/-: pending transfer
 
 
-/* --- Universal Serial Transceiver - USART/USI --- */
+/* --- Universal Serial Transceiver (USART/USI) --- */
 #define USI_CT      (*(REG16 0xFFA0)) // r/w: control register
 #define USI_SPIRTX  (*(REG16 0xFFA2)) // r/w: spi receive/transmit register
 #define USI_UARTRTX (*(REG16 0xFFA4)) // r/w: uart receive/transmit register
@@ -156,7 +156,7 @@
 #define USI_SPI_PRSC_4096 7 // CLK/4096
 
 
-/* --- Genearl Purpose Inputs/Outputs - GPIO --- */
+/* --- General Purpose Inputs/Outputs (GPIO) --- */
 #define GPIO_CT      (*(REG16 0xFFA8)) // -/w: control register
 #define GPIO_IN      (*(REG16 0xFFAA)) // r/-: parallel input
 #define GPIO_OUT     (*(REG16 0xFFAC)) // r/w: parallel output
@@ -172,7 +172,7 @@
 //  1: interrupts enabled
 
 
-/* --- High-Precision Timer - TIMER --- */
+/* --- High-Precision Timer (TIMER) --- */
 #define TMR_CT    (*(REG16 0xFFB0)) // r/w: control register
 #define TMR_CNT   (*(REG16 0xFFB2)) // r/w: counter register
 #define TMR_THRES (*(REG16 0xFFB4)) // r/w: threshold register
@@ -197,7 +197,7 @@
 #define TMR_PRSC_4096 7 // CLK/4096
 
 
-/* --- Watchdog Timer - WTD --- */
+/* --- Watchdog Timer (WTD) --- */
 #define WDT_CT (*(REG16 0xFFB8)) // r/w: Watchdog control register
 
 // Watchdog control register
@@ -219,7 +219,7 @@
 #define WDT_PRSC_4096 7 // CLK/4096
 
 
-/* --- Cyclic Redundancy Check - CRC --- */
+/* --- Cyclic Redundancy Check (CRC16/32) --- */
 #define CRC_POLY_LO (*(REG16 0xFFC0)) // -/w: low part of polynomial
 #define CRC_POLY_HI (*(REG16 0xFFC2)) // -/w: high part of polynomial
 #define CRC_CRC16IN (*(REG16 0xFFC4)) // -/w: input for CRC16
@@ -233,7 +233,7 @@
 #define CRC_R32bit    (*(REG32 (&CRC_RESX)))    // r/w: crc shift register as 32-bit data word
 
 
-/* --- Custom Functions Unit - CFU --- */
+/* --- Custom Functions Unit (CFU) --- */
 #define CFU_REG0 (*(REG16 0xFFD0)) // r/w: user defined...
 #define CFU_REG1 (*(REG16 0xFFD2)) // r/w: user defined...
 #define CFU_REG2 (*(REG16 0xFFD4)) // r/w: user defined...
@@ -255,7 +255,7 @@
 //#define ? (*(REG16 0xFFEE))
 
 
-/* --- System Configuration - SYSCONFIG --- */
+/* --- System Configuration (SYSCONFIG) --- */
 #define CPUID0 (*(REG16 0xFFF0)) // r/-: HW version
 #define CPUID1 (*(REG16 0xFFF2)) // r/-: system configuration
 #define CPUID2 (*(REG16 0xFFF4)) // r/-: CPU identifier

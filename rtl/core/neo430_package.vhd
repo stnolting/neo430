@@ -123,7 +123,7 @@ package neo430_package is
   constant wdt_base_c : std_ulogic_vector(15 downto 0) := x"FFB8";
   constant wdt_size_c : natural := 2; -- bytes
 
-  constant WDT_ctrl_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wdt_base_c) + x"0000");
+  constant wdt_ctrl_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wdt_base_c) + x"0000");
 
   -- IO: Cyclic redundancy check (CRC) --
   constant crc_base_c : std_ulogic_vector(15 downto 0) := x"FFC0";
@@ -323,15 +323,15 @@ package neo430_package is
     );
     port (
       -- global control --
-      clk_i      : in  std_ulogic; -- global clock, rising edge
-      rst_i      : in  std_ulogic; -- global reset, low-active, async
+      clk_i     : in  std_ulogic; -- global clock, rising edge
+      rst_i     : in  std_ulogic; -- global reset, low-active, async
       -- memory interface --
-      instr_i    : in  std_ulogic_vector(15 downto 0); -- instruction word from memory
+      instr_i   : in  std_ulogic_vector(15 downto 0); -- instruction word from memory
       -- control --
-      sreg_i     : in  std_ulogic_vector(15 downto 0); -- current status register
-      ctrl_o     : out std_ulogic_vector(ctrl_width_c-1 downto 0); -- control signals
-      irq_vec_o  : out std_ulogic_vector(01 downto 0); -- irq channel address
-      imm_o      : out std_ulogic_vector(15 downto 0); -- branch offset
+      sreg_i    : in  std_ulogic_vector(15 downto 0); -- current status register
+      ctrl_o    : out std_ulogic_vector(ctrl_width_c-1 downto 0); -- control signals
+      irq_vec_o : out std_ulogic_vector(01 downto 0); -- irq channel address
+      imm_o     : out std_ulogic_vector(15 downto 0); -- branch offset
       -- irq lines --
       irq_i     : in  std_ulogic_vector(03 downto 0); -- IRQ lines
       irq_ack_o : out std_ulogic_vector(03 downto 0)  -- IRQ acknowledge
@@ -346,17 +346,17 @@ package neo430_package is
     );
     port (
       -- global control --
-      clk_i      : in  std_ulogic; -- global clock, rising edge
-      rst_i      : in  std_ulogic; -- global reset, low-active, async
+      clk_i  : in  std_ulogic; -- global clock, rising edge
+      rst_i  : in  std_ulogic; -- global reset, low-active, async
       -- data input --
-      alu_i      : in  std_ulogic_vector(15 downto 0); -- data from alu
-      addr_i     : in  std_ulogic_vector(15 downto 0); -- data from addr unit
-      flag_i     : in  std_ulogic_vector(03 downto 0); -- new ALU flags
+      alu_i  : in  std_ulogic_vector(15 downto 0); -- data from alu
+      addr_i : in  std_ulogic_vector(15 downto 0); -- data from addr unit
+      flag_i : in  std_ulogic_vector(03 downto 0); -- new ALU flags
       -- control --
-      ctrl_i     : in  std_ulogic_vector(ctrl_width_c-1 downto 0);
+      ctrl_i : in  std_ulogic_vector(ctrl_width_c-1 downto 0);
       -- data output --
-      data_o     : out std_ulogic_vector(15 downto 0); -- read data
-      sreg_o     : out std_ulogic_vector(15 downto 0)  -- current SR
+      data_o : out std_ulogic_vector(15 downto 0); -- read data
+      sreg_o : out std_ulogic_vector(15 downto 0)  -- current SR
     );
   end component;
 
@@ -368,16 +368,16 @@ package neo430_package is
     );
     port (
       -- global control --
-      clk_i      : in  std_ulogic; -- global clock, rising edge
+      clk_i  : in  std_ulogic; -- global clock, rising edge
       -- operands --
-      reg_i      : in  std_ulogic_vector(15 downto 0); -- data from reg file
-      mem_i      : in  std_ulogic_vector(15 downto 0); -- data from memory
-      sreg_i     : in  std_ulogic_vector(15 downto 0); -- current SR
+      reg_i  : in  std_ulogic_vector(15 downto 0); -- data from reg file
+      mem_i  : in  std_ulogic_vector(15 downto 0); -- data from memory
+      sreg_i : in  std_ulogic_vector(15 downto 0); -- current SR
       -- control --
-      ctrl_i     : in  std_ulogic_vector(ctrl_width_c-1 downto 0);
+      ctrl_i : in  std_ulogic_vector(ctrl_width_c-1 downto 0);
       -- results --
-      data_o     : out std_ulogic_vector(15 downto 0); -- result
-      flag_o     : out std_ulogic_vector(03 downto 0)  -- new ALU flags
+      data_o : out std_ulogic_vector(15 downto 0); -- result
+      flag_o : out std_ulogic_vector(03 downto 0)  -- new ALU flags
     );
   end component;
 
@@ -489,21 +489,21 @@ package neo430_package is
   component neo430_wb_interface
     port (
       -- host access --
-      clk_i       : in  std_ulogic; -- global clock line
-      rden_i      : in  std_ulogic; -- read enable
-      wren_i      : in  std_ulogic_vector(01 downto 0); -- write enable
-      addr_i      : in  std_ulogic_vector(15 downto 0); -- address
-      data_i      : in  std_ulogic_vector(15 downto 0); -- data in
-      data_o      : out std_ulogic_vector(15 downto 0); -- data out
+      clk_i    : in  std_ulogic; -- global clock line
+      rden_i   : in  std_ulogic; -- read enable
+      wren_i   : in  std_ulogic_vector(01 downto 0); -- write enable
+      addr_i   : in  std_ulogic_vector(15 downto 0); -- address
+      data_i   : in  std_ulogic_vector(15 downto 0); -- data in
+      data_o   : out std_ulogic_vector(15 downto 0); -- data out
       -- wishbone interface --
-      wb_adr_o    : out std_ulogic_vector(31 downto 0); -- address
-      wb_dat_i    : in  std_ulogic_vector(31 downto 0); -- read data
-      wb_dat_o    : out std_ulogic_vector(31 downto 0); -- write data
-      wb_we_o     : out std_ulogic; -- read/write
-      wb_sel_o    : out std_ulogic_vector(03 downto 0); -- byte enable
-      wb_stb_o    : out std_ulogic; -- strobe
-      wb_cyc_o    : out std_ulogic; -- valid cycle
-      wb_ack_i    : in  std_ulogic  -- transfer acknowledge
+      wb_adr_o : out std_ulogic_vector(31 downto 0); -- address
+      wb_dat_i : in  std_ulogic_vector(31 downto 0); -- read data
+      wb_dat_o : out std_ulogic_vector(31 downto 0); -- write data
+      wb_we_o  : out std_ulogic; -- read/write
+      wb_sel_o : out std_ulogic_vector(03 downto 0); -- byte enable
+      wb_stb_o : out std_ulogic; -- strobe
+      wb_cyc_o : out std_ulogic; -- valid cycle
+      wb_ack_i : in  std_ulogic  -- transfer acknowledge
     );
   end component;
 
@@ -538,17 +538,17 @@ package neo430_package is
   component neo430_gpio
     port (
       -- host access --
-      clk_i       : in  std_ulogic; -- global clock line
-      rden_i      : in  std_ulogic; -- read enable
-      wren_i      : in  std_ulogic_vector(01 downto 0); -- write enable
-      addr_i      : in  std_ulogic_vector(15 downto 0); -- address
-      data_i      : in  std_ulogic_vector(15 downto 0); -- data in
-      data_o      : out std_ulogic_vector(15 downto 0); -- data out
+      clk_i  : in  std_ulogic; -- global clock line
+      rden_i : in  std_ulogic; -- read enable
+      wren_i : in  std_ulogic_vector(01 downto 0); -- write enable
+      addr_i : in  std_ulogic_vector(15 downto 0); -- address
+      data_i : in  std_ulogic_vector(15 downto 0); -- data in
+      data_o : out std_ulogic_vector(15 downto 0); -- data out
       -- parallel io --
-      gpio_o      : out std_ulogic_vector(15 downto 0);
-      gpio_i      : in  std_ulogic_vector(15 downto 0);
+      gpio_o : out std_ulogic_vector(15 downto 0);
+      gpio_i : in  std_ulogic_vector(15 downto 0);
       -- interrupt --
-      irq_o       : out std_ulogic
+      irq_o  : out std_ulogic
     );
   end component;
 
