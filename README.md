@@ -1,6 +1,6 @@
-# Introduction
+## Introduction
 
-Welcome to the NEO430 Processor project!
+Welcome to the __NEO430 Processor__ project!
 
 You need a small but still powerful, customizable and microcontroller-like
 processor system for your next FPGA design? Then the NEO430 is the perfect
@@ -54,15 +54,15 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Internal DMEN (RAM, for data) and IMEM (RAM or ROM, for code), configurable sizes
 - One external interrupt line
 - Customizable processor hardware configuration
-- __Optional__ multiplier/divider unit (MULDIV)
-- __Optional__ high-precision timer (TIMER)
-- __Optional__ USART interface; UART and SPI in parallel (USART)
-- __Optional__ general purpose parallel IO port (GPIO), 16 inputs, 16 outputs, with pin-change interrupt
-- __Optional__ 32-bit Wishbone bus interface adapter (WB32)
-- __Optional__ watchdog timer (WDT)
-- __Optional__ cyclic redundancy check unit (CRC16/32)
-- __Optional__ custom functions unit (CFU) for user-defined processor extensions
-- __Optional__ internal bootloader (2kB ROM) with serial user console and automatic boot from external EEPROM
+- Optional multiplier/divider unit (MULDIV)
+- Optional high-precision timer (TIMER)
+- Optional USART interface; UART and SPI in parallel (USART)
+- Optional general purpose parallel IO port (GPIO), 16 inputs, 16 outputs, with pin-change interrupt
+- Optional 32-bit Wishbone bus interface adapter (WB32) - including bridges to Avalon(TM) bus and AXI-Lite(TM)
+- Optional watchdog timer (WDT)
+- Optional cyclic redundancy check unit (CRC16/32)
+- Optional custom functions unit (CFU) for user-defined processor extensions
+- Optional internal bootloader (2kB ROM) with serial user console and automatic boot from external EEPROM
 
 
 ## Differences to TI's Original MSP430(TM) Processors
@@ -132,9 +132,12 @@ If you have any questions, bug reports, ideas or if you are facing problems with
 
 "MSP430" is a trademark of Texas Instruments Corporation.
 
-"Virtex" is a trademarks of Xilinx Inc.
+"Virtex", "ISE" and "Vivado" are trademarks of Xilinx Inc.
 
-"Cyclone" is a trademarks of Intel Corporation.
+"Cyclone", "Quartus" and "Avalon bus" are trademarks of Intel Corporation.
+
+"AXI" and "AXI-Lite" are trademarks of Arm Holdings plc.
+
 
 
 
