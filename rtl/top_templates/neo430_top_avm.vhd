@@ -1,5 +1,5 @@
 -- #################################################################################################
--- #  << NEO430 - Processor Top Entity with Avalon Master Interface >>                             #
+-- #  << NEO430 - Processor Top Entity with Avalon-Compatible Master Interface >>                  #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -69,7 +69,7 @@ entity neo430_top_avm is
     -- interrupts --
     irq_i           : in  std_logic; -- external interrupt request line
     irq_ack_o       : out std_logic; -- external interrupt request acknowledge
-    -- Avalon slave interface --
+    -- Avalon master interface --
     avm_address     : out std_logic_vector(31 downto 0);
     avm_readdata    : in  std_logic_vector(31 downto 0);
     avm_writedata   : out std_logic_vector(31 downto 0);
@@ -188,7 +188,7 @@ begin
   gpio_i_int     <= std_ulogic_vector(gpio_i);
   uart_rxd_i_int <= std_ulogic(uart_rxd_i);
   spi_miso_i_int <= std_ulogic(spi_miso_i);
-  irq_i_int      <= std_ulogic(irq_i_int);
+  irq_i_int      <= std_ulogic(irq_i);
 
   gpio_o         <= std_logic_vector(gpio_o_int);
   uart_txd_o     <= std_logic(uart_txd_o_int);
