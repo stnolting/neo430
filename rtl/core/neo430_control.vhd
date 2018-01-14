@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               28.12.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               14.01.2018  #
 -- #################################################################################################
 
 library ieee;
@@ -185,7 +185,7 @@ begin
         sam_nxt <= "00"; -- SRC address mode = REG
         ctrl_nxt(ctrl_alu_bw_c) <= '0'; -- word mode
         ctrl_nxt(ctrl_rf_ad_c)  <= '0'; -- DST address mode = REG
-        ctrl_nxt(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) <= alu_mov_c;
+        ctrl_nxt(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) <= alu_mov_c; -- keep this for all following states
         ctrl_nxt(ctrl_rf_adr3_c  downto ctrl_rf_adr0_c)  <= reg_pc_c; -- source/destination: PC
         ctrl_nxt(ctrl_adr_off1_c downto ctrl_adr_off0_c) <= "10"; -- add +2
         ctrl_nxt(ctrl_rf_in_sel_c) <= '1'; -- select addr feedback
@@ -547,48 +547,45 @@ begin
 
       when IRQ_0 => -- IRQ processing cycle 0: SP=SP-2, disable sleep mode
       -- ------------------------------------------------------------
-        ctrl_nxt(ctrl_rf_dsleep_c)   <= '1'; -- disable sleep mode
         ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_sp_c; -- source/destination: SP
         ctrl_nxt(ctrl_adr_mar_wr_c)  <= '1'; -- write to MAR
         ctrl_nxt(ctrl_adr_off1_c downto ctrl_adr_off0_c) <= "11"; -- add -2
         ctrl_nxt(ctrl_adr_mar_sel_c) <= '1'; -- use result from adder
         ctrl_nxt(ctrl_rf_in_sel_c)   <= '1'; -- select addr feedback
         ctrl_nxt(ctrl_rf_wb_en_c)    <= '1'; -- valid RF write back
+        ctrl_nxt(ctrl_rf_dsleep_c)   <= '1'; -- disable sleep mode
         state_nxt <= IRQ_1;
 
       when IRQ_1 => -- IRQ processing cycle 1: Buffer PC for memory write
       -- ------------------------------------------------------------
         ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_pc_c; -- source: PC
         ctrl_nxt(ctrl_alu_opa_wr_c) <= '1'; -- write PC to OpA
-        ctrl_nxt(ctrl_alu_opb_wr_c) <= '1'; -- write PC to OpB
         state_nxt <= IRQ_2;
 
       when IRQ_2 => -- IRQ processing cycle 2: Write PC (push), SP=SP-2
       -- ------------------------------------------------------------
-        ctrl_nxt(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) <= alu_mov_c;
-        ctrl_nxt(ctrl_mem_wr_c) <= '1'; -- write memory request (store PC)
+        ctrl_nxt(ctrl_mem_wr_c)      <= '1'; -- write memory request (store PC)
         ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_sp_c; -- source/destination: SP
-        ctrl_nxt(ctrl_adr_mar_wr_c) <= '1'; -- write to MAR
+        ctrl_nxt(ctrl_adr_mar_wr_c)  <= '1'; -- write to MAR
         ctrl_nxt(ctrl_adr_off1_c downto ctrl_adr_off0_c) <= "11"; -- add -2
         ctrl_nxt(ctrl_adr_mar_sel_c) <= '1'; -- use result from adder
         ctrl_nxt(ctrl_rf_in_sel_c)   <= '1'; -- select addr feedback
         ctrl_nxt(ctrl_rf_wb_en_c)    <= '1'; -- valid RF write back
         state_nxt <= IRQ_3;
 
-      when IRQ_3 => -- IRQ processing cycle 3: Buffer SR for memory write, clear SR, set IRQ vector address
+      when IRQ_3 => -- IRQ processing cycle 3: Buffer SR for memory write, set IRQ vector address, disable interrupt enable flag in SR
       -- ------------------------------------------------------------
         ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_sr_c; -- source: SR
-        ctrl_nxt(ctrl_alu_opa_wr_c) <= '1'; -- write to OpA
-        ctrl_nxt(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) <= alu_bic_c; -- output zero
-        ctrl_nxt(ctrl_rf_wb_en_c)    <= '1'; -- valid RF write back (clear SR)
+        ctrl_nxt(ctrl_alu_opa_wr_c)  <= '1'; -- write SR to OpA
         ctrl_nxt(ctrl_adr_bp_en_c)   <= '1'; -- directly output PC/IRQ vector
         ctrl_nxt(ctrl_adr_ivec_oe_c) <= '1'; -- output IRQ vector
         ctrl_nxt(ctrl_mem_rd_c)      <= '1'; -- Memory read (fast)
+        ctrl_nxt(ctrl_rf_dgie_c)     <= '1'; -- disable interrupt enable flag
+        irq_ack                      <= '1'; -- acknowledge IRQ
         state_nxt <= IRQ_4;
 
       when IRQ_4 => -- IRQ processing cycle 4: Write SR (push), get IRQ vector
       -- ------------------------------------------------------------
-        ctrl_nxt(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) <= alu_mov_c;
         ctrl_nxt(ctrl_mem_wr_c)     <= '1'; -- write memory request
         ctrl_nxt(ctrl_alu_in_sel_c) <= '1'; -- get data from memory
         ctrl_nxt(ctrl_alu_opa_wr_c) <= '1'; -- write to OpA
@@ -596,10 +593,8 @@ begin
 
       when IRQ_5 => -- IRQ processing cycle 5: Store IRQ vector to PC
       -- ------------------------------------------------------------
-        ctrl_nxt(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) <= alu_mov_c;
-        ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c)   <= reg_pc_c; -- destination: PC
+        ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_pc_c; -- destination: PC
         ctrl_nxt(ctrl_rf_wb_en_c) <= '1'; -- valid RF write back
-        irq_ack   <= '1'; -- acknowledge IRQ
         state_nxt <= IFETCH_0; -- done!
 
 

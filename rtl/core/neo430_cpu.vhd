@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               13.08.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               14.01.2018  #
 -- #################################################################################################
 
 library ieee;
@@ -58,6 +58,7 @@ architecture neo430_cpu_rtl of neo430_cpu is
   -- local signals --
   signal mem_addr  : std_ulogic_vector(15 downto 0); -- memory address
   signal mdi       : std_ulogic_vector(15 downto 0); -- memory data_in
+  signal mdo       : std_ulogic_vector(15 downto 0); -- memory data_out
   signal ctrl_bus  : std_ulogic_vector(ctrl_width_c-1 downto 0); -- main control spine
   signal sreg      : std_ulogic_vector(15 downto 0); -- current status register
   signal alu_flags : std_ulogic_vector(03 downto 0); -- new ALU flags
@@ -177,8 +178,9 @@ begin
   mem_imwe_o <= sreg(sreg_r_c);
 
   -- data in/out swap --
-  mdi        <= mem_data_i when (dio_swap = '0') else mem_data_i(7 downto 0) & mem_data_i(15 downto 8);
-  mem_data_o <= alu_res    when (dio_swap = '0') else alu_res(7 downto 0) & alu_res(15 downto 8);
+  mdi <= mem_data_i when (dio_swap = '0') else mem_data_i(7 downto 0) & mem_data_i(15 downto 8);
+  mdo <= alu_res    when (dio_swap = '0') else alu_res(7 downto 0) & alu_res(15 downto 8);
+  mem_data_o <= mdo; -- when (ctrl_bus(ctrl_mem_wr_c) = '1') else (others => '0'); -- reduce switching activity
 
   -- address output --
   mem_addr_o <= mem_addr(15 downto 1) & '0'; -- word-aligned addresses only

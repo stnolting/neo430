@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               12.01.2018  #
+-- #  Stephan Nolting, Hannover, Germany                                               14.01.2018  #
 -- #################################################################################################
 
 library ieee;
@@ -30,7 +30,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0155"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0160"; -- no touchy!
 
   -- Internal Functions ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -207,29 +207,30 @@ package neo430_package is
   constant ctrl_rf_fup_c      : natural :=  8; -- update ALU flags
   constant ctrl_rf_wb_en_c    : natural :=  9; -- enable RF write back
   constant ctrl_rf_dsleep_c   : natural := 10; -- disable sleep mode
-  constant ctrl_rf_boot_c     : natural := 11; -- inject PC boot address
+  constant ctrl_rf_dgie_c     : natural := 11; -- disable global interrupt enable
+  constant ctrl_rf_boot_c     : natural := 12; -- inject PC boot address
   -- alu --
-  constant ctrl_alu_in_sel_c  : natural := 12; -- ALU OP input select
-  constant ctrl_alu_opa_wr_c  : natural := 13; -- write ALU operand A
-  constant ctrl_alu_opb_wr_c  : natural := 14; -- write ALU operand B
-  constant ctrl_alu_cmd0_c    : natural := 15; -- ALU command bit 0
-  constant ctrl_alu_cmd1_c    : natural := 16; -- ALU command bit 1
-  constant ctrl_alu_cmd2_c    : natural := 17; -- ALU command bit 2
-  constant ctrl_alu_cmd3_c    : natural := 18; -- ALU command bit 3
-  constant ctrl_alu_bw_c      : natural := 19; -- byte(1)/word(0) operation
+  constant ctrl_alu_in_sel_c  : natural := 13; -- ALU OP input select
+  constant ctrl_alu_opa_wr_c  : natural := 14; -- write ALU operand A
+  constant ctrl_alu_opb_wr_c  : natural := 15; -- write ALU operand B
+  constant ctrl_alu_cmd0_c    : natural := 16; -- ALU command bit 0
+  constant ctrl_alu_cmd1_c    : natural := 17; -- ALU command bit 1
+  constant ctrl_alu_cmd2_c    : natural := 18; -- ALU command bit 2
+  constant ctrl_alu_cmd3_c    : natural := 19; -- ALU command bit 3
+  constant ctrl_alu_bw_c      : natural := 20; -- byte(1)/word(0) operation
   -- address generator --
-  constant ctrl_adr_off0_c    : natural := 20; -- address offset selection bit 0
-  constant ctrl_adr_off1_c    : natural := 21; -- address offset selection bit 1
-  constant ctrl_adr_imm_en_c  : natural := 22; -- select immediate branch input
-  constant ctrl_adr_mar_sel_c : natural := 23; -- select input for MAR
-  constant ctrl_adr_bp_en_c   : natural := 24; -- mem addr output select, 0:MAR, 1:bypass
-  constant ctrl_adr_ivec_oe_c : natural := 25; -- output IRQ if 1, else output PC
-  constant ctrl_adr_mar_wr_c  : natural := 26; -- write MAR
+  constant ctrl_adr_off0_c    : natural := 21; -- address offset selection bit 0
+  constant ctrl_adr_off1_c    : natural := 22; -- address offset selection bit 1
+  constant ctrl_adr_imm_en_c  : natural := 23; -- select immediate branch input
+  constant ctrl_adr_mar_sel_c : natural := 24; -- select input for MAR
+  constant ctrl_adr_bp_en_c   : natural := 25; -- mem addr output select, 0:MAR, 1:bypass
+  constant ctrl_adr_ivec_oe_c : natural := 26; -- output IRQ if 1, else output PC
+  constant ctrl_adr_mar_wr_c  : natural := 27; -- write MAR
   -- memory interface --
-  constant ctrl_mem_wr_c      : natural := 27; -- write to memory
-  constant ctrl_mem_rd_c      : natural := 28; -- read from memory
+  constant ctrl_mem_wr_c      : natural := 28; -- write to memory
+  constant ctrl_mem_rd_c      : natural := 29; -- read from memory
   -- bus size --
-  constant ctrl_width_c       : natural := 29; -- control bus size
+  constant ctrl_width_c       : natural := 30; -- control bus size
 
   -- Condition Codes ------------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------

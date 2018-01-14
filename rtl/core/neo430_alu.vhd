@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               27.12.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               14.01.2018  #
 -- #################################################################################################
 
 library ieee;
@@ -299,10 +299,6 @@ begin
     end case;
   end process alu_core;
 
-  -- output and high-byte mask --
-  data_o(07 downto 0) <= alu_res(07 downto 0);
-  data_o(15 downto 8) <= alu_res(15 downto 8) when (ctrl_i(ctrl_alu_bw_c) = '0') else x"00";
-
 
   -- Additional Flag Logic ----------------------------------------------------
   -- -----------------------------------------------------------------------------
@@ -313,6 +309,12 @@ begin
 
   -- negative flag --
   negative <= alu_res(7) when (ctrl_i(ctrl_alu_bw_c) = '1') else alu_res(15);
+
+
+  -- Output Mask --------------------------------------------------------------
+  -- -----------------------------------------------------------------------------
+  data_o(07 downto 0) <= alu_res(07 downto 0);
+  data_o(15 downto 8) <= alu_res(15 downto 8) when (ctrl_i(ctrl_alu_bw_c) = '0') else x"00";
 
 
 end neo430_alu_rtl;

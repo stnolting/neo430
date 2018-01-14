@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               11.11.2017  #
+-- #  Stephan Nolting, Hannover, Germany                                               14.01.2018  #
 -- #################################################################################################
 
 library ieee;
@@ -99,10 +99,16 @@ begin
         sreg(sreg_r_c) <= in_data(sreg_r_c);
       else -- automatic update
         sreg(sreg_q_c) <= '0'; -- auto-clear
-        if (ctrl_i(ctrl_rf_dsleep_c) = '1') then -- disable sleep mode
+        -- disable sleep mode --
+        if (ctrl_i(ctrl_rf_dsleep_c) = '1') then
           sreg(sreg_s_c) <= '0';
         end if;
-        if (ctrl_i(ctrl_rf_fup_c) = '1') then -- update ALU flags
+        -- disable interrupt enable --
+        if (ctrl_i(ctrl_rf_dgie_c) = '1') then
+          sreg(sreg_i_c) <= '0';
+        end if;
+         -- update ALU flags --
+        if (ctrl_i(ctrl_rf_fup_c) = '1') then
           sreg(sreg_c_c) <= flag_i(flag_c_c);
           sreg(sreg_z_c) <= flag_i(flag_z_c);
           sreg(sreg_n_c) <= flag_i(flag_n_c);
@@ -115,7 +121,7 @@ begin
   -- status register output --
   sreg_o <= sreg;
 
-  -- gp regs (including PC, dummy SR and dummy CG) --
+  -- general purpose register (including PC, dummy SR and dummy CG) --
   rf_write: process(clk_i)
   begin
     if rising_edge(clk_i) then
@@ -147,7 +153,7 @@ begin
         when others => data_o <= x"0000";
       end case;
     else
-      -- sp / gp register file read access --
+      -- gp register file read access --
       data_o <= reg_file(to_integer(unsigned(ctrl_i(ctrl_rf_adr3_c downto ctrl_rf_adr0_c))));
     end if;
   end process rf_read;

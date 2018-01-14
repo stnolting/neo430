@@ -22,7 +22,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               12.01.2018  #
+// #  Stephan Nolting, Hannover, Germany                                               14.01.2018  #
 // #################################################################################################
 
 
@@ -35,8 +35,6 @@
 
 // Function prototypes
 void __attribute__((__interrupt__)) gpio_irq_handler(void);
-void __attribute__((__interrupt__)) timer_irq_handler(void);
-void delay(uint16_t t);
 
 
 /* ------------------------------------------------------------
@@ -66,32 +64,17 @@ int main(void) {
 
   // set address of IRQ handler
   IRQVEC_GPIO  = (uint16_t)(&gpio_irq_handler);
-  IRQVEC_TIMER = (uint16_t)(&timer_irq_handler);
 
   // configure GPIO pin-change interrupt
   GPIO_IRQMASK = 0xFFFF; // use all input pins as trigger
 
-  // set timer period:
-  // LED cnt update frequency = 5Hz
-  // f_tick := 5Hz @ PRSC := 4096
-  // f_tick = 5Hz = f_clock / (PRSC * (TMR_THRES + 1))
-  // TMR_THRES = f_clock / (f_tick * PRSC) - 1
-  //           = f_clock / (5 * 4096) - 1
-  uint32_t f_clock = CLOCKSPEED_32bit;
-  TMR_THRES = (uint16_t)((f_clock / (uint32_t)(20480)) - 1);
-
-  // configure timer operation
-  TMR_CT = (1<<TMR_CT_EN) |   // enable timer
-           (1<<TMR_CT_ARST) | // auto reset on threshold match
-           (1<<TMR_CT_IRQ) |  // enable IRQ
-           (7<<TMR_CT_PRSC0); // 7 -> PRSC = 4096
-
   // enable global IRQs
   eint();
 
-  // do nothing
+  // go to sleep mode, increment counter whenever the CPU wakes up
   while (1) {
     sleep();
+    GPIO_OUT = (GPIO_OUT + 1) & 0x00FF; // increment LED counter
   }
 
   return 0;
@@ -109,15 +92,5 @@ void __attribute__((__interrupt__)) gpio_irq_handler(void) {
   uart_br_print("GPIO pin change interrupt! Current input state: 0x");
   uart_print_hex_word(GPIO_IN);
   uart_br_print("\n");
-}
-
-
-/* ------------------------------------------------------------
- * INFO Timer interrupt handler
- * ------------------------------------------------------------ */
-void __attribute__((__interrupt__)) timer_irq_handler(void) {
-
-  // increment LED counter
-  GPIO_OUT = (GPIO_OUT + 1) & 0x00FF;
 }
 
