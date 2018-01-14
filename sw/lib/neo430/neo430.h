@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               10.01.2018  #
+// #  Stephan Nolting, Hannover, Germany                                               12.01.2018  #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -157,19 +157,10 @@
 
 
 /* --- General Purpose Inputs/Outputs (GPIO) --- */
-#define GPIO_CT      (*(REG16 0xFFA8)) // -/w: control register
-#define GPIO_IN      (*(REG16 0xFFAA)) // r/-: parallel input
-#define GPIO_OUT     (*(REG16 0xFFAC)) // r/w: parallel output
-#define GPIO_IRQMASK (*(REG16 0xFFAE)) // -/w: irq mask register
-
-// bits 1:0 of GPIO CTRL reg: Trigger
-//  00: low level
-//  01: high level
-//  10: falling edge
-//  11: rising edge
-// bit 2 of GPIO CTRL reg: General interrupt enable flag
-//  0: interrupts disabled
-//  1: interrupts enabled
+//#define reserved   (*(REG16 0xFFA8)) // reserved
+#define GPIO_IRQMASK (*(REG16 0xFFAA)) // -/w: irq mask register
+#define GPIO_IN      (*(REG16 0xFFAC)) // r/-: parallel input
+#define GPIO_OUT     (*(REG16 0xFFAE)) // r/w: parallel output
 
 
 /* --- High-Precision Timer (TIMER) --- */
@@ -186,7 +177,7 @@
 #define TMR_CT_PRSC1 4 // r/w: prescaler select bit 1
 #define TMR_CT_PRSC2 5 // r/w: prescaler select bit 2
 
-// timer clock prescaler select:
+// Timer clock prescaler select:
 #define TMR_PRSC_2    0 // CLK/2
 #define TMR_PRSC_4    1 // CLK/4
 #define TMR_PRSC_8    2 // CLK/8
@@ -208,7 +199,7 @@
 #define WDT_ENABLE   3 // r/w: WDT enable
 #define WDT_RCAUSE   4 // r/-: reset cause (0: external, 1: watchdog timeout)
 
-// watchdog clock prescaler select:
+// Watchdog clock prescaler select:
 #define WDT_PRSC_2    0 // CLK/2
 #define WDT_PRSC_4    1 // CLK/4
 #define WDT_PRSC_8    2 // CLK/8

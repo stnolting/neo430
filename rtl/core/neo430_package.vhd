@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               10.01.2018  #
+-- #  Stephan Nolting, Hannover, Germany                                               12.01.2018  #
 -- #################################################################################################
 
 library ieee;
@@ -30,7 +30,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0154"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0155"; -- no touchy!
 
   -- Internal Functions ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -54,7 +54,7 @@ package neo430_package is
   constant imem_base_c : std_ulogic_vector(15 downto 0) := x"0000"; -- base address, fixed!
 
   -- Main Memory: DMEM(RAM) --
-  constant dmem_base_c : std_ulogic_vector(15 downto 0) := x"8000"; -- base address, fixed for now!
+  constant dmem_base_c : std_ulogic_vector(15 downto 0) := x"8000"; -- base address, fixed!
 
   -- Boot ROM --
   constant boot_base_c : std_ulogic_vector(15 downto 0) := x"F000"; -- bootloader base address, fixed!
@@ -105,10 +105,10 @@ package neo430_package is
   constant gpio_base_c : std_ulogic_vector(15 downto 0) := x"FFA8";
   constant gpio_size_c : natural := 8; -- bytes
 
-  constant gpio_ctrl_addr_c    : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0000");
-  constant gpio_in_addr_c      : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0002");
-  constant gpio_out_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0004");
-  constant gpio_irqmask_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0006");
+--constant reserved            : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0000");
+  constant gpio_irqmask_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0002");
+  constant gpio_in_addr_c      : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0004");
+  constant gpio_out_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0006");
 
   -- IO: High-Precision Timer (TIMER) --
   constant timer_base_c : std_ulogic_vector(15 downto 0) := x"FFB0";

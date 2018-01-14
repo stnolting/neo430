@@ -29,7 +29,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               28.12.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               12.01.2018  #
 // #################################################################################################
 
 // Libraries
@@ -109,8 +109,8 @@ int  main(void) {
   IRQVEC_TIMER = (uint16_t)(&timer_irq_handler); // timer match
 
   // init GPIO
+  GPIO_IRQMASK = 0; // no pin change interrupt please, thanks
   gpio_port_set(1<<STATUS_LED); // activate status LED, clear all others
-//GPIO_CT = 0; // disable all pin change IRQs
 
   // set Baud rate & init USART control register:
   // enable USART, no IRQs, SPI clock mode 0, 1/1024 SPI speed, disable all 6 SPI CS lines (set high)
@@ -137,7 +137,7 @@ int  main(void) {
   // ****************************************************************
   // Show bootloader intro and system information
   // ****************************************************************
-  uart_br_print("\n\nNEO430 Bootloader V20171228 by Stephan Nolting\n\n"
+  uart_br_print("\n\nNEO430 Bootloader V20180112 by Stephan Nolting\n\n"
                 "HWV: 0x");
   uart_print_hex_word(HW_VERSION);
   uart_br_print("\nCLK: 0x");
@@ -220,7 +220,7 @@ void start_app(void) {
 
   // valid image in IMEM?
   if (VALID_IMAGE == 0) {
-    uart_br_print("Potentially invalid image. Boot anyway (y/n)? ");
+    uart_br_print("Image maybe invalid. Boot anyway (y/n)? ");
     if (uart_getc() != 'y')
       return;
   }

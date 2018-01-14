@@ -22,7 +22,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               06.10.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               12.01.2018  #
 // #################################################################################################
 
 
@@ -49,7 +49,7 @@ int main(void) {
   USI_CT = (1<<USI_CT_EN);
 
   // intro text
-  uart_br_print("\nGPIO interrupt (rising edge) demo program\n\n");
+  uart_br_print("\nGPIO pin change interrupt demo program\n\n");
 
   // check if GPIO & TIMER units present
   if (!(SYS_FEATURES & (1<<SYS_GPIO_EN))) {
@@ -68,8 +68,7 @@ int main(void) {
   IRQVEC_GPIO  = (uint16_t)(&gpio_irq_handler);
   IRQVEC_TIMER = (uint16_t)(&timer_irq_handler);
 
-  // configure GPIO module
-  GPIO_CT      = (1<<2) | (3<<0); // enable IRQs and trigger on rising edge
+  // configure GPIO pin-change interrupt
   GPIO_IRQMASK = 0xFFFF; // use all input pins as trigger
 
   // set timer period:
@@ -104,10 +103,10 @@ int main(void) {
  * ------------------------------------------------------------ */
 void __attribute__((__interrupt__)) gpio_irq_handler(void) {
 
-  // we cannot ensure to actually get the specific state of
-  // the input register, which caused the IRQ
+  // we cannot 100% ensure to actually get the specific state of
+  // the input, which caused the IRQ
 
-  uart_br_print("GPIO pin.change interrupt! Current input state: 0x");
+  uart_br_print("GPIO pin change interrupt! Current input state: 0x");
   uart_print_hex_word(GPIO_IN);
   uart_br_print("\n");
 }
