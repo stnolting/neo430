@@ -1,5 +1,5 @@
 -- #################################################################################################
--- #  << NEO430 - Processor Top Entity with AXI-Lite-Compatible Master Interface >>                #
+-- #  << NEO430 - Processor Top Entity with AXI4-Lite-Compatible Master Interface >>               #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               14.02.2018  #
+-- #  Stephan Nolting, Hannover, Germany                                               14.01.2018  #
 -- #################################################################################################
 
 library ieee;
@@ -29,7 +29,7 @@ use ieee.numeric_std.all;
 library neo430;
 use neo430.neo430_package.all;
 
-entity neo430_top_axi_lite is
+entity neo430_top_axi4lite is
   generic (
     -- general configuration --
     CLOCK_SPEED : natural := 100000000; -- main clock in Hz
@@ -96,9 +96,9 @@ entity neo430_top_axi_lite is
     m_axi_bvalid  : in  std_logic;
     m_axi_bready  : out std_logic
   );
-end neo430_top_axi_lite;
+end neo430_top_axi4lite;
 
-architecture neo430_top_axi_lite_rtl of neo430_top_axi_lite is
+architecture neo430_top_axi4lite_rtl of neo430_top4axi_lite is
 
   -- internal wishbone bus --
   type wb_bus_t is record
@@ -208,7 +208,7 @@ begin
   irq_ack_o      <= std_logic(irq_ack_o_int);
 
 
-  -- Wishbone-to-AXI-compatible Bridge ----------------------------------------
+  -- Wishbone-to-AXI4-Lite-compatible Bridge ----------------------------------
   -- -----------------------------------------------------------------------------
 
   -- transfer type --
@@ -249,8 +249,8 @@ begin
   -- Acknowledge Wishbone transfer --
   wb_core.ack <= wb_core.cyc and -- valid transfer
                  axi_resp_ok and -- transfer successful
-                ((pending_rd and std_ulogic(m_axi_rvalid)) or -- read transfer
-                 (pending_wr and (std_ulogic(m_axi_awready) or std_ulogic(m_axi_wready)))); -- write transfer
+                 ((pending_rd and std_ulogic(m_axi_rvalid)) or -- read transfer
+                  (pending_wr and std_ulogic(m_axi_awready) and std_ulogic(m_axi_wready))); -- write transfer
 
   -- Clock and Reset --
   m_axi_aclk    <= clk_i;
@@ -273,4 +273,4 @@ begin
   m_axi_wvalid  <= std_logic(pending_wr);
 
 
-end neo430_top_axi_lite_rtl;
+end neo430_top_axi_lite4rtl;
