@@ -41,7 +41,7 @@ Top Entity with AXI-Lite Memory Mapped Master:
 ---------------------------------------------------------------
  *still experimental*
 
- The *neo430_top_axi_lite.vhd* top entity converts the processor's Wishbone bus to an AXI-lite master
+ The *neo430_top_axi4lite.vhd* top entity converts the processor's Wishbone bus to an AXI-lite master
  interface. From a software point of view, the AXI-lite interface is used by calling the default Wishbone
  transfer functions.
 
