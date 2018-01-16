@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               12.01.2018  #
+// #  Stephan Nolting, Hannover, Germany                                               16.01.2018  #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -130,7 +130,7 @@
 // USART control register
 #define USI_CT_EN         0 // r/w: USART enable
 #define USI_CT_UARTRXIRQ  1 // r/w: uart rx done interrupt enable
-#define USI_CT_RXAVAIL    2 // r/-: uart receiver data available
+#define USI_CT_UARTTXIRQ  2 // r/w: uart tx done interrupt enable
 #define USI_CT_UARTTXBSY  3 // r/-: uart transmitter is busy
 #define USI_CT_SPICPHA    4 // r/w: spi clock phase (idle polarity = '0')
 #define USI_CT_SPIIRQ     5 // r/w: spi transmission done interrupt enable

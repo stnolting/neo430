@@ -3,6 +3,9 @@
 -- # ********************************************************************************************* #
 -- #  This is the top entity of the neo430 processor. Instantiate this unit in your own project    #
 -- #  and define all the configuration generics according to your requirements.                    #
+-- #  Alternatively, you can use one of the other top entities provided in the rtl\top_templates   #
+-- #  folder. These alternative top entities provides advanced bus interfaces like Avalon or AXI4- #
+-- #  Lite. Also, there is a top entity providing only resolved signal types (i.e., std_logic).    #
 -- # ********************************************************************************************* #
 -- #  The NEO430 processor:                                                                        #
 -- #  - Reset and clock generators                                                                 #
@@ -19,7 +22,7 @@
 -- #  - Optional Watchdog Timer                                                                    #
 -- #  - Optional CRC Module                                                                        #
 -- #  - Optional Custom Functions Unit                                                             #
--- #  - Sysconfig (infomem for various system information & interrupt vector configuration)        #
+-- #  - Sysconfig (infomem for various system information)                                         #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -39,7 +42,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 06.01.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 16.01.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -242,7 +245,7 @@ begin
 
   -- interrupt priority assignment --
   irq(0) <= timer_irq;    -- timer match (highest priority)
-  irq(1) <= usart_irq;    -- UART Rx available | UART Tx done | SPI RTX done
+  irq(1) <= usart_irq;    -- UART Rx available [OR] UART Tx done [OR] SPI RTX done
   irq(2) <= gpio_irq;     -- GPIO input pin change
   irq(3) <= xirq_sync(1); -- external interrupt request (lowest priority)
 
