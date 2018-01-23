@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               19.08.2017  #
+-- # Stephan Nolting, Hannover, Germany                                                 20.01.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -52,12 +52,14 @@ architecture neo430_dmem_rtl of neo430_dmem is
   signal addr   : integer;
 
   -- RAM --
-  type dmem_file_t is array (0 to DMEM_SIZE/2-1) of std_ulogic_vector(15 downto 0);
-  signal dmem_file : dmem_file_t;
+  type dmem_file_t is array (0 to DMEM_SIZE/2-1) of std_ulogic_vector(7 downto 0);
+  signal dmem_file_l : dmem_file_t;
+  signal dmem_file_h : dmem_file_t;
 
   -- RAM attribute to inhibit bypass-logic - Altera only! --
   attribute ramstyle : string;
-  attribute ramstyle of dmem_file : signal is "no_rw_check";
+  attribute ramstyle of dmem_file_l : signal is "no_rw_check";
+  attribute ramstyle of dmem_file_h : signal is "no_rw_check";
 
 begin
 
@@ -73,50 +75,23 @@ begin
   begin
     if rising_edge(clk_i) then
       rden <= rden_i and acc_en;
-
-      -- write access LOW byte --
-      if (acc_en = '1') and (wren_i(0) = '1') then -- write low byte
-        if (is_power_of_two(DMEM_SIZE, 16) = true) then
-          dmem_file(addr)(07 downto 0) <= data_i(07 downto 0);
-        -- modified write-access: to prevent simulation errors when DMEM_SIZE is not a power of 2 --
-        elsif (addr < DMEM_SIZE/2) then
-          dmem_file(addr)(07 downto 0) <= data_i(07 downto 0);
+      if (acc_en = '1') then
+        if (wren_i(0) = '1') then -- write low byte
+          dmem_file_l(addr) <= data_i(07 downto 0);
         else
-          report "DMEM write access out of range since DMEM_SIZE is not a power of 2!" severity error;
+          rdata(07 downto 0) <= dmem_file_l(addr);
         end if;
-      end if;
-
-      -- write access HIGH byte --
-      if (acc_en = '1') and (wren_i(1) = '1') then -- write high byte
-        if (is_power_of_two(DMEM_SIZE, 16) = true) then
-          dmem_file(addr)(15 downto 8) <= data_i(15 downto 8);
-        -- modified write-access: to prevent simulation errors when DMEM_SIZE is not a power of 2 --
-        elsif (addr < DMEM_SIZE/2) then
-          dmem_file(addr)(15 downto 8) <= data_i(15 downto 8);
+        if (wren_i(1) = '1') then -- write high byte
+          dmem_file_h(addr) <= data_i(15 downto 8);
         else
-          report "DMEM write access out of range since DMEM_SIZE is not a power of 2!" severity error;
+          rdata(15 downto 8) <= dmem_file_h(addr);
         end if;
-      end if;
-
-      -- read access (both bytes) --
-      if (is_power_of_two(DMEM_SIZE, 16) = false) then
-        -- modified read-access: to prevent simulation errors when DMEM_SIZE is not a power of 2 --
-        if (addr < DMEM_SIZE/2) then
-          rdata <= dmem_file(addr);
-        else
-          if ((rden_i and acc_en) = '1') then
-            report "DMEM access out of range since DMEM_SIZE is not a power of 2!" severity error;
-          end if;
-          rdata <= (others => '-');
-        end if;
-      else
-        rdata <= dmem_file(addr);
       end if;
     end if;
   end process dmem_file_access;
 
   -- output gate --
-  data_o <= rdata when (rden = '1') else x"0000";
+  data_o <= rdata when (rden = '1') else (others => '0');
 
 
 end neo430_dmem_rtl;
