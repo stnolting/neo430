@@ -1,8 +1,8 @@
 -- #################################################################################################
 -- #  << NEO430 - System Configuration Memory >>                                                   #
 -- # ********************************************************************************************* #
--- #  - Lower 8 word addresses*: ROM for HW info ( 8 entries)                                      #
--- #  - Upper 8 word addresses* (2 x mirrored): RAM for the 4 interrupt vector addresses           #
+-- # This is a read only memory providing information about the processor configuration obtained   #
+-- # from the top entity's generics.                                                               #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               10.01.2018  #
+-- # Stephan Nolting, Hannover, Germany                                                 10.01.2018 #
 -- #################################################################################################
 
 library ieee;

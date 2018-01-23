@@ -1,10 +1,10 @@
 -- #################################################################################################
 -- #  << NEO430 - Serial Communication Unit >>                                                     #
 -- # ********************************************************************************************* #
--- #  Synchronous & asynchronous serial transceivers.                                              #
--- #  UART: 8-bit, no parity bit, 1 stop bit, variable BAUD rate.                                  #
--- #  SPI: 8-bit, MSB first, 2 clock modes, 8 clock speeds, 6 dedicated CS lines.                  #
--- #  Interrupt: SPI_transfer_done [OR] UART_RX_available [OR] UART_TX_done                        #
+-- # Synchronous & asynchronous serial transceivers.                                               #
+-- # UART: 8-bit, no parity bit, 1 stop bit, variable BAUD rate.                                   #
+-- # SPI: 8-bit, MSB first, 2 clock modes, 8 clock speeds, 6 dedicated CS lines.                   #
+-- # Interrupt: SPI_transfer_done [OR] UART_RX_available [OR] UART_TX_done                         #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -24,7 +24,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               16.01.2018  #
+-- #  tephan Nolting, Hannover, Germany                                                 16.01.2018 #
 -- #################################################################################################
 
 library ieee;

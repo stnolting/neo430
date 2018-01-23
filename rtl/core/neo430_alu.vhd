@@ -1,8 +1,8 @@
 -- #################################################################################################
 -- #  << NEO430 - Arithmetical/Logical Unit >>                                                     #
 -- # ********************************************************************************************* #
--- #  Main data processing ALU and temporary operand registers.                                    #
--- #  BCD arithmetic operations need 2 cycles, all other operations only take one cycle.           #
+-- # Main data processing ALU and temporary operand registers.                                     #
+-- # BCD arithmetic operations need 2 cycles, all other operations only take one cycle.            #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               14.01.2018  #
+-- # Stephan Nolting, Hannover, Germany                                                 14.01.2018 #
 -- #################################################################################################
 
 library ieee;

@@ -1,8 +1,8 @@
 -- #################################################################################################
 -- #  << NEO430 - General Purpose Parallel IO Unit >>                                              #
 -- # ********************************************************************************************* #
--- #  16-bit parallel input & output unit. Any pin-change (HI->LO or LO->HI) triggers the IRQ.     #
--- #  Pins used for the pin change interrupt are selected using a 16-bit mask.                     #
+-- # 16-bit parallel input & output unit. Any pin-change (HI->LO or LO->HI) triggers the IRQ.      #
+-- # Pins used for the pin change interrupt are selected using a 16-bit mask.                      #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               12.01.2018  #
+-- # Stephan Nolting, Hannover, Germany                                                 12.01.2018 #
 -- #################################################################################################
 
 library ieee;

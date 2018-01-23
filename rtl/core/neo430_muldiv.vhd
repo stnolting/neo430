@@ -1,10 +1,10 @@
 -- #################################################################################################
 -- #  << NEO430 - 16-Bit Unsigned Multiplier & Divider Unit >>                                     #
 -- # ********************************************************************************************* #
--- #  NOTE: This unit uses "repeated trial subtraction" as division algorithm                      #
--- #  NOTE: This unit uses "shifted add" as multiplication algorithm                               #
--- #  Division: DIVIDEND / DIVIDER = QUOTIENT + REMAINDER / DIVIDER (each 16-bit)                  #
--- #  Multiplication: FACTOR1 * FACTOR2 = PRODUCT (32-bit)                                         #
+-- # NOTE: This unit uses "repeated trial subtraction" as division algorithm                       #
+-- # NOTE: This unit uses "shifted add" as multiplication algorithm                                #
+-- # Division: DIVIDEND / DIVIDER = QUOTIENT + REMAINDER / DIVIDER (each 16-bit)                   #
+-- # Multiplication: FACTOR1 * FACTOR2 = PRODUCT (32-bit)                                          #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: http://opencores.org/project,neo430        #
 -- # Copyright 2015-2016, Stephan Nolting: stnolting@gmail.com                                     #
@@ -24,7 +24,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from http://www.gnu.org/licenses/lgpl-3.0.en.html                 #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               01.12.2017  #
+-- #  tephan Nolting, Hannover, Germany                                                 01.12.2017 #
 -- #################################################################################################
 
 library ieee;

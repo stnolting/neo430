@@ -1,7 +1,10 @@
 -- #################################################################################################
 -- #  << NEO430 - High-Precision Timer >>                                                          #
 -- # ********************************************************************************************* #
--- #  Configure THRES before enabling the timer to prevent false interrupt requests.               #
+-- # This timer uses a configurable prescaler to increment an internal 16-bit counter. When the    #
+-- # counter value reaches the programmable threshold an interrupt can be triggered. Optionally,   #
+-- # the counter can be automatically reset when reaching the threshold value.                     #
+-- # Configure THRES before enabling the timer to prevent false interrupt requests.                #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -21,7 +24,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               23.12.2017  #
+-- #  tephan Nolting, Hannover, Germany                                                 23.12.2017 #
 -- #################################################################################################
 
 library ieee;
