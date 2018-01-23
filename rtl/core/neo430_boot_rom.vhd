@@ -1,8 +1,8 @@
 -- #################################################################################################
 -- #  << NEO430 - Bootloader ROM >>                                                                #
 -- # ********************************************************************************************* #
--- #  This memory includes the in-place executable image of the NEO430 bootloader. See the         #
--- #  processor's documentary to get more information.                                             #
+-- # This memory includes the in-place executable image of the NEO430 bootloader. See the          #
+-- # processor's documentary to get more information.                                              #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               01.12.2017  #
+-- # Stephan Nolting, Hannover, Germany                                                 20.01.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -79,13 +79,15 @@ begin
   mem_file_access: process(clk_i)
   begin
     if rising_edge(clk_i) then
-      rden  <= rden_i and acc_en;
-      rdata <= boot_img(addr);
+      rden <= rden_i and acc_en;
+      if (acc_en = '1') then -- reduce switching activity when not accessed
+        rdata <= boot_img(addr);
+      end if;
     end if;
   end process mem_file_access;
 
   -- output gate --
-  data_o <= rdata when (rden = '1') else x"0000";
+  data_o <= rdata when (rden = '1') else (others => '0');
 
 
 end neo430_boot_rom_rtl;
