@@ -62,6 +62,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Optional watchdog timer (WDT)
 - Optional cyclic redundancy check unit (CRC16/32)
 - Optional custom functions unit (CFU) for user-defined processor extensions
+- Optional 3 channel 8-bit PWM controller
 - Optional internal bootloader (2kB ROM) with serial user console and automatic boot from external EEPROM
 
 
@@ -81,17 +82,17 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 ## Implementation Results
 
-Mapping results generated for HW version 0x0154. 
+Mapping results generated for HW version 0x0170. 
 
 | __Xilinx Virtex-6__                 | LUTs | FFs | BRAMs | DSPs | f_max   |
 |-------------------------------------|:----:|-----|-------|------|---------|
-| Full (default) configuration:       | 1127 | 819 | 4     | 0    | 172 MHz |
-| Minimal configuration (CPU + GPIO): | 485  | 250 | 3     | 0    | 198 MHz |
+| Full (default) configuration:       | TBA  | TBA | 4     | 0    | TBA MHz |
+| Minimal configuration (CPU + GPIO): | TBA  | TBA | 3     | 0    | TBA MHz |
 
 | __Intel/Altera Cyclone IV__         | LUTs | FFs | Memory bits | DSPs | f_max   |
 |-------------------------------------|:----:|-----|-------------|------|---------|
-| Full (default) configuration:       | 1512 | 813 | 65792       | 0    | 115 MHz |
-| Minimal configuration (CPU + GPIO): | 645  | 248 | 49408       | 0    | 116 MHz |
+| Full (default) configuration:       | 1588 | 868 | 65792       | 0    | 115 MHz |
+| Minimal configuration (CPU + GPIO): | 614  | 232 | 49408       | 0    | 120 MHz |
 
 
 ## Let's Get It Started!
