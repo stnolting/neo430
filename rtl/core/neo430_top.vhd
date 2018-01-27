@@ -14,15 +14,16 @@
 -- #  - Internal ROM (IMEM, configurable size) for code                                            #
 -- #  - Internal RAM (DMEM, configurable size) for data (and code)                                 #
 -- #  - Optional 16-bit multiplier/divider unit                                                    #
--- #  - Optional 16-bit IN and 16-bit OUT GPIO port                                                #
+-- #  - Sysconfig (infomem for various system information)                                         #
+-- #  - Optional 16-bit IN and 16-bit OUT GPIO port with pin-change interrupt                      #
 -- #  - Optional 32-bit Wishbone interface                                                         #
 -- #  - Optional High precision timer                                                              #
 -- #  - Optional USART - SPI and UART                                                              #
--- #  - Optional Internal ROM bootloader                                                           #
+-- #  - Optional Internal ROM for bootloader                                                       #
 -- #  - Optional Watchdog Timer                                                                    #
--- #  - Optional CRC Module                                                                        #
--- #  - Optional Custom Functions Unit                                                             #
--- #  - Sysconfig (infomem for various system information)                                         #
+-- #  - Optional CRC16/32 Module                                                                   #
+-- #  - Optional Custom Functions Unit to implement user-defined processor extension               #
+-- #  - Optional Pulse Width Modulation controller                                                 #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -42,7 +43,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 16.01.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 26.01.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -71,6 +72,7 @@ entity neo430_top is
     USART_USE   : boolean := true;  -- implement USART? (default=true)
     CRC_USE     : boolean := true;  -- implement CRC unit? (default=true)
     CFU_USE     : boolean := false; -- implement custom functions unit? (default=false)
+    PWM_USE     : boolean := true;  -- implement PWM controller? (default=true)
     -- boot configuration --
     BOOTLD_USE  : boolean := true;  -- implement and use bootloader? (default=true)
     IMEM_AS_ROM : boolean := false  -- implement IMEM as read-only memory? (default=false)
@@ -82,6 +84,8 @@ entity neo430_top is
     -- parallel io --
     gpio_o     : out std_ulogic_vector(15 downto 0); -- parallel output
     gpio_i     : in  std_ulogic_vector(15 downto 0); -- parallel input
+    -- pwm channels --
+    pwm_o      : out std_ulogic_vector(02 downto 0); -- pwm channels
     -- serial com --
     uart_txd_o : out std_ulogic; -- UART send data
     uart_rxd_i : in  std_ulogic; -- UART receive data
@@ -114,10 +118,12 @@ architecture neo430_top_rtl of neo430_top is
   signal sys_rst      : std_ulogic;
   signal wdt_rst      : std_ulogic;
   signal clk_div      : std_ulogic_vector(11 downto 0);
+  signal clk_div_ff   : std_ulogic_vector(11 downto 0);
   signal clk_gen      : std_ulogic_vector(07 downto 0);
   signal timer_cg_en  : std_ulogic;
   signal usart_cg_en  : std_ulogic;
   signal wdt_cg_en    : std_ulogic;
+  signal pwm_cg_en    : std_ulogic;
 
   type cpu_bus_t is record
     rd_en : std_ulogic;
@@ -145,6 +151,7 @@ architecture neo430_top_rtl of neo430_top is
   signal gpio_rdata      : std_ulogic_vector(15 downto 0);
   signal crc_rdata       : std_ulogic_vector(15 downto 0);
   signal cfu_rdata       : std_ulogic_vector(15 downto 0);
+  signal pwm_rdata       : std_ulogic_vector(15 downto 0);
   signal sysconfig_rdata : std_ulogic_vector(15 downto 0);
 
   -- interrupt system --
@@ -191,21 +198,28 @@ begin
     if (sys_rst = '0') then
       clk_div <= (others => '0');
     elsif rising_edge(clk_i) then
-      if ((timer_cg_en or usart_cg_en or wdt_cg_en) = '1') then
+      if ((timer_cg_en or usart_cg_en or wdt_cg_en or pwm_cg_en) = '1') then
         clk_div <= std_ulogic_vector(unsigned(clk_div) + 1);
       end if;
     end if;
   end process clock_generator;
 
-  -- clock select --
-  clk_gen(0) <= clk_div(0);  -- CLK/2
-  clk_gen(1) <= clk_div(1);  -- CLK/4
-  clk_gen(2) <= clk_div(2);  -- CLK/8
-  clk_gen(3) <= clk_div(5);  -- CLK/64
-  clk_gen(4) <= clk_div(6);  -- CLK/128
-  clk_gen(5) <= clk_div(9);  -- CLK/1024
-  clk_gen(6) <= clk_div(10); -- CLK/2048
-  clk_gen(7) <= clk_div(11); -- CLK/4096
+  clock_generator_buf: process(clk_i)
+  begin
+    if rising_edge(clk_i) then
+      clk_div_ff <= clk_div;
+    end if;
+  end process clock_generator_buf;
+
+  -- clock enable select --
+  clk_gen(clk_div2_c)    <= clk_div_ff(0)  and (not clk_div(0));  -- CLK/2
+  clk_gen(clk_div4_c)    <= clk_div_ff(1)  and (not clk_div(1));  -- CLK/4
+  clk_gen(clk_div8_c)    <= clk_div_ff(2)  and (not clk_div(2));  -- CLK/8
+  clk_gen(clk_div64_c)   <= clk_div_ff(5)  and (not clk_div(5));  -- CLK/64
+  clk_gen(clk_div128_c)  <= clk_div_ff(6)  and (not clk_div(6));  -- CLK/128
+  clk_gen(clk_div1024_c) <= clk_div_ff(9)  and (not clk_div(9));  -- CLK/1024
+  clk_gen(clk_div2048_c) <= clk_div_ff(10) and (not clk_div(10)); -- CLK/2048
+  clk_gen(clk_div4096_c) <= clk_div_ff(11) and (not clk_div(11)); -- CLK/4096
 
 
   -- CPU ----------------------------------------------------------------------
@@ -232,8 +246,9 @@ begin
   );
 
   -- final CPU read data --
-  cpu_bus.rdata <= rom_rdata or ram_rdata or boot_rdata or muldiv_rdata or wb_rdata or usart_rdata or
-                   gpio_rdata or timer_rdata or wdt_rdata or sysconfig_rdata or crc_rdata or cfu_rdata;
+  cpu_bus.rdata <= rom_rdata or ram_rdata or boot_rdata or muldiv_rdata or wb_rdata or
+                   usart_rdata or gpio_rdata or timer_rdata or wdt_rdata or
+                   sysconfig_rdata or crc_rdata or cfu_rdata or pwm_rdata;
 
   -- sync for external IRQ --
   external_irq_sync: process(clk_i)
@@ -250,8 +265,7 @@ begin
   irq(3) <= xirq_sync(1); -- external interrupt request (lowest priority)
 
   -- external interrupt acknowledge --
-  irq_ack_o <= irq_ack(3);
-  --- the internal irq sources DO NOT REQUIRE an acknowledge!
+  irq_ack_o <= irq_ack(3); -- the internal irq sources do not require an acknowledge
 
 
   -- Main Memory (ROM/IMEM & RAM/DMEM) ----------------------------------------
@@ -545,6 +559,35 @@ begin
   end generate;
 
 
+  -- PWM Controller -----------------------------------------------------------
+  -- -----------------------------------------------------------------------------
+  neo430_pwm_inst_true:
+  if (PWM_USE = true) generate
+    neo430_pwm_inst: neo430_pwm
+    port map(
+      -- host access --
+      clk_i       => clk_i,         -- global clock line
+      rden_i      => io_rd_en,      -- read enable
+      wren_i      => io_wr_en,      -- write enable
+      addr_i      => cpu_bus.addr,  -- address
+      data_i      => cpu_bus.wdata, -- data in
+      data_o      => pwm_rdata,     -- data out
+      -- clock generator --
+      clkgen_en_o => pwm_cg_en,     -- enable clock generator
+      clkgen_i    => clk_gen,
+      -- pwm output channels --
+      pwm_o       => pwm_o
+    );
+  end generate;
+
+  neo430_pwm_inst_false:
+  if (PWM_USE = false) generate
+    pwm_cg_en <= '0';
+    pwm_rdata <= (others => '0');
+    pwm_o     <= (others => '0');
+  end generate;
+
+
   -- System Configuration -----------------------------------------------------
   -- -----------------------------------------------------------------------------
   neo430_sysconfig_inst: neo430_sysconfig
@@ -565,6 +608,7 @@ begin
     USART_USE   => USART_USE,       -- implement USART?
     CRC_USE     => CRC_USE,         -- implement CRC unit?
     CFU_USE     => CFU_USE,         -- implement CFU?
+    PWM_USE     => PWM_USE,         -- implement PWM?
     -- boot configuration --
     BOOTLD_USE  => BOOTLD_USE,      -- implement and use bootloader?
     IMEM_AS_ROM => IMEM_AS_ROM      -- implement IMEM as read-only memory?
