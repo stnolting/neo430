@@ -151,7 +151,7 @@ begin
     end if;
   end process arithmetic_core;
 
-  -- DIV: try another subtraction... --
+  -- DIV: try another subtraction --
   try_sub <= std_ulogic_vector(unsigned('0' & remainder(14 downto 0) & quotient(15)) - unsigned('0' & opb));
 
   -- MUL: do another addition

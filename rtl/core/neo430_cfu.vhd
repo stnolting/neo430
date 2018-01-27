@@ -26,7 +26,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 06.01.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 26.01.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -75,7 +75,7 @@ begin
 
   -- Access Control -----------------------------------------------------------
   -- -----------------------------------------------------------------------------
-  -- This assignments are required to check if this unit is accessed at all.
+  -- These assignments are required to check if this unit is accessed at all.
   -- Do NOT modify this for your custom application (unless you really know what you are doing)!
   acc_en <= '1' when (addr_i(hi_abb_c downto lo_abb_c) = cfu_base_c(hi_abb_c downto lo_abb_c)) else '0';
   addr   <= cfu_base_c(15 downto lo_abb_c) & addr_i(lo_abb_c-1 downto 1) & '0'; -- word aligned
@@ -84,9 +84,8 @@ begin
 
   -- Write access -------------------------------------------------------------
   -- -----------------------------------------------------------------------------
-  -- Here we are writing to the interface registers of the module. The write access is split-up
-  -- for writing to the lower or/and to the higher byte. No decoding of the lowest bit of the address
-  -- is required since the CPU hardware performs a byte-swap when writing bytes to unaligned word-addresses.
+  -- Here we are writing to the interface registers of the module. This unit can only be accessed
+  -- in full 16-bit word mode!
   wr_access: process(clk_i)
   begin
     if rising_edge(clk_i) then
@@ -110,13 +109,13 @@ begin
   -- >>> UNIT HARDWARE RESET <<< --
   -- The IO devices DO NOT feature a dedicated reset signal, so make sure your CFU does not require a defined initial state.
   -- If you really require a defined initial state, implement a software reset by implementing a control register with an
-  -- enable bit, which resets all states when cleared.
+  -- enable bit, which resets all internal states when cleared.
 
 
   -- Read access --------------------------------------------------------------
   -- -----------------------------------------------------------------------------
   -- This is the read access process. Data must be asserted synchronously to the output data bus
-  -- and thus, with only cycle delay. The units always output a full 16-bit word, no matter if we want to
+  -- and thus, with exactly 1 cycle delay. The units always output a full 16-bit word, no matter if we want to
   -- read 8- or 16-bit. For actual 8-bit read accesses the corresponding byte is selected in the
   -- hardware of the CPU core.
   rd_access: process(clk_i)

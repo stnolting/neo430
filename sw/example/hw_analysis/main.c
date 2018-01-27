@@ -122,6 +122,9 @@ int main(void) {
   // CFU
   _printf("- Custom Functions Unit: ");
   print_state(ft & (1<<SYS_CFU_EN));
+  // PWM
+  _printf("- PWM Controller:        ");
+  print_state(ft & (1<<SYS_PWM_EN));
 
 
   // Exit

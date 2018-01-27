@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 06.01.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 26.01.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -71,7 +71,7 @@ begin
   -- Access Control -----------------------------------------------------------
   -- -----------------------------------------------------------------------------
   acc_en <= '1' when (addr_i(hi_abb_c downto lo_abb_c) = crc_base_c(hi_abb_c downto lo_abb_c)) else '0';
-  addr   <= timer_base_c(15 downto lo_abb_c) & addr_i(lo_abb_c-1 downto 1) & '0'; -- word aligned
+  addr   <= crc_base_c(15 downto lo_abb_c) & addr_i(lo_abb_c-1 downto 1) & '0'; -- word aligned
   wren   <= acc_en and wren_i(1) and wren_i(0);
 
 

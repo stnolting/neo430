@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hanover, Germany                                                29.12.2017  #
+-- # Stephan Nolting, Hanover, Germany                                                  23.01.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -100,6 +100,7 @@ begin
     USART_USE   => true,              -- implement USART? (default=true)
     CRC_USE     => true,              -- implement CRC unit? (default=true)
     CFU_USE     => true,              -- implement custom functions unit? (default=false)
+    PWM_USE     => true,              -- implement PWM controller? (default=true)
     -- boot configuration --
     BOOTLD_USE  => false,             -- implement and use bootloader? (default=true)
     IMEM_AS_ROM => false              -- implement IMEM as read-only memory? (default=false)
@@ -109,8 +110,10 @@ begin
     clk_i      => clk_gen,            -- global clock, rising edge
     rst_i      => rst_gen,            -- global reset, async, low-active
     -- gpio --
-    gpio_o      => open,               -- parallel output
-    gpio_i      => x"0000",            -- parallel input
+    gpio_o      => open,              -- parallel output
+    gpio_i      => x"0000",           -- parallel input
+    -- pwm channels --
+    pwm_o       => open,              -- pwm channels
     -- serial com --
     uart_txd_o => uart_txd,           -- UART send data
     uart_rxd_i => '0',                -- UART receive data

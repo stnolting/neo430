@@ -25,7 +25,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 22.02.1017 #
+-- # Stephan Nolting, Hannover, Germany                                                 23.01.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -86,7 +86,7 @@ architecture neo430_wdt_rtl of neo430_wdt is
   signal rst_sync : std_ulogic_vector(01 downto 0);
 
   -- prescaler clock generator --
-  signal prsc_tick, prsc_sel, prsc_sel_ff : std_ulogic;
+  signal prsc_tick : std_ulogic;
 
 begin
 
@@ -130,8 +130,6 @@ begin
       fail_ff <= fail;
       -- reset synchronizer --
       rst_sync <= rst_sync(0) & rst_gen(rst_gen'left);
-      -- tick generator --
-      prsc_sel_ff <= prsc_sel;
       -- counter update --
       if (wren = '1') then -- clear counter on write access (manual watchdog reset)
         cnt <= (others => '0');
@@ -141,10 +139,9 @@ begin
     end if;
   end process cnt_sync;
 
-  -- counter clock select / edge detection --
+  -- counter clock select --
   clkgen_en_o <= enable;
-  prsc_sel    <= clkgen_i(to_integer(unsigned(clk_sel)));
-  prsc_tick   <= prsc_sel_ff and (not prsc_sel); -- edge detector
+  prsc_tick   <= clkgen_i(to_integer(unsigned(clk_sel)));
 
   -- system reset --
   rst_o <= rst_sync(1);

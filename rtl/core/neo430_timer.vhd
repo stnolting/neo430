@@ -24,7 +24,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  tephan Nolting, Hannover, Germany                                                 23.12.2017 #
+-- #  tephan Nolting, Hannover, Germany                                                 23.01.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -76,7 +76,7 @@ architecture neo430_timer_rtl of neo430_timer is
   signal ctrl : std_ulogic_vector(05 downto 0);
 
   -- prescaler clock generator --
-  signal prsc_tick, prsc_sel, prsc_sel_ff : std_ulogic;
+  signal prsc_tick : std_ulogic;
 
   -- timer control --
   signal match       : std_ulogic; -- thres = cnt
@@ -92,21 +92,19 @@ begin
   wr_en  <= acc_en and wren_i(1) and wren_i(0);
 
 
-  -- Write access (and timer update) ------------------------------------------
+  -- Write access and timer update --------------------------------------------
   -- -----------------------------------------------------------------------------
   wr_access: process(clk_i)
   begin
     if rising_edge(clk_i) then
       -- edge detector --
       irq_fire_ff <= irq_fire;
-      -- tick generator --
-      prsc_sel_ff <= prsc_sel;
-      -- timer reg --
+      -- timer counter --
       if (wr_en = '1') and (addr = timer_cnt_addr_c) then
         cnt <= data_i;
-      elsif (ctrl(ctrl_en_bit_c) = '1') then
+      elsif (ctrl(ctrl_en_bit_c) = '1') then -- timer enabled
         if (match = '1') and (ctrl(ctrl_arst_bit_c) = '1') then -- match?
-          cnt <= x"0000";
+          cnt <= (others => '0');
         elsif (match = '0') and (prsc_tick = '1') then -- count++ if no match
           cnt <= std_ulogic_vector(unsigned(cnt) + 1);
         end if;
@@ -129,9 +127,8 @@ begin
     end if;
   end process wr_access;
 
-  -- timer clock select / edge detection --
-  prsc_sel  <= clkgen_i(to_integer(unsigned(ctrl(ctrl_prsc2_bit_c downto ctrl_prsc0_bit_c))));
-  prsc_tick <= prsc_sel_ff and (not prsc_sel); -- edge detector
+  -- timer clock select --
+  prsc_tick <= clkgen_i(to_integer(unsigned(ctrl(ctrl_prsc2_bit_c downto ctrl_prsc0_bit_c))));
 
   -- enable external clock generator --
   clkgen_en_o <= ctrl(ctrl_en_bit_c);

@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               28.12.2017  #
+// # Stephan Nolting, Hannover, Germany                                                 26.01.2018 #
 // #################################################################################################
 
 #ifndef neo430_cpu_h
@@ -34,6 +34,7 @@ inline void set_sreg(uint16_t d);
 inline void sleep(void);
 inline void clear_irq_buffer(void);
 void cpu_delay(uint16_t t);
+void cpu_delay_ms(uint16_t ms);
 inline void soft_reset(void);
 inline void jump_address(uint16_t addr);
 inline void call_address(uint16_t addr);
@@ -127,6 +128,22 @@ void cpu_delay(uint16_t t) {
   while (t--) {
     for (i=0; i<0xFFFF; i++)
       asm volatile ("nop");
+  }
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Waits <ms> microseconds (not very precise!)
+ * PARAM ms time in microseconds to wait
+ * ------------------------------------------------------------ */
+void cpu_delay_ms(uint16_t ms) {
+
+  // empirical ;)
+  uint32_t a = ((uint32_t)CLOCKSPEED_HI) << 1;
+  register uint32_t cnt = a * (uint32_t)ms;
+
+  while(cnt--) {
+    asm volatile ("nop");
   }
 }
 

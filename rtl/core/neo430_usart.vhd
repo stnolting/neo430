@@ -24,7 +24,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  tephan Nolting, Hannover, Germany                                                 16.01.2018 #
+-- #  tephan Nolting, Hannover, Germany                                                 23.01.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -94,12 +94,8 @@ architecture neo430_usart_rtl of neo430_usart is
   signal rd_en  : std_ulogic; -- read enable
 
   -- clock generators --
-  signal uart_clk     : std_ulogic;
-  signal uart_prsc    : std_ulogic;
-  signal uart_prsc_ff : std_ulogic;
-  signal spi_clk      : std_ulogic;
-  signal spi_prsc     : std_ulogic;
-  signal spi_prsc_ff  : std_ulogic;
+  signal uart_clk : std_ulogic;
+  signal spi_clk  : std_ulogic;
 
   -- uart tx unit --
   signal uart_tx_busy     : std_ulogic;
@@ -158,24 +154,14 @@ begin
 
   -- Clock Selection ----------------------------------------------------------
   -- -----------------------------------------------------------------------------
-  clk_gen: process(clk_i)
-  begin
-    if rising_edge(clk_i) then
-      uart_prsc_ff <= uart_prsc;
-      spi_prsc_ff  <= spi_prsc;
-    end if;
-  end process clk_gen;
-
   -- clock enable --
   clkgen_en_o <= ctrl(ctrl_usart_en_c);
 
-  -- spi clock select / edge detection --
-  spi_prsc <= clkgen_i(to_integer(unsigned(ctrl(ctrl_spi_prsc2_c downto ctrl_spi_prsc0_c))));
-  spi_clk  <= (not spi_prsc_ff) and spi_prsc; -- rising edge
+  -- spi clock select --
+  spi_clk <= clkgen_i(to_integer(unsigned(ctrl(ctrl_spi_prsc2_c downto ctrl_spi_prsc0_c))));
 
-  -- uart clock select / edge detection --
-  uart_prsc <= clkgen_i(to_integer(unsigned(baud_prsc(2 downto 0))));
-  uart_clk  <= (not uart_prsc_ff) and uart_prsc; -- rising edge
+  -- uart clock select --
+  uart_clk <= clkgen_i(to_integer(unsigned(baud_prsc(2 downto 0))));
 
 
   -- UART transmitter ---------------------------------------------------------

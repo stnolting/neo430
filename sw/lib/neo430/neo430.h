@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               16.01.2018  #
+// #  Stephan Nolting, Hannover, Germany                                               27.01.2018  #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -235,11 +235,20 @@
 #define CFU_REG7 (*(REG16 0xFFDE)) // r/w: user defined...
 
 
+/* --- Pulse Width Modulation Controller --- */
+#define PWM_CT  (*(REG16 0xFFE0)) // -/w: control register
+#define PWM_CH0 (*(REG16 0xFFE2)) // -/w: duty cycle channel 0
+#define PWM_CH1 (*(REG16 0xFFE4)) // -/w: duty cycle channel 1
+#define PWM_CH2 (*(REG16 0xFFE6)) // -/w: duty cycle channel 2
+
+// PWM controller control register
+#define PWM_CT_ENABLE 0 // r/w: WDT enable
+#define PWM_CT_FMODE  1 // r/w: 0 = slow PWM mode, 1 = fast PWM mode
+// fast PWM mode: CLK / 64
+// slow PWM mode: CLK / 4096
+
+
 /* --- Reserved --- */
-//#define ? (*(REG16 0xFFE0))
-//#define ? (*(REG16 0xFFE2))
-//#define ? (*(REG16 0xFFE4))
-//#define ? (*(REG16 0xFFE6))
 //#define ? (*(REG16 0xFFE8))
 //#define ? (*(REG16 0xFFEA))
 //#define ? (*(REG16 0xFFEC))
@@ -281,6 +290,7 @@
 #define SYS_IROM_EN   8 // Implement IMEM as true ROM?
 #define SYS_CRC_EN    9 // CRC synthesized
 #define SYS_CFU_EN   10 // CFU synthesized
+#define SYS_PWM_EN   11 // PWM controller synthesized
 
 
 // ----------------------------------------------------------------------------
@@ -291,6 +301,7 @@
 #include "neo430_crc.h"
 #include "neo430_gpio.h"
 #include "neo430_muldiv.h"
+#include "neo430_pwm.h"
 #include "neo430_usart.h"
 #include "neo430_wdt.h"
 #include "neo430_wishbone.h"

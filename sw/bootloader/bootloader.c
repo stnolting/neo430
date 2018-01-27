@@ -29,7 +29,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               12.01.2018  #
+// #  Stephan Nolting, Hannover, Germany                                               23.01.2018  #
 // #################################################################################################
 
 // Libraries
@@ -102,6 +102,9 @@ int  main(void) {
   // disable Wishbone interface
   WB32_CT = 0;
 
+  // disable PWM
+  PWM_CT = 0;
+
   // no valid boot image in IMEM yet
   VALID_IMAGE = 0;
 
@@ -137,7 +140,7 @@ int  main(void) {
   // ****************************************************************
   // Show bootloader intro and system information
   // ****************************************************************
-  uart_br_print("\n\nNEO430 Bootloader V20180112 by Stephan Nolting\n\n"
+  uart_br_print("\n\nNEO430 Bootloader V20180123 by Stephan Nolting\n\n"
                 "HWV: 0x");
   uart_print_hex_word(HW_VERSION);
   uart_br_print("\nCLK: 0x");

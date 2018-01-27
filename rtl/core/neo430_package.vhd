@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 16.01.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 26.01.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -30,7 +30,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0161"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0170"; -- no touchy!
 
   -- Internal Functions ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -73,9 +73,9 @@ package neo430_package is
   constant muldiv_opa_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0000");
   constant muldiv_opb_div_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0002");
   constant muldiv_opb_mul_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0004");
---constant reserved              : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0006");
---constant reserved              : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0008");
---constant reserved              : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"000A");
+--constant muldiv_???_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0006");
+--constant muldiv_???_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0008");
+--constant muldiv_???_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"000A");
   constant muldiv_resx_addr_c    : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"000C");
   constant muldiv_resy_addr_c    : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"000E");
 
@@ -90,7 +90,7 @@ package neo430_package is
   constant wb32_wr_adr_hi_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"0008");
   constant wb32_data_lo_addr_c   : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"000A");
   constant wb32_data_hi_addr_c   : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"000C");
---constant reserved              : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"000E");
+--constant wb32_???_addr_c       : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"000E");
 
   -- IO: Universal synchronous/asynchronous receiver and transmitter (USART) --
   constant usart_base_c : std_ulogic_vector(15 downto 0) := x"FFA0";
@@ -105,7 +105,7 @@ package neo430_package is
   constant gpio_base_c : std_ulogic_vector(15 downto 0) := x"FFA8";
   constant gpio_size_c : natural := 8; -- bytes
 
---constant reserved            : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0000");
+--constant gpio_???_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0000");
   constant gpio_irqmask_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0002");
   constant gpio_in_addr_c      : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0004");
   constant gpio_out_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(gpio_base_c) + x"0006");
@@ -117,7 +117,7 @@ package neo430_package is
   constant timer_ctrl_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0000");
   constant timer_cnt_addr_c   : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0002");
   constant timer_thres_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0004");
---constant reserved           : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0006");
+--constant timer_???_addr_c   : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0006");
 
   -- IO: Watchdog Timer (WDT) --
   constant wdt_base_c : std_ulogic_vector(15 downto 0) := x"FFB8";
@@ -129,14 +129,14 @@ package neo430_package is
   constant crc_base_c : std_ulogic_vector(15 downto 0) := x"FFC0";
   constant crc_size_c : natural := 16; -- bytes
 
-  constant crc_poly_lo_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0000");
-  constant crc_poly_hi_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0002");
-  constant crc_crc16_in_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0004");
-  constant crc_crc32_in_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0006");
---constant reserved            : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0008");
---constant reserved            : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"000A");
-  constant crc_resx_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"000C");
-  constant crc_resy_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"000E");
+  constant crc_poly_lo_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(crc_base_c) + x"0000");
+  constant crc_poly_hi_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(crc_base_c) + x"0002");
+  constant crc_crc16_in_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(crc_base_c) + x"0004");
+  constant crc_crc32_in_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(crc_base_c) + x"0006");
+--constant crc_???_addr_c      : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(crc_base_c) + x"0008");
+--constant crc_???_addr_c      : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(crc_base_c) + x"000A");
+  constant crc_resx_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(crc_base_c) + x"000C");
+  constant crc_resy_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(crc_base_c) + x"000E");
 
   -- IO: Custom Functions Unit (CFU) --
   constant cfu_base_c : std_ulogic_vector(15 downto 0) := x"FFD0";
@@ -151,22 +151,38 @@ package neo430_package is
   constant cfu_reg6_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"000C");
   constant cfu_reg7_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(cfu_base_c) + x"000E");
 
-  -- IO: RESERVED --
---constant ???_base_c : std_ulogic_vector(15 downto 0) := x"FFE0";
---constant ???_size_c : natural := 16; -- bytes
+  -- IO: Pulse-Width Modulation Controller (PWM) --
+  constant pwm_base_c : std_ulogic_vector(15 downto 0) := x"FFE0";
+  constant pwm_size_c : natural := 8; -- bytes
 
---constant ???_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0000");
---constant ???_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0002");
---constant ???_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0004");
---constant ???_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0006");
---constant ???_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0008");
---constant ???_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"000A");
---constant ???_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"000C");
---constant ???_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"000E");
+  constant pwm_ctrl_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(pwm_base_c) + x"0000");
+  constant pwm_ch0_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(pwm_base_c) + x"0002");
+  constant pwm_ch1_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(pwm_base_c) + x"0004");
+  constant pwm_ch2_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(pwm_base_c) + x"0006");
+
+  -- IO: RESERVED --
+--constant ???_base_c : std_ulogic_vector(15 downto 0) := x"FFE8";
+--constant ???_size_c : natural := 8; -- bytes
+
+--constant ???_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0000");
+--constant ???_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0002");
+--constant ???_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0004");
+--constant ???_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0006");
 
   -- IO: System Configuration --
   constant sysconfig_base_c : std_ulogic_vector(15 downto 0) := x"FFF0";
   constant sysconfig_size_c : natural := 16; -- bytes
+
+  -- Clock Generator -------------------------------------------------------------------------
+  -- -------------------------------------------------------------------------------------------
+  constant clk_div2_c    : natural := 0;
+  constant clk_div4_c    : natural := 1;
+  constant clk_div8_c    : natural := 2;
+  constant clk_div64_c   : natural := 3;
+  constant clk_div128_c  : natural := 4;
+  constant clk_div1024_c : natural := 5;
+  constant clk_div2048_c : natural := 6;
+  constant clk_div4096_c : natural := 7;
 
   -- Register Addresses ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -283,6 +299,7 @@ package neo430_package is
       USART_USE   : boolean := true; -- implement USART? (default=true)
       CRC_USE     : boolean := true; -- implement CRC unit? (default=true)
       CFU_USE     : boolean := false; -- implement custom functions unit? (default=false)
+      PWM_USE     : boolean := true; -- implement PWM controller?
       -- boot configuration --
       BOOTLD_USE  : boolean := true; -- implement and use bootloader? (default=true)
       IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory? (default=false)
@@ -294,6 +311,8 @@ package neo430_package is
       -- gpio --
       gpio_o     : out std_ulogic_vector(15 downto 0); -- parallel output
       gpio_i     : in  std_ulogic_vector(15 downto 0); -- parallel input
+      -- pwm channels --
+      pwm_o      : out std_ulogic_vector(02 downto 0); -- pwm channels
       -- serial com --
       uart_txd_o : out std_ulogic; -- UART send data
       uart_rxd_i : in  std_ulogic; -- UART receive data
@@ -622,6 +641,25 @@ package neo430_package is
     );
   end component;
 
+  -- Component: PWM Controller --------------------------------------------------------------
+  -- -------------------------------------------------------------------------------------------
+  component neo430_pwm
+    port (
+      -- host access --
+      clk_i       : in  std_ulogic; -- global clock line
+      rden_i      : in  std_ulogic; -- read enable
+      wren_i      : in  std_ulogic_vector(01 downto 0); -- write enable
+      addr_i      : in  std_ulogic_vector(15 downto 0); -- address
+      data_i      : in  std_ulogic_vector(15 downto 0); -- data in
+      data_o      : out std_ulogic_vector(15 downto 0); -- data out
+      -- clock generator --
+      clkgen_en_o : out std_ulogic; -- enable clock generator
+      clkgen_i    : in  std_ulogic_vector(07 downto 0);
+      -- pwm output channels --
+      pwm_o       : out std_ulogic_vector(02 downto 0)
+    );
+  end component;
+
   -- Component: System Configuration --------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_sysconfig
@@ -642,6 +680,7 @@ package neo430_package is
       USART_USE   : boolean := true; -- implement USART?
       CRC_USE     : boolean := true; -- implement CRC unit?
       CFU_USE     : boolean := true; -- implement CF unit?
+      PWM_USE     : boolean := true; -- implement PWM controller?
       -- boot configuration --
       BOOTLD_USE  : boolean := true; -- implement and use bootloader?
       IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory?

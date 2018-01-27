@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  Stephan Nolting, Hannover, Germany                                               14.01.2018  #
+-- # Stephan Nolting, Hannover, Germany                                                 23.01.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -47,6 +47,7 @@ entity neo430_top_axi4lite is
     USART_USE   : boolean := true; -- implement USART? (default=true)
     CRC_USE     : boolean := true; -- implement CRC unit? (default=true)
     CFU_USE     : boolean := false; -- implement custom functions unit? (default=false)
+    PWM_USE     : boolean := true; -- implement PWM controller?
     -- boot configuration --
     BOOTLD_USE  : boolean := true; -- implement and use bootloader? (default=true)
     IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory? (default=false)
@@ -58,6 +59,8 @@ entity neo430_top_axi4lite is
     -- GPIO --
     gpio_o        : out std_logic_vector(15 downto 0); -- parallel output
     gpio_i        : in  std_logic_vector(15 downto 0); -- parallel input
+    -- pwm channels --
+    pwm_o         : out std_logic_vector(02 downto 0); -- pwm channels
     -- UART --
     uart_txd_o    : out std_logic; -- UART send data
     uart_rxd_i    : in  std_logic; -- UART receive data
@@ -118,6 +121,7 @@ architecture neo430_top_axi4lite_rtl of neo430_top4axi_lite is
   signal rst_i_int      : std_ulogic;
   signal gpio_o_int     : std_ulogic_vector(15 downto 0);
   signal gpio_i_int     : std_ulogic_vector(15 downto 0);
+  signal pwm_o_int      : std_ulogic_vector(02 downto 0);
   signal uart_txd_o_int : std_ulogic;
   signal uart_rxd_i_int : std_ulogic;
   signal spi_sclk_o_int : std_ulogic;
@@ -158,6 +162,7 @@ begin
     USART_USE   => USART_USE,         -- implement USART? (default=true)
     CRC_USE     => CRC_USE,           -- implement CRC unit? (default=true)
     CFU_USE     => CFU_USE,           -- implement CF unit? (default=false)
+    PWM_USE     => PWM_USE,           -- implement PWM controller? (default=true)
     -- boot configuration --
     BOOTLD_USE  => BOOTLD_USE,        -- implement and use bootloader? (default=true)
     IMEM_AS_ROM => IMEM_AS_ROM        -- implement IMEM as read-only memory? (default=false)
@@ -169,6 +174,8 @@ begin
     -- parallel io --
     gpio_o      => gpio_o_int,        -- parallel output
     gpio_i      => gpio_i_int,        -- parallel input
+    -- pwm channels --
+    pwm_o       => pwm_o_int;         -- pwm channels
     -- serial com --
     uart_txd_o  => uart_txd_o_int,    -- UART send data
     uart_rxd_i  => uart_rxd_i_int,    -- UART receive data
@@ -201,6 +208,7 @@ begin
   irq_i_int      <= std_ulogic(irq_i);
 
   gpio_o         <= std_logic_vector(gpio_o_int);
+  pwm_o          <= std_logic_vector(pwm_o_int);
   uart_txd_o     <= std_logic(uart_txd_o_int);
   spi_sclk_o     <= std_logic(spi_sclk_o_int);
   spi_mosi_o     <= std_logic(spi_mosi_o_int);
