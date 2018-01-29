@@ -69,6 +69,9 @@
 #define REG8  (volatile uint8_t*)
 #define REG16 (volatile uint16_t*)
 #define REG32 (volatile uint32_t*)
+#define ROM8  (const volatile uint8_t*)  // read-only
+#define ROM16 (const volatile uint16_t*) // read-only
+#define ROM32 (const volatile uint32_t*) // read-only
 
 
 /* --- Unsigned Multiplier/Divider Unit (MULDIV) --- */
@@ -78,9 +81,9 @@
 //#define reserved     (*(REG16 0xFF86))
 //#define reserved     (*(REG16 0xFF88))
 //#define reserved     (*(REG16 0xFF8A))
-#define MULDIV_RESX    (*(REG16 0xFF8C)) // r/-: quotient or product low word
-#define MULDIV_RESY    (*(REG16 0xFF8E)) // r/-: remainder or product high word
-#define MULDIV_R32bit  (*(REG32 (&MULDIV_RESX))) // r/-: read result as 32-bit data word
+#define MULDIV_RESX    (*(ROM16 0xFF8C)) // r/-: quotient or product low word
+#define MULDIV_RESY    (*(ROM16 0xFF8E)) // r/-: remainder or product high word
+#define MULDIV_R32bit  (*(ROM32 (&MULDIV_RESX))) // r/-: read result as 32-bit data word
 
 
 /* --- Wishbone Bus Adapter (WB32) --- */
@@ -159,7 +162,7 @@
 /* --- General Purpose Inputs/Outputs (GPIO) --- */
 //#define reserved   (*(REG16 0xFFA8)) // reserved
 #define GPIO_IRQMASK (*(REG16 0xFFAA)) // -/w: irq mask register
-#define GPIO_IN      (*(REG16 0xFFAC)) // r/-: parallel input
+#define GPIO_IN      (*(ROM16 0xFFAC)) // r/-: parallel input
 #define GPIO_OUT     (*(REG16 0xFFAE)) // r/w: parallel output
 
 
@@ -244,8 +247,6 @@
 // PWM controller control register
 #define PWM_CT_ENABLE 0 // r/w: WDT enable
 #define PWM_CT_FMODE  1 // r/w: 0 = slow PWM mode, 1 = fast PWM mode
-// fast PWM mode: CLK / 64
-// slow PWM mode: CLK / 4096
 
 
 /* --- Reserved --- */
@@ -256,14 +257,14 @@
 
 
 /* --- System Configuration (SYSCONFIG) --- */
-#define CPUID0 (*(REG16 0xFFF0)) // r/-: HW version
-#define CPUID1 (*(REG16 0xFFF2)) // r/-: system configuration
-#define CPUID2 (*(REG16 0xFFF4)) // r/-: CPU identifier
-#define CPUID3 (*(REG16 0xFFF6)) // r/-: IMEM/ROM size in bytes
-#define CPUID4 (*(REG16 0xFFF8)) // r/-: DMEM/RAM base address
-#define CPUID5 (*(REG16 0xFFFA)) // r/-: DMEM/RAM size in bytes
-#define CPUID6 (*(REG16 0xFFFC)) // r/-: clock speed lo
-#define CPUID7 (*(REG16 0xFFFE)) // r/-: clock speed hi
+#define CPUID0 (*(ROM16 0xFFF0)) // r/-: HW version
+#define CPUID1 (*(ROM16 0xFFF2)) // r/-: system configuration
+#define CPUID2 (*(ROM16 0xFFF4)) // r/-: CPU identifier
+#define CPUID3 (*(ROM16 0xFFF6)) // r/-: IMEM/ROM size in bytes
+#define CPUID4 (*(ROM16 0xFFF8)) // r/-: DMEM/RAM base address
+#define CPUID5 (*(ROM16 0xFFFA)) // r/-: DMEM/RAM size in bytes
+#define CPUID6 (*(ROM16 0xFFFC)) // r/-: clock speed lo
+#define CPUID7 (*(ROM16 0xFFFE)) // r/-: clock speed hi
 
 // Aliases
 #define HW_VERSION    CPUID0 // r/-: HW version number

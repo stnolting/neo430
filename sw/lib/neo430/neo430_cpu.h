@@ -200,7 +200,7 @@ inline uint16_t __bswap(uint16_t a) {
  * ------------------------------------------------------------ */
 inline uint16_t __combine_bytes(uint8_t hi, uint8_t lo) {
 
-  uint16_t r = __bswap((uint16_t)hi);
+  register uint16_t r = __bswap((uint16_t)hi);
   return r | (uint16_t)lo;
 }
 

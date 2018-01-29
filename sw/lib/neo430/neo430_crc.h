@@ -37,12 +37,11 @@ inline uint16_t crc16_iterate(uint8_t data);
 inline uint32_t crc32_iterate(uint8_t data);
 
 
-
 /* ------------------------------------------------------------
  * INFO Compute CRC16 from buffer
  * PARAM start_val: Start value for CRC shift register
  * PARAM polynomial: 16-bit polynomial XOR mask
- * PARAM data: Pointer do BYTE input data array
+ * PARAM data: Pointer to BYTE input data array
  * PARAM length: Number of elements in input data array
  * RETURN CRC16 result
  * ------------------------------------------------------------ */
@@ -63,8 +62,8 @@ uint16_t crc16(uint16_t start_val, uint16_t polynomial, uint8_t *data, uint16_t 
 /* ------------------------------------------------------------
  * INFO Compute CRC32 from buffer
  * PARAM start_val: Start value for CRC shift register
- * PARAM polynomial: 16-bit polynomial XOR mask
- * PARAM data: Pointer do BYTE input data array
+ * PARAM polynomial: 32-bit polynomial XOR mask
+ * PARAM data: Pointer to BYTE input data array
  * PARAM length: Number of elements in input data array
  * RETURN CRC32 result
  * ------------------------------------------------------------ */

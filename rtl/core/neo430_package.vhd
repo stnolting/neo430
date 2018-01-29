@@ -125,7 +125,7 @@ package neo430_package is
 
   constant wdt_ctrl_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wdt_base_c) + x"0000");
 
-  -- IO: Cyclic redundancy check (CRC) --
+  -- IO: Cyclic Redundancy Check (CRC) --
   constant crc_base_c : std_ulogic_vector(15 downto 0) := x"FFC0";
   constant crc_size_c : natural := 16; -- bytes
 

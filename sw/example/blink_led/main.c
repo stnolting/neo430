@@ -21,7 +21,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               06.10.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               28.10.2017  #
 // #################################################################################################
 
 
@@ -31,9 +31,6 @@
 
 // Configuration
 #define BAUD_RATE 19200
-
-// Function prototypes
-void delay(uint16_t t);
 
 
 /* ------------------------------------------------------------
@@ -54,27 +51,11 @@ int main(void) {
     return 1;
   }
 
-  gpio_port_set(0); // deactivate all LEDs
-
   uint16_t i = 0; // init counter
   while (1) {
-    gpio_port_set(0x00FF & i++); // set output port and increment counter
-    delay(10); // wait some time
+    gpio_port_set(0x00FF & (i++)); // set output port and increment counter
+    cpu_delay_ms(200); // wait 200ms
   }
 
   return 0;
-}
-
-
-/* ------------------------------------------------------------
- * INFO Stupid delay subroutine
- * PARAM t delay
- * ------------------------------------------------------------ */
-void delay(uint16_t t) {
-
-  uint16_t i = 0;
-  while (t--) {
-    for (i=0; i<0xFFFF; i++)
-      asm volatile ("nop");
-  }
 }

@@ -48,28 +48,47 @@ int main(void) {
     return 1;
   }
 
-  // enable pwm controller in slow mode
-  pwm_enable_slow_mode();
+  // enable pwm controller in fast mode
+  pwm_enable_fast_mode();
 
-  // initialize all pwm channels
-  uint8_t pwm0 = 0;
-  uint8_t pwm1 = 85;
-  uint8_t pwm2 = 170;
+  uint8_t pwm = 0;
+  uint8_t up = 1;
+  uint8_t ch = 0;
+
+  // clear all channels
+  pwm_set_ch0(0);
+  pwm_set_ch1(0);
+  pwm_set_ch2(0);
 
   // animate!
   while(1) {
+  
     // update duty cycle
-    pwm0 += 1;
-    pwm1 += 1;
-    pwm2 += 1;
-
+    if (up) {
+      if (pwm == 127) // up to half intensity
+        up = 0;
+      else
+        pwm++;
+    }
+    else {
+      if (pwm == 0) {
+        ch = (ch + 1) & 3;
+        up = 1;
+      }
+      else
+        pwm--;
+    }
+  
     // output new duty cycle
-    pwm_set_ch0(pwm0);
-    pwm_set_ch1(pwm1);
-    pwm_set_ch2(pwm2);
-
-    // wait 10ms
-    cpu_delay_ms(10);
+    if (ch == 0)
+      pwm_set_ch0(pwm);
+    if (ch == 1)
+      pwm_set_ch1(pwm);
+    if (ch == 2)
+      pwm_set_ch2(pwm);
+  
+    // wait 5ms
+    cpu_delay_ms(5);
   }
 
   return 0;

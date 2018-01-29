@@ -75,12 +75,12 @@ int main(void) {
 
 
   // **************************************************************
-  // YOUR APPLICATION YOU WANT TO PROFILE REGARDING REAL RUNTIME
+  // YOUR APPLIhttps://smile.amazon.de/gp/video/detail/B00J9OBDU4/ref=pd_cbs_318_20CATION YOU WANT TO PROFILE REGARDING REAL RUNTIME
   // The code below is just a compute-intensive exemplary dummy...
   volatile uint32_t a = 0x87654321;
   volatile uint32_t b = 0x12345678;
   volatile uint32_t c = (a%b)/27; // use *SW* division and multiplication here
-  GPIO_IN = (uint16_t)c; // store result to a read-only register so the compiler does not complain -> dismiss result ;)
+  GPIO_OUT = (uint16_t)c; // store result to a read-only register so the compiler does not complain -> dismiss result ;)
   // **************************************************************
 
 

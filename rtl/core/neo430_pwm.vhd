@@ -64,8 +64,8 @@ architecture neo430_pwm_rtl of neo430_pwm is
   constant lo_abb_c : natural := index_size(pwm_size_c); -- low address boundary bit
 
   -- Control register bits --
-  constant ctrl_enable_c : natural := 0; -- r/w: PWM enable
-  constant ctrl_fmode_c  : natural := 1; -- r/w: 1 = fast PWM mode, 0 = slow PWM mode
+  constant ctrl_enable_c : natural := 0; -- -/w: PWM enable
+  constant ctrl_fmode_c  : natural := 1; -- -/w: 1 = fast PWM mode, 0 = slow PWM mode
 
   -- access control --
   signal acc_en : std_ulogic; -- module access enable
@@ -73,10 +73,10 @@ architecture neo430_pwm_rtl of neo430_pwm is
   signal wren   : std_ulogic; -- word write enable
 
   -- accessible regs --
-  signal enable : std_ulogic;
-  signal fmode  : std_ulogic;
   type pwm_ch_t is array (0 to num_pwm_channels_c-1) of std_ulogic_vector(pwm_resolution_c-1 downto 0);
   signal pwm_ch : pwm_ch_t;
+  signal enable : std_ulogic;
+  signal fmode  : std_ulogic;
 
   -- prescaler clock generator --
   signal prsc_tick : std_ulogic;

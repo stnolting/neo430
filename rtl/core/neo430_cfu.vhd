@@ -26,7 +26,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 26.01.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 27.01.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -59,7 +59,8 @@ architecture neo430_cfu_rtl of neo430_cfu is
   -- access control --
   signal acc_en : std_ulogic; -- module access enable
   signal addr   : std_ulogic_vector(15 downto 0); -- access address
-  signal wren   : std_ulogic; -- full word write enables
+  signal wren   : std_ulogic; -- full word write enable
+  signal rden   : std_ulogic; -- read enable
 
   -- accessible regs (8x16-bit) --
   signal user_reg0 : std_ulogic_vector(15 downto 0);
@@ -80,6 +81,7 @@ begin
   acc_en <= '1' when (addr_i(hi_abb_c downto lo_abb_c) = cfu_base_c(hi_abb_c downto lo_abb_c)) else '0';
   addr   <= cfu_base_c(15 downto lo_abb_c) & addr_i(lo_abb_c-1 downto 1) & '0'; -- word aligned
   wren   <= acc_en and wren_i(1) and wren_i(0);
+  rden   <= acc_en and rden_i;
 
 
   -- Write access -------------------------------------------------------------
@@ -90,7 +92,7 @@ begin
   begin
     if rising_edge(clk_i) then
       -- write access to user registers --
-      if (acc_en = '1') and (wren = '1') then -- valid write access
+      if (wren = '1') then -- valid write access
         case addr is
           when cfu_reg0_addr_c => user_reg0 <= data_i;
           when cfu_reg1_addr_c => user_reg1 <= data_i;
@@ -122,7 +124,7 @@ begin
   begin
     if rising_edge(clk_i) then
       data_o <= (others => '0'); -- this is crucial for the final OR-ing of all device's outputs
-      if (acc_en = '1') and (rden_i = '1') then -- valid read access
+      if (rden = '1') then -- valid read access
         case addr is
           when cfu_reg0_addr_c => data_o <= user_reg0;
           when cfu_reg1_addr_c => data_o <= user_reg1;

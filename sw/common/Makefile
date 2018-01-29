@@ -22,7 +22,7 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 # ********************************************************************************************* #
-#  Stephan Nolting, Hannover, Germany                                               16.10.2017  #
+# Stephan Nolting, Hannover, Germany                                                 28.01.2018 #
 #################################################################################################
 
 
@@ -66,7 +66,7 @@ IMAGE_GEN = $(TOOL_PATH)/image_gen/image_gen
 
 # Compiler flags
 CC_OPTS = -pipe -nostartfiles -fwhole-program -fdata-sections -ffunction-sections -Xlinker --gc-sections -Wl,-static -Wall
-CC_OPTS += -minrt -Xassembler --mY -mhwmult=none
+CC_OPTS += -minrt -Xassembler --mY -mhwmult=none -mrelax
 
 #-------------------------------------------------------------------------------
 # Paths

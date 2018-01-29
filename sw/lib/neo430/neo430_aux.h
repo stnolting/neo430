@@ -59,7 +59,7 @@ void __memset(uint8_t *dst, uint8_t data, uint16_t num) {
 uint8_t __memcmp(uint8_t *dst, uint8_t *src, uint16_t num) {
 
   while (num--) {
-    if ((*dst++ - *src++) != 0)
+    if (*dst++ != *src++)
       return 1;
   }
   return 0;

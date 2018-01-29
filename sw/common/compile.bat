@@ -22,7 +22,7 @@
 @REM # You should have received a copy of the GNU Lesser General Public License along with this      #
 @REM # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 @REM # ********************************************************************************************* #
-@REM #  Stephan Nolting, Hannover, Germany                                               16.10.2017  #
+@REM # Stephan Nolting, Hannover, Germany                                                 28.01.2018 #
 @REM #################################################################################################
 
 
@@ -46,7 +46,7 @@
 
 @REM Compiler flags
 @set CC_OPTS= -nostartfiles -pipe -fwhole-program -fdata-sections -ffunction-sections -Xlinker --gc-sections -Wl,-static -Wall
-@set CC_OPTS=%CC_OPTS% -minrt -Xassembler --mY -mhwmult=none
+@set CC_OPTS=%CC_OPTS% -minrt -Xassembler --mY -mhwmult=none -mrelax
 
 @REM Assemble start-up code
 @%AS% -mcpu=msp430 crt0.asm -mY -o crt0.elf
