@@ -24,7 +24,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 20.01.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 29.01.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -105,14 +105,12 @@ begin
       if (acc_en = '1') then
         if (wren_i(0) = '1') and (upen_i = '1') and (IMEM_AS_ROM = false) then
           imem_file_l(addr) <= data_i(07 downto 0);
-        else
-          rdata(07 downto 0) <= imem_file_l(addr);
         end if;
+        rdata(07 downto 0) <= imem_file_l(addr);
         if (wren_i(1) = '1') and (upen_i = '1') and (IMEM_AS_ROM = false) then
           imem_file_h(addr) <= data_i(15 downto 8);
-        else
-          rdata(15 downto 8) <= imem_file_h(addr);
         end if;
+        rdata(15 downto 8) <= imem_file_h(addr);
       end if;
     end if;
   end process imem_file_access;
