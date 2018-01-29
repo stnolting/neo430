@@ -82,7 +82,8 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 ## Implementation Results
 
-Mapping results generated for HW version 0x0170. 
+Mapping results generated for HW version 0x0170. The full (default) configuration includes
+all optional processor modules.
 
 | __Xilinx Virtex-6__                 | LUTs | FFs | BRAMs | DSPs | f_max   |
 |-------------------------------------|:----:|-----|-------|------|---------|
