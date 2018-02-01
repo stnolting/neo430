@@ -24,7 +24,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from http://www.gnu.org/licenses/lgpl-3.0.en.html                 #
 -- # ********************************************************************************************* #
--- #  tephan Nolting, Hannover, Germany                                                 01.12.2017 #
+-- #  tephan Nolting, Hannover, Germany                                                 31.12.2017 #
 -- #################################################################################################
 
 library ieee;
@@ -98,15 +98,12 @@ begin
           when others =>
             NULL;
         end case;
-        -- operation division/multiplication --
-        case addr is
-          when muldiv_opb_div_addr_c => -- division
-            operation <= '1';
-          when muldiv_opb_mul_addr_c => -- multiplication
-            operation <= '0';
-          when others =>
-            NULL;
-        end case;
+        -- operation: division/multiplication --
+        if (addr = muldiv_opb_div_addr_c) then -- division
+          operation <= '1';
+        else -- multiplication
+          operation <= '0';
+        end if;
       end if;
     end if;
   end process wr_access;
