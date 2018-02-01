@@ -23,7 +23,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 27.01.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 01.02.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -82,7 +82,7 @@ architecture neo430_pwm_rtl of neo430_pwm is
   signal prsc_tick : std_ulogic;
 
   -- pwm counter --
-  signal pwm_cnt : std_ulogic_vector(pwm_resolution_c   downto 0);
+  signal pwm_cnt : std_ulogic_vector(pwm_resolution_c-1 downto 0);
 
 begin
 
@@ -126,18 +126,14 @@ begin
       if (enable = '0') then 
         pwm_cnt <= (others => '0');
       elsif (prsc_tick = '1') then
-        pwm_cnt <= std_ulogic_vector(unsigned('0' & pwm_cnt(pwm_resolution_c-1 downto 0)) + 1);
+        pwm_cnt <= std_ulogic_vector(unsigned(pwm_cnt) + 1);
       end if;
       -- channels --
       for i in 0 to num_pwm_channels_c-1 loop
-        if (enable = '0') then
+        if (unsigned(pwm_cnt) >= unsigned(pwm_ch(i))) or (enable = '0') then
           pwm_o(i) <= '0';
         else
-          if (pwm_cnt(pwm_resolution_c) = '1') then
-            pwm_o(i) <= '1';
-          elsif (unsigned(pwm_cnt(pwm_resolution_c-1 downto 0)) >= unsigned(pwm_ch(i))) then
-            pwm_o(i) <= '0';
-          end if;
+          pwm_o(i) <= '1';
         end if;
       end loop; -- i, pwm channel
     end if;
