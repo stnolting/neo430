@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from http://www.gnu.org/licenses/lgpl-3.0.en.html                 #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 27.01.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 02.01.2018 #
 // #################################################################################################
 
 
@@ -74,6 +74,7 @@ int main(void) {
       if (pwm == 0) {
         ch = (ch + 1) & 3;
         up = 1;
+        cpu_delay_ms(200);
       }
       else
         pwm--;

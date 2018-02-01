@@ -97,7 +97,7 @@ begin
         -- operation selection --
         if (addr = crc_crc16_in_addr_c) then
           mode <= '0'; -- crc16 mode
-        else--if (addr = crc_crc32_in_addr_c) then
+        else
           mode <= '1'; -- crc32 mode
         end if;
       end if;
