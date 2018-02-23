@@ -39,7 +39,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 ## Processor Features
 
-![NEO430, optional modules are marked using dashed lines](https://github.com/stnolting/neo430/blob/master/doc/figures/neo430_arch.png "NEO430, optional modules are marked using dashed lines")
+![NEO430, optional modules are marked using dashed lines](https://github.com/stnolting/neo430/blob/master/doc/figures/neo430_arch.png =500x "NEO430, optional modules are marked using dashed lines")
 
 
 - 16-bit open source soft-core microcontroller-like processor system
@@ -144,4 +144,4 @@ If you have any questions, bug reports, ideas or if you are facing problems with
 
 
 
-![OSHW](https://github.com/stnolting/neo430/blob/master/doc/figures/oshw_logo.png "Open Source Hardware")
+![OSHW"NEO430, optional modules are marked using dashed lines](https://github.com/stnolting/neo430/blob/master/doc/figures/oshw_logo.png "Open Source Hardware" =100x)
