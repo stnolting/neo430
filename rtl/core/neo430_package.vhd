@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 26.01.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 23.02.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -30,7 +30,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0170"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0171"; -- no touchy!
 
   -- Internal Functions ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -46,6 +46,9 @@ package neo430_package is
   function gray_to_bin(input : std_ulogic_vector) return std_ulogic_vector;
   function int_to_hexchar(input : integer) return character;
   function bcd_add4(a : std_ulogic_vector; b : std_ulogic_vector; c : std_ulogic) return std_ulogic_vector;
+  function or_all(a : std_ulogic_vector) return std_ulogic;
+  function and_all(a : std_ulogic_vector) return std_ulogic;
+  function xor_all(a : std_ulogic_vector) return std_ulogic;
 
   -- Address Space Layout -------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -699,7 +702,7 @@ end neo430_package;
 
 package body neo430_package is
 
-  -- Function: Minimum required bit width ---------------------------------------------------
+  -- Function: Minimal required bit width ---------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   function index_size(input : natural) return natural is
   begin
@@ -865,6 +868,42 @@ package body neo430_package is
     end if;
     return std_ulogic_vector(cry_v & res_v);
   end function bcd_add4;
+
+  -- Function: OR all bits ------------------------------------------------------------------
+  -- -------------------------------------------------------------------------------------------
+  function or_all(a : std_ulogic_vector) return std_ulogic is
+    variable tmp_v : std_ulogic;
+  begin
+    tmp_v := a(a'low);
+    for i in a'low+1 to a'high loop
+      tmp_v := tmp_v or a(i);
+    end loop; -- i
+    return tmp_v;
+  end function or_all;
+
+  -- Function: AND all bits -----------------------------------------------------------------
+  -- -------------------------------------------------------------------------------------------
+  function and_all(a : std_ulogic_vector) return std_ulogic is
+    variable tmp_v : std_ulogic;
+  begin
+    tmp_v := a(a'low);
+    for i in a'low+1 to a'high loop
+      tmp_v := tmp_v and a(i);
+    end loop; -- i
+    return tmp_v;
+  end function and_all;
+
+  -- Function: XOR all bits -----------------------------------------------------------------
+  -- -------------------------------------------------------------------------------------------
+  function xor_all(a : std_ulogic_vector) return std_ulogic is
+    variable tmp_v : std_ulogic;
+  begin
+    tmp_v := a(a'low);
+    for i in a'low+1 to a'high loop
+      tmp_v := tmp_v xor a(i);
+    end loop; -- i
+    return tmp_v;
+  end function xor_all;
 
 
 end neo430_package;

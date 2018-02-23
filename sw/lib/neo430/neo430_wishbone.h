@@ -30,21 +30,21 @@
 uint32_t wishbone_read32(uint32_t a);
 void wishbone_write32(uint32_t a, uint32_t d);
 
-uint16_t wishbone_read16(uint32_t a);
-void wishbone_write16(uint32_t a, uint16_t d);
+uint16_t wishbone_read16(uint32_t a); // This function performs a data alignment based on the address!
+void wishbone_write16(uint32_t a, uint16_t d); // This function performs a data alignment based on the address!
 
-uint8_t wishbone_read8(uint32_t a);
-void wishbone_write8(uint32_t a, uint8_t d);
+uint8_t wishbone_read8(uint32_t a); // This function performs a data alignment based on the address!
+void wishbone_write8(uint32_t a, uint8_t d); // This function performs a data alignment based on the address!
 
 // prototypes non-blocking functions
 uint32_t wishbone_read32_nonblocking(uint32_t a, uint8_t* success);
 void wishbone_write32_nonblocking(uint32_t a, uint32_t d, uint8_t* success);
 
-uint16_t wishbone_read16_nonblocking(uint32_t a, uint8_t* success);
-void wishbone_write16_nonblocking(uint32_t a, uint16_t d, uint8_t* success);
+uint16_t wishbone_read16_nonblocking(uint32_t a, uint8_t* success); // This function performs a data alignment based on the address!
+void wishbone_write16_nonblocking(uint32_t a, uint16_t d, uint8_t* success); // This function performs a data alignment based on the address!
 
-uint8_t wishbone_read8_nonblocking(uint32_t a, uint8_t* success);
-void wishbone_write8_nonblocking(uint32_t a, uint8_t d, uint8_t* success);
+uint8_t wishbone_read8_nonblocking(uint32_t a, uint8_t* success); // This function performs a data alignment based on the address!
+void wishbone_write8_nonblocking(uint32_t a, uint8_t d, uint8_t* success); // This function performs a data alignment based on the address!
 
 
 /* ------------------------------------------------------------
@@ -90,6 +90,7 @@ void wishbone_write32(uint32_t a, uint32_t d) {
 
 /* ------------------------------------------------------------
  * INFO Read 16-bit from Wishbone device (blocking), standard mode, pipelined
+ * INFO This function performs a data alignment based on the address!
  * PARAM 32-bit device address
  * RETURN 16-bit read data
  * ------------------------------------------------------------ */
@@ -116,6 +117,7 @@ uint16_t wishbone_read16(uint32_t a) {
 
 /* ------------------------------------------------------------
  * INFO Write 16-bit to Wishbone device (blocking), standard mode, pipelined
+ * INFO This function performs a data alignment based on the address!
  * PARAM a: 32-bit device address
  * PARAM d: 16-bit write data
  * ------------------------------------------------------------ */
@@ -141,6 +143,7 @@ void wishbone_write16(uint32_t a, uint16_t d) {
 
 /* ------------------------------------------------------------
  * INFO Read 8-bit from Wishbone device (blocking), standard mode, pipelined
+ * INFO This function performs a data alignment based on the address!
  * PARAM 32-bit device address
  * RETURN 0 if success, 1 if timeout
  * ------------------------------------------------------------ */
@@ -163,6 +166,7 @@ uint8_t wishbone_read8(uint32_t a) {
 
 /* ------------------------------------------------------------
  * INFO Write 8-bit to Wishbone device (blocking), standard mode, pipelined
+ * INFO This function performs a data alignment based on the address!
  * PARAM a: 32-bit device address
  * PARAM d: 8-bit write data
  * ------------------------------------------------------------ */
@@ -229,6 +233,7 @@ void wishbone_write32_nonblocking(uint32_t a, uint32_t d, uint8_t* success) {
 
 /* ------------------------------------------------------------
  * INFO Read 16-bit from Wishbone device (non-blocking), standard mode, pipelined
+ * INFO This function performs a data alignment based on the address!
  * PARAM 32-bit device address
  * PARAM pointer to byte variable to indicate success (=0)
  * RETURN 16-bit read data
@@ -256,6 +261,7 @@ uint16_t wishbone_read16_nonblocking(uint32_t a, uint8_t* success) {
 
 /* ------------------------------------------------------------
  * INFO Write 16-bit to Wishbone device (non-blocking), standard mode, pipelined
+ * INFO This function performs a data alignment based on the address!
  * PARAM a: 32-bit device address
  * PARAM d: 16-bit write data
  * PARAM pointer to byte variable to indicate success (=0)
@@ -282,6 +288,7 @@ void wishbone_write16_nonblocking(uint32_t a, uint16_t d, uint8_t* success) {
 
 /* ------------------------------------------------------------
  * INFO Read 8-bit from Wishbone device (non-blocking), standard mode, pipelined
+ * INFO This function performs a data alignment based on the address!
  * PARAM 32-bit device address
  * PARAM pointer to byte variable to indicate success (=0)
  * RETURN 0 if success, 1 if timeout
@@ -305,6 +312,7 @@ uint8_t wishbone_read8_nonblocking(uint32_t a, uint8_t* success) {
 
 /* ------------------------------------------------------------
  * INFO Write 8-bit to Wishbone device (non-blocking), standard mode, pipelined
+ * INFO This function performs a data alignment based on the address!
  * PARAM a: 32-bit device address
  * PARAM d: 8-bit write data
  * PARAM pointer to byte variable to indicate success (=0)

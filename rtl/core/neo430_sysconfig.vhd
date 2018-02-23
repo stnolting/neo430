@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 23.01.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 10.02.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -49,7 +49,7 @@ entity neo430_sysconfig is
     TIMER_USE   : boolean := true; -- implement timer?
     USART_USE   : boolean := true; -- implement USART?
     CRC_USE     : boolean := true; -- implement CRC unit?
-    CFU_USE     : boolean := false; -- implement CF unit?
+    CFU_USE     : boolean := true; -- implement CF unit?
     PWM_USE     : boolean := true; -- implement PWM controller?
     -- boot configuration --
     BOOTLD_USE  : boolean := true; -- implement and use bootloader?

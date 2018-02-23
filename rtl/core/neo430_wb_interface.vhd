@@ -160,7 +160,7 @@ begin
   end process arbiter;
 
   -- device actually in use? --
-  enable <= '0' when (byte_en = "0000") else '1';
+  enable <= not or_all(byte_en); -- '0' when (byte_en = "0000") else '1';
 
   -- valid cycle signal --
   wb_cyc_o <= pending;

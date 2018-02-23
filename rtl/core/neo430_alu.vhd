@@ -303,8 +303,8 @@ begin
   -- Additional Flag Logic ----------------------------------------------------
   -- -----------------------------------------------------------------------------
   -- zero flag --
-  lo_zero <= '1' when (alu_res(07 downto 0) = x"00") else '0'; -- zero detector LO byte
-  hi_zero <= '1' when (alu_res(15 downto 8) = x"00") else '0'; -- zero detector HI byte
+  lo_zero <= not or_all(alu_res(07 downto 0)); -- zero detector LO byte
+  hi_zero <= not or_all(alu_res(15 downto 8)); -- zero detector HI byte
   zero    <= lo_zero when (ctrl_i(ctrl_alu_bw_c) = '1') else (lo_zero and hi_zero);
 
   -- negative flag --

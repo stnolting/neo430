@@ -110,10 +110,7 @@ begin
       din     <= in_buf;
       sync_in <= din;
       -- IRQ --
-      irq_o <= '0';
-      if (irq_raw /= x"0000") then
-        irq_o <= '1';
-      end if;
+      irq_o <= or_all(irq_raw);
     end if;
   end process irq_generator;
 

@@ -12,15 +12,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="28594815000001fs"></ZoomEndTime>
-      <Cursor1Time time="6630310730000fs"></Cursor1Time>
+      <ZoomStartTime time="295660916667fs"></ZoomStartTime>
+      <ZoomEndTime time="296225416668fs"></ZoomEndTime>
+      <Cursor1Time time="295855917000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="145"></NameColumnWidth>
-      <ValueColumnWidth column_width="60"></ValueColumnWidth>
+      <NameColumnWidth column_width="135"></NameColumnWidth>
+      <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="125" />
+   <WVObjectSize size="111" />
    <wvobject type="divider" fp_name="divider6">
       <obj_property name="label">Global</obj_property>
       <obj_property name="DisplayName">label</obj_property>
@@ -99,6 +99,7 @@
    <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_cpu_inst/neo430_reg_file_inst/sreg" type="array">
       <obj_property name="ElementShortName">sreg[15:0]</obj_property>
       <obj_property name="ObjectShortName">sreg[15:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_cpu_inst/neo430_reg_file_inst/reg_file" type="array">
       <obj_property name="ElementShortName">reg_file[15:0][15:0]</obj_property>
@@ -226,14 +227,6 @@
       <obj_property name="ElementShortName">spi_cs_o[5:0]</obj_property>
       <obj_property name="ObjectShortName">spi_cs_o[5:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_usart_inst/spi_rtx_sreg" type="array">
-      <obj_property name="ElementShortName">spi_rtx_sreg[7:0]</obj_property>
-      <obj_property name="ObjectShortName">spi_rtx_sreg[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_usart_inst/uart_tx_sreg" type="array">
-      <obj_property name="ElementShortName">uart_tx_sreg[9:0]</obj_property>
-      <obj_property name="ObjectShortName">uart_tx_sreg[9:0]</obj_property>
-   </wvobject>
    <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_usart_inst/uart_tx_busy" type="logic">
       <obj_property name="ElementShortName">uart_tx_busy</obj_property>
       <obj_property name="ObjectShortName">uart_tx_busy</obj_property>
@@ -304,29 +297,9 @@
       <obj_property name="ElementShortName">enable</obj_property>
       <obj_property name="ObjectShortName">enable</obj_property>
    </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_wdt_inst_true/neo430_wdt_inst/clk_sel" type="array">
-      <obj_property name="ElementShortName">clk_sel[2:0]</obj_property>
-      <obj_property name="ObjectShortName">clk_sel[2:0]</obj_property>
-   </wvobject>
    <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_wdt_inst_true/neo430_wdt_inst/cnt" type="array">
       <obj_property name="ElementShortName">cnt[16:0]</obj_property>
       <obj_property name="ObjectShortName">cnt[16:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_wdt_inst_true/neo430_wdt_inst/rst_gen" type="array">
-      <obj_property name="ElementShortName">rst_gen[3:0]</obj_property>
-      <obj_property name="ObjectShortName">rst_gen[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_wdt_inst_true/neo430_wdt_inst/rst_sync" type="array">
-      <obj_property name="ElementShortName">rst_sync[1:0]</obj_property>
-      <obj_property name="ObjectShortName">rst_sync[1:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_wdt_inst_true/neo430_wdt_inst/rst_o" type="logic">
-      <obj_property name="ElementShortName">rst_o</obj_property>
-      <obj_property name="ObjectShortName">rst_o</obj_property>
-   </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_wdt_inst_true/neo430_wdt_inst/source" type="logic">
-      <obj_property name="ElementShortName">source</obj_property>
-      <obj_property name="ObjectShortName">source</obj_property>
    </wvobject>
    <wvobject type="divider" fp_name="divider22">
       <obj_property name="label">IO: Wishbone Bus Interface</obj_property>
@@ -502,40 +475,12 @@
       <obj_property name="ElementShortName">enable</obj_property>
       <obj_property name="ObjectShortName">enable</obj_property>
    </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_pwm_inst_true/neo430_pwm_inst/clk_sel" type="array">
-      <obj_property name="ElementShortName">clk_sel[2:0]</obj_property>
-      <obj_property name="ObjectShortName">clk_sel[2:0]</obj_property>
-   </wvobject>
    <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_pwm_inst_true/neo430_pwm_inst/pwm_o" type="array">
       <obj_property name="ElementShortName">pwm_o[2:0]</obj_property>
       <obj_property name="ObjectShortName">pwm_o[2:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_pwm_inst_true/neo430_pwm_inst/pwm_ch0" type="array">
-      <obj_property name="ElementShortName">pwm_ch0[7:0]</obj_property>
-      <obj_property name="ObjectShortName">pwm_ch0[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_pwm_inst_true/neo430_pwm_inst/pwm_ch1" type="array">
-      <obj_property name="ElementShortName">pwm_ch1[7:0]</obj_property>
-      <obj_property name="ObjectShortName">pwm_ch1[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_pwm_inst_true/neo430_pwm_inst/pwm_ch2" type="array">
-      <obj_property name="ElementShortName">pwm_ch2[7:0]</obj_property>
-      <obj_property name="ObjectShortName">pwm_ch2[7:0]</obj_property>
-   </wvobject>
    <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_pwm_inst_true/neo430_pwm_inst/prsc_tick" type="logic">
       <obj_property name="ElementShortName">prsc_tick</obj_property>
       <obj_property name="ObjectShortName">prsc_tick</obj_property>
-   </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_pwm_inst_true/neo430_pwm_inst/pwm_ch0_cnt" type="array">
-      <obj_property name="ElementShortName">pwm_ch0_cnt[8:0]</obj_property>
-      <obj_property name="ObjectShortName">pwm_ch0_cnt[8:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_pwm_inst_true/neo430_pwm_inst/pwm_ch1_cnt" type="array">
-      <obj_property name="ElementShortName">pwm_ch1_cnt[8:0]</obj_property>
-      <obj_property name="ObjectShortName">pwm_ch1_cnt[8:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_pwm_inst_true/neo430_pwm_inst/pwm_ch2_cnt" type="array">
-      <obj_property name="ElementShortName">pwm_ch2_cnt[8:0]</obj_property>
-      <obj_property name="ObjectShortName">pwm_ch2_cnt[8:0]</obj_property>
    </wvobject>
 </wave_config>

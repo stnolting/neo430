@@ -39,8 +39,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 ## Processor Features
 
-<img src="https://github.com/stnolting/neo430/blob/master/doc/figures/neo430_arch.png" width="500px"/>
-(optional modules are marked using dashed lines)
+![NEO430, optional modules are marked using dashed lines](https://github.com/stnolting/neo430/blob/master/doc/figures/neo430_arch.png "NEO430, optional modules are marked using dashed lines")
 
 
 - 16-bit open source soft-core microcontroller-like processor system
@@ -82,18 +81,20 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 ## Implementation Results
 
-Mapping results generated for HW version 0x0170. The full (default) configuration includes
+Mapping results generated for HW version 0x0171. The full (default) configuration includes
 all optional processor modules.
 
-| __Xilinx Virtex-6__                 | LUTs | FFs | BRAMs | DSPs | f_max   |
-|-------------------------------------|:----:|-----|-------|------|---------|
-| Full (default) configuration:       | TBA  | TBA | 4     | 0    | TBA MHz |
-| Minimal configuration (CPU + GPIO): | TBA  | TBA | 3     | 0    | TBA MHz |
+| __Xilinx Artix-7 (XC7A35TICSG324-1L)__  | LUTs | FFs | BRAMs | DSPs | f*      |
+|:----------------------------------------|:----:|:---:|:-----:|:----:|:-------:|
+| Full (default) configuration:           | TBA  | TBA | 4     | 0    | TBA MHz |
+| Minimal configuration (CPU + GPIO):     | TBA  | TBA | 3     | 0    | TBA MHz |
 
-| __Intel/Altera Cyclone IV__         | LUTs | FFs | Memory bits | DSPs | f_max   |
-|-------------------------------------|:----:|-----|-------------|------|---------|
-| Full (default) configuration:       | 1588 | 868 | 65792       | 0    | 115 MHz |
-| Minimal configuration (CPU + GPIO): | 614  | 232 | 49408       | 0    | 120 MHz |
+*) Constrained
+
+| __Intel/Altera Cyclone IV (EP4CE22F17C6)__  | LUTs | FFs | Memory bits | DSPs | f_max   |
+|:--------------------------------------------|:----:|:---:|:-----------:|:----:|:-------:|
+| Full (default) configuration:               | 1527 | 863 | 65792       | 0    | 115 MHz |
+| Minimal configuration (CPU + GPIO):         |  626 | 232 | 49408       | 0    | 117 MHz |
 
 
 ## Let's Get It Started!
@@ -143,4 +144,4 @@ If you have any questions, bug reports, ideas or if you are facing problems with
 
 
 
-<img src="https://github.com/stnolting/neo430/blob/master/doc/figures/oshw_logo.png" width="100px"/>
+![OSHW](https://github.com/stnolting/neo430/blob/master/doc/figures/oshw_logo.png "Open Source Hardware")
