@@ -39,7 +39,9 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 ## Processor Features
 
-![NEO430, optional modules are marked using dashed lines](https://github.com/stnolting/neo430/blob/master/doc/figures/neo430_arch.png =500x "NEO430, optional modules are marked using dashed lines")
+<img src="https://github.com/stnolting/neo430/blob/master/doc/figures/neo430_arch.png" width="500px"/>
+(optional modules are marked using dashed lines in the figure above)
+
 
 
 - 16-bit open source soft-core microcontroller-like processor system
@@ -86,8 +88,8 @@ all optional processor modules.
 
 | __Xilinx Artix-7 (XC7A35TICSG324-1L)__  | LUTs | FFs | BRAMs | DSPs | f*      |
 |:----------------------------------------|:----:|:---:|:-----:|:----:|:-------:|
-| Full (default) configuration:           | TBA  | TBA | 4     | 0    | TBA MHz |
-| Minimal configuration (CPU + GPIO):     | TBA  | TBA | 3     | 0    | TBA MHz |
+| Full (default) configuration:           | 925  | 856 | 2.5   | 0    | 100 MHz |
+| Minimal configuration (CPU + GPIO):     | 726  | 291 | 1     | 0    | 100 MHz |
 
 *) Constrained
 
@@ -143,5 +145,4 @@ If you have any questions, bug reports, ideas or if you are facing problems with
 
 
 
-
-![OSHW"NEO430, optional modules are marked using dashed lines](https://github.com/stnolting/neo430/blob/master/doc/figures/oshw_logo.png "Open Source Hardware" =100x)
+<img src="https://github.com/stnolting/neo430/blob/master/doc/figures/oshw_logo.png" width="100px"/>
