@@ -91,12 +91,17 @@ all optional processor modules.
 | Full (default) configuration:           | 925  | 856 | 2.5   | 0    | 100 MHz |
 | Minimal configuration (CPU + GPIO):     | 726  | 291 | 1     | 0    | 100 MHz |
 
-*) Constrained
+| __Xilinx Virtex-6 (XC6VLX240T-1FFG1156)__  | LUTs | FFs | BRAMs | DSPs | f_max   |
+|:-------------------------------------------|:----:|:---:|:-----:|:----:|:-------:|
+| Full (default) configuration:              | 1074 | 825 | 5     | 0    | 156 MHz |
+| Minimal configuration (CPU + GPIO):        |  402 | 241 | 4     | 0    | 204 MHz |
 
 | __Intel/Altera Cyclone IV (EP4CE22F17C6)__  | LUTs | FFs | Memory bits | DSPs | f_max   |
 |:--------------------------------------------|:----:|:---:|:-----------:|:----:|:-------:|
 | Full (default) configuration:               | 1527 | 863 | 65792       | 0    | 115 MHz |
 | Minimal configuration (CPU + GPIO):         |  626 | 232 | 49408       | 0    | 117 MHz |
+
+*) Constrained
 
 
 ## Let's Get It Started!
@@ -137,7 +142,7 @@ If you have any questions, bug reports, ideas or if you are facing problems with
 
 "MSP430" is a trademark of Texas Instruments Corporation.
 
-"Virtex", "ISE" and "Vivado" are trademarks of Xilinx Inc.
+"Virtex", "Artix", "ISE" and "Vivado" are trademarks of Xilinx Inc.
 
 "Cyclone", "Quartus" and "Avalon bus" are trademarks of Intel Corporation.
 

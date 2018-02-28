@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 14.01.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 28.02.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -128,8 +128,8 @@ begin
     add_hi_v := std_ulogic_vector(unsigned(a_hi_v) + unsigned(b_hi_v) + unsigned(add_lo_v(8 downto 8)));
 
     -- overflow logic: plus + plus = minus || minus + minus = plus --
-    ova_16_v := ((not op_a_v(15)) and (not op_b_v(15)) and add_hi_v(7)) or (op_a_v(15) and op_b_v(15) and (not add_hi_v(7)));
-    ova_8_v  := ((not op_a_v(7))  and (not op_b_v(7))  and add_lo_v(7)) or (op_a_v(7)  and op_b_v(7)  and (not add_lo_v(7)));
+    ova_16_v := ((not op_a_ff(15)) and (not op_b_ff(15)) and add_hi_v(7)) or (op_a_ff(15) and op_b_ff(15) and (not add_hi_v(7)));
+    ova_8_v  := ((not op_a_ff(7))  and (not op_b_ff(7))  and add_lo_v(7)) or (op_a_ff(7)  and op_b_ff(7)  and (not add_lo_v(7)));
 
     -- output --
     add_res(15 downto 0) <= add_hi_v(7 downto 0) & add_lo_v(7 downto 0); -- result
