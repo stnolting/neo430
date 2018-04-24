@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 14.01.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 20.04.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -33,8 +33,9 @@ use neo430.neo430_package.all;
 
 entity neo430_cpu is
   generic (
-    DADD_USE   : boolean := true; -- implement DADD instruction?
-    BOOTLD_USE : boolean := true  -- implement and use bootloader?
+    DADD_USE    : boolean := true; -- implement DADD instruction?
+    BOOTLD_USE  : boolean := true; -- implement and use bootloader?
+    IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory?
   );
   port (
     -- global control --
@@ -99,7 +100,8 @@ begin
   -- -----------------------------------------------------------------------------
   neo430_reg_file_inst: neo430_reg_file
   generic map (
-    BOOTLD_USE => BOOTLD_USE  -- implement and use bootloader?
+    BOOTLD_USE  => BOOTLD_USE, -- implement and use bootloader?
+    IMEM_AS_ROM => IMEM_AS_ROM -- implement IMEM as read-only memory?
   )
   port map (
     -- global control --
