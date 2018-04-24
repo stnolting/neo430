@@ -64,6 +64,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Optional cyclic redundancy check unit (CRC16/32)
 - Optional custom functions unit (CFU) for user-defined processor extensions
 - Optional 3 channel 8-bit PWM controller
+- Optional true random number generator (TRNG)
 - Optional internal bootloader (2kB ROM) with serial user console and automatic boot from external EEPROM
 
 
@@ -83,7 +84,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 ## Implementation Results
 
-Mapping results generated for HW version 0x0171. The full (default) configuration includes
+Mapping results generated for HW version 0x0180. The full (default) configuration includes
 all optional processor modules.
 
 | __Xilinx Artix-7 (XC7A35TICSG324-1L)__  | LUTs | FFs | BRAMs | DSPs | f*      |

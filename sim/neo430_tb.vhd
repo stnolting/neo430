@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hanover, Germany                                                  23.01.2018 #
+-- # Stephan Nolting, Hanover, Germany                                                  24.04.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -101,6 +101,7 @@ begin
     CRC_USE     => true,              -- implement CRC unit? (default=true)
     CFU_USE     => true,              -- implement custom functions unit? (default=false)
     PWM_USE     => true,              -- implement PWM controller? (default=true)
+    TRNG_USE    => false,             -- implement true random number generator? (default=false)
     -- boot configuration --
     BOOTLD_USE  => false,             -- implement and use bootloader? (default=true)
     IMEM_AS_ROM => false              -- implement IMEM as read-only memory? (default=false)

@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 27.01.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 24.04.2018 #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -249,8 +249,15 @@
 #define PWM_CT_FMODE  1 // r/w: 0 = slow PWM mode, 1 = fast PWM mode
 
 
+/* --- True Random Number Generator --- */
+#define TRNG_CT   (*(REG16 0xFFE8)) // -/w: control register
+#define TRNG_DATA (*(REG16 0xFFE8)) // r/-: random data (bytes)
+
+// TRNG control register
+#define TRNG_CT_ENABLE 0 // -/w: TRNG enable
+
+
 /* --- Reserved --- */
-//#define ? (*(REG16 0xFFE8))
 //#define ? (*(REG16 0xFFEA))
 //#define ? (*(REG16 0xFFEC))
 //#define ? (*(REG16 0xFFEE))
@@ -292,6 +299,7 @@
 #define SYS_CRC_EN    9 // CRC synthesized
 #define SYS_CFU_EN   10 // CFU synthesized
 #define SYS_PWM_EN   11 // PWM controller synthesized
+#define SYS_TRNG_EN  12 // TRNG synthesized
 
 
 // ----------------------------------------------------------------------------
@@ -303,6 +311,7 @@
 #include "neo430_gpio.h"
 #include "neo430_muldiv.h"
 #include "neo430_pwm.h"
+#include "neo430_trng.h"
 #include "neo430_usart.h"
 #include "neo430_wdt.h"
 #include "neo430_wishbone.h"

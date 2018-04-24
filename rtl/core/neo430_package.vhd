@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 28.02.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 24.04.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -30,7 +30,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0172"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0180"; -- no touchy!
 
   -- Internal Functions ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -163,9 +163,15 @@ package neo430_package is
   constant pwm_ch1_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(pwm_base_c) + x"0004");
   constant pwm_ch2_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(pwm_base_c) + x"0006");
 
+  -- IO: True Random Number Generator --
+  constant trng_base_c : std_ulogic_vector(15 downto 0) := x"FFE8";
+  constant trng_size_c : natural := 2; -- bytes
+
+  constant trng_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(trng_base_c) + x"0000");
+
   -- IO: RESERVED --
---constant ???_base_c : std_ulogic_vector(15 downto 0) := x"FFE8";
---constant ???_size_c : natural := 8; -- bytes
+--constant ???_base_c : std_ulogic_vector(15 downto 0) := x"FFF0";
+--constant ???_size_c : natural := 6; -- bytes
 
 --constant ???_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0000");
 --constant ???_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0002");
@@ -302,7 +308,8 @@ package neo430_package is
       USART_USE   : boolean := true; -- implement USART? (default=true)
       CRC_USE     : boolean := true; -- implement CRC unit? (default=true)
       CFU_USE     : boolean := false; -- implement custom functions unit? (default=false)
-      PWM_USE     : boolean := true; -- implement PWM controller?
+      PWM_USE     : boolean := true; -- implement PWM controller? (default = true)
+      TRNG_USE    : boolean := false; -- implement true random number generator? (default=false)
       -- boot configuration --
       BOOTLD_USE  : boolean := true; -- implement and use bootloader? (default=true)
       IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory? (default=false)
@@ -365,7 +372,8 @@ package neo430_package is
   -- -------------------------------------------------------------------------------------------
   component neo430_reg_file
     generic (
-      BOOTLD_USE : boolean := true -- implement and use bootloader?
+      BOOTLD_USE  : boolean := true; -- implement and use bootloader?
+      IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory?
     );
     port (
       -- global control --
@@ -427,8 +435,9 @@ package neo430_package is
   -- -------------------------------------------------------------------------------------------
   component neo430_cpu
     generic (
-      DADD_USE   : boolean := true; -- implement DADD instruction?
-      BOOTLD_USE : boolean := true  -- implement and use bootloader?
+      DADD_USE    : boolean := true; -- implement DADD instruction?
+      BOOTLD_USE  : boolean := true; -- implement and use bootloader?
+      IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory?
     );
     port(
       -- global control --
@@ -663,6 +672,20 @@ package neo430_package is
     );
   end component;
 
+  -- Component: True Random Number Generator ------------------------------------------------
+  -- -------------------------------------------------------------------------------------------
+  component neo430_trng
+    port (
+      -- host access --
+      clk_i  : in  std_ulogic; -- global clock line
+      rden_i : in  std_ulogic; -- read enable
+      wren_i : in  std_ulogic_vector(01 downto 0); -- write enable
+      addr_i : in  std_ulogic_vector(15 downto 0); -- address
+      data_i : in  std_ulogic_vector(15 downto 0); -- data in
+      data_o : out std_ulogic_vector(15 downto 0)  -- data out
+    );
+  end component;
+
   -- Component: System Configuration --------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_sysconfig
@@ -684,6 +707,7 @@ package neo430_package is
       CRC_USE     : boolean := true; -- implement CRC unit?
       CFU_USE     : boolean := true; -- implement CF unit?
       PWM_USE     : boolean := true; -- implement PWM controller?
+      TRNG_USE    : boolean := true; -- implement TRNG?
       -- boot configuration --
       BOOTLD_USE  : boolean := true; -- implement and use bootloader?
       IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory?

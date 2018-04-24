@@ -29,7 +29,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               23.01.2018  #
+// #  Stephan Nolting, Hannover, Germany                                               24.04.2018  #
 // #################################################################################################
 
 // Libraries
@@ -105,6 +105,9 @@ int  main(void) {
   // disable PWM
   PWM_CT = 0;
 
+  // disable TRNG
+  TRNG_CT = 0;
+
   // no valid boot image in IMEM yet
   VALID_IMAGE = 0;
 
@@ -140,7 +143,7 @@ int  main(void) {
   // ****************************************************************
   // Show bootloader intro and system information
   // ****************************************************************
-  uart_br_print("\n\nNEO430 Bootloader V20180123 by Stephan Nolting\n\n"
+  uart_br_print("\n\nNEO430 Bootloader V20180424 by Stephan Nolting\n\n"
                 "HWV: 0x");
   uart_print_hex_word(HW_VERSION);
   uart_br_print("\nCLK: 0x");
@@ -223,7 +226,7 @@ void start_app(void) {
 
   // valid image in IMEM?
   if (VALID_IMAGE == 0) {
-    uart_br_print("Image maybe invalid. Boot anyway (y/n)? ");
+    uart_br_print("Image still valid? Boot anyway (y/n)? ");
     if (uart_getc() != 'y')
       return;
   }
@@ -486,7 +489,7 @@ uint16_t get_image_word(uint16_t a, uint8_t src) {
  * ------------------------------------------------------------ */
 void system_error(uint8_t err_code){
 
-  uart_br_print("\a\nERROR ");
+  uart_br_print("\a\nERR");
   uart_print_hex_byte(err_code);
 
   asm volatile ("mov #0, r2"); // deactivate IRQs, no more write access to IMEM

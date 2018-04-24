@@ -1,5 +1,5 @@
 -- #################################################################################################
--- #  << NEO430 - Processor Top Entity (neo430_top.vhd) >>                                         #
+-- #  << NEO430 - Processor Top Entity >>                                                          #
 -- # ********************************************************************************************* #
 -- #  This is the top entity of the neo430 processor. Instantiate this unit in your own project    #
 -- #  and define all the configuration generics according to your requirements.                    #
@@ -24,6 +24,7 @@
 -- #  - Optional CRC16/32 Module                                                                   #
 -- #  - Optional Custom Functions Unit to implement user-defined processor extension               #
 -- #  - Optional Pulse Width Modulation controller                                                 #
+-- #  - Optional True Random Number Generator                                                      #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -43,7 +44,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 26.01.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 24.04.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -73,6 +74,7 @@ entity neo430_top is
     CRC_USE     : boolean := true;  -- implement CRC unit? (default=true)
     CFU_USE     : boolean := false; -- implement custom functions unit? (default=false)
     PWM_USE     : boolean := true;  -- implement PWM controller? (default=true)
+    TRNG_USE    : boolean := false; -- implement true random number generator? (default=false)
     -- boot configuration --
     BOOTLD_USE  : boolean := true;  -- implement and use bootloader? (default=true)
     IMEM_AS_ROM : boolean := false  -- implement IMEM as read-only memory? (default=false)
@@ -152,6 +154,7 @@ architecture neo430_top_rtl of neo430_top is
   signal crc_rdata       : std_ulogic_vector(15 downto 0);
   signal cfu_rdata       : std_ulogic_vector(15 downto 0);
   signal pwm_rdata       : std_ulogic_vector(15 downto 0);
+  signal trng_rdata      : std_ulogic_vector(15 downto 0);
   signal sysconfig_rdata : std_ulogic_vector(15 downto 0);
 
   -- interrupt system --
@@ -226,8 +229,9 @@ begin
   -- -----------------------------------------------------------------------------
   neo430_cpu_inst: neo430_cpu
   generic map (
-    DADD_USE   => DADD_USE,         -- implement DADD instruction? (default=true)
-    BOOTLD_USE => BOOTLD_USE        -- implement and use bootloader? (default=true)
+    DADD_USE    => DADD_USE,        -- implement DADD instruction? (default=true)
+    BOOTLD_USE  => BOOTLD_USE,      -- implement and use bootloader? (default=true)
+    IMEM_AS_ROM => IMEM_AS_ROM      -- implement IMEM as read-only memory?
   )
   port map (
     -- global control --
@@ -247,8 +251,8 @@ begin
 
   -- final CPU read data --
   cpu_bus.rdata <= rom_rdata or ram_rdata or boot_rdata or muldiv_rdata or wb_rdata or
-                   usart_rdata or gpio_rdata or timer_rdata or wdt_rdata or
-                   sysconfig_rdata or crc_rdata or cfu_rdata or pwm_rdata;
+                   usart_rdata or gpio_rdata or timer_rdata or wdt_rdata or sysconfig_rdata or
+                   crc_rdata or cfu_rdata or pwm_rdata or trng_rdata;
 
   -- sync for external IRQ --
   external_irq_sync: process(clk_i)
@@ -588,6 +592,28 @@ begin
   end generate;
 
 
+  -- True Random Number Generator ---------------------------------------------
+  -- -----------------------------------------------------------------------------
+  neo430_trng_inst_true:
+  if (TRNG_USE = true) generate
+    neo430_trng_inst: neo430_trng
+    port map(
+      -- host access --
+      clk_i       => clk_i,         -- global clock line
+      rden_i      => io_rd_en,      -- read enable
+      wren_i      => io_wr_en,      -- write enable
+      addr_i      => cpu_bus.addr,  -- address
+      data_i      => cpu_bus.wdata, -- data in
+      data_o      => trng_rdata     -- data out
+    );
+  end generate;
+
+  neo430_trng_inst_false:
+  if (TRNG_USE = false) generate
+    trng_rdata <= (others => '0');
+  end generate;
+
+
   -- System Configuration -----------------------------------------------------
   -- -----------------------------------------------------------------------------
   neo430_sysconfig_inst: neo430_sysconfig
@@ -609,6 +635,7 @@ begin
     CRC_USE     => CRC_USE,         -- implement CRC unit?
     CFU_USE     => CFU_USE,         -- implement CFU?
     PWM_USE     => PWM_USE,         -- implement PWM?
+    TRNG_USE    => TRNG_USE,        -- implement TRNG?
     -- boot configuration --
     BOOTLD_USE  => BOOTLD_USE,      -- implement and use bootloader?
     IMEM_AS_ROM => IMEM_AS_ROM      -- implement IMEM as read-only memory?

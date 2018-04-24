@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 23.02.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 24.04.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -48,6 +48,7 @@ entity neo430_top_avm is
     CRC_USE         : boolean := true; -- implement CRC unit? (default=true)
     CFU_USE         : boolean := false; -- implement custom functions unit? (default=false)
     PWM_USE         : boolean := true; -- implement PWM controller?
+    TRNG_USE        : boolean := false; -- implement true random number generator? (default=false)
     -- boot configuration --
     BOOTLD_USE      : boolean := true; -- implement and use bootloader? (default=true)
     IMEM_AS_ROM     : boolean := false -- implement IMEM as read-only memory? (default=false)
@@ -153,6 +154,7 @@ begin
     CRC_USE     => CRC_USE,           -- implement CRC unit? (default=true)
     CFU_USE     => CFU_USE,           -- implement CF unit? (default=false)
     PWM_USE     => PWM_USE,           -- implement PWM controller? (default=true)
+    TRNG_USE    => TRNG_USE,          -- implement true random number generator? (default=false)
     -- boot configuration --
     BOOTLD_USE  => BOOTLD_USE,        -- implement and use bootloader? (default=true)
     IMEM_AS_ROM => IMEM_AS_ROM        -- implement IMEM as read-only memory? (default=false)
