@@ -21,7 +21,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               06.01.2018  #
+// #  Stephan Nolting, Hannover, Germany                                               25.04.2018  #
 // #################################################################################################
 
 
@@ -125,6 +125,9 @@ int main(void) {
   // PWM
   _printf("- PWM Controller:        ");
   print_state(ft & (1<<SYS_PWM_EN));
+  // TRNG
+  _printf("- True Random Generator: ");
+  print_state(ft & (1<<SYS_TRNG_EN));
 
 
   // Exit
@@ -147,7 +150,7 @@ int main(void) {
 void print_state(uint16_t d) {
 
   if (d)
-    _printf("ENABLED\n");
+    _printf("enabled\n");
   else
     _printf("DISABLED\n");
 }
