@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from http://www.gnu.org/licenses/lgpl-3.0.en.html                 #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               24.04.2018  #
+// #  Stephan Nolting, Hannover, Germany                                               25.04.2018  #
 // #################################################################################################
 
 
@@ -42,17 +42,17 @@ int main(void) {
   USI_CT = (1<<USI_CT_EN);
 
   // intro text
-  uart_br_print("\nTrue Random Number Generator (TRNG) test program\n\n");
+  _printf("\nTrue Random Number Generator (TRNG) test program\n\n");
 
   // check if TRNG unit was synthesized, exit if no TRNG controller is available
   if (!(SYS_FEATURES & (1<<SYS_TRNG_EN))) {
-    uart_br_print("Error! No TRNG synthesized!");
+    _printf("Error! No TRNG synthesized!");
     return 1;
   }
 
   while(1) {
     // wait for any key
-    uart_br_print("\n\nPress any key to start/stop\n\n");
+    _printf("\n\nPress any key to start/stop\n\n");
     while(!uart_char_received());
 
     trng_enable();

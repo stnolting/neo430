@@ -85,7 +85,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 ## Implementation Results
 
 Mapping results generated for HW version 0x0180. The full (default) configuration includes
-all optional processor modules.
+all optional processor modules (excluding the CFU and the TRNG).
 
 | __Xilinx Artix-7 (XC7A35TICSG324-1L)__  | LUTs | FFs | BRAMs | DSPs | f*      |
 |:----------------------------------------|:----:|:---:|:-----:|:----:|:-------:|
@@ -147,7 +147,7 @@ If you have any questions, bug reports, ideas or if you are facing problems with
 
 "Cyclone", "Quartus" and "Avalon bus" are trademarks of Intel Corporation.
 
-"AXI" and "AXI-Lite" are trademarks of Arm Holdings plc.
+"AXI", "AXI4" and "AXI4-Lite" are trademarks of Arm Holdings plc.
 
 
 

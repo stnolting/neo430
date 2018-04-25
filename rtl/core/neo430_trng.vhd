@@ -4,8 +4,7 @@
 -- # True random number generator based on free running oscillators. These oscillators are built   #
 -- # from single inverters, where the output is directly used as input again. The feedback is de-  #
 -- # coupled using latches, which are transparent when the TRNG is running. The latches are auto-  #
--- # matically initilized (reset) before using.                                                    #
--- # Adjust the number of oscillators according to your feeling ;)                                 #
+-- # matically initilized (reset) before operation.                                                #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -25,7 +24,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 24.04.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 25.04.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -50,11 +49,11 @@ end neo430_trng;
 architecture neo430_trng_rtl of neo430_trng is
 
   -- ADVANCED user configuration -------------------------------------------------------------------
-  constant num_trngs_c : natural := 8; -- number of random generators (= oscillators, default = 8)
+  constant num_trngs_c : natural := 6; -- number of random generators (= #oscillators, default = 6)
   -- -----------------------------------------------------------------------------------------------
 
   -- control register bits --
-  constant ctrl_rnd_en_c  : natural :=  0; -- -/w: TRNG enable
+  constant ctrl_rnd_en_c : natural := 0; -- -/w: TRNG enable
 
   -- IO space: module base address --
   constant hi_abb_c : natural := index_size(io_size_c)-1; -- high address boundary bit
@@ -70,12 +69,12 @@ architecture neo430_trng_rtl of neo430_trng is
   signal sreg       : std_ulogic_vector(7 downto 0);
   signal cnt        : std_ulogic_vector(2 downto 0);
   signal rnd_gen    : std_ulogic_vector(num_trngs_c-1 downto 0);
-  signal rnd_reset  : std_ulogic;
+  signal rnd_reset  : std_ulogic_vector(num_trngs_c-1 downto 0);
   signal rnd_enable : std_ulogic;
   signal rnd_bit    : std_ulogic;
   signal rnd_sync0  : std_ulogic;
   signal rnd_sync1  : std_ulogic;
-  signal rnd_data   : std_ulogic_vector(7 downto 0);
+  signal rnd_data   : std_ulogic_vector(7 downto 0); -- accessibe data register (read-only)
 
 begin
 
@@ -84,45 +83,44 @@ begin
   acc_en <= '1' when (addr_i(hi_abb_c downto lo_abb_c) = trng_base_c(hi_abb_c downto lo_abb_c)) else '0';
   addr   <= trng_base_c(15 downto lo_abb_c) & addr_i(lo_abb_c-1 downto 1) & '0'; -- word aligned
   wren   <= acc_en and wren_i(1) and wren_i(0);
-  rden   <= acc_en and rden_i;
-
+  rden   <= acc_en and rden_i
 
   -- Write access -------------------------------------------------------------
   -- -----------------------------------------------------------------------------
   wr_access: process(clk_i)
   begin
     if rising_edge(clk_i) then
-      rnd_reset  <= not rnd_enable;
-      if (wren = '1') then -- valid write access
+      -- write access --
+      if (wren = '1') then
         rnd_enable <= data_i(ctrl_rnd_en_c);
       end if;
+      -- using individual resets for each OSC - derived from a shift register - to prevent the syntheisis tool
+      -- from removing all but one OSC (since they implement "logical identical functions")
+      rnd_reset <= rnd_reset(num_trngs_c-2 downto 0) & (not rnd_enable);
     end if;
   end process wr_access;
 
 
-  -- RND Generators -----------------------------------------------------------
+  -- Random Generator ---------------------------------------------------------
   -- -----------------------------------------------------------------------------
-  random_generators: process(rnd_reset, rnd_enable, rnd_gen)
+  random_generator: process(rnd_reset, rnd_enable, rnd_gen)
+    variable rnd_v : std_ulogic;
   begin
+    -- generators (oscillators) --
     for i in 0 to num_trngs_c-1 loop
-      if (rnd_reset = '1') then
+      if (rnd_reset(i) = '1') then
         rnd_gen(i) <= '0';
       elsif (rnd_enable = '1') then -- yeah, these ARE latches ;)
         rnd_gen(i) <= not rnd_gen(i); -- these are the oscillators
       end if;
     end loop; -- i
-  end process random_generators;
-
-  -- XOR all generators together --
-  rnd_gen_xor: process(rnd_gen)
-    variable rnd_v : std_ulogic;
-  begin
+    -- XOR all generators together --
     rnd_v := rnd_gen(0);
     for i in 1 to num_trngs_c-1 loop
       rnd_v := rnd_v xor rnd_gen(i);
     end loop; -- i
     rnd_bit <= rnd_v;
-  end process rnd_gen_xor;
+  end process random_generator;
 
 
   -- Random Data Shift Register -----------------------------------------------
@@ -139,9 +137,10 @@ begin
       else
         cnt  <= std_ulogic_vector(unsigned(cnt) + 1);
         sreg <= sreg(6 downto 0) & rnd_sync1;
-        if (cnt = "000") then -- sample output byte
-          rnd_data <= sreg;
-        end if;
+      end if;
+      -- sample output byte --
+      if (cnt = "000") and (rnd_enable = '1') then
+        rnd_data <= sreg;
       end if;
     end if;
   end process data_sreg;
@@ -153,7 +152,7 @@ begin
   begin
     if rising_edge(clk_i) then
       data_o <= (others => '0');
-      if (rden = '1') then -- valid read access
+      if (rden = '1') then
         data_o(7 downto 0) <= rnd_data;
       end if;
     end if;
