@@ -24,7 +24,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 25.04.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 27.04.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -61,7 +61,6 @@ architecture neo430_trng_rtl of neo430_trng is
 
   -- access control --
   signal acc_en : std_ulogic; -- module access enable
-  signal addr   : std_ulogic_vector(15 downto 0); -- access address
   signal wren   : std_ulogic; -- full word write enable
   signal rden   : std_ulogic; -- read enable
 
@@ -81,7 +80,6 @@ begin
   -- Access Control -----------------------------------------------------------
   -- -----------------------------------------------------------------------------
   acc_en <= '1' when (addr_i(hi_abb_c downto lo_abb_c) = trng_base_c(hi_abb_c downto lo_abb_c)) else '0';
-  addr   <= trng_base_c(15 downto lo_abb_c) & addr_i(lo_abb_c-1 downto 1) & '0'; -- word aligned
   wren   <= acc_en and wren_i(1) and wren_i(0);
   rden   <= acc_en and rden_i;
 
