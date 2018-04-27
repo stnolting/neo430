@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               06.10.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               27.04.2018  #
 // #################################################################################################
 
 
@@ -68,16 +68,28 @@ int main(void) {
   _printf("You can pause/restart the simulation by pressing any key.\n");
 
   // randomize until key pressed
-  while (uart_char_received() == 0) {
-    __xorshift32();
+  if ((SYS_FEATURES & (1<<SYS_TRNG_EN))) {
+    trng_enable();
+    _printf("Will use TRNG to initialize universe\n\n");
+    while (uart_char_received() == 0);
   }
+  else {
+    while (uart_char_received() == 0) {
+      __xorshift32();
+    }
+  }
+
 
   // initialize universe using random data
   for (x=0; x<NUM_CELLS_X/8; x++) {
     for (y=0; y<NUM_CELLS_Y; y++) {
-      universe[0][x][y] = (uint8_t)__xorshift32();
+      if ((SYS_FEATURES & (1<<SYS_TRNG_EN))) 
+        universe[0][x][y] = trng_get_byte();
+      else
+        universe[0][x][y] = (uint8_t)__xorshift32();
     }
   }
+  trng_disable();
 
   while(1) {
 
