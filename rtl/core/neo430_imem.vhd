@@ -24,7 +24,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 29.01.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 27.04.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -61,7 +61,7 @@ architecture neo430_imem_rtl of neo430_imem is
   impure function init_imem(clear : boolean; hilo : std_ulogic; init : application_init_image_t) return imem_file8_t is
     variable mem_v : imem_file8_t;
   begin
-    if (clear = false) then
+    if (clear = false) then -- do not leave memory empty -> initialize with app code
       for i in 0 to IMEM_SIZE/2-1 loop
         if (hilo = '0') then -- low byte
           mem_v(i) := init(i)(07 downto 00);
@@ -79,14 +79,18 @@ architecture neo430_imem_rtl of neo430_imem is
   signal rden   : std_ulogic;
   signal addr   : integer;
 
-  -- internal ROM type - do not init memory if bootloader is used --
-  signal imem_file_l : imem_file8_t := init_imem(BOOTLD_USE, '0', application_init_image);
-  signal imem_file_h : imem_file8_t := init_imem(BOOTLD_USE, '1', application_init_image);
+  -- internal "RAM" type - implemented if bootloader is used; initialize with app code if no bootloader is used --
+  signal imem_file_ram_l : imem_file8_t := init_imem(BOOTLD_USE, '0', application_init_image);
+  signal imem_file_ram_h : imem_file8_t := init_imem(BOOTLD_USE, '1', application_init_image);
 
-  -- RAM attribute to inhibit bypass-logic - Altera only! --
+  -- internal "ROM" type - implemented if bootloader is NOT used; always initialize with app code --
+  constant imem_file_rom_l : imem_file8_t := init_imem(false, '0', application_init_image);
+  constant imem_file_rom_h : imem_file8_t := init_imem(false, '1', application_init_image);
+
+  -- RAM attribute to inhibit bypass-logic - Intel only! --
   attribute ramstyle : string;
-  attribute ramstyle of imem_file_l : signal is "no_rw_check";
-  attribute ramstyle of imem_file_h : signal is "no_rw_check";
+  attribute ramstyle of imem_file_ram_l : signal is "no_rw_check";
+  attribute ramstyle of imem_file_ram_h : signal is "no_rw_check";
 
 begin
 
@@ -103,14 +107,19 @@ begin
     if rising_edge(clk_i) then
       rden <= rden_i and acc_en;
       if (acc_en = '1') then
-        if (wren_i(0) = '1') and (upen_i = '1') and (IMEM_AS_ROM = false) then
-          imem_file_l(addr) <= data_i(07 downto 0);
+        if (IMEM_AS_ROM = false) then -- implement IMEM as RAM
+          if (wren_i(0) = '1') and (upen_i = '1') then
+            imem_file_ram_l(addr) <= data_i(07 downto 0);
+          end if;
+          rdata(07 downto 0) <= imem_file_ram_l(addr);
+          if (wren_i(1) = '1') and (upen_i = '1') then
+            imem_file_ram_h(addr) <= data_i(15 downto 8);
+          end if;
+          rdata(15 downto 8) <= imem_file_ram_h(addr);
+        else -- implement IMEM as true ROM
+          rdata(07 downto 0) <= imem_file_rom_l(addr);
+          rdata(15 downto 8) <= imem_file_rom_h(addr);
         end if;
-        rdata(07 downto 0) <= imem_file_l(addr);
-        if (wren_i(1) = '1') and (upen_i = '1') and (IMEM_AS_ROM = false) then
-          imem_file_h(addr) <= data_i(15 downto 8);
-        end if;
-        rdata(15 downto 8) <= imem_file_h(addr);
       end if;
     end if;
   end process imem_file_access;

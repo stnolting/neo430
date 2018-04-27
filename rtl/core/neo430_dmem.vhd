@@ -56,7 +56,7 @@ architecture neo430_dmem_rtl of neo430_dmem is
   signal dmem_file_l : dmem_file_t;
   signal dmem_file_h : dmem_file_t;
 
-  -- RAM attribute to inhibit bypass-logic - Altera only! --
+  -- RAM attribute to inhibit bypass-logic - Intel only! --
   attribute ramstyle : string;
   attribute ramstyle of dmem_file_l : signal is "no_rw_check";
   attribute ramstyle of dmem_file_h : signal is "no_rw_check";
