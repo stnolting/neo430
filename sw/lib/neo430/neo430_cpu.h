@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 26.01.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 29.04.2018 #
 // #################################################################################################
 
 #ifndef neo430_cpu_h
@@ -41,6 +41,11 @@ inline void call_address(uint16_t addr);
 inline uint16_t __bswap(uint16_t a);
 inline uint16_t __combine_bytes(uint8_t hi, uint8_t lo);
 inline uint16_t __dadd(uint16_t a, uint16_t b);
+void __memset(uint8_t *dst, uint8_t data, uint16_t num);
+uint8_t __memcmp(uint8_t *dst, uint8_t *src, uint16_t num);
+void __memcpy(uint8_t *dst, uint8_t *src, uint16_t num);
+uint16_t __bit_rev16(uint16_t x);
+uint32_t __xorshift32(void);
 
 
 /* ------------------------------------------------------------
@@ -217,6 +222,87 @@ inline uint16_t __dadd(uint16_t a, uint16_t b) {
   asm volatile ("clrc");
   asm volatile ("dadd %[b], %[z]" : [z] "=r" (z) : "[z]" (z), [b] "r" (b));
   return z;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Memory initialization (byte-wise)
+ * PARAM dst: Byte-pointer to beginning of target memory space
+ * PARAM data: Init data
+ * PARAM num: Number of bytes to initialize
+ * ------------------------------------------------------------ */
+void __memset(uint8_t *dst, uint8_t data, uint16_t num) {
+
+  while (num--)
+    *dst++ = data;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Compare memory to memory
+ * PARAM dst: Pointer to beginning of first memory space
+ * PARAM src: Pointer to beginning of second memory space
+ * PARAM num: Number of bytes to compare
+ * RETURN 0 if src == dst
+ * ------------------------------------------------------------ */
+uint8_t __memcmp(uint8_t *dst, uint8_t *src, uint16_t num) {
+
+  while (num--) {
+    if (*dst++ != *src++)
+      return 1;
+  }
+  return 0;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Copy memory space SRC to DST (byte by byte)
+ * PARAM dst: Pointer to beginning destination memory space
+ * PARAM src: Pointer to beginning source memory space
+ * PARAM num: Number of bytes to copy
+ * ------------------------------------------------------------ */
+void __memcpy(uint8_t *dst, uint8_t *src, uint16_t num) {
+
+  while (num--)
+    *dst++ = *src++;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO 16-bit bit reversal
+ * PARAM input operand to be reversed
+ * RETURN reversed bit pattern
+ * ------------------------------------------------------------ */
+uint16_t __bit_rev16(uint16_t x) {
+
+  register uint16_t z = x;
+  register uint16_t y = 0;
+  uint8_t i = 0;
+
+  for (i=0; i<8; i++) { // two-times unrolled
+    asm volatile ("rrc %[a], %[b]" : [b] "=r" (z) : "[b]" (z), [a] "r" (z));
+    asm volatile ("rlc %[c], %[d]" : [d] "=r" (y) : "[d]" (y), [c] "r" (y));
+
+    asm volatile ("rrc %[a], %[b]" : [b] "=r" (z) : "[b]" (z), [a] "r" (z));
+    asm volatile ("rlc %[c], %[d]" : [d] "=r" (y) : "[d]" (y), [c] "r" (y));
+  }
+  return y;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Pseudo-random number generator
+ * RETURN 32-bit random data
+ * ------------------------------------------------------------ */
+uint32_t __xorshift32(void) {
+
+  static uint32_t x32 = 314159265;
+
+  x32 ^= x32 << 13;
+  x32 ^= x32 >> 17;
+  x32 ^= x32 << 5;
+
+  return x32;
 }
 
 

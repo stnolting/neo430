@@ -70,7 +70,7 @@ int main(void) {
   // randomize until key pressed
   if ((SYS_FEATURES & (1<<SYS_TRNG_EN))) {
     trng_enable();
-    _printf("Will use TRNG to initialize universe\n\n");
+    _printf("\nTRNG detected. Will use TRNG to initialize universe.\n");
     while (uart_char_received() == 0);
   }
   else {

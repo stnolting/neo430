@@ -43,7 +43,6 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 (optional modules are marked using dashed lines in the figure above)
 
 
-
 - 16-bit open source soft-core microcontroller-like processor system
 - Code-efficient CISC-like instruction capabilities
 - Full support of the original MSP430 instruction set architecture
@@ -51,7 +50,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Application compilation scripts for Windows and Linux/Cygwin
 - Completely described in behavioral, platform-independent VHDL
 - Fully synchronous design, no latches, no gated clocks
-- Very small outline and high operating frequency compared to other implementations ;)
+- Very small outline and high operating frequency
 - Internal DMEN (RAM, for data) and IMEM (RAM or ROM, for code), configurable sizes
 - One external interrupt line
 - Customizable processor hardware configuration
@@ -63,9 +62,9 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Optional watchdog timer (WDT)
 - Optional cyclic redundancy check unit (CRC16/32)
 - Optional custom functions unit (CFU) for user-defined processor extensions
-- Optional 3 channel 8-bit PWM controller
+- Optional 3 channel 8-bit PWM controller (PWM)
 - Optional true random number generator (TRNG)
-- Optional internal bootloader (2kB ROM) with serial user console and automatic boot from external EEPROM
+- Optional internal bootloader (2kB ROM) with serial user console and automatic boot from external SPI EEPROM
 
 
 ## Differences to TI's Original MSP430(TM) Processors

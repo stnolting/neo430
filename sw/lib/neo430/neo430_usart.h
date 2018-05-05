@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               21.07.2017  #
+// #  Stephan Nolting, Hannover, Germany                                               29.04.2018  #
 // #################################################################################################
 
 #ifndef neo430_usart_h
@@ -52,6 +52,7 @@ void uart_print_bin_word(uint16_t w);
 void uart_print_bin_dword(uint32_t dw);
 void _itoa(uint32_t x);
 void _printf(char *format, ...);
+uint32_t hexstr_to_uint(char *buffer, uint8_t length);
 
 
 /* ------------------------------------------------------------
@@ -450,6 +451,36 @@ void _printf(char *format, ...) {
     }
   }
   va_end(a);
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Convert N hex chars into uint32
+ * PARAM Pointer to buffer with hex chars
+ * PARAM Number of hex chars to convert (1..8)
+ * RETURN Conversion result
+ * ------------------------------------------------------------ */
+uint32_t hexstr_to_uint(char *buffer, uint8_t length) {
+
+  uint32_t res = 0, d = 0;
+  char c = 0;
+
+  while (length--) {
+    c = *buffer++;
+
+    if ((c >= '0') && (c <= '9'))
+      d = (uint32_t)(c - '0');
+    else if ((c >= 'a') && (c <= 'f'))
+      d = (uint32_t)((c - 'a') + 10);
+    else if ((c >= 'A') && (c <= 'F'))
+      d = (uint32_t)((c - 'A') + 10);
+    else
+      d = 0;
+
+    res = res + (d << (length*4));
+  }
+
+  return res;
 }
 
 
