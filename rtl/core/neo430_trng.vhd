@@ -24,7 +24,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 27.04.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 30.04.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -49,7 +49,7 @@ end neo430_trng;
 architecture neo430_trng_rtl of neo430_trng is
 
   -- ADVANCED user configuration -------------------------------------------------------------------
-  constant num_trngs_c : natural := 6; -- number of random generators (= #oscillators, default = 6)
+  constant num_trngs_c : natural := 4; -- number of random generators (= #oscillators, default = 4)
   -- -----------------------------------------------------------------------------------------------
 
   -- control register bits --
@@ -65,14 +65,14 @@ architecture neo430_trng_rtl of neo430_trng is
   signal rden   : std_ulogic; -- read enable
 
   -- random number generator --
-  signal sreg       : std_ulogic_vector(7 downto 0);
-  signal cnt        : std_ulogic_vector(2 downto 0);
   signal rnd_gen    : std_ulogic_vector(num_trngs_c-1 downto 0);
   signal rnd_reset  : std_ulogic_vector(num_trngs_c-1 downto 0);
   signal rnd_enable : std_ulogic;
+  signal rnd_sync0  : std_ulogic_vector(num_trngs_c-1 downto 0);
+  signal rnd_sync1  : std_ulogic_vector(num_trngs_c-1 downto 0);
   signal rnd_bit    : std_ulogic;
-  signal rnd_sync0  : std_ulogic;
-  signal rnd_sync1  : std_ulogic;
+  signal rnd_sreg   : std_ulogic_vector(7 downto 0);
+  signal rnd_cnt    : std_ulogic_vector(2 downto 0);
   signal rnd_data   : std_ulogic_vector(7 downto 0); -- accessibe data register (read-only)
 
 begin
@@ -102,23 +102,35 @@ begin
   -- Random Generator ---------------------------------------------------------
   -- -----------------------------------------------------------------------------
   random_generator: process(rnd_reset, rnd_enable, rnd_gen)
-    variable rnd_v : std_ulogic;
   begin
-    -- generators (oscillators) --
     for i in 0 to num_trngs_c-1 loop
       if (rnd_reset(i) = '1') then
         rnd_gen(i) <= '0';
       elsif (rnd_enable = '1') then -- yeah, these ARE latches ;)
-        rnd_gen(i) <= not rnd_gen(i); -- these are the oscillators
+        rnd_gen(i) <= not rnd_gen(i); -- here we have the oscillators
       end if;
     end loop; -- i
-    -- XOR all generators together --
-    rnd_v := rnd_gen(0);
+  end process random_generator;
+
+  -- synchronize output of each oscillator --
+  random_generator_sync: process(clk_i)
+  begin
+    if rising_edge(clk_i) then
+      rnd_sync0 <= rnd_gen;
+      rnd_sync1 <= rnd_sync0; -- no metastability beyond this point!
+    end if;
+  end process random_generator_sync;
+
+  -- XOR all generators --
+  random_generator_xor: process(rnd_sync1)
+    variable rnd_v : std_ulogic;
+  begin
+    rnd_v := rnd_sync1(0);
     for i in 1 to num_trngs_c-1 loop
-      rnd_v := rnd_v xor rnd_gen(i);
+      rnd_v := rnd_v xor rnd_sync1(i);
     end loop; -- i
     rnd_bit <= rnd_v;
-  end process random_generator;
+  end process random_generator_xor;
 
 
   -- Random Data Shift Register -----------------------------------------------
@@ -126,19 +138,16 @@ begin
   data_sreg: process(clk_i)
   begin
     if rising_edge(clk_i) then
-      -- synchronize data --
-      rnd_sync0 <= rnd_bit;
-      rnd_sync1 <= rnd_sync0;
       -- acquire data --
       if (rnd_enable = '0') then
-        cnt <= (others => '0');
+        rnd_cnt <= (others => '0');
       else
-        cnt  <= std_ulogic_vector(unsigned(cnt) + 1);
-        sreg <= sreg(6 downto 0) & rnd_sync1;
+        rnd_cnt  <= std_ulogic_vector(unsigned(rnd_cnt) + 1);
+        rnd_sreg <= rnd_sreg(6 downto 0) & rnd_bit;
       end if;
       -- sample output byte --
-      if (cnt = "000") and (rnd_enable = '1') then
-        rnd_data <= sreg;
+      if (rnd_cnt = "000") and (rnd_enable = '1') then
+        rnd_data <= rnd_sreg;
       end if;
     end if;
   end process data_sreg;

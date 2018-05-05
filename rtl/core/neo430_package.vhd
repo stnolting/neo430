@@ -170,13 +170,12 @@ package neo430_package is
   constant trng_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(trng_base_c) + x"0000");
 
   -- IO: RESERVED --
---constant ???_base_c : std_ulogic_vector(15 downto 0) := x"FFF0";
+--constant ???_base_c : std_ulogic_vector(15 downto 0) := x"FFFA";
 --constant ???_size_c : natural := 6; -- bytes
 
 --constant ???_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0000");
 --constant ???_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0002");
 --constant ???_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0004");
---constant ???_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0006");
 
   -- IO: System Configuration --
   constant sysconfig_base_c : std_ulogic_vector(15 downto 0) := x"FFF0";
