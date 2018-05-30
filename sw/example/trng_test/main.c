@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from http://www.gnu.org/licenses/lgpl-3.0.en.html                 #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               25.04.2018  #
+// #  Stephan Nolting, Hannover, Germany                                               30.05.2018  #
 // #################################################################################################
 
 
@@ -57,7 +57,9 @@ int main(void) {
 
     trng_enable();
     while(1) {
-      _printf("%u, ", (uint16_t)trng_get_byte());
+      uint16_t d = (uint16_t)trng_get_byte();
+      _printf("%u, ", d);
+      gpio_port_set(d);
 
       // stop?
       if (uart_char_received()) { // any key input?

@@ -29,7 +29,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               27.04.2018  #
+// #  Stephan Nolting, Hannover, Germany                                               30.05.2018  #
 // #################################################################################################
 
 // Libraries
@@ -47,6 +47,7 @@
 
 // 25LC512 EEPROM
 #define BOOT_EEP_CS      0    // boot EEPROM CS (SPI.CS0)
+#define EEP_IMAGE_BASE   0x00 // base address of NEO430 boot image
 #define EEP_WRITE        0x02 // initialize start of write sequence
 #define EEP_READ         0x03 // initialize start of read sequence
 #define EEP_RDSR         0x05 // read status register
@@ -143,7 +144,7 @@ int  main(void) {
   // ****************************************************************
   // Show bootloader intro and system information
   // ****************************************************************
-  uart_br_print("\n\nNEO430 Bootloader V20180427 by Stephan Nolting\n\n"
+  uart_br_print("\n\nNEO430 Bootloader V20180530 by Stephan Nolting\n\n"
                 "HWV: 0x");
   uart_print_hex_word(HW_VERSION);
   uart_br_print("\nCLK: 0x");
@@ -330,15 +331,15 @@ void store_eeprom(void) {
     system_error(ERROR_EEPROM);
 
   // write signature
-  eeprom_write(0x0000, 0xCAFE);
+  eeprom_write(EEP_IMAGE_BASE + 0, 0xCAFE);
 
   // write size
   uint16_t end = IMEM_SIZE;
-  eeprom_write(0x0002, end);
+  eeprom_write(EEP_IMAGE_BASE + 2, end);
 
   // store data from IMEM and update checksum
   uint16_t *mem_pnt = 0;
-  uint16_t eep_index = 0x0006;
+  uint16_t eep_index = EEP_IMAGE_BASE + 6;
   uint16_t checksum = 0;
   uint16_t d = 0;
   while ((uint16_t)mem_pnt < end) {
@@ -350,7 +351,7 @@ void store_eeprom(void) {
   }
 
   // write checksum
-  eeprom_write(0x0004, checksum);
+  eeprom_write(EEP_IMAGE_BASE + 4, checksum);
 
   uart_br_print("OK");
 }

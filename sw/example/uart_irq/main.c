@@ -22,7 +22,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               16.12.2017  #
+// # Stephan Nolting, Hannover, Germany                                                 30.05.2018 #
 // #################################################################################################
 
 
@@ -32,7 +32,7 @@
 
 // Configuration
 #define BAUD_RATE 19200
-#define UART_FIFO_SIZE 256 // must be a power of two!
+#define UART_FIFO_SIZE 512 // must be a power of two!
 #define UART_FIFO_MASK (UART_FIFO_SIZE-1)
 
 // Types
@@ -48,8 +48,11 @@ volatile struct uart_fifo uart_rtx_fifo;
 // Function prototypes
 void __attribute__((__interrupt__)) uart_irq_handler(void);
 void __attribute__((__interrupt__)) timer_irq_handler(void);
-uint8_t uart_fifo_put(volatile struct uart_fifo *fifo, uint8_t c);
-uint8_t uart_fifo_get(volatile struct uart_fifo *fifo, uint8_t *c);
+void __attribute__((__interrupt__)) gpio_irq_handler(void);
+
+void fifo_put_string(volatile struct uart_fifo *fifo, char *s);
+uint8_t fifo_put(volatile struct uart_fifo *fifo, uint8_t c);
+uint8_t fifo_get(volatile struct uart_fifo *fifo, uint8_t *c);
 
 /* ------------------------------------------------------------
  * INFO Main function
@@ -65,24 +68,22 @@ int main(void) {
   uart_rtx_fifo.get_pnt = 0;
   uart_rtx_fifo.put_pnt = 0;
 
+  // deactivate all LEDs
+  GPIO_OUT = 0;
 
-  // set address of UART and TIMER IRQ handlers
+  // set address of UART, TIMER and GPIO IRQ handlers
   IRQVEC_USART = (uint16_t)(&uart_irq_handler);
   IRQVEC_TIMER = (uint16_t)(&timer_irq_handler);
+  IRQVEC_GPIO  = (uint16_t)(&gpio_irq_handler);
 
+  // configure GPIO pin-change interrupt
+  GPIO_IRQMASK = 0xFFFF; // use all input pins as trigger
 
-  // configure UART interrupt
+  // configure UART RX interrupt
   USI_CT |= (1<<USI_CT_UARTRXIRQ);
 
-
   // configure TIMER period
-
-  // set timer threshold value
-  // f_tick = 1000Hz @ PRSC = 4096
-  // THRES = f_main / (1000Hz * 4096) = f_main >> 12
-  uint32_t f_clock = CLOCKSPEED_32bit;
-  TMR_THRES = (uint16_t)(f_clock  / 4096000);
-
+  TMR_THRES = 1; // very high sample rate ;)
   // clear timer counter
   TMR_CNT = 0;
 
@@ -90,27 +91,11 @@ int main(void) {
   TMR_CT = (1<<TMR_CT_EN)   | // enable timer
            (1<<TMR_CT_ARST) | // auto reset on threshold match
            (1<<TMR_CT_IRQ)  | // enable IRQ
-           (7<<TMR_CT_PRSC0); // PRSC = 7 -> prescaler =4096
+           (TMR_PRSC_4096<<TMR_CT_PRSC0);
 
 
-  uart_fifo_put(&uart_rtx_fifo, (uint8_t)'\r');
-  uart_fifo_put(&uart_rtx_fifo, (uint8_t)'\n');
-  uart_fifo_put(&uart_rtx_fifo, (uint8_t)'U');
-  uart_fifo_put(&uart_rtx_fifo, (uint8_t)'A');
-  uart_fifo_put(&uart_rtx_fifo, (uint8_t)'R');
-  uart_fifo_put(&uart_rtx_fifo, (uint8_t)'T');
-  uart_fifo_put(&uart_rtx_fifo, (uint8_t)' ');
-  uart_fifo_put(&uart_rtx_fifo, (uint8_t)'I');
-  uart_fifo_put(&uart_rtx_fifo, (uint8_t)'R');
-  uart_fifo_put(&uart_rtx_fifo, (uint8_t)'Q');
-  uart_fifo_put(&uart_rtx_fifo, (uint8_t)' ');
-  uart_fifo_put(&uart_rtx_fifo, (uint8_t)'E');
-  uart_fifo_put(&uart_rtx_fifo, (uint8_t)'c');
-  uart_fifo_put(&uart_rtx_fifo, (uint8_t)'h');
-  uart_fifo_put(&uart_rtx_fifo, (uint8_t)'o');
-  uart_fifo_put(&uart_rtx_fifo, (uint8_t)'\r');
-  uart_fifo_put(&uart_rtx_fifo, (uint8_t)'\n');
-
+  // write string to buffer
+  fifo_put_string(&uart_rtx_fifo, "\r\nUART IRQ FIFO Echo Test\r\n");
 
   // enable global IRQs
   eint();
@@ -130,7 +115,7 @@ int main(void) {
  * ------------------------------------------------------------ */
 void __attribute__((__interrupt__)) uart_irq_handler(void) {
 
-  uart_fifo_put(&uart_rtx_fifo, (uint8_t)uart_char_read());
+  fifo_put(&uart_rtx_fifo, (uint8_t)uart_char_read());
 }
 
 
@@ -143,20 +128,30 @@ void __attribute__((__interrupt__)) timer_irq_handler(void) {
 
   uint8_t c;
 
-  // char in buffer available?
-  if (uart_fifo_get(&uart_rtx_fifo, &c) == 0) {
-    // UART transceiver idle?
-    if ((USI_CT & (1<<USI_CT_UARTTXBSY)) == 0) {
+  // UART transceiver idle?
+  if ((USI_CT & (1<<USI_CT_UARTTXBSY)) == 0) {
+    // char in buffer available?
+    if (fifo_get(&uart_rtx_fifo, &c) == 0) {
       USI_UARTRTX = (uint16_t)c;
     }
   }
 }
 
+/* ------------------------------------------------------------
+ * INFO Write string to buffer, blocking!
+ * ------------------------------------------------------------ */
+void fifo_put_string(volatile struct uart_fifo *fifo, char *s) {
+
+  uint8_t c = 0;
+  while ((c = (uint8_t)*s++))
+    fifo_put(fifo, c);
+}
+
 
 /* ------------------------------------------------------------
- * INFO Write to RTX buffer, return 0 if success
+ * INFO Write to buffer, return 0 if success
  * ------------------------------------------------------------ */
-uint8_t uart_fifo_put(volatile struct uart_fifo *fifo, uint8_t c) {
+uint8_t fifo_put(volatile struct uart_fifo *fifo, uint8_t c) {
 
   uint16_t next = ((fifo->put_pnt + 1) & UART_FIFO_MASK);
 
@@ -171,9 +166,9 @@ uint8_t uart_fifo_put(volatile struct uart_fifo *fifo, uint8_t c) {
 
 
 /* ------------------------------------------------------------
- * INFO Read from UART RTX buffer, returns 0 if success
+ * INFO Read from buffer, returns 0 if success
  * ------------------------------------------------------------ */
-uint8_t uart_fifo_get(volatile struct uart_fifo *fifo, uint8_t *c) {
+uint8_t fifo_get(volatile struct uart_fifo *fifo, uint8_t *c) {
 
   if (fifo->get_pnt == fifo->put_pnt)
     return 1; // fifo empty
@@ -185,3 +180,12 @@ uint8_t uart_fifo_get(volatile struct uart_fifo *fifo, uint8_t *c) {
   return 0;
 }
 
+
+
+/* ------------------------------------------------------------
+ * INFO GPIO pin-change interrupt handler
+ * ------------------------------------------------------------ */
+void __attribute__((__interrupt__)) gpio_irq_handler(void) {
+
+  GPIO_OUT = (GPIO_OUT + 1) & 0x00FF; // increment LED counter
+}
