@@ -150,10 +150,10 @@ begin
     variable dsum_hl_v, dsum_hh_v : std_ulogic_vector(4 downto 0);
   begin
     -- four 4-bit CBD adders --
-    dsum_ll_v := bcd_add4(op_a_ff(03 downto 00), op_b_ff(03 downto 00), sreg_i(sreg_c_c));
-    dsum_lh_v := bcd_add4(op_a_ff(07 downto 04), op_b_ff(07 downto 04), dsum_ll_v(4));
-    dsum_hl_v := bcd_add4(op_a_ff(11 downto 08), op_b_ff(11 downto 08), dsum_lh_v(4));
-    dsum_hh_v := bcd_add4(op_a_ff(15 downto 12), op_b_ff(15 downto 12), dsum_hl_v(4));
+    dsum_ll_v := bcd_add4_f(op_a_ff(03 downto 00), op_b_ff(03 downto 00), sreg_i(sreg_c_c));
+    dsum_lh_v := bcd_add4_f(op_a_ff(07 downto 04), op_b_ff(07 downto 04), dsum_ll_v(4));
+    dsum_hl_v := bcd_add4_f(op_a_ff(11 downto 08), op_b_ff(11 downto 08), dsum_lh_v(4));
+    dsum_hh_v := bcd_add4_f(op_a_ff(15 downto 12), op_b_ff(15 downto 12), dsum_hl_v(4));
 
     -- output --
     dadd_res(03 downto 00) <= dsum_ll_v(3 downto 0);
@@ -303,8 +303,8 @@ begin
   -- Additional Flag Logic ----------------------------------------------------
   -- -----------------------------------------------------------------------------
   -- zero flag --
-  lo_zero <= not or_all(alu_res(07 downto 0)); -- zero detector LO byte
-  hi_zero <= not or_all(alu_res(15 downto 8)); -- zero detector HI byte
+  lo_zero <= not or_all_f(alu_res(07 downto 0)); -- zero detector LO byte
+  hi_zero <= not or_all_f(alu_res(15 downto 8)); -- zero detector HI byte
   zero    <= lo_zero when (ctrl_i(ctrl_alu_bw_c) = '1') else (lo_zero and hi_zero);
 
   -- negative flag --

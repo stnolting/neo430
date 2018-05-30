@@ -97,7 +97,7 @@ begin
   -- Access Control -----------------------------------------------------------
   -- -----------------------------------------------------------------------------
   acc_en <= '1' when (addr_i >= imem_base_c) and (addr_i < std_ulogic_vector(unsigned(imem_base_c) + IMEM_SIZE)) else '0';
-  addr   <= to_integer(unsigned(addr_i(index_size(IMEM_SIZE/2) downto 1))); -- word aligned
+  addr   <= to_integer(unsigned(addr_i(index_size_f(IMEM_SIZE/2) downto 1))); -- word aligned
 
 
   -- Memory Access ------------------------------------------------------------

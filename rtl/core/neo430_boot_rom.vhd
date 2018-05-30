@@ -71,7 +71,7 @@ begin
   -- Access Control -----------------------------------------------------------
   -- -----------------------------------------------------------------------------
   acc_en <= '1' when (addr_i >= boot_base_c) and (addr_i < std_ulogic_vector(unsigned(boot_base_c) + boot_size_c)) else '0';
-  addr <= to_integer(unsigned(addr_i(index_size(boot_size_c/2) downto 1))); -- word aligned
+  addr <= to_integer(unsigned(addr_i(index_size_f(boot_size_c/2) downto 1))); -- word aligned
 
 
   -- Memory Access ------------------------------------------------------------

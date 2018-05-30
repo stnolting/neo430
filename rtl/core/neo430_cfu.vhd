@@ -53,8 +53,8 @@ end neo430_cfu;
 architecture neo430_cfu_rtl of neo430_cfu is
 
   -- IO space: module base address --
-  constant hi_abb_c : natural := index_size(io_size_c)-1; -- high address boundary bit
-  constant lo_abb_c : natural := index_size(cfu_size_c); -- low address boundary bit
+  constant hi_abb_c : natural := index_size_f(io_size_c)-1; -- high address boundary bit
+  constant lo_abb_c : natural := index_size_f(cfu_size_c); -- low address boundary bit
 
   -- access control --
   signal acc_en : std_ulogic; -- module access enable

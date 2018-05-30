@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 20.04.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 30.05.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -59,7 +59,8 @@ architecture neo430_cpu_rtl of neo430_cpu is
   -- local signals --
   signal mem_addr  : std_ulogic_vector(15 downto 0); -- memory address
   signal mdi       : std_ulogic_vector(15 downto 0); -- memory data_in
-  signal mdo       : std_ulogic_vector(15 downto 0); -- memory data_out
+  signal mdi_gate  : std_ulogic_vector(15 downto 0); -- memory data_in power gate
+  signal mdo_gate  : std_ulogic_vector(15 downto 0); -- memory data_out power gate
   signal ctrl_bus  : std_ulogic_vector(ctrl_width_c-1 downto 0); -- main control spine
   signal sreg      : std_ulogic_vector(15 downto 0); -- current status register
   signal alu_flags : std_ulogic_vector(03 downto 0); -- new ALU flags
@@ -70,6 +71,7 @@ architecture neo430_cpu_rtl of neo430_cpu is
   signal irq_sel   : std_ulogic_vector(01 downto 0); -- IRQ vector
   signal dio_swap  : std_ulogic; -- data in/out swap
   signal bw_ff     : std_ulogic; -- byte/word access flag
+  signal rd_ff     : std_ulogic; -- is read access
 
 begin
 
@@ -166,6 +168,7 @@ begin
     if rising_edge(clk_i) then
       bw_ff    <= ctrl_bus(ctrl_alu_bw_c);
       dio_swap <= ctrl_bus(ctrl_alu_bw_c) and mem_addr(0);
+      rd_ff    <= ctrl_bus(ctrl_mem_rd_c);
     end if;
   end process memory_control;
 
@@ -180,12 +183,13 @@ begin
   mem_imwe_o <= sreg(sreg_r_c);
 
   -- data in/out swap --
-  mdi <= mem_data_i when (dio_swap = '0') else mem_data_i(7 downto 0) & mem_data_i(15 downto 8);
-  mdo <= alu_res    when (dio_swap = '0') else alu_res(7 downto 0) & alu_res(15 downto 8);
-  mem_data_o <= mdo; -- when (ctrl_bus(ctrl_mem_wr_c) = '1') else (others => '0'); -- reduce switching activity
+  mdi_gate   <= mem_data_i when ((rd_ff = '1') or (low_power_mode_c = false)) else (others => '0'); -- AND GATE to reduce switching activity in low power mode
+  mdi        <= mdi_gate   when (dio_swap = '0') else mem_data_i(7 downto 0) & mem_data_i(15 downto 8);
+  mdo_gate   <= alu_res    when (dio_swap = '0') else alu_res(7 downto 0) & alu_res(15 downto 8);
+  mem_data_o <= mdo_gate   when ((ctrl_bus(ctrl_mem_wr_c) = '1') or (low_power_mode_c = false)) else (others => '0'); -- AND GATE to reduce switching activity in low power mode
 
   -- address output --
-  mem_addr_o <= mem_addr(15 downto 1) & '0'; -- word-aligned addresses only
+  mem_addr_o <= mem_addr(15 downto 1) & '0'; -- word-aligned addresses only beyond this point
 
 
 end neo430_cpu_rtl;

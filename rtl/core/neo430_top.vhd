@@ -10,21 +10,21 @@
 -- #  The NEO430 processor:                                                                        #
 -- #  - Reset and clock generators                                                                 #
 -- #  - External IRQ synchronizer                                                                  #
--- #  - NEO430 CPU (MSP430(TM)-ISA-compatible)                                                     #
--- #  - Internal ROM (IMEM, configurable size) for code                                            #
--- #  - Internal RAM (DMEM, configurable size) for data (and code)                                 #
--- #  - Optional 16-bit multiplier/divider unit                                                    #
--- #  - Sysconfig (infomem for various system information)                                         #
--- #  - Optional 16-bit IN and 16-bit OUT GPIO port with pin-change interrupt                      #
--- #  - Optional 32-bit Wishbone interface                                                         #
--- #  - Optional High precision timer                                                              #
--- #  - Optional USART - SPI and UART                                                              #
--- #  - Optional Internal ROM for bootloader                                                       #
--- #  - Optional Watchdog Timer                                                                    #
--- #  - Optional CRC16/32 Module                                                                   #
--- #  - Optional Custom Functions Unit to implement user-defined processor extension               #
--- #  - Optional Pulse Width Modulation controller                                                 #
--- #  - Optional True Random Number Generator                                                      #
+-- #  - NEO430 CPU (MSP430(TM)-ISA-compatible) (CPU)                                               #
+-- #  - Internal RAM or ROM (configurable size) for code (IMEM)                                    #
+-- #  - Internal RAM (configurable size) for data (and code) (DMEM)                                #
+-- #  - Optional 16-bit multiplier/divider unit (MULDIV)                                           #
+-- #  - Sysconfig (infomem for various system information) (SYSCONFIG)                             #
+-- #  - Optional 16-bit IN and 16-bit OUT GPIO port with pin-change interrupt (GPIO)               #
+-- #  - Optional 32-bit Wishbone interface (WB32)                                                  #
+-- #  - Optional High precision timer (TIMER)                                                      #
+-- #  - Optional USART - SPI and UART (USART)                                                      #
+-- #  - Optional Internal ROM for bootloader (BOOTLD)                                              #
+-- #  - Optional Watchdog Timer (WDT)                                                              #
+-- #  - Optional CRC16/32 Module (CRC16/32)                                                        #
+-- #  - Optional Custom Functions Unit to implement user-defined processor extension (CFU)         #
+-- #  - Optional Pulse Width Modulation controller (PWM)                                           #
+-- #  - Optional True Random Number Generator (TRNG)                                               #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -201,7 +201,7 @@ begin
     if (sys_rst = '0') then
       clk_div <= (others => '0');
     elsif rising_edge(clk_i) then
-      if ((timer_cg_en or usart_cg_en or wdt_cg_en or pwm_cg_en) = '1') then
+      if ((timer_cg_en or usart_cg_en or wdt_cg_en or pwm_cg_en) = '1') then -- anybody needing clocks?
         clk_div <= std_ulogic_vector(unsigned(clk_div) + 1);
       end if;
     end if;
@@ -325,7 +325,7 @@ begin
 
   -- IO Access? ---------------------------------------------------------------
   -- -----------------------------------------------------------------------------
-  io_acc   <= '1' when (cpu_bus.addr(15 downto index_size(io_size_c)) = io_base_c(15 downto index_size(io_size_c))) else '0';
+  io_acc   <= '1' when (cpu_bus.addr(15 downto index_size_f(io_size_c)) = io_base_c(15 downto index_size_f(io_size_c))) else '0';
   io_rd_en <= cpu_bus.rd_en when (io_acc = '1') else '0';
   io_wr_en <= cpu_bus.wr_en when (io_acc = '1') else "00";
 

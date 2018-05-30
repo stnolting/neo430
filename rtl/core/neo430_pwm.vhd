@@ -60,8 +60,8 @@ architecture neo430_pwm_rtl of neo430_pwm is
   constant num_pwm_channels_c : natural := 3; -- number of PWM channels - FIXED!
 
   -- IO space: module base address --
-  constant hi_abb_c : natural := index_size(io_size_c)-1; -- high address boundary bit
-  constant lo_abb_c : natural := index_size(pwm_size_c); -- low address boundary bit
+  constant hi_abb_c : natural := index_size_f(io_size_c)-1; -- high address boundary bit
+  constant lo_abb_c : natural := index_size_f(pwm_size_c); -- low address boundary bit
 
   -- Control register bits --
   constant ctrl_enable_c : natural := 0; -- -/w: PWM enable

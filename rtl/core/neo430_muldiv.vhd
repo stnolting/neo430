@@ -6,8 +6,8 @@
 -- # Division: DIVIDEND / DIVIDER = QUOTIENT + REMAINDER / DIVIDER (each 16-bit)                   #
 -- # Multiplication: FACTOR1 * FACTOR2 = PRODUCT (32-bit)                                          #
 -- # ********************************************************************************************* #
--- # This file is part of the NEO430 Processor project: http://opencores.org/project,neo430        #
--- # Copyright 2015-2016, Stephan Nolting: stnolting@gmail.com                                     #
+-- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
+-- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
 -- #                                                                                               #
 -- # This source file may be used and distributed without restriction provided that this copyright #
 -- # statement is not removed from the file and that any derivative work contains the original     #
@@ -22,9 +22,9 @@
 -- # See the GNU Lesser General Public License for more details.                                   #
 -- #                                                                                               #
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
--- # source; if not, download it from http://www.gnu.org/licenses/lgpl-3.0.en.html                 #
+-- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  tephan Nolting, Hannover, Germany                                                 31.12.2017 #
+-- # Stephan Nolting, Hannover, Germany                                                 26.05.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -49,8 +49,8 @@ end neo430_muldiv;
 architecture neo430_muldiv_rtl of neo430_muldiv is
 
   -- IO space: module base address --
-  constant hi_abb_c : natural := index_size(io_size_c)-1; -- high address boundary bit
-  constant lo_abb_c : natural := index_size(muldiv_size_c); -- low address boundary bit
+  constant hi_abb_c : natural := index_size_f(io_size_c)-1; -- high address boundary bit
+  constant lo_abb_c : natural := index_size_f(muldiv_size_c); -- low address boundary bit
 
   -- access control --
   signal acc_en : std_ulogic; -- module access enable

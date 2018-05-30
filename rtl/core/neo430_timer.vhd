@@ -54,8 +54,8 @@ end neo430_timer;
 architecture neo430_timer_rtl of neo430_timer is
 
   -- IO space: module base address --
-  constant hi_abb_c : natural := index_size(io_size_c)-1; -- high address boundary bit
-  constant lo_abb_c : natural := index_size(timer_size_c); -- low address boundary bit
+  constant hi_abb_c : natural := index_size_f(io_size_c)-1; -- high address boundary bit
+  constant lo_abb_c : natural := index_size_f(timer_size_c); -- low address boundary bit
 
   -- control reg bits --
   constant ctrl_en_bit_c     : natural := 0; -- r/w: timer enable

@@ -52,8 +52,8 @@ end neo430_gpio;
 architecture neo430_gpio_rtl of neo430_gpio is
 
   -- IO space: module base address --
-  constant hi_abb_c : natural := index_size(io_size_c)-1; -- high address boundary bit
-  constant lo_abb_c : natural := index_size(gpio_size_c); -- low address boundary bit
+  constant hi_abb_c : natural := index_size_f(io_size_c)-1; -- high address boundary bit
+  constant lo_abb_c : natural := index_size_f(gpio_size_c); -- low address boundary bit
 
   -- access control --
   signal acc_en : std_ulogic; -- module access enable
@@ -110,7 +110,7 @@ begin
       din     <= in_buf;
       sync_in <= din;
       -- IRQ --
-      irq_o <= or_all(irq_raw);
+      irq_o <= or_all_f(irq_raw);
     end if;
   end process irq_generator;
 

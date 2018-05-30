@@ -69,8 +69,8 @@ end neo430_sysconfig;
 architecture neo430_sysconfig_rtl of neo430_sysconfig is
 
   -- IO space: module base address --
-  constant hi_abb_c : natural := index_size(io_size_c)-1; -- high address boundary bit
-  constant lo_abb_c : natural := index_size(sysconfig_size_c); -- low address boundary bit
+  constant hi_abb_c : natural := index_size_f(io_size_c)-1; -- high address boundary bit
+  constant lo_abb_c : natural := index_size_f(sysconfig_size_c); -- low address boundary bit
 
   -- access control --
   signal acc_en    : std_ulogic; -- access enable
@@ -93,7 +93,7 @@ begin
   addr   <= sysconfig_base_c(15 downto lo_abb_c) & addr_i(lo_abb_c-1 downto 1) & '0'; -- word aligned
   rden   <= acc_en and rden_i;
 
-  info_addr <= addr(index_size(sysconfig_size_c)-1 downto 1);
+  info_addr <= addr(index_size_f(sysconfig_size_c)-1 downto 1);
   
 
   -- Construct Info ROM -------------------------------------------------------
@@ -102,19 +102,19 @@ begin
   sysinfo_mem(0) <= hw_version_c; -- HW version
 
   -- CPUID1: System setup (features) --
-  sysinfo_mem(1)(00) <= bool_to_ulogic(MULDIV_USE);  -- MULDIV present?
-  sysinfo_mem(1)(01) <= bool_to_ulogic(WB32_USE);    -- WB32 present?
-  sysinfo_mem(1)(02) <= bool_to_ulogic(WDT_USE);     -- WDT present?
-  sysinfo_mem(1)(03) <= bool_to_ulogic(GPIO_USE);    -- GPIO present?
-  sysinfo_mem(1)(04) <= bool_to_ulogic(TIMER_USE);   -- TIMER present?
-  sysinfo_mem(1)(05) <= bool_to_ulogic(USART_USE);   -- USART present?
-  sysinfo_mem(1)(06) <= bool_to_ulogic(DADD_USE);    -- DADD instruction present?
-  sysinfo_mem(1)(07) <= bool_to_ulogic(BOOTLD_USE);  -- bootloader present?
-  sysinfo_mem(1)(08) <= bool_to_ulogic(IMEM_AS_ROM); -- IMEM implemented as true ROM?
-  sysinfo_mem(1)(09) <= bool_to_ulogic(CRC_USE);     -- CRC present?
-  sysinfo_mem(1)(10) <= bool_to_ulogic(CFU_USE);     -- CFU present?
-  sysinfo_mem(1)(11) <= bool_to_ulogic(PWM_USE);     -- PWM present?
-  sysinfo_mem(1)(12) <= bool_to_ulogic(TRNG_USE);    -- TRNG present?
+  sysinfo_mem(1)(00) <= bool_to_ulogic_f(MULDIV_USE);  -- MULDIV present?
+  sysinfo_mem(1)(01) <= bool_to_ulogic_f(WB32_USE);    -- WB32 present?
+  sysinfo_mem(1)(02) <= bool_to_ulogic_f(WDT_USE);     -- WDT present?
+  sysinfo_mem(1)(03) <= bool_to_ulogic_f(GPIO_USE);    -- GPIO present?
+  sysinfo_mem(1)(04) <= bool_to_ulogic_f(TIMER_USE);   -- TIMER present?
+  sysinfo_mem(1)(05) <= bool_to_ulogic_f(USART_USE);   -- USART present?
+  sysinfo_mem(1)(06) <= bool_to_ulogic_f(DADD_USE);    -- DADD instruction present?
+  sysinfo_mem(1)(07) <= bool_to_ulogic_f(BOOTLD_USE);  -- bootloader present?
+  sysinfo_mem(1)(08) <= bool_to_ulogic_f(IMEM_AS_ROM); -- IMEM implemented as true ROM?
+  sysinfo_mem(1)(09) <= bool_to_ulogic_f(CRC_USE);     -- CRC present?
+  sysinfo_mem(1)(10) <= bool_to_ulogic_f(CFU_USE);     -- CFU present?
+  sysinfo_mem(1)(11) <= bool_to_ulogic_f(PWM_USE);     -- PWM present?
+  sysinfo_mem(1)(12) <= bool_to_ulogic_f(TRNG_USE);    -- TRNG present?
   sysinfo_mem(1)(15 downto 13) <= (others => '0');   -- reserved
 
   -- CPUID2: User code --

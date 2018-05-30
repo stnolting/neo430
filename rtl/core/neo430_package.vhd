@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 24.04.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 30.05.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -30,25 +30,30 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0180"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0182"; -- no touchy!
+
+  -- Danger Zone! ---------------------------------------------------------------------------
+  -- -------------------------------------------------------------------------------------------
+  constant low_power_mode_c : boolean := false; -- reduces switching activity, but will also decrease f_max and might increase area
+  constant awesome_mode_c   : boolean := true; -- of course!
 
   -- Internal Functions ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  function index_size(input : natural) return natural;
-  function is_power_of_two(num : natural; bit_width : natural) return boolean;
-  function bit_reversal(input : std_ulogic_vector) return std_ulogic_vector;
-  function set_bits(input : std_ulogic_vector) return natural;
-  function leading_zeros(input : std_ulogic_vector) return natural;
-  function cond_sel_natural(cond : boolean; val_t : natural; val_f : natural) return natural;
-  function cond_sel_stdulogicvector(cond : boolean; val_t : std_ulogic_vector; val_f : std_ulogic_vector) return std_ulogic_vector;
-  function bool_to_ulogic(cond : boolean) return std_ulogic;
-  function bin_to_gray(input : std_ulogic_vector) return std_ulogic_vector;
-  function gray_to_bin(input : std_ulogic_vector) return std_ulogic_vector;
-  function int_to_hexchar(input : integer) return character;
-  function bcd_add4(a : std_ulogic_vector; b : std_ulogic_vector; c : std_ulogic) return std_ulogic_vector;
-  function or_all(a : std_ulogic_vector) return std_ulogic;
-  function and_all(a : std_ulogic_vector) return std_ulogic;
-  function xor_all(a : std_ulogic_vector) return std_ulogic;
+  function index_size_f(input : natural) return natural;
+  function is_power_of_two_f(num : natural; bit_width : natural) return boolean;
+  function bit_reversal_f(input : std_ulogic_vector) return std_ulogic_vector;
+  function set_bits_f(input : std_ulogic_vector) return natural;
+  function leading_zeros_f(input : std_ulogic_vector) return natural;
+  function cond_sel_natural_f(cond : boolean; val_t : natural; val_f : natural) return natural;
+  function cond_sel_stdulogicvector_f(cond : boolean; val_t : std_ulogic_vector; val_f : std_ulogic_vector) return std_ulogic_vector;
+  function bool_to_ulogic_f(cond : boolean) return std_ulogic;
+  function bin_to_gray_f(input : std_ulogic_vector) return std_ulogic_vector;
+  function gray_to_bin_f(input : std_ulogic_vector) return std_ulogic_vector;
+  function int_to_hexchar_f(input : integer) return character;
+  function bcd_add4_f(a : std_ulogic_vector; b : std_ulogic_vector; c : std_ulogic) return std_ulogic_vector;
+  function or_all_f(a : std_ulogic_vector) return std_ulogic;
+  function and_all_f(a : std_ulogic_vector) return std_ulogic;
+  function xor_all_f(a : std_ulogic_vector) return std_ulogic;
 
   -- Address Space Layout -------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -727,7 +732,7 @@ package body neo430_package is
 
   -- Function: Minimal required bit width ---------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  function index_size(input : natural) return natural is
+  function index_size_f(input : natural) return natural is
   begin
     for i in 0 to natural'high loop
       if (2**i >= input) then
@@ -735,11 +740,11 @@ package body neo430_package is
       end if;
     end loop; -- i
     return 0;
-  end function index_size;
+  end function index_size_f;
 
   -- Function: Test is value (encoded with a certain bit width) is a power of 2 -------------
   -- -------------------------------------------------------------------------------------------
-  function is_power_of_two(num : natural; bit_width : natural) return boolean is
+  function is_power_of_two_f(num : natural; bit_width : natural) return boolean is
   begin
     for i in 0 to bit_width loop
       if ((2**i) = num) then
@@ -747,22 +752,22 @@ package body neo430_package is
       end if;
     end loop; -- i
     return false;
-  end function is_power_of_two;
+  end function is_power_of_two_f;
 
   -- Function: Bit reversal -----------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  function bit_reversal(input : std_ulogic_vector) return std_ulogic_vector is
+  function bit_reversal_f(input : std_ulogic_vector) return std_ulogic_vector is
     variable output_v : std_ulogic_vector(input'range);
   begin
     for i in 0 to input'length-1 loop
       output_v(input'length-i-1) := input(i);
     end loop; -- i
     return output_v;
-  end function bit_reversal;
+  end function bit_reversal_f;
 
   -- Function: Count number of set bits (aka population count) ------------------------------
   -- -------------------------------------------------------------------------------------------
-  function set_bits(input : std_ulogic_vector) return natural is
+  function set_bits_f(input : std_ulogic_vector) return natural is
     variable cnt_v : natural range 0 to input'length-1;
   begin
     cnt_v := 0;
@@ -772,11 +777,11 @@ package body neo430_package is
       end if;
     end loop; -- i
     return cnt_v;
-  end function set_bits;
+  end function set_bits_f;
 
   -- Function: Count leading zeros ----------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  function leading_zeros(input : std_ulogic_vector) return natural is
+  function leading_zeros_f(input : std_ulogic_vector) return natural is
     variable cnt_v : natural range 0 to input'length;
   begin
     cnt_v := 0;
@@ -788,44 +793,44 @@ package body neo430_package is
       end if;
     end loop; -- i
     return cnt_v;
-  end function leading_zeros;
+  end function leading_zeros_f;
 
   -- Function: Conditional select natural ---------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  function cond_sel_natural(cond : boolean; val_t : natural; val_f : natural) return natural is
+  function cond_sel_natural_f(cond : boolean; val_t : natural; val_f : natural) return natural is
   begin
     if (cond = true) then
       return val_t;
     else
       return val_f;
     end if;
-  end function cond_sel_natural;
+  end function cond_sel_natural_f;
 
   -- Function: Conditional select std_ulogic_vector -----------------------------------------
   -- -------------------------------------------------------------------------------------------
-  function cond_sel_stdulogicvector(cond : boolean; val_t : std_ulogic_vector; val_f : std_ulogic_vector) return std_ulogic_vector is
+  function cond_sel_stdulogicvector_f(cond : boolean; val_t : std_ulogic_vector; val_f : std_ulogic_vector) return std_ulogic_vector is
   begin
     if (cond = true) then
       return val_t;
     else
       return val_f;
     end if;
-  end function cond_sel_stdulogicvector;
+  end function cond_sel_stdulogicvector_f;
 
   -- Function: Convert BOOL to STD_ULOGIC ---------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  function bool_to_ulogic(cond : boolean) return std_ulogic is
+  function bool_to_ulogic_f(cond : boolean) return std_ulogic is
   begin
     if (cond = true) then
       return '1';
     else
       return '0';
     end if;
-  end function bool_to_ulogic;
+  end function bool_to_ulogic_f;
 
   -- Function: Binary to Gray ---------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  function bin_to_gray(input : std_ulogic_vector) return std_ulogic_vector is
+  function bin_to_gray_f(input : std_ulogic_vector) return std_ulogic_vector is
     variable output_v : std_ulogic_vector(input'range);
   begin
     output_v(input'length-1) := input(input'length-1); -- keep MSB
@@ -833,11 +838,11 @@ package body neo430_package is
       output_v(i) := input(i) xor input(i+1);
     end loop; -- i
     return output_v;
-  end function bin_to_gray;
+  end function bin_to_gray_f;
 
   -- Function: Gray to Binary ---------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  function gray_to_bin(input : std_ulogic_vector) return std_ulogic_vector is
+  function gray_to_bin_f(input : std_ulogic_vector) return std_ulogic_vector is
     variable output_v : std_ulogic_vector(input'range);
   begin
     output_v(input'length-1) := input(input'length-1); -- keep MSB
@@ -845,11 +850,11 @@ package body neo430_package is
       output_v(i) := output_v(i+1) xor input(i);
     end loop; -- i
     return output_v;
-  end function gray_to_bin;
+  end function gray_to_bin_f;
 
   -- Function: Integer (4-bit) to hex char --------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  function int_to_hexchar(input : integer) return character is
+  function int_to_hexchar_f(input : integer) return character is
     variable output_v : character;
   begin
     case (input) is
@@ -872,11 +877,11 @@ package body neo430_package is
       when others => output_v := '?';
     end case;
     return output_v;
-  end function int_to_hexchar;
+  end function int_to_hexchar_f;
 
   -- Function: 4-bit BCD addition with carry ------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  function bcd_add4(a : std_ulogic_vector; b : std_ulogic_vector; c : std_ulogic) return std_ulogic_vector is
+  function bcd_add4_f(a : std_ulogic_vector; b : std_ulogic_vector; c : std_ulogic) return std_ulogic_vector is
     variable tmp_v : unsigned(4 downto 0);
     variable res_v : unsigned(3 downto 0);
     variable cry_v : std_ulogic;
@@ -890,11 +895,11 @@ package body neo430_package is
       cry_v := '0';
     end if;
     return std_ulogic_vector(cry_v & res_v);
-  end function bcd_add4;
+  end function bcd_add4_f;
 
   -- Function: OR all bits ------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  function or_all(a : std_ulogic_vector) return std_ulogic is
+  function or_all_f(a : std_ulogic_vector) return std_ulogic is
     variable tmp_v : std_ulogic;
   begin
     tmp_v := a(a'low);
@@ -902,11 +907,11 @@ package body neo430_package is
       tmp_v := tmp_v or a(i);
     end loop; -- i
     return tmp_v;
-  end function or_all;
+  end function or_all_f;
 
   -- Function: AND all bits -----------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  function and_all(a : std_ulogic_vector) return std_ulogic is
+  function and_all_f(a : std_ulogic_vector) return std_ulogic is
     variable tmp_v : std_ulogic;
   begin
     tmp_v := a(a'low);
@@ -914,11 +919,11 @@ package body neo430_package is
       tmp_v := tmp_v and a(i);
     end loop; -- i
     return tmp_v;
-  end function and_all;
+  end function and_all_f;
 
   -- Function: XOR all bits -----------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  function xor_all(a : std_ulogic_vector) return std_ulogic is
+  function xor_all_f(a : std_ulogic_vector) return std_ulogic is
     variable tmp_v : std_ulogic;
   begin
     tmp_v := a(a'low);
@@ -926,7 +931,7 @@ package body neo430_package is
       tmp_v := tmp_v xor a(i);
     end loop; -- i
     return tmp_v;
-  end function xor_all;
+  end function xor_all_f;
 
 
 end neo430_package;

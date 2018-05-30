@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 14.01.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 28.05.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -608,30 +608,18 @@ begin
 
   -- Interrupt Controller -----------------------------------------------------
   -- -----------------------------------------------------------------------------
-  irq_controller: process(rst_i, clk_i)
+  irq_buffer: process(clk_i)
   begin
-    if (rst_i = '0') then
-      irq_buf   <= (others => '0');
-      irq_vec   <= (others => '0');
-      irq_start <= '0'; -- starting IRQ handler
-    elsif rising_edge(clk_i) then
-      -- gather IRQs --
+    if rising_edge(clk_i) then
+      irq_vec <= irq_vec_nxt;
       for i in 0 to 3 loop
         irq_buf(i) <= (irq_buf(i) or irq_i(i)) and (not sreg_i(sreg_q_c)) and (not irq_ack_mask(i));
       end loop; -- i
-      -- starting IRQ --
-      if (irq_start = '0') then -- no starting IRQ
-        irq_vec <= irq_vec_nxt;
-        if (irq_buf /= "0000") and (sreg_i(sreg_i_c) = '1') then
-          irq_start <= '1';
-        end if;
-      -- clear start flag when entering IRQ service routinge (auto clear of I flag)
-      -- or manually abort IRQ start by clearing the I flag
-      elsif (sreg_i(sreg_i_c) = '0') then
-        irq_start <= '0';
-      end if;
     end if;
-  end process irq_controller;
+  end process irq_buffer;
+
+  -- valid start of IRQ handler --
+  irq_start <= '1' when (irq_buf /= "0000") and (sreg_i(sreg_i_c) = '1') else '0';
 
   -- acknowledge mask --
   irq_ack_mask_gen: process(irq_ack, irq_vec)

@@ -53,8 +53,8 @@ end neo430_wb_interface;
 architecture neo430_wb_interface_rtl of neo430_wb_interface is
 
   -- IO space: module base address --
-  constant hi_abb_c : natural := index_size(io_size_c)-1; -- high address boundary bit
-  constant lo_abb_c : natural := index_size(wb32_size_c); -- low address boundary bit
+  constant hi_abb_c : natural := index_size_f(io_size_c)-1; -- high address boundary bit
+  constant lo_abb_c : natural := index_size_f(wb32_size_c); -- low address boundary bit
 
   -- control reg bits --
   constant ctrl_byte_en0_c : natural :=  0; -- -/w: wishbone data byte enable bit 0
@@ -160,7 +160,7 @@ begin
   end process arbiter;
 
   -- device actually in use? --
-  enable <= not or_all(byte_en); -- '0' when (byte_en = "0000") else '1';
+  enable <= not or_all_f(byte_en); -- '0' when (byte_en = "0000") else '1';
 
   -- valid cycle signal --
   wb_cyc_o <= pending;

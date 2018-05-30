@@ -56,8 +56,8 @@ end neo430_wdt;
 architecture neo430_wdt_rtl of neo430_wdt is
 
   -- IO space: module base address --
-  constant hi_abb_c : natural := index_size(io_size_c)-1; -- high address boundary bit
-  constant lo_abb_c : natural := index_size(wdt_size_c); -- low address boundary bit
+  constant hi_abb_c : natural := index_size_f(io_size_c)-1; -- high address boundary bit
+  constant lo_abb_c : natural := index_size_f(wdt_size_c); -- low address boundary bit
 
   -- Watchdog access password - do not change! --
   constant wdt_password_c : std_ulogic_vector(07 downto 0) := x"47";

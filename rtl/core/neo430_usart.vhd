@@ -61,8 +61,8 @@ end neo430_usart;
 architecture neo430_usart_rtl of neo430_usart is
 
   -- IO space: module base address --
-  constant hi_abb_c : natural := index_size(io_size_c)-1; -- high address boundary bit
-  constant lo_abb_c : natural := index_size(usart_size_c); -- low address boundary bit
+  constant hi_abb_c : natural := index_size_f(io_size_c)-1; -- high address boundary bit
+  constant lo_abb_c : natural := index_size_f(usart_size_c); -- low address boundary bit
 
   -- accessible regs --
   signal ctrl      : std_ulogic_vector(15 downto 0);

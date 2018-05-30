@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 24.04.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 26.05.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -58,12 +58,13 @@ architecture neo430_reg_file_rtl of neo430_reg_file is
   -- boot from beginning of boot ROM (boot_base_c) if bootloader is used, otherwise boot from beginning of IMEM (imem_base_c)
   -- By not using a reset-like init of the PC, the whole register file (except for SR and CG)
   -- can be mapped to distributed RAM saving logic resources
-  constant pc_boot_addr_c : std_ulogic_vector(15 downto 0) := cond_sel_stdulogicvector(BOOTLD_USE, boot_base_c, imem_base_c);
+  constant pc_boot_addr_c : std_ulogic_vector(15 downto 0) := cond_sel_stdulogicvector_f(BOOTLD_USE, boot_base_c, imem_base_c);
 
   -- register file (including dummy regs) --
   type   reg_file_t is array (15 downto 0) of std_ulogic_vector(15 downto 0);
   signal reg_file : reg_file_t;
   signal sreg     : std_ulogic_vector(15 downto 0);
+  signal sreg_int : std_ulogic_vector(15 downto 0);
 
   --- RAM attribute to inhibit bypass-logic - Altera only! ---
   attribute ramstyle : string;
@@ -87,7 +88,7 @@ begin
     if (rst_i = '0') then
       sreg <= (others => '0'); -- here we NEED a true hardware reset
     elsif rising_edge(clk_i) then
-      -- status register --
+      -- physical status register --
       if ((ctrl_i(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) = reg_sr_c) and
           (ctrl_i(ctrl_rf_ad_c) = '0') and (ctrl_i(ctrl_rf_wb_en_c) = '1')) then -- only write in reg-addr-mode!
         sreg(sreg_c_c) <= in_data(sreg_c_c);
@@ -121,10 +122,24 @@ begin
     end if;
   end process sreg_write;
 
-  -- status register output --
-  sreg_o <= sreg;
+  -- construct logical SREG --
+  sreg_combine: process(sreg)
+  begin
+    sreg_int <= (others => '0');
+    sreg_int(sreg_c_c) <= sreg(sreg_c_c);
+    sreg_int(sreg_z_c) <= sreg(sreg_z_c);
+    sreg_int(sreg_n_c) <= sreg(sreg_n_c);
+    sreg_int(sreg_i_c) <= sreg(sreg_i_c);
+    sreg_int(sreg_s_c) <= sreg(sreg_s_c);
+    sreg_int(sreg_v_c) <= sreg(sreg_v_c);
+    sreg_int(sreg_q_c) <= sreg(sreg_q_c);
+    sreg_int(sreg_r_c) <= sreg(sreg_r_c);
+  end process sreg_combine;
 
-  -- general purpose register (including PC, dummy SR and dummy CG) --
+  -- status register output --
+  sreg_o <= sreg_int;
+
+  -- general purpose register file (including PC, dummy SR and dummy CG) --
   rf_write: process(clk_i)
   begin
     if rising_edge(clk_i) then
@@ -137,7 +152,7 @@ begin
 
   -- Register File Read Access ------------------------------------------------
   -- -----------------------------------------------------------------------------
-  rf_read: process(ctrl_i, reg_file, sreg)
+  rf_read: process(ctrl_i, reg_file, sreg_int)
     variable const_sel_v : std_ulogic_vector(02 downto 0);
   begin
     if ((ctrl_i(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) = reg_sr_c) or
@@ -145,7 +160,7 @@ begin
       -- constant generator / SR read access --
       const_sel_v := ctrl_i(ctrl_rf_adr0_c) & ctrl_i(ctrl_rf_as1_c) & ctrl_i(ctrl_rf_as0_c);
       case const_sel_v is
-        when "000"  => data_o <= sreg; -- read SR
+        when "000"  => data_o <= sreg_int; -- read SR
         when "001"  => data_o <= x"0000"; -- absolute addressing mode
         when "010"  => data_o <= x"0004"; -- +4
         when "011"  => data_o <= x"0008"; -- +8

@@ -56,8 +56,8 @@ architecture neo430_trng_rtl of neo430_trng is
   constant ctrl_rnd_en_c : natural := 0; -- -/w: TRNG enable
 
   -- IO space: module base address --
-  constant hi_abb_c : natural := index_size(io_size_c)-1; -- high address boundary bit
-  constant lo_abb_c : natural := index_size(trng_size_c); -- low address boundary bit
+  constant hi_abb_c : natural := index_size_f(io_size_c)-1; -- high address boundary bit
+  constant lo_abb_c : natural := index_size_f(trng_size_c); -- low address boundary bit
 
   -- access control --
   signal acc_en : std_ulogic; -- module access enable
