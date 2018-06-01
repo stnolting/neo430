@@ -1,8 +1,8 @@
 // #################################################################################################
 // #  < Wishbone bus explorer >                                                                    #
 // # ********************************************************************************************* #
-// # Manual access to the registers of modules, which are connected to Wishbone bus. This is also  #
-// # a neat example to illustrate the construction of a console-like user interface.               #
+// # Manual access to the registers of modules, which are connected to the Wishbone bus. This tool #
+// # uses NONBLOCKING Wishbone transactions.                                                       #
 // # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 // # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -22,7 +22,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               06.10.2017  #
+// # Stephan Nolting, Hannover, Germany                                                 01.06.2018 #
 // #################################################################################################
 
 
@@ -69,15 +69,12 @@ int main(void) {
   }
 
   // default config
-  wb_config = 1;
+  wb_config = 4;
 
   uart_br_print("Configure the actual data transfer size (1, 2 or 4 bytes)\n"
                 "using 'setup'. Addresses are always 32-bit wide.\n"
-                "Type 'help' to see the help menu.\n\n"
-
-                "Note: Do not access unused addreses! This program uses\n"
-                "blocking accesses, so performing transactions to unimplemented\n"
-                "addresses will permanently stall the program!\n");
+                "This tool uses non-blocking Wishbone transactions.\n\n"
+                "Type 'help' to see the help menu.\n\n");
 
   // Main menu
   for (;;) {
@@ -198,26 +195,36 @@ void read_wb_address(void) {
   uart_print_hex_dword(address);
   uart_br_print("]... ");
 
-  uint8_t r_data8 = 0;
-  uint16_t r_data16 = 0;
-  uint32_t r_data32 = 0;
-
-  // perform access
-  if (wb_config == 1)
-    r_data8 = wishbone_read8(address);
-  if (wb_config == 2)
-    r_data16 = wishbone_read16(address);
-  if (wb_config == 4)
-    r_data32 = wishbone_read32(address);
-
   // print result
   uart_br_print("Read data: 0x");
+
   if (wb_config == 1)
-    uart_print_hex_byte(r_data8);
-  if (wb_config == 2)
-    uart_print_hex_word(r_data16);
-  if (wb_config == 4)
-    uart_print_hex_dword(r_data32);
+    wishbone_read8_start(address);
+  else if (wb_config == 2)
+    wishbone_read16_start(address);
+  else if (wb_config == 4)
+    wishbone_read32_start(address);
+
+  // wait for transfer to finish
+  uint16_t timeout = 0;
+  while(1){
+    if (!wishbone_busy())
+      break;
+    if (timeout++ == 100) {
+      uart_br_print("\nError! Device not responding! Press key to proceed.\n");
+      while(!uart_char_received());
+      return;
+    }
+  }
+
+  // read data
+  if (wb_config == 1)
+    uart_print_hex_byte(wishbone_get_data8(address));
+  else if (wb_config == 2)
+    uart_print_hex_word(wishbone_get_data16(address));
+  else if (wb_config == 4)
+    uart_print_hex_dword(wishbone_get_data32(address));
+
   uart_br_print("\n");
 }
 
@@ -243,17 +250,25 @@ void write_wb_address(void) {
   uart_print_hex_dword(address);
   uart_br_print("]... ");
 
-  uint8_t w_data8 = (uint8_t)data;
-  uint16_t w_data16 = (uint16_t)data;
-  uint32_t w_data32 = data;
-
   // perform access
   if (wb_config == 1)
-    wishbone_write8(address, w_data8);
-  if (wb_config == 2)
-    wishbone_write16(address, w_data16);
-  if (wb_config == 4)
-    wishbone_write32(address, w_data32);
+    wishbone_write8_start(address, (uint8_t)data);
+  else if (wb_config == 2)
+    wishbone_write16_start(address, (uint16_t)data);
+  else if (wb_config == 4)
+    wishbone_write32_start(address, data);
+
+  // wait for transfer to finish
+  uint16_t timeout = 0;
+  while(1){
+    if (!wishbone_busy())
+      break;
+    if (timeout++ == 100) {
+      uart_br_print("\nError! Device not responding! Press key to proceed.\n");
+      while(!uart_char_received());
+      return;
+    }
+  }
 
   uart_br_print("Done.\n"); 
 }
@@ -275,10 +290,6 @@ void dump_wb(void) {
                 "You can abort dumping by pressing any key.\n");
   while(!uart_char_received());
 
-  uint8_t r_data8 = 0;
-  uint16_t r_data16 = 0;
-  uint32_t r_data32 = 0;
-
   while(1) {
     uart_br_print("0x");
     uart_print_hex_dword(address);
@@ -287,29 +298,43 @@ void dump_wb(void) {
     uint16_t border = 16 / wb_config;
     for (i=0; i<border; i++) {
 
-      // perform access
+      // trigger access
       if (wb_config == 1)
-        r_data8 = wishbone_read8(address);
-      if (wb_config == 2)
-        r_data16 = wishbone_read16(address);
-      if (wb_config == 4)
-        r_data32 = wishbone_read32(address);
+        wishbone_read8_start(address);
+      else if (wb_config == 2)
+        wishbone_read16_start(address);
+      else if (wb_config == 4)
+        wishbone_read32_start(address);
 
+      // wait for transfer to finish
+      uint16_t timeout = 0;
+      while(1){
+        if (!wishbone_busy())
+          break;
+        if (timeout++ == 100) {
+          uart_br_print("\nError! Device not responding! Press key to proceed.\n");
+          while(!uart_char_received());
+          return;
+        }
+      }
+
+      // read data
       if (wb_config == 1) {
-        uart_print_hex_byte(r_data8);
+        uart_print_hex_byte(wishbone_get_data8(address));
         address += 1;
       }
       else if (wb_config == 2) {
-        uart_print_hex_word(r_data16);
+        uart_print_hex_word(wishbone_get_data16(address));
         address += 2;
       }
-      else {
-        uart_print_hex_dword(r_data32);
+      else if (wb_config == 4) {
+        uart_print_hex_dword(wishbone_get_data32(address));
         address += 4;
       }
-      uart_putc(' ');
 
+      uart_putc(' ');
     }
+
     uart_br_print("\n");
     if (uart_char_received()) // abort
       return;

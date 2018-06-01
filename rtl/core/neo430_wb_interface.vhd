@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 12.01.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 01.06.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -160,7 +160,7 @@ begin
   end process arbiter;
 
   -- device actually in use? --
-  enable <= not or_all_f(byte_en); -- '0' when (byte_en = "0000") else '1';
+  enable <= or_all_f(byte_en);
 
   -- valid cycle signal --
   wb_cyc_o <= pending;
