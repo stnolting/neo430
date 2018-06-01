@@ -92,7 +92,7 @@ begin
       if (wren = '1') then
         rnd_enable <= data_i(ctrl_rnd_en_c);
       end if;
-      -- using individual resets for each OSC - derived from a shift register - to prevent the syntheisis tool
+      -- using individual resets for each OSC - derived from a shift register - to prevent the synthesis tool
       -- from removing all but one OSC (since they implement "logical identical functions")
       rnd_reset <= rnd_reset(num_trngs_c-2 downto 0) & (not rnd_enable);
     end if;

@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 28.02.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 01.06.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -60,8 +60,8 @@ architecture neo430_alu_rtl of neo430_alu is
   signal dadd_res_ff      : std_ulogic_vector(16 downto 0); -- decimal adder kernel result buffered
   signal dadd_res_in      : std_ulogic_vector(16 downto 0); -- decimal adder kernel result buffered
   signal alu_res          : std_ulogic_vector(15 downto 0); -- alu result
-  signal lo_zero, hi_zero : std_ulogic; -- zero detectors
-  signal zero             : std_ulogic; -- final zero flag
+  signal data_res         : std_ulogic_vector(15 downto 0); -- final alu result
+  signal zero             : std_ulogic; -- zero detector
   signal negative         : std_ulogic; -- sign detectors
 
 begin
@@ -146,10 +146,9 @@ begin
   -- Decimal Arithmetic Core --------------------------------------------------
   -- -----------------------------------------------------------------------------
   decimal_arithmetic_core: process(op_a_ff, op_b_ff, sreg_i)
-    variable dsum_ll_v, dsum_lh_v : std_ulogic_vector(4 downto 0);
-    variable dsum_hl_v, dsum_hh_v : std_ulogic_vector(4 downto 0);
+    variable dsum_ll_v, dsum_lh_v, dsum_hl_v, dsum_hh_v : std_ulogic_vector(4 downto 0);
   begin
-    -- four 4-bit CBD adders --
+    -- four 4-bit BCD adders --
     dsum_ll_v := bcd_add4_f(op_a_ff(03 downto 00), op_b_ff(03 downto 00), sreg_i(sreg_c_c));
     dsum_lh_v := bcd_add4_f(op_a_ff(07 downto 04), op_b_ff(07 downto 04), dsum_ll_v(4));
     dsum_hl_v := bcd_add4_f(op_a_ff(11 downto 08), op_b_ff(11 downto 08), dsum_lh_v(4));
@@ -235,17 +234,17 @@ begin
 
       when alu_bic_c => -- r <= !a & b
         alu_res <= (not op_a_ff) and op_b_ff;
-        flag_o(flag_c_c) <= sreg_i(sreg_c_c);
-        flag_o(flag_v_c) <= sreg_i(sreg_v_c);
-        flag_o(flag_n_c) <= sreg_i(sreg_n_c);
-        flag_o(flag_z_c) <= sreg_i(sreg_z_c);
+        flag_o(flag_c_c) <= sreg_i(sreg_c_c); -- keep
+        flag_o(flag_v_c) <= sreg_i(sreg_v_c); -- keep
+        flag_o(flag_n_c) <= sreg_i(sreg_n_c); -- keep
+        flag_o(flag_z_c) <= sreg_i(sreg_z_c); -- keep
 
       when alu_bis_c => -- r <= a | b
         alu_res <= op_a_ff or op_b_ff;
-        flag_o(flag_c_c) <= sreg_i(sreg_c_c);
-        flag_o(flag_v_c) <= sreg_i(sreg_v_c);
-        flag_o(flag_n_c) <= sreg_i(sreg_n_c);
-        flag_o(flag_z_c) <= sreg_i(sreg_z_c);
+        flag_o(flag_c_c) <= sreg_i(sreg_c_c); -- keep
+        flag_o(flag_v_c) <= sreg_i(sreg_v_c); -- keep
+        flag_o(flag_n_c) <= sreg_i(sreg_n_c); -- keep
+        flag_o(flag_z_c) <= sreg_i(sreg_z_c); -- keep
 
       when alu_bit_c => -- r <= a & b (no write back, done by ctrl arbiter)
         alu_res <= op_a_ff and op_b_ff;
@@ -278,43 +277,43 @@ begin
 
       when alu_swap_c => -- r <= swap bytes of a
         alu_res <= op_a_ff(7 downto 0) & op_a_ff(15 downto 8);
-        flag_o(flag_c_c) <= sreg_i(sreg_c_c);
-        flag_o(flag_v_c) <= sreg_i(sreg_v_c);
-        flag_o(flag_n_c) <= sreg_i(sreg_n_c);
-        flag_o(flag_z_c) <= sreg_i(sreg_z_c);
+        flag_o(flag_c_c) <= sreg_i(sreg_c_c); -- keep
+        flag_o(flag_v_c) <= sreg_i(sreg_v_c); -- keep
+        flag_o(flag_n_c) <= sreg_i(sreg_n_c); -- keep
+        flag_o(flag_z_c) <= sreg_i(sreg_z_c); -- keep
 
       when alu_mov_c => -- r <= a
         alu_res <= op_a_ff;
-        flag_o(flag_c_c) <= sreg_i(sreg_c_c);
-        flag_o(flag_v_c) <= sreg_i(sreg_v_c);
-        flag_o(flag_n_c) <= sreg_i(sreg_n_c);
-        flag_o(flag_z_c) <= sreg_i(sreg_z_c);
+        flag_o(flag_c_c) <= sreg_i(sreg_c_c); -- keep
+        flag_o(flag_v_c) <= sreg_i(sreg_v_c); -- keep
+        flag_o(flag_n_c) <= sreg_i(sreg_n_c); -- keep
+        flag_o(flag_z_c) <= sreg_i(sreg_z_c); -- keep
 
       when others => -- undefined
         alu_res <= op_a_ff;
         flag_o(flag_c_c) <= sreg_i(sreg_c_c); -- keep
         flag_o(flag_v_c) <= sreg_i(sreg_v_c); -- keep
-        flag_o(flag_n_c) <= negative; -- update
-        flag_o(flag_z_c) <= zero; -- update
+        flag_o(flag_n_c) <= sreg_i(sreg_n_c); -- keep
+        flag_o(flag_z_c) <= sreg_i(sreg_z_c); -- keep
     end case;
   end process alu_core;
 
 
-  -- Additional Flag Logic ----------------------------------------------------
+  -- Post processing logic ----------------------------------------------------
   -- -----------------------------------------------------------------------------
+
+  -- word/byte mode mask --
+  data_res(07 downto 0) <= alu_res(07 downto 0);
+  data_res(15 downto 8) <= alu_res(15 downto 8) when (ctrl_i(ctrl_alu_bw_c) = '0') else x"00";
+
   -- zero flag --
-  lo_zero <= not or_all_f(alu_res(07 downto 0)); -- zero detector LO byte
-  hi_zero <= not or_all_f(alu_res(15 downto 8)); -- zero detector HI byte
-  zero    <= lo_zero when (ctrl_i(ctrl_alu_bw_c) = '1') else (lo_zero and hi_zero);
+  zero <= not or_all_f(data_res);
 
   -- negative flag --
-  negative <= alu_res(7) when (ctrl_i(ctrl_alu_bw_c) = '1') else alu_res(15);
+  negative <= data_res(7) when (ctrl_i(ctrl_alu_bw_c) = '1') else data_res(15);
 
-
-  -- Output Mask --------------------------------------------------------------
-  -- -----------------------------------------------------------------------------
-  data_o(07 downto 0) <= alu_res(07 downto 0);
-  data_o(15 downto 8) <= alu_res(15 downto 8) when (ctrl_i(ctrl_alu_bw_c) = '0') else x"00";
+  -- final data output --
+  data_o <= data_res;
 
 
 end neo430_alu_rtl;
