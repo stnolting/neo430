@@ -22,7 +22,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 01.06.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 04.06.2018 #
 // #################################################################################################
 
 
@@ -70,6 +70,7 @@ int main(void) {
 
   // default config
   wb_config = 4;
+  wishbone_terminate(); // terminate current transfer
 
   uart_br_print("Configure the actual data transfer size (1, 2 or 4 bytes)\n"
                 "using 'setup'. Addresses are always 32-bit wide.\n"
@@ -212,6 +213,7 @@ void read_wb_address(void) {
       break;
     if (timeout++ == 100) {
       uart_br_print("\nError! Device not responding! Press key to proceed.\n");
+      wishbone_terminate(); // terminate current transfer
       while(!uart_char_received());
       return;
     }
@@ -265,6 +267,7 @@ void write_wb_address(void) {
       break;
     if (timeout++ == 100) {
       uart_br_print("\nError! Device not responding! Press key to proceed.\n");
+      wishbone_terminate(); // terminate current transfer
       while(!uart_char_received());
       return;
     }
@@ -313,6 +316,7 @@ void dump_wb(void) {
           break;
         if (timeout++ == 100) {
           uart_br_print("\nError! Device not responding! Press key to proceed.\n");
+          wishbone_terminate(); // terminate current transfer
           while(!uart_char_received());
           return;
         }

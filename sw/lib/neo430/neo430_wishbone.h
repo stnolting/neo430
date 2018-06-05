@@ -24,7 +24,7 @@
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
 // # Thanks to Edward Sherriff!                                                                    #
-// # Stephan Nolting, Hannover, Germany                                                 01.06.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 04.06.2018 #
 // #################################################################################################
 
 #ifndef neo430_wishbone_h
@@ -52,6 +52,7 @@ void wishbone_write8_start(uint32_t a, uint8_t d); // This function performs a d
 
 
 uint16_t wishbone_busy(void);
+void wishbone_terminate();
 uint32_t wishbone_get_data32(uint32_t a);
 uint16_t wishbone_get_data16(uint32_t a); // This function performs a data alignment based on the address!
 uint8_t wishbone_get_data8(uint32_t a); // This function performs a data alignment based on the address!
@@ -315,6 +316,15 @@ void wishbone_write8_start(uint32_t a, uint8_t d) {
 uint16_t wishbone_busy(void) {
 
   return (WB32_CT & (1<<WB32_CT_PENDING));
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Terminate current Wishbone transfer
+ * ------------------------------------------------------------ */
+void wishbone_terminate(void) {
+
+  WB32_CT = 0;
 }
 
 
