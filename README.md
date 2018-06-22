@@ -79,6 +79,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Only one power-down (sleep) mode
 - Wishbone-compatible interface to attach custom IP
 - Internal bootloader with text interface (via UART serial port)
+- *NO* built-in support of floating point types (i.e. float & double)
 
 
 ## Implementation Results
