@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 01.06.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 22.06.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -30,7 +30,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0183"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0184"; -- no touchy!
 
   -- Danger Zone! ---------------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------

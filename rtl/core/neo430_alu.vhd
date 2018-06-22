@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 01.06.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 22.06.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -89,7 +89,7 @@ begin
   -- Binary Arithmetic Core ---------------------------------------------------
   -- -----------------------------------------------------------------------------
   binary_arithmetic_core: process(ctrl_i, op_a_ff, op_b_ff, sreg_i)
-    variable op_a_v, op_b_v     : std_ulogic_vector(15 downto 0);
+    variable op_a_v             : std_ulogic_vector(15 downto 0);
     variable carry_v            : std_ulogic;
     variable carry_null_v       : std_ulogic;
     variable a_lo_v, a_hi_v     : std_ulogic_vector(8 downto 0);
@@ -98,8 +98,7 @@ begin
     variable carry_in_v         : std_ulogic_vector(0 downto 0);
     variable ova_16_v, ova_8_v  : std_ulogic;
   begin
-    -- add/sub control --
-    op_b_v := op_b_ff;
+    -- add/sub control (for operand A= --
     if (ctrl_i(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) = alu_add_c) or 
        (ctrl_i(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) = alu_addc_c) then -- addition
       op_a_v       := op_a_ff;
@@ -120,16 +119,16 @@ begin
     -- operands --
     a_lo_v := '0' & op_a_v(07 downto 0);
     a_hi_v := '0' & op_a_v(15 downto 8);
-    b_lo_v := '0' & op_b_v(07 downto 0);
-    b_hi_v := '0' & op_b_v(15 downto 8);
+    b_lo_v := '0' & op_b_ff(07 downto 0);
+    b_hi_v := '0' & op_b_ff(15 downto 8);
 
     -- adder core --
     add_lo_v := std_ulogic_vector(unsigned(a_lo_v) + unsigned(b_lo_v) + unsigned(carry_in_v(0 downto 0)));
     add_hi_v := std_ulogic_vector(unsigned(a_hi_v) + unsigned(b_hi_v) + unsigned(add_lo_v(8 downto 8)));
 
-    -- overflow logic: plus + plus = minus || minus + minus = plus --
-    ova_16_v := ((not op_a_ff(15)) and (not op_b_ff(15)) and add_hi_v(7)) or (op_a_ff(15) and op_b_ff(15) and (not add_hi_v(7)));
-    ova_8_v  := ((not op_a_ff(7))  and (not op_b_ff(7))  and add_lo_v(7)) or (op_a_ff(7)  and op_b_ff(7)  and (not add_lo_v(7)));
+    -- overflow logic for the actual ADDER CORE (thx Edward!): plus + plus = minus || minus + minus = plus --
+    ova_16_v := ((not op_a_v(15)) and (not op_b_ff(15)) and add_hi_v(7)) or (op_a_v(15) and op_b_ff(15) and (not add_hi_v(7)));
+    ova_8_v  := ((not op_a_v(7))  and (not op_b_ff(7))  and add_lo_v(7)) or (op_a_v(7)  and op_b_ff(7)  and (not add_lo_v(7)));
 
     -- output --
     add_res(15 downto 0) <= add_hi_v(7 downto 0) & add_lo_v(7 downto 0); -- result
