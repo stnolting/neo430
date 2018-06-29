@@ -28,10 +28,10 @@
 // prototypes
 void gpio_pin_set(uint8_t p);
 void gpio_pin_clr(uint8_t p);
-inline void gpio_port_set(uint16_t d);
-inline void gpio_port_toggle(uint16_t d);
+void gpio_port_set(uint16_t d);
+void gpio_port_toggle(uint16_t d);
 void gpio_pin_toggle(uint8_t p);
-inline uint16_t gpio_pin_get(uint8_t p);
+uint16_t gpio_pin_get(uint8_t p);
 uint16_t gpio_port_get(void);
 
 
@@ -59,7 +59,7 @@ void gpio_pin_clr(uint8_t p) {
  * INFO Set output port
  * PARAM Output data
  * ------------------------------------------------------------ */
-inline void gpio_port_set(uint16_t d) {
+void gpio_port_set(uint16_t d) {
 
   GPIO_OUT = d;
 }
@@ -69,7 +69,7 @@ inline void gpio_port_set(uint16_t d) {
  * INFO Toggle output port
  * PARAM Toggle output data
  * ------------------------------------------------------------ */
-inline void gpio_port_toggle(uint16_t d) {
+void gpio_port_toggle(uint16_t d) {
 
   GPIO_OUT = GPIO_OUT ^ d;
 }
@@ -100,7 +100,7 @@ uint16_t gpio_pin_get(uint8_t p) {
  * INFO Get input port
  * RETURN Input port state
  * ------------------------------------------------------------ */
-inline uint16_t gpio_port_get(void) {
+uint16_t gpio_port_get(void) {
 
   return GPIO_IN;
 }

@@ -22,13 +22,13 @@
 @REM # You should have received a copy of the GNU Lesser General Public License along with this      #
 @REM # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 @REM # ********************************************************************************************* #
-@REM #  Stephan Nolting, Hannover, Germany                                               16.10.2017  #
+@REM # Stephan Nolting, Hannover, Germany                                                 29.06.2018 #
 @REM #################################################################################################
 
 
 @REM ----------------------USER CONFIGURATION----------------------
 @REM Path of MSPGCC binaries:
-@if "%MSP430GCC_BIN_PATH%" == "" set MSP430GCC_BIN_PATH=C:\msp430-gcc-6.4.0.32_win32\bin
+@if "%MSP430GCC_BIN_PATH%" == "" set MSP430GCC_BIN_PATH=C:\msp430-gcc-7.3.1.24_win64\bin
 @REM --------------------------------------------------------------
 
 @REM Tools

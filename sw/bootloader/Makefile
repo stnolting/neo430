@@ -22,7 +22,7 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 # ********************************************************************************************* #
-#  Stephan Nolting, Hannover, Germany                                               16.10.2017  #
+# Stephan Nolting, Hannover, Germany                                                 29.06.2018 #
 #################################################################################################
 
 
@@ -30,7 +30,7 @@
 # USER CONFIGURATION
 #-------------------------------------------------------------------------------
 # Path of compiler binaries:
-MSP430GCC_BIN_PATH ?= /mnt/c/msp430-gcc-6.4.0.32_linux64/bin
+MSP430GCC_BIN_PATH ?= /mnt/c/msp430-gcc-7.3.1.24_linux64/bin
 
 #-------------------------------------------------------------------------------
 # Make defaults
