@@ -107,8 +107,6 @@ bootloader.s: main.elf
 
 # Converter for VHLD memory init image
 neo430_bootloader_image.vhd: bootloader.bin $(IMAGE_GEN)
-	@echo Image size \(bytes\):
-	@stat -c "%s" bootloader.bin
 	@$(IMAGE_GEN) -bld_img $< $@
 	@echo Installing bootloader image to rtl/core/neo430_bootloader_image.vhd
 	@cp neo430_bootloader_image.vhd ../../rtl/core/.

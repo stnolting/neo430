@@ -23,7 +23,7 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 # ********************************************************************************************* #
-#  Stephan Nolting, Hannover, Germany                                               23.09.2016  #
+# Stephan Nolting, Hannover, Germany                                                 29.06.2018 #
 #################################################################################################
 
 
@@ -58,8 +58,6 @@ APP_PATH = ../example/$(curr_folder)
 all:
 	@echo $(WARNING)
 	@make -r -s -C $(COMMON_PATH) APP_DIR=$(APP_PATH) MAIN=$(MAIN)
-	@echo Final executable size '(bytes)':
-	@stat -c "%s" main.bin
 
 
 #-------------------------------------------------------------------------------

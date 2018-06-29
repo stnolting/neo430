@@ -19,7 +19,7 @@
 @REM # You should have received a copy of the GNU Lesser General Public License along with this      #
 @REM # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 @REM # ********************************************************************************************* #
-@REM #  Stephan Nolting, Hannover, Germany                                               23.09.2016  #
+@REM # Stephan Nolting, Hannover, Germany                                                 29.06.2018 #
 @REM #################################################################################################
 
 
@@ -47,9 +47,3 @@
 @move main.bin %PROJECT_PATH%\. > nul
 @move main.s %PROJECT_PATH%\. > nul
 @cd %PROJECT_PATH%
-
-
-@REM Display file size
-@for %%A in (main.bin) do @set fileSize=%%~zA
-@echo Final executable size (bytes):
-@echo %fileSize%

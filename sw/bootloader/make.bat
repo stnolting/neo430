@@ -70,11 +70,6 @@
 @echo Installing bootloader image to rtl\core\neo430_bootloader_image.vhd
 @copy neo430_bootloader_image.vhd ..\..\rtl\core\. > nul
 
-@REM Display file size
-@for %%A in (bootloader.bin) do @set fileSize=%%~zA
-@echo Image size (bytes):
-@echo %fileSize%
-
 
 @REM Clean up
 @del main.elf crt0.elf main.elf bootloader.bin bootloader.asm neo430_bootloader_image.vhd
