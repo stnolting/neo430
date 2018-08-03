@@ -19,24 +19,24 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               27.12.2017  #
+// # Stephan Nolting, Hannover, Germany                                                 04.07.2018 #
 // #################################################################################################
 
 #ifndef neo430_wdt_h
 #define neo430_wdt_h
 
 // prototypes
-void wdt_enable(uint8_t prsc);
-void wdt_disable(void);
-void wdt_reset(void);
-void wdt_force_hw_reset(void);
+void neo430_wdt_enable(uint8_t prsc);
+void neo430_wdt_disable(void);
+void neo430_wdt_reset(void);
+void neo430_wdt_force_hw_reset(void);
 
 
 /* ------------------------------------------------------------
  * INFO Enable watchdog
  * PARAM Prescaler selection (0..7)
  * ------------------------------------------------------------ */
-void wdt_enable(uint8_t prsc) {
+void neo430_wdt_enable(uint8_t prsc) {
 
   WDT_CT = (WDT_PASSWORD<<8) | (1<<WDT_ENABLE) | (prsc & 0x07);
 }
@@ -45,7 +45,7 @@ void wdt_enable(uint8_t prsc) {
 /* ------------------------------------------------------------
  * INFO Disable watchdog
  * ------------------------------------------------------------ */
-void wdt_disable(void) {
+void neo430_wdt_disable(void) {
 
   WDT_CT = (WDT_PASSWORD<<8) | (0<<WDT_ENABLE);
 }
@@ -54,7 +54,7 @@ void wdt_disable(void) {
 /* ------------------------------------------------------------
  * INFO Reset watchdog
  * ------------------------------------------------------------ */
-void wdt_reset(void) {
+void neo430_wdt_reset(void) {
 
   WDT_CT = WDT_CT | (WDT_PASSWORD<<8);
 }
@@ -64,7 +64,7 @@ void wdt_reset(void) {
  * INFO Perform a hardware reset by activating the WDT and
  * performing an invalid access (wrong password)
  * ------------------------------------------------------------ */
-void wdt_force_hw_reset(void) {
+void neo430_wdt_force_hw_reset(void) {
 
   WDT_CT = (WDT_PASSWORD<<8) | (1<<WDT_ENABLE);
   WDT_CT = 0; // invalid access -> triggers reset

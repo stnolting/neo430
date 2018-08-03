@@ -19,39 +19,39 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 29.04.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 04.07.2018 #
 // #################################################################################################
 
 #ifndef neo430_cpu_h
 #define neo430_cpu_h
 
 // prototypes
-inline void eint(void);
-inline void dint(void);
-inline uint16_t get_sp(void);
-inline uint16_t get_sreg(void);
-inline void set_sreg(uint16_t d);
-inline void sleep(void);
-inline void clear_irq_buffer(void);
-void cpu_delay(uint16_t t);
-void cpu_delay_ms(uint16_t ms);
-inline void soft_reset(void);
-inline void jump_address(uint16_t addr);
-inline void call_address(uint16_t addr);
-inline uint16_t __bswap(uint16_t a);
-inline uint16_t __combine_bytes(uint8_t hi, uint8_t lo);
-inline uint16_t __dadd(uint16_t a, uint16_t b);
-void __memset(uint8_t *dst, uint8_t data, uint16_t num);
-uint8_t __memcmp(uint8_t *dst, uint8_t *src, uint16_t num);
-void __memcpy(uint8_t *dst, uint8_t *src, uint16_t num);
-uint16_t __bit_rev16(uint16_t x);
-uint32_t __xorshift32(void);
+inline void neo430_eint(void);
+inline void neo430_dint(void);
+inline uint16_t neo430_get_sp(void);
+inline uint16_t neo430_get_sreg(void);
+inline void neo430_set_sreg(uint16_t d);
+inline void neo430_sleep(void);
+inline void neo430_clear_irq_buffer(void);
+void neo430_cpu_delay(uint16_t t);
+void neo430_cpu_delay_ms(uint16_t ms);
+inline void neo430_soft_reset(void);
+inline void neo430_jump_address(uint16_t addr);
+inline void neo430_call_address(uint16_t addr);
+inline uint16_t __neo430_bswap(uint16_t a);
+inline uint16_t __neo430_combine_bytes(uint8_t hi, uint8_t lo);
+inline uint16_t __neo430_dadd(uint16_t a, uint16_t b);
+void __neo430_memset(uint8_t *dst, uint8_t data, uint16_t num);
+uint8_t __neo430_memcmp(uint8_t *dst, uint8_t *src, uint16_t num);
+void __neo430_memcpy(uint8_t *dst, uint8_t *src, uint16_t num);
+uint16_t __neo430_bit_rev16(uint16_t x);
+uint32_t __neo430_xorshift32(void);
 
 
 /* ------------------------------------------------------------
  * INFO Enable global interrupt flag
  * ------------------------------------------------------------ */
-inline void eint(void){
+inline void neo430_eint(void){
 
   asm volatile ("eint");
 }
@@ -60,7 +60,7 @@ inline void eint(void){
 /* ------------------------------------------------------------
  * INFO Disable global interrupt flag
  * ------------------------------------------------------------ */
-inline void dint(void){
+inline void neo430_dint(void){
 
   asm volatile ("dint");
   asm volatile ("nop");
@@ -71,7 +71,7 @@ inline void dint(void){
  * INFO Read stack pointer (for debugging only)
  * RETURN current stack pointer
  * ------------------------------------------------------------ */
-inline uint16_t get_sp(void){
+inline uint16_t neo430_get_sp(void){
 
   register uint16_t d;
   asm volatile ("mov r1, %0" : "=r" (d));
@@ -84,7 +84,7 @@ inline uint16_t get_sp(void){
  * INFO Read status register
  * RETURN current status register
  * ------------------------------------------------------------ */
-inline uint16_t get_sreg(void){
+inline uint16_t neo430_get_sreg(void){
 
   register uint16_t d;
   asm volatile ("mov r2, %0" : "=r" (d));
@@ -97,7 +97,7 @@ inline uint16_t get_sreg(void){
  * INFO Set status register
  * PARAM d new value for status register
  * ------------------------------------------------------------ */
-inline void set_sreg(uint16_t d){
+inline void neo430_set_sreg(uint16_t d){
 
   register uint16_t r = d;
   asm volatile ("mov %0, r2" : : "r" (r));
@@ -107,7 +107,7 @@ inline void set_sreg(uint16_t d){
 /* ------------------------------------------------------------
  * INFO Set CPU to sleep mode
  * ------------------------------------------------------------ */
-inline void sleep(void){
+inline void neo430_sleep(void){
 
   asm volatile ("bis %0, r2" : : "i" (1<<S_FLAG));
 }
@@ -116,7 +116,7 @@ inline void sleep(void){
 /* ------------------------------------------------------------
  * INFO Clear CPU pending IRQ buffer
  * ------------------------------------------------------------ */
-inline void clear_irq_buffer(void){
+inline void neo430_clear_irq_buffer(void){
 
   asm volatile ("bis %0, r2" : : "i" (1<<Q_FLAG));
   // no need to reset the flag as it automatically clears again
@@ -127,7 +127,7 @@ inline void clear_irq_buffer(void){
  * INFO Simple wait function
  * PARAM Amount of ~2^16 machine cycles to wait
  * ------------------------------------------------------------ */
-void cpu_delay(uint16_t t) {
+void neo430_cpu_delay(uint16_t t) {
 
   register uint16_t i = 0;
   while (t--) {
@@ -141,7 +141,7 @@ void cpu_delay(uint16_t t) {
  * INFO Waits <ms> microseconds (not very precise!)
  * PARAM ms time in microseconds to wait
  * ------------------------------------------------------------ */
-void cpu_delay_ms(uint16_t ms) {
+void neo430_cpu_delay_ms(uint16_t ms) {
 
   // empirical ;)
   uint32_t a = ((uint32_t)CLOCKSPEED_HI) << 1;
@@ -156,7 +156,7 @@ void cpu_delay_ms(uint16_t ms) {
 /* ------------------------------------------------------------
  * INFO Perform a soft reset by jumping to beginning of IMEM
  * ------------------------------------------------------------ */
-inline void soft_reset(void) {
+inline void neo430_soft_reset(void) {
 
   asm volatile ("mov #0x0000, r0");
 }
@@ -166,7 +166,7 @@ inline void soft_reset(void) {
  * INFO Jump to address
  * PARAM Destination address
  * ------------------------------------------------------------ */
-inline void jump_address(uint16_t addr) {
+inline void neo430_jump_address(uint16_t addr) {
 
   register uint16_t r = addr;
   asm volatile ("mov %0, r0" : : "r" (r));
@@ -177,7 +177,7 @@ inline void jump_address(uint16_t addr) {
  * INFO Call address and save return address to stack
  * PARAM Destination address
  * ------------------------------------------------------------ */
-inline void call_address(uint16_t addr) {
+inline void neo430_call_address(uint16_t addr) {
 
   register uint16_t r = addr;
   asm volatile ("call %0" : : "r" (r));
@@ -189,7 +189,7 @@ inline void call_address(uint16_t addr) {
  * PARAM 16-bit input word
  * RETURN 16-bit word with swapped bytes
  * ------------------------------------------------------------ */
-inline uint16_t __bswap(uint16_t a) {
+inline uint16_t __neo430_bswap(uint16_t a) {
 
   register uint16_t r = a;
   asm volatile ("swpb %0, %1" : "=r" (r) : "r" (r));
@@ -203,9 +203,9 @@ inline uint16_t __bswap(uint16_t a) {
  * PARAM lo will be put in result's low byte
  * RETURN 16-bit combined word
  * ------------------------------------------------------------ */
-inline uint16_t __combine_bytes(uint8_t hi, uint8_t lo) {
+inline uint16_t __neo430_combine_bytes(uint8_t hi, uint8_t lo) {
 
-  register uint16_t r = __bswap((uint16_t)hi);
+  register uint16_t r = __neo430_bswap((uint16_t)hi);
   return r | (uint16_t)lo;
 }
 
@@ -216,7 +216,7 @@ inline uint16_t __combine_bytes(uint8_t hi, uint8_t lo) {
  * PARAM 2x 16-bit BCD operands (4 digits)
  * RETURN 16-bit BCD result (4 digits)
  * ------------------------------------------------------------ */
-inline uint16_t __dadd(uint16_t a, uint16_t b) {
+inline uint16_t __neo430_dadd(uint16_t a, uint16_t b) {
 
   register uint16_t z = a;
   asm volatile ("clrc");
@@ -231,7 +231,7 @@ inline uint16_t __dadd(uint16_t a, uint16_t b) {
  * PARAM data: Init data
  * PARAM num: Number of bytes to initialize
  * ------------------------------------------------------------ */
-void __memset(uint8_t *dst, uint8_t data, uint16_t num) {
+void __neo430_memset(uint8_t *dst, uint8_t data, uint16_t num) {
 
   while (num--)
     *dst++ = data;
@@ -245,7 +245,7 @@ void __memset(uint8_t *dst, uint8_t data, uint16_t num) {
  * PARAM num: Number of bytes to compare
  * RETURN 0 if src == dst
  * ------------------------------------------------------------ */
-uint8_t __memcmp(uint8_t *dst, uint8_t *src, uint16_t num) {
+uint8_t __neo430_memcmp(uint8_t *dst, uint8_t *src, uint16_t num) {
 
   while (num--) {
     if (*dst++ != *src++)
@@ -261,7 +261,7 @@ uint8_t __memcmp(uint8_t *dst, uint8_t *src, uint16_t num) {
  * PARAM src: Pointer to beginning source memory space
  * PARAM num: Number of bytes to copy
  * ------------------------------------------------------------ */
-void __memcpy(uint8_t *dst, uint8_t *src, uint16_t num) {
+void __neo430_memcpy(uint8_t *dst, uint8_t *src, uint16_t num) {
 
   while (num--)
     *dst++ = *src++;
@@ -273,7 +273,7 @@ void __memcpy(uint8_t *dst, uint8_t *src, uint16_t num) {
  * PARAM input operand to be reversed
  * RETURN reversed bit pattern
  * ------------------------------------------------------------ */
-uint16_t __bit_rev16(uint16_t x) {
+uint16_t __neo430_bit_rev16(uint16_t x) {
 
   register uint16_t z = x;
   register uint16_t y = 0;
@@ -294,7 +294,7 @@ uint16_t __bit_rev16(uint16_t x) {
  * INFO Pseudo-random number generator
  * RETURN 32-bit random data
  * ------------------------------------------------------------ */
-uint32_t __xorshift32(void) {
+uint32_t __neo430_xorshift32(void) {
 
   static uint32_t x32 = 314159265;
 

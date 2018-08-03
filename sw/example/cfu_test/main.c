@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               29.12.2017  #
+// # Stephan Nolting, Hannover, Germany                                                 04.07.2018 #
 // #################################################################################################
 
 
@@ -40,21 +40,21 @@ void verify16(char *s, uint16_t a, uint16_t b);
 int main(void) {
 
   // setup UART
-  uart_set_baud(BAUD_RATE);
+  neo430_uart_set_baud(BAUD_RATE);
   USI_CT = (1<<USI_CT_EN);
 
   // intro text
-  uart_br_print("\nCustom Functions Unit (CFU) test program\n");
+  neo430_uart_br_print("\nCustom Functions Unit (CFU) test program\n");
 
   // check if CFU present
   if (!(SYS_FEATURES & (1<<SYS_CFU_EN))) {
-    uart_br_print("Error! No CFU synthesized!");
+    neo430_uart_br_print("Error! No CFU synthesized!");
     return 1;
   }
 
   // wait for user to start
-  uart_br_print("Press any key to start.\n\n");
-  while (uart_char_received() == 0);
+  neo430_uart_br_print("Press any key to start.\n\n");
+  while (neo430_uart_char_received() == 0);
 
   // initialize test vectors
   uint8_t i;
@@ -63,7 +63,7 @@ int main(void) {
     test_data16[i] = i*1728 + 913;
 
 
-  uart_br_print("Testing read/write accesses...\n");
+  neo430_uart_br_print("Testing read/write accesses...\n");
 
   CFU_REG0 = test_data16[0];
   verify16("CFU_REG0", CFU_REG0, test_data16[0]);
@@ -98,16 +98,16 @@ int main(void) {
  * ------------------------------------------------------------ */
 void verify16(char *s, uint16_t a, uint16_t b) {
 
-  uart_br_print("Checking ");
-  uart_br_print(s);
-  uart_br_print(" - expected: 0x");
-  uart_print_hex_word(b);
-  uart_br_print(", received: 0x");
-  uart_print_hex_word(a);
+  neo430_uart_br_print("Checking ");
+  neo430_uart_br_print(s);
+  neo430_uart_br_print(" - expected: 0x");
+  neo430_uart_print_hex_word(b);
+  neo430_uart_br_print(", received: 0x");
+  neo430_uart_print_hex_word(a);
 
   if (a == b)
-    uart_br_print(" - OK\n");
+    neo430_uart_br_print(" - OK\n");
   else
-    uart_br_print(" - FAILED\n");
+    neo430_uart_br_print(" - FAILED\n");
 }
 

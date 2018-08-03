@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               06.10.2017  #
+// # Stephan Nolting, Hannover, Germany                                                04.07.2018 #
 // #################################################################################################
 
 
@@ -51,26 +51,26 @@ volatile uint8_t led_brightness;
 int main(void) {
 
   // setup UART
-  uart_set_baud(BAUD_RATE);
+  neo430_uart_set_baud(BAUD_RATE);
   USI_CT = (1<<USI_CT_EN);
 
   // intro text
-  uart_br_print("\nSoftware PWM demo.\n");
+  neo430_uart_br_print("\nSoftware PWM demo.\n");
 
   // check if TIMER unit was synthesized, exit if no TIMER is available
   if (!(SYS_FEATURES & (1<<SYS_TIMER_EN))) {
-    uart_br_print("Error! No TIMER unit synthesized!");
+    neo430_uart_br_print("Error! No TIMER unit synthesized!");
     return 1;
   }
 
   // check if GPIO unit was synthesized, exit if no GPIO is available
   if (!(SYS_FEATURES & (1<<SYS_GPIO_EN))) {
-    uart_br_print("Error! No GPIO unit synthesized!");
+    neo430_uart_br_print("Error! No GPIO unit synthesized!");
     return 1;
   }
 
   // deactivate all LEDs
-  gpio_port_set(0);
+  neo430_gpio_port_set(0);
 
   // set address of timer IRQ handler
   IRQVEC_TIMER = (uint16_t)(&timer_irq_handler);
@@ -100,7 +100,7 @@ int main(void) {
   led_brightness = MIN_VAL;
 
   // enable global IRQs
-  eint();
+  neo430_eint();
 
   // generate heartbeat
   uint8_t up_down = 0; // start with decreasing intensity
@@ -129,9 +129,9 @@ int main(void) {
 void __attribute__((__interrupt__)) timer_irq_handler(void) {
 
   if (pwm_cnt <= led_brightness)
-    gpio_pin_set(LED_PIN); // LED on
+    neo430_gpio_pin_set(LED_PIN); // LED on
   else
-    gpio_pin_clr(LED_PIN); // LED off
+    neo430_gpio_pin_clr(LED_PIN); // LED off
 
   if (pwm_cnt == 256)
     pwm_cnt = 0;

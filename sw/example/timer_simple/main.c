@@ -21,7 +21,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               27.12.2017  #
+// # Stephan Nolting, Hannover, Germany                                                04.07.2018 #
 // #################################################################################################
 
 
@@ -48,35 +48,35 @@ void __attribute__((__interrupt__)) timer_irq_handler(void);
 int main(void) {
 
   // setup UART
-  uart_set_baud(BAUD_RATE);
+  neo430_uart_set_baud(BAUD_RATE);
   USI_CT = (1<<USI_CT_EN);
 
   // check if TIMER unit was synthesized, exit if no TIMER is available
   if (!(SYS_FEATURES & (1<<SYS_TIMER_EN))) {
-    uart_br_print("Error! No TIMER unit synthesized!");
+    neo430_uart_br_print("Error! No TIMER unit synthesized!");
     return 1;
   }
 
-  gpio_pin_clr(BLINK_LED); // clear LED
+  neo430_gpio_pin_clr(BLINK_LED); // clear LED
 
   // intro text
-  uart_br_print("\nTimer blinking status LED at "xstr(BLINK_FREQ)" Hz.\n");
+  neo430_uart_br_print("\nTimer blinking status LED at "xstr(BLINK_FREQ)" Hz.\n");
 
   // set address of timer IRQ handler
   IRQVEC_TIMER = (uint16_t)(&timer_irq_handler);
 
   // configure timer frequency
-  if (config_timer_period(BLINK_FREQ))
-    uart_br_print("Invalid TIMER frequency!\n");
+  if (neo430_config_timer_period(BLINK_FREQ))
+    neo430_uart_br_print("Invalid TIMER frequency!\n");
 
   TMR_CT |= (1<<TMR_CT_EN) | (1<<TMR_CT_ARST) | (1<<TMR_CT_IRQ); // enable timer, auto-reset, irq enabled
 
   // enable global IRQs
-  eint();
+  neo430_eint();
 
   // do something else...
   while (1) {
-    sleep(); // go to power down mode
+    neo430_sleep(); // go to power down mode
   }
 
   return 0;
@@ -88,6 +88,6 @@ int main(void) {
  * ------------------------------------------------------------ */
 void __attribute__((__interrupt__)) timer_irq_handler(void) {
 
-  gpio_pin_toggle(BLINK_LED);
+  neo430_gpio_pin_toggle(BLINK_LED);
 }
 

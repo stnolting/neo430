@@ -24,46 +24,86 @@
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
 // # Thanks to Edward Sherriff!                                                                    #
-// # Stephan Nolting, Hannover, Germany                                                 04.06.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 14.07.2018 #
 // #################################################################################################
 
 #ifndef neo430_wishbone_h
 #define neo430_wishbone_h
 
-// prototypes blocking functions
-uint32_t wishbone_read32(uint32_t a);
-void wishbone_write32(uint32_t a, uint32_t d);
+// prototypes blocking functions for 32-bit data bus width
+uint32_t neo430_wishbone32_read32(uint32_t a);
+void neo430_wishbone32_write32(uint32_t a, uint32_t d);
 
-uint16_t wishbone_read16(uint32_t a); // This function performs a data alignment based on the address!
-void wishbone_write16(uint32_t a, uint16_t d); // This function performs a data alignment based on the address!
+uint16_t neo430_wishbone32_read16(uint32_t a); // This function performs a data alignment based on the address!
+void neo430_wishbone32_write16(uint32_t a, uint16_t d); // This function performs a data alignment based on the address!
 
-uint8_t wishbone_read8(uint32_t a); // This function performs a data alignment based on the address!
-void wishbone_write8(uint32_t a, uint8_t d); // This function performs a data alignment based on the address!
+uint8_t neo430_wishbone32_read8(uint32_t a); // This function performs a data alignment based on the address!
+void neo430_wishbone32_write8(uint32_t a, uint8_t d); // This function performs a data alignment based on the address!
 
-// prototypes non-blocking functions
-void wishbone_read32_start(uint32_t a);
-void wishbone_write32_start(uint32_t a, uint32_t d);
+// prototypes non-blocking functions for 32-bit data bus width
+void neo430_wishbone32_read32_start(uint32_t a);
+void neo430_wishbone32_write32_start(uint32_t a, uint32_t d);
 
-void wishbone_read16_start(uint32_t a);
-void wishbone_write16_start(uint32_t a, uint16_t d); // This function performs a data alignment based on the address!
+void neo430_wishbone32_read16_start(uint32_t a);
+void neo430_wishbone32_write16_start(uint32_t a, uint16_t d); // This function performs a data alignment based on the address!
 
-void wishbone_read8_start(uint32_t a);
-void wishbone_write8_start(uint32_t a, uint8_t d); // This function performs a data alignment based on the address!
+void neo430_wishbone32_read8_start(uint32_t a);
+void neo430_wishbone32_write8_start(uint32_t a, uint8_t d); // This function performs a data alignment based on the address!
+
+uint32_t neo430_wishbone32_get_data32(uint32_t a);
+uint16_t neo430_wishbone32_get_data16(uint32_t a); // This function performs a data alignment based on the address!
+uint8_t neo430_wishbone32_get_data8(uint32_t a); // This function performs a data alignment based on the address!
+
+// -------------
+
+// prototypes blocking functions for 32-bit data bus width using NO ADDRESS ALIGNMENT
+uint32_t neo430_wishbone32_read(uint32_t a);
+void neo430_wishbone32_write(uint32_t a, uint32_t d);
+
+// prototypes non-blocking functions for 32-bit data bus width using NO ADDRESS ALIGNMENT
+void neo430_wishbone32_read_start(uint32_t a);
+void neo430_wishbone32_write_start(uint32_t a, uint32_t d);
+uint32_t neo430_wishbone32_get_data(uint32_t a);
+
+// -------------
+
+// prototypes blocking functions for 16-bit data bus width using NO ADDRESS ALIGNMENT
+uint16_t neo430_wishbone16_read(uint32_t a);
+void neo430_wishbone16_write(uint32_t a, uint16_t d);
+
+// prototypes non-blocking functions for 16-bit data bus width using NO ADDRESS ALIGNMENT
+void neo430_wishbone16_read_start(uint32_t a);
+void neo430_wishbone16_write_start(uint32_t a, uint16_t d);
+uint16_t neo430_wishbone16_get_data(uint32_t a);
+
+// -------------
+
+// prototypes blocking functions for 8-bit data bus width using NO ADDRESS ALIGNMENT
+uint8_t neo430_wishbone8_read(uint32_t a);
+void neo430_wishbone8_write(uint32_t a, uint8_t d);
+
+// prototypes non-blocking functions for 8-bit data bus width using NO ADDRESS ALIGNMENT
+void neo430_wishbone8_read_start(uint32_t a);
+void neo430_wishbone8_write_start(uint32_t a, uint8_t d);
+uint8_t neo430_wishbone8_get_data8(uint32_t a);
+
+// -------------
+
+// general status funtion prototypes
+uint16_t neo430_wishbone_busy(void);
+void neo430_wishbone_terminate();
 
 
-uint16_t wishbone_busy(void);
-void wishbone_terminate();
-uint32_t wishbone_get_data32(uint32_t a);
-uint16_t wishbone_get_data16(uint32_t a); // This function performs a data alignment based on the address!
-uint8_t wishbone_get_data8(uint32_t a); // This function performs a data alignment based on the address!
-
+// ************************************************************************************************
+// Byte-wise access functions, with address alignment, blocking
+// ************************************************************************************************
 
 /* ------------------------------------------------------------
  * INFO Read 32-bit from Wishbone device (blocking), standard mode, pipelined
  * PARAM 32-bit device address
  * RETURN read data
  * ------------------------------------------------------------ */
-uint32_t wishbone_read32(uint32_t a) {
+uint32_t neo430_wishbone32_read32(uint32_t a) {
 
   // 32-bit transfer
   WB32_CT = 0xF;
@@ -83,7 +123,7 @@ uint32_t wishbone_read32(uint32_t a) {
  * PARAM a: 32-bit device address
  * PARAM d: 32-bit write data
  * ------------------------------------------------------------ */
-void wishbone_write32(uint32_t a, uint32_t d) {
+void neo430_wishbone32_write32(uint32_t a, uint32_t d) {
 
   // 32-bit transfer
   WB32_CT = 0xF;
@@ -105,7 +145,7 @@ void wishbone_write32(uint32_t a, uint32_t d) {
  * PARAM 32-bit device address
  * RETURN 16-bit read data
  * ------------------------------------------------------------ */
-uint16_t wishbone_read16(uint32_t a) {
+uint16_t neo430_wishbone32_read16(uint32_t a) {
 
   // 16-bit transfer
   if (a & 2)
@@ -132,7 +172,7 @@ uint16_t wishbone_read16(uint32_t a) {
  * PARAM a: 32-bit device address
  * PARAM d: 16-bit write data
  * ------------------------------------------------------------ */
-void wishbone_write16(uint32_t a, uint16_t d) {
+void neo430_wishbone32_write16(uint32_t a, uint16_t d) {
 
   // 16-bit transfer
   if (a & 2) {
@@ -158,7 +198,7 @@ void wishbone_write16(uint32_t a, uint16_t d) {
  * PARAM 32-bit device address
  * RETURN 0 if fail, 1 if timeout
  * ------------------------------------------------------------ */
-uint8_t wishbone_read8(uint32_t a) {
+uint8_t neo430_wishbone32_read8(uint32_t a) {
 
   // 8-bit transfer
   WB32_CT = 1 << (a & 3); // corresponding byte enable
@@ -181,7 +221,7 @@ uint8_t wishbone_read8(uint32_t a) {
  * PARAM a: 32-bit device address
  * PARAM d: 8-bit write data
  * ------------------------------------------------------------ */
-void wishbone_write8(uint32_t a, uint8_t d) {
+void neo430_wishbone32_write8(uint32_t a, uint8_t d) {
 
   // 8-bit transfer
   WB32_CT = 1 << (a & 3); // corresponding byte enable
@@ -208,7 +248,7 @@ void wishbone_write8(uint32_t a, uint8_t d) {
  * INFO Initiate read 32-bit from Wishbone device (non-blocking), standard mode, pipelined
  * PARAM 32-bit device address
  * ------------------------------------------------------------ */
-void wishbone_read32_start(uint32_t a) {
+void neo430_wishbone32_read32_start(uint32_t a) {
 
   // 32-bit transfer
   WB32_CT = 0xF;
@@ -223,7 +263,7 @@ void wishbone_read32_start(uint32_t a) {
  * PARAM a: 32-bit device address
  * PARAM d: 32-bit write data
  * ------------------------------------------------------------ */
-void wishbone_write32_start(uint32_t a, uint32_t d) {
+void neo430_wishbone32_write32_start(uint32_t a, uint32_t d) {
 
   // 32-bit transfer
   WB32_CT = 0xF;
@@ -241,7 +281,7 @@ void wishbone_write32_start(uint32_t a, uint32_t d) {
  * INFO This function performs a data alignment based on the address!
  * PARAM 32-bit device address
  * ------------------------------------------------------------ */
-void wishbone_read16_start(uint32_t a) {
+void neo430_wishbone32_read16_start(uint32_t a) {
 
   // 16-bit transfer
   if (a & 2)
@@ -260,7 +300,7 @@ void wishbone_read16_start(uint32_t a) {
  * PARAM a: 32-bit device address
  * PARAM d: 16-bit write data
  * ------------------------------------------------------------ */
-void wishbone_write16_start(uint32_t a, uint16_t d) {
+void neo430_wishbone32_write16_start(uint32_t a, uint16_t d) {
 
   // 16-bit transfer
   if (a & 2) {
@@ -279,7 +319,7 @@ void wishbone_write16_start(uint32_t a, uint16_t d) {
  * INFO This function performs a data alignment based on the address!
  * PARAM 32-bit device address
  * ------------------------------------------------------------ */
-void wishbone_read8_start(uint32_t a) {
+void neo430_wishbone32_read8_start(uint32_t a) {
 
   // 8-bit transfer
   WB32_CT = 1 << (a & 3); // corresponding byte enable
@@ -295,7 +335,7 @@ void wishbone_read8_start(uint32_t a) {
  * PARAM a: 32-bit device address
  * PARAM d: 8-bit write data
  * ------------------------------------------------------------ */
-void wishbone_write8_start(uint32_t a, uint8_t d) {
+void neo430_wishbone32_write8_start(uint32_t a, uint8_t d) {
 
   // 8-bit transfer
   WB32_CT = 1 << (a & 3); // corresponding byte enable
@@ -310,30 +350,11 @@ void wishbone_write8_start(uint32_t a, uint8_t d) {
 
 
 /* ------------------------------------------------------------
- * INFO Check if Wishbone transaction is (still) in progress
- * RETURN 1 if transfer in progress, 0 if idel
- * ------------------------------------------------------------ */
-uint16_t wishbone_busy(void) {
-
-  return (WB32_CT & (1<<WB32_CT_PENDING));
-}
-
-
-/* ------------------------------------------------------------
- * INFO Terminate current Wishbone transfer
- * ------------------------------------------------------------ */
-void wishbone_terminate(void) {
-
-  WB32_CT = 0;
-}
-
-
-/* ------------------------------------------------------------
  * INFO Read 32-bit data after nonblocking transaction has been started
  * PARAM 32-bit device address
  * RETURN read data
  * ------------------------------------------------------------ */
-uint32_t wishbone_get_data32(uint32_t a) {
+uint32_t neo430_wishbone32_get_data32(uint32_t a) {
 
   return WB32_D_32bit;
 }
@@ -344,7 +365,7 @@ uint32_t wishbone_get_data32(uint32_t a) {
  * PARAM 32-bit device address
  * RETURN read data
  * ------------------------------------------------------------ */
-uint16_t wishbone_get_data16(uint32_t a) {
+uint16_t neo430_wishbone32_get_data16(uint32_t a) {
 
   if (a & 2)
     return WB32_HD; // high 16-bit word
@@ -358,12 +379,319 @@ uint16_t wishbone_get_data16(uint32_t a) {
  * PARAM 32-bit device address
  * RETURN read data
  * ------------------------------------------------------------ */
-uint8_t wishbone_get_data8(uint32_t a) {
+uint8_t neo430_wishbone32_get_data8(uint32_t a) {
 
   // select correct byte to be written
   volatile uint8_t* in = (uint8_t*)(&WB32_D_8bit + ((uint8_t)a & 3));
   return *in;
 }
 
+
+// ************************************************************************************************
+// Blocking access functions for data bus width = 32-bit, NO ADDRESS ALIGNMENT
+// ************************************************************************************************
+
+
+/* ------------------------------------------------------------
+ * INFO Read 32-bit from Wishbone device (blocking), standard mode, pipelined
+ * PARAM 32-bit device address
+ * RETURN 32-bit read data
+ * ------------------------------------------------------------ */
+uint32_t neo430_wishbone32_read(uint32_t a) {
+
+  // 32-bit transfer
+  WB32_CT = 0xF;
+
+  // device address + transfer trigger
+  WB32_RA_32bit = a;
+
+  // wait for access to be completed - blocking!
+  while((WB32_CT & (1<<WB32_CT_PENDING)) != 0);
+
+  return WB32_D_32bit;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Write 32-bit to Wishbone device (blocking), standard mode, pipelined
+ * INFO This function performs a data alignment based on the address!
+ * PARAM a: 32-bit device address
+ * PARAM d: 32-bit write data
+ * ------------------------------------------------------------ */
+void neo430_wishbone32_write(uint32_t a, uint32_t d) {
+
+  // 32-bit transfer
+  WB32_CT = 0xf;
+  WB32_D_32bit = d;
+
+  // device address + transfer trigger
+  WB32_WA_32bit = a;
+
+  // wait for access to be completed - blocking!
+  while((WB32_CT & (1<<WB32_CT_PENDING)) != 0);
+}
+
+
+// ************************************************************************************************
+// NONBLOCKING FUNCTIONS
+// ************************************************************************************************
+// Use wishbone_busy() to check status
+// Use Wishbone_get_data(address) to get data from read accesses
+// ************************************************************************************************
+
+/* ------------------------------------------------------------
+ * INFO Initiate read 32-bit from Wishbone device (non-blocking), standard mode, pipelined
+ * PARAM 32-bit device address
+ * ------------------------------------------------------------ */
+void neo430_wishbone32_read_start(uint32_t a) {
+
+  // 32-bit transfer
+  WB32_CT = 0xF;
+
+  // device address + transfer trigger
+  WB32_RA_32bit = a;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Initiate write 32-bit to Wishbone device (non-blocking), standard mode, pipelined
+ * PARAM a: 32-bit device address
+ * PARAM d: 32-bit write data
+ * ------------------------------------------------------------ */
+void neo430_wishbone32_write_start(uint32_t a, uint32_t d) {
+
+  // 32-bit transfer
+  WB32_CT = 0xF;
+
+  // write data
+  WB32_D_32bit = d;
+
+  // device address + transfer trigger
+  WB32_WA_32bit = a;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Read 32-bit data after nonblocking transaction has been started
+ * PARAM 32-bit device address
+ * RETURN 32-bit read data
+ * ------------------------------------------------------------ */
+uint32_t neo430_wishbone32_get_data(uint32_t a) {
+
+  return WB32_D_32bit;
+}
+
+
+// ************************************************************************************************
+// Blocking access functions for data bus width = 16-bit, NO ADDRESS ALIGNMENT
+// ************************************************************************************************
+
+
+/* ------------------------------------------------------------
+ * INFO Read 16-bit from Wishbone device (blocking), standard mode, pipelined
+ * PARAM 32-bit device address
+ * RETURN 16-bit read data
+ * ------------------------------------------------------------ */
+uint16_t neo430_wishbone16_read(uint32_t a) {
+
+  // 16-bit transfer
+  WB32_CT = 0x3; // low 16-bit word
+
+  // device address + transfer trigger
+  WB32_RA_32bit = a;
+
+  // wait for access to be completed - blocking!
+  while((WB32_CT & (1<<WB32_CT_PENDING)) != 0);
+
+  return WB32_LD; // low 16-bit word
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Write 16-bit to Wishbone device (blocking), standard mode, pipelined
+ * INFO This function performs a data alignment based on the address!
+ * PARAM a: 32-bit device address
+ * PARAM d: 16-bit write data
+ * ------------------------------------------------------------ */
+void neo430_wishbone16_write(uint32_t a, uint16_t d) {
+
+  // 16-bit transfer
+  WB32_CT = 0x3; // low 16-bit word
+  WB32_LD = d;
+
+  // device address + transfer trigger
+  WB32_WA_32bit = a;
+
+  // wait for access to be completed - blocking!
+  while((WB32_CT & (1<<WB32_CT_PENDING)) != 0);
+}
+
+
+// ************************************************************************************************
+// NONBLOCKING FUNCTIONS
+// ************************************************************************************************
+// Use wishbone_busy() to check status
+// Use Wishbone_get_data(address) to get data from read accesses
+// ************************************************************************************************
+
+/* ------------------------------------------------------------
+ * INFO Initiate read 16-bit from Wishbone device (non-blocking), standard mode, pipelined
+ * PARAM 32-bit device address
+ * ------------------------------------------------------------ */
+void neo430_wishbone16_read_start(uint32_t a) {
+
+  // 16-bit transfer
+  WB32_CT = 0x3;
+
+  // device address + transfer trigger
+  WB32_RA_32bit = a;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Initiate write 16-bit to Wishbone device (non-blocking), standard mode, pipelined
+ * PARAM a: 32-bit device address
+ * PARAM d: 16-bit write data
+ * ------------------------------------------------------------ */
+void neo430_wishbone16_write_start(uint32_t a, uint16_t d) {
+
+  // 16-bit transfer
+  WB32_CT = 0x3;
+
+  // write data
+  WB32_LD = d;
+
+  // device address + transfer trigger
+  WB32_WA_32bit = a;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Read 16-bit data after nonblocking transaction has been started
+ * PARAM 32-bit device address
+ * RETURN 16-bit read data
+ * ------------------------------------------------------------ */
+uint16_t neo430_wishbone16_get_data(uint32_t a) {
+
+  return WB32_LD;
+}
+
+
+// ************************************************************************************************
+// Blocking access functions for data bus width = 8-bit, NO ADDRESS ALIGNMENT
+// ************************************************************************************************
+
+
+/* ------------------------------------------------------------
+ * INFO Read 8-bit from Wishbone device (blocking), standard mode, pipelined
+ * PARAM 32-bit device address
+ * RETURN 8-bit read data
+ * ------------------------------------------------------------ */
+uint8_t neo430_wishbone8_read(uint32_t a) {
+
+  // 8-bit transfer
+  WB32_CT = 0x1;
+
+  // device address + transfer trigger
+  WB32_RA_32bit = a;
+
+  // wait for access to be completed - blocking!
+  while((WB32_CT & (1<<WB32_CT_PENDING)) != 0);
+
+  return (uint8_t)WB32_LD; // low 16-bit word
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Write 8-bit to Wishbone device (blocking), standard mode, pipelined
+ * INFO This function performs a data alignment based on the address!
+ * PARAM a: 32-bit device address
+ * PARAM d: 8-bit write data
+ * ------------------------------------------------------------ */
+void neo430_wishbone8_write(uint32_t a, uint8_t d) {
+
+  // 8-bit transfer
+  WB32_CT = 0x1; // low 8-bit word
+  WB32_LD = (uint16_t)d;
+
+  // device address + transfer trigger
+  WB32_WA_32bit = a;
+
+  // wait for access to be completed - blocking!
+  while((WB32_CT & (1<<WB32_CT_PENDING)) != 0);
+}
+
+
+// ************************************************************************************************
+// NONBLOCKING FUNCTIONS
+// ************************************************************************************************
+// Use wishbone_busy() to check status
+// Use Wishbone_get_data(address) to get data from read accesses
+// ************************************************************************************************
+
+/* ------------------------------------------------------------
+ * INFO Initiate read 16-bit from Wishbone device (non-blocking), standard mode, pipelined
+ * PARAM 8-bit device address
+ * ------------------------------------------------------------ */
+void neo430_wishbone8_read_start(uint32_t a) {
+
+  // 8-bit transfer
+  WB32_CT = 0x1;
+
+  // device address + transfer trigger
+  WB32_RA_32bit = a;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Initiate write 8-bit to Wishbone device (non-blocking), standard mode, pipelined
+ * PARAM a: 32-bit device address
+ * PARAM d: 8-bit write data
+ * ------------------------------------------------------------ */
+void neo430_wishbone8_write_start(uint32_t a, uint8_t d) {
+
+  // 8-bit transfer
+  WB32_CT = 0x1;
+
+  // write data
+  WB32_LD = (uint16_t)d;
+
+  // device address + transfer trigger
+  WB32_WA_32bit = a;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Read 8-bit data after nonblocking transaction has been started
+ * PARAM 32-bit device address
+ * RETURN 8-bit read data
+ * ------------------------------------------------------------ */
+uint8_t neo430_wishbone8_get_data(uint32_t a) {
+
+  return (uint8_t)WB32_LD;
+}
+
+
+// ************************************************************************************************
+// NONBLOCKING ARBITRATION FUNCTIONS
+// ************************************************************************************************
+
+/* ------------------------------------------------------------
+ * INFO Check if Wishbone transaction is (still) in progress
+ * RETURN 1 if transfer in progress, 0 if idel
+ * ------------------------------------------------------------ */
+uint16_t neo430_wishbone_busy(void) {
+
+  return (WB32_CT & (1<<WB32_CT_PENDING));
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Terminate current Wishbone transfer
+ * ------------------------------------------------------------ */
+void neo430_wishbone_terminate(void) {
+
+  WB32_CT = 0;
+}
 
 #endif // neo430_wishbone_h

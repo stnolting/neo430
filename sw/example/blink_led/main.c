@@ -21,7 +21,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               28.10.2017  #
+// # Stephan Nolting, Hannover, Germany                                                 04.07.2018 #
 // #################################################################################################
 
 
@@ -39,22 +39,22 @@
 int main(void) {
 
   // setup UART
-  uart_set_baud(BAUD_RATE);
+  neo430_uart_set_baud(BAUD_RATE);
   USI_CT = (1<<USI_CT_EN);
 
   // intro text
-  uart_br_print("\nBlinking LED demo program\n");
+  neo430_uart_br_print("\nBlinking LED demo program\n");
 
   // check if GPIO unit was synthesized, exit if no GPIO is available
   if (!(SYS_FEATURES & (1<<SYS_GPIO_EN))) {
-    uart_br_print("Error! No GPIO unit synthesized!");
+    neo430_uart_br_print("Error! No GPIO unit synthesized!");
     return 1;
   }
 
   uint16_t i = 0; // init counter
   while (1) {
-    gpio_port_set(0x00FF & (i++)); // set output port and increment counter
-    cpu_delay_ms(200); // wait 200ms
+    neo430_gpio_port_set(0x00FF & (i++)); // set output port and increment counter
+    neo430_cpu_delay_ms(200); // wait 200ms
   }
 
   return 0;

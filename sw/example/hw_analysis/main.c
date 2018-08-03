@@ -21,7 +21,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               25.04.2018  #
+// # Stephan Nolting, Hannover, Germany                                                 04.07.2018 #
 // #################################################################################################
 
 
@@ -43,29 +43,29 @@ void print_state(uint16_t d);
 int main(void) {
 
   // setup UART
-  uart_set_baud(BAUD_RATE);
+  neo430_uart_set_baud(BAUD_RATE);
   USI_CT = (1<<USI_CT_EN);
 
   // intro text
-  _printf("\nNEO430 Hardware Analysis Tool\n\n");
+  _neo430_printf("\nNEO430 Hardware Analysis Tool\n\n");
 
   // General information
   // --------------------------------------------
   // HW version
-  _printf("Hardware version: 0x%x\n", HW_VERSION);
+  _neo430_printf("Hardware version: 0x%x\n", HW_VERSION);
 
   // HW user code
-  _printf("User code:        0x%x\n", USER_CODE);
+  _neo430_printf("User code:        0x%x\n", USER_CODE);
   
   // Clock speed
   uint32_t clock = CLOCKSPEED_32bit;
-  _printf("Clock speed:      %n Hz\n", clock);
+  _neo430_printf("Clock speed:      %n Hz\n", clock);
 
   // ROM/IMEM
-  _printf("IMEM/ROM:         %u bytes @ 0x0000\n", IMEM_SIZE);
+  _neo430_printf("IMEM/ROM:         %u bytes @ 0x0000\n", IMEM_SIZE);
 
   // RAM/DMEM
-  _printf("DMEM/RAM:         %u bytes @ 0x%x\n", DMEM_SIZE, DMEM_BASE);
+  _neo430_printf("DMEM/RAM:         %u bytes @ 0x%x\n", DMEM_SIZE, DMEM_BASE);
 
   // UART baud rate
   uint16_t baud = USI_BAUD & 0x00FF;
@@ -82,61 +82,61 @@ int main(void) {
     default: prsc = 0; break;
   }
   uint32_t baud_value = clock / (uint32_t)(prsc * baud);
-  _printf("UART Baud rate:   %n\n", baud_value);
+  _neo430_printf("UART Baud rate:   %n\n", baud_value);
 
 
   // System features
   // --------------------------------------------
   uint16_t ft = SYS_FEATURES;
-  _printf("\n\nSystem features\n");
+  _neo430_printf("\n\nSystem features\n");
   // CFU
-  _printf("- Multiplier/Divider:    ");
+  _neo430_printf("- Multiplier/Divider:    ");
   print_state(ft & (1<<SYS_MULDIV_EN));
   // WB32
-  _printf("- Wishbone adapter:      ");
+  _neo430_printf("- Wishbone adapter:      ");
   print_state(ft & (1<<SYS_WB32_EN));
   // WDT
-  _printf("- Watchdog timer:        ");
+  _neo430_printf("- Watchdog timer:        ");
   print_state(ft & (1<<SYS_WDT_EN));
   // GPIO
-  _printf("- GPIO unit:             ");
+  _neo430_printf("- GPIO unit:             ");
   print_state(ft & (1<<SYS_GPIO_EN));
   // TIMER
-  _printf("- High-precision timer:  ");
+  _neo430_printf("- High-precision timer:  ");
   print_state(ft & (1<<SYS_TIMER_EN));
   // USART
-  _printf("- USART:                 ");
+  _neo430_printf("- USART:                 ");
   print_state(ft & (1<<SYS_USART_EN));
   // DADD
-  _printf("- DADD instruction:      ");
+  _neo430_printf("- DADD instruction:      ");
   print_state(ft & (1<<SYS_DADD_EN));
   // Bootloader installed
-  _printf("- Internal bootloader:   ");
+  _neo430_printf("- Internal bootloader:   ");
   print_state(ft & (1<<SYS_BTLD_EN));
   // is IMEM true ROM?
-  _printf("- IMEM as true ROM:      ");
+  _neo430_printf("- IMEM as true ROM:      ");
   print_state(ft & (1<<SYS_IROM_EN));
   // CRC
-  _printf("- CRC16/CRC32:           ");
+  _neo430_printf("- CRC16/CRC32:           ");
   print_state(ft & (1<<SYS_CRC_EN));
   // CFU
-  _printf("- Custom Functions Unit: ");
+  _neo430_printf("- Custom Functions Unit: ");
   print_state(ft & (1<<SYS_CFU_EN));
   // PWM
-  _printf("- PWM Controller:        ");
+  _neo430_printf("- PWM Controller:        ");
   print_state(ft & (1<<SYS_PWM_EN));
   // TRNG
-  _printf("- True Random Generator: ");
+  _neo430_printf("- True Random Generator: ");
   print_state(ft & (1<<SYS_TRNG_EN));
 
 
   // Exit
   // --------------------------------------------
-  _printf("\n\nPress any key to return to bootloader.\n");
-  while(!uart_char_received());
+  _neo430_printf("\n\nPress any key to return to bootloader.\n");
+  while(!neo430_uart_char_received());
 
   if (!(SYS_FEATURES & (1<<SYS_BTLD_EN)))
-    uart_br_print("No bootloader installed!\n");
+    _neo430_printf("No bootloader installed!\n");
   else
     asm volatile ("mov #0xF000, r0");
 
@@ -150,7 +150,7 @@ int main(void) {
 void print_state(uint16_t d) {
 
   if (d)
-    _printf("enabled\n");
+    _neo430_printf("enabled\n");
   else
-    _printf("DISABLED\n");
+    _neo430_printf("DISABLED\n");
 }

@@ -19,27 +19,27 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               12.01.2018  #
+// # Stephan Nolting, Hannover, Germany                                                04.07.2018 #
 // #################################################################################################
 
 #ifndef neo430_gpio_h
 #define neo430_gpio_h
 
 // prototypes
-void gpio_pin_set(uint8_t p);
-void gpio_pin_clr(uint8_t p);
-void gpio_port_set(uint16_t d);
-void gpio_port_toggle(uint16_t d);
-void gpio_pin_toggle(uint8_t p);
-uint16_t gpio_pin_get(uint8_t p);
-uint16_t gpio_port_get(void);
+void neo430_gpio_pin_set(uint8_t p);
+void neo430_gpio_pin_clr(uint8_t p);
+void neo430_gpio_port_set(uint16_t d);
+void neo430_gpio_port_toggle(uint16_t d);
+void neo430_gpio_pin_toggle(uint8_t p);
+uint16_t neo430_gpio_pin_get(uint8_t p);
+uint16_t neo430_gpio_port_get(void);
 
 
 /* ------------------------------------------------------------
  * INFO Set output pin
  * PARAM Pin number to be set (0..15)
  * ------------------------------------------------------------ */
-void gpio_pin_set(uint8_t p) {
+void neo430_gpio_pin_set(uint8_t p) {
 
   GPIO_OUT = GPIO_OUT | (uint16_t)(1 << p);
 }
@@ -49,7 +49,7 @@ void gpio_pin_set(uint8_t p) {
  * INFO Clear output pin
  * PARAM Pin number to be cleared (0..15)
  * ------------------------------------------------------------ */
-void gpio_pin_clr(uint8_t p) {
+void neo430_gpio_pin_clr(uint8_t p) {
 
   GPIO_OUT = GPIO_OUT & ~((uint16_t)(1 << p));
 }
@@ -59,7 +59,7 @@ void gpio_pin_clr(uint8_t p) {
  * INFO Set output port
  * PARAM Output data
  * ------------------------------------------------------------ */
-void gpio_port_set(uint16_t d) {
+void neo430_gpio_port_set(uint16_t d) {
 
   GPIO_OUT = d;
 }
@@ -69,7 +69,7 @@ void gpio_port_set(uint16_t d) {
  * INFO Toggle output port
  * PARAM Toggle output data
  * ------------------------------------------------------------ */
-void gpio_port_toggle(uint16_t d) {
+void neo430_gpio_port_toggle(uint16_t d) {
 
   GPIO_OUT = GPIO_OUT ^ d;
 }
@@ -79,7 +79,7 @@ void gpio_port_toggle(uint16_t d) {
  * INFO Toggle output pin
  * PARAM Pin number (0..15)
  * ------------------------------------------------------------ */
-void gpio_pin_toggle(uint8_t p) {
+void neo430_gpio_pin_toggle(uint8_t p) {
 
   GPIO_OUT = GPIO_OUT ^ (uint16_t)(1 << p);
 }
@@ -90,7 +90,7 @@ void gpio_pin_toggle(uint8_t p) {
  * PARAM Pin number (0..15)
  * RETURN 0 if pin cleared, pin set otherwise
  * ------------------------------------------------------------ */
-uint16_t gpio_pin_get(uint8_t p) {
+uint16_t neo430_gpio_pin_get(uint8_t p) {
 
   return GPIO_IN & (uint16_t)(1 << p);
 }
@@ -100,7 +100,7 @@ uint16_t gpio_pin_get(uint8_t p) {
  * INFO Get input port
  * RETURN Input port state
  * ------------------------------------------------------------ */
-uint16_t gpio_port_get(void) {
+uint16_t neo430_gpio_port_get(void) {
 
   return GPIO_IN;
 }

@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from http://www.gnu.org/licenses/lgpl-3.0.en.html                 #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               30.05.2018  #
+// # Stephan Nolting, Hannover, Germany                                                04.07.2018 #
 // #################################################################################################
 
 
@@ -38,32 +38,32 @@
 int main(void) {
 
   // setup UART
-  uart_set_baud(BAUD_RATE);
+  neo430_uart_set_baud(BAUD_RATE);
   USI_CT = (1<<USI_CT_EN);
 
   // intro text
-  _printf("\nTrue Random Number Generator (TRNG) test program\n\n");
+  _neo430_printf("\nTrue Random Number Generator (TRNG) test program\n\n");
 
   // check if TRNG unit was synthesized, exit if no TRNG controller is available
   if (!(SYS_FEATURES & (1<<SYS_TRNG_EN))) {
-    _printf("Error! No TRNG synthesized!");
+    _neo430_printf("Error! No TRNG synthesized!");
     return 1;
   }
 
   while(1) {
     // wait for any key
-    _printf("\n\nPress any key to start/stop\n\n");
-    while(!uart_char_received());
+    _neo430_printf("\n\nPress any key to start/stop\n\n");
+    while(!neo430_uart_char_received());
 
-    trng_enable();
+    neo430_trng_enable();
     while(1) {
-      uint16_t d = (uint16_t)trng_get_byte();
-      _printf("%u, ", d);
-      gpio_port_set(d);
+      uint16_t d = (uint16_t)neo430_trng_get_byte();
+      _neo430_printf("%u, ", d);
+      neo430_gpio_port_set(d);
 
       // stop?
-      if (uart_char_received()) { // any key input?
-        trng_disable();
+      if (neo430_uart_char_received()) { // any key input?
+        neo430_trng_disable();
         break;
       }
     }

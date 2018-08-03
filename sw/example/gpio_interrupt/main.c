@@ -22,7 +22,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               14.01.2018  #
+// # Stephan Nolting, Hannover, Germany                                                 04.07.2018 #
 // #################################################################################################
 
 
@@ -43,19 +43,19 @@ void __attribute__((__interrupt__)) gpio_irq_handler(void);
 int main(void) {
 
   // setup UART
-  uart_set_baud(BAUD_RATE);
+  neo430_uart_set_baud(BAUD_RATE);
   USI_CT = (1<<USI_CT_EN);
 
   // intro text
-  uart_br_print("\nGPIO pin change interrupt demo program\n\n");
+  neo430_uart_br_print("\nGPIO pin change interrupt demo program\n\n");
 
   // check if GPIO & TIMER units present
   if (!(SYS_FEATURES & (1<<SYS_GPIO_EN))) {
-    uart_br_print("Error! No GPIO unit synthesized!");
+    neo430_uart_br_print("Error! No GPIO unit synthesized!");
     return 1;
   }
   if (!(SYS_FEATURES & (1<<SYS_TIMER_EN))) {
-    uart_br_print("Error! No TIMER unit synthesized!");
+    neo430_uart_br_print("Error! No TIMER unit synthesized!");
     return 1;
   }
 
@@ -69,11 +69,11 @@ int main(void) {
   GPIO_IRQMASK = 0xFFFF; // use all input pins as trigger
 
   // enable global IRQs
-  eint();
+  neo430_eint();
 
   // go to sleep mode, increment counter whenever the CPU wakes up
   while (1) {
-    sleep();
+    neo430_sleep();
     GPIO_OUT = (GPIO_OUT + 1) & 0x00FF; // increment LED counter
   }
 
@@ -89,8 +89,8 @@ void __attribute__((__interrupt__)) gpio_irq_handler(void) {
   // we cannot 100% ensure to actually get the specific state of
   // the input, which caused the IRQ
 
-  uart_br_print("GPIO pin change interrupt! Current input state: 0x");
-  uart_print_hex_word(GPIO_IN);
-  uart_br_print("\n");
+  neo430_uart_br_print("GPIO pin change interrupt! Current input state: 0x");
+  neo430_uart_print_hex_word(GPIO_IN);
+  neo430_uart_br_print("\n");
 }
 

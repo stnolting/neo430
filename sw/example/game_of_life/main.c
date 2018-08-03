@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               27.04.2018  #
+// # Stephan Nolting, Hannover, Germany                                                 04.07.2018 #
 // #################################################################################################
 
 
@@ -53,7 +53,7 @@ int main(void) {
   int16_t x, y;
 
   // setup UART
-  uart_set_baud(BAUD_RATE);
+  neo430_uart_set_baud(BAUD_RATE);
   USI_CT = (1<<USI_CT_EN);
 
 
@@ -62,20 +62,20 @@ int main(void) {
   clear_universe(0);
   clear_universe(1);
 
-  _printf("\n\n### Conways's Game of Life ###\n\n");
-  _printf("This program requires a terminal resolution of at least %ux%u characters.\n", NUM_CELLS_X+2, NUM_CELLS_Y+3);
-  _printf("Press any key to start a random-initialized torus-style universe of %ux%u cells.\n", NUM_CELLS_X, NUM_CELLS_Y);
-  _printf("You can pause/restart the simulation by pressing any key.\n");
+  _neo430_printf("\n\n### Conways's Game of Life ###\n\n");
+  _neo430_printf("This program requires a terminal resolution of at least %ux%u characters.\n", NUM_CELLS_X+2, NUM_CELLS_Y+3);
+  _neo430_printf("Press any key to start a random-initialized torus-style universe of %ux%u cells.\n", NUM_CELLS_X, NUM_CELLS_Y);
+  _neo430_printf("You can pause/restart the simulation by pressing any key.\n");
 
   // randomize until key pressed
   if ((SYS_FEATURES & (1<<SYS_TRNG_EN))) {
-    trng_enable();
-    _printf("\nTRNG detected. Will use TRNG to initialize universe.\n");
-    while (uart_char_received() == 0);
+    neo430_trng_enable();
+    _neo430_printf("\nTRNG detected. Will use TRNG to initialize universe.\n");
+    while (neo430_uart_char_received() == 0);
   }
   else {
-    while (uart_char_received() == 0) {
-      __xorshift32();
+    while (neo430_uart_char_received() == 0) {
+      __neo430_xorshift32();
     }
   }
 
@@ -84,25 +84,25 @@ int main(void) {
   for (x=0; x<NUM_CELLS_X/8; x++) {
     for (y=0; y<NUM_CELLS_Y; y++) {
       if ((SYS_FEATURES & (1<<SYS_TRNG_EN))) 
-        universe[0][x][y] = trng_get_byte();
+        universe[0][x][y] = neo430_trng_get_byte();
       else
-        universe[0][x][y] = (uint8_t)__xorshift32();
+        universe[0][x][y] = (uint8_t)__neo430_xorshift32();
     }
   }
-  trng_disable();
+  neo430_trng_disable();
 
   while(1) {
 
     // user abort?
-    if (uart_char_received()) {
-      _printf("\nRestart (y/n)?");
-      if (uart_getc() == 'y') {
-        soft_reset();
+    if (neo430_uart_char_received()) {
+      _neo430_printf("\nRestart (y/n)?");
+      if (neo430_uart_getc() == 'y') {
+        neo430_soft_reset();
       }
     }
 
     // print generation, population count and the current universe
-    _printf("\n\nGeneration %l, %u living cells\n", generation, pop_count(u));
+    _neo430_printf("\n\nGeneration %l, %u living cells\n", generation, pop_count(u));
     print_universe(u);
 
     // compute next generation
@@ -125,7 +125,7 @@ int main(void) {
     generation++;
 
     // wait some time...
-    cpu_delay((CLOCKSPEED_HI >> 6) + 1);
+    neo430_cpu_delay((CLOCKSPEED_HI >> 6) + 1);
   }
 
   return 0;
@@ -139,35 +139,35 @@ void print_universe(uint8_t u){
 
   int16_t x, y;
 
-  uart_putc('+');
+  neo430_uart_putc('+');
   for (x=0; x<NUM_CELLS_X; x++) {
-    uart_putc('-');
+    neo430_uart_putc('-');
   }
-  uart_putc('+');
-  uart_putc('\r');
-  uart_putc('\n');
+  neo430_uart_putc('+');
+  neo430_uart_putc('\r');
+  neo430_uart_putc('\n');
 
   for (y=0; y<NUM_CELLS_Y; y++) {
-    uart_putc('|');
+    neo430_uart_putc('|');
    
     for (x=0; x<NUM_CELLS_X; x++) {
       if (get_cell(u, x, y))
-        uart_putc('#');
+        neo430_uart_putc('#');
       else
-        uart_putc(' ');
+        neo430_uart_putc(' ');
     }
 
     // end of line
-    uart_putc('|');
-    uart_putc('\r');
-    uart_putc('\n');
+    neo430_uart_putc('|');
+    neo430_uart_putc('\r');
+    neo430_uart_putc('\n');
   }
 
-  uart_putc('+');
+  neo430_uart_putc('+');
   for (x=0; x<NUM_CELLS_X; x++) {
-    uart_putc('-');
+    neo430_uart_putc('-');
   }
-  uart_putc('+');
+  neo430_uart_putc('+');
 }
 
 

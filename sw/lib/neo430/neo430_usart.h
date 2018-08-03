@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               29.04.2018  #
+// # Stephan Nolting, Hannover, Germany                                                 03.08.2018 #
 // #################################################################################################
 
 #ifndef neo430_usart_h
@@ -29,37 +29,37 @@
 #include <stdarg.h>
 
 // prototypes (SPI)
-void spi_cs_en(uint8_t cs);
-void spi_cs_dis(uint8_t cs);
-void spi_cs_dis_all(void);
-uint8_t spi_trans(uint8_t d);
+void neo430_spi_cs_en(uint8_t cs);
+void neo430_spi_cs_dis(uint8_t cs);
+void neo430_spi_cs_dis_all(void);
+uint8_t neo430_spi_trans(uint8_t d);
 
 // prototypes (UART)
-void uart_set_baud(uint32_t baudrate);
-void uart_putc(char c);
-char uart_getc(void);
-uint16_t uart_char_received(void);
-char uart_char_read(void);
-void uart_print(char *s);
-void uart_br_print(char *s);
-uint16_t uart_scan(char *buffer, uint16_t max_size);
-void uart_print_hex_char(char c);
-void uart_print_hex_byte(uint8_t b);
-void uart_print_hex_word(uint16_t w);
-void uart_print_hex_dword(uint32_t dw);
-void uart_print_bin_byte(uint8_t b);
-void uart_print_bin_word(uint16_t w);
-void uart_print_bin_dword(uint32_t dw);
-void _itoa(uint32_t x);
-void _printf(char *format, ...);
-uint32_t hexstr_to_uint(char *buffer, uint8_t length);
+void neo430_uart_set_baud(uint32_t baudrate);
+void neo430_uart_putc(char c);
+char neo430_uart_getc(void);
+uint16_t neo430_uart_char_received(void);
+char neo430_uart_char_read(void);
+void neo430_uart_print(char *s);
+void neo430_uart_br_print(char *s);
+uint16_t neo430_uart_scan(char *buffer, uint16_t max_size, uint16_t echo);
+void neo430_uart_print_hex_char(char c);
+void neo430_uart_print_hex_byte(uint8_t b);
+void neo430_uart_print_hex_word(uint16_t w);
+void neo430_uart_print_hex_dword(uint32_t dw);
+void neo430_uart_print_bin_byte(uint8_t b);
+void neo430_uart_print_bin_word(uint16_t w);
+void neo430_uart_print_bin_dword(uint32_t dw);
+void _neo430_itoa(uint32_t x);
+void _neo430_printf(char *format, ...);
+uint32_t neo430_hexstr_to_uint(char *buffer, uint8_t length);
 
 
 /* ------------------------------------------------------------
  * INFO Enable SPI CSx (set low)
  * PARAM CS line (0..5)
  * ------------------------------------------------------------ */
-void spi_cs_en(uint8_t cs) {
+void neo430_spi_cs_en(uint8_t cs) {
 
   USI_CT |= 1 << (USI_CT_SPICS0 + cs);
 }
@@ -69,7 +69,7 @@ void spi_cs_en(uint8_t cs) {
  * INFO Disable SPI CSx (set high)
  * PARAM CS line (0..5)
  * ------------------------------------------------------------ */
-void spi_cs_dis(uint8_t cs) {
+void neo430_spi_cs_dis(uint8_t cs) {
 
   USI_CT &= ~(1 << (USI_CT_SPICS0 + cs));
 }
@@ -78,7 +78,7 @@ void spi_cs_dis(uint8_t cs) {
 /* ------------------------------------------------------------
  * INFO Disable all SPI CS lines
  * ------------------------------------------------------------ */
-void spi_cs_dis_all(void) {
+void neo430_spi_cs_dis_all(void) {
 
   USI_CT &= 0x03FF;
 }
@@ -99,7 +99,7 @@ void spi_cs_dis_all(void) {
  * PARAM d byte to be send
  * RETURN received byte
  * ------------------------------------------------------------ */
-uint8_t spi_trans(uint8_t d) {
+uint8_t neo430_spi_trans(uint8_t d) {
 
   USI_SPIRTX = (uint16_t)d; // trigger transfer
   while((USI_CT & (1<<USI_CT_SPIBSY)) != 0); // wait for current transfer to finish
@@ -122,7 +122,7 @@ uint8_t spi_trans(uint8_t d) {
  *  7: CLK/4096
  * PARAM actual baudrate to be used
  * ------------------------------------------------------------ */
-void uart_set_baud(uint32_t baudrate){
+void neo430_uart_set_baud(uint32_t baudrate){
 
   // raw baud rate prescaler
   uint32_t clock = CLOCKSPEED_32bit;
@@ -150,7 +150,7 @@ void uart_set_baud(uint32_t baudrate){
  * INFO Send single char via internal UART
  * PARAM c char to send
  * ------------------------------------------------------------ */
-void uart_putc(char c){
+void neo430_uart_putc(char c){
 
   // wait for previous transfer to finish
   while ((USI_CT & (1<<USI_CT_UARTTXBSY)) != 0);
@@ -163,7 +163,7 @@ void uart_putc(char c){
  * INFO This function is blocking!
  * RETURN received char
  * ------------------------------------------------------------ */
-char uart_getc(void){
+char neo430_uart_getc(void){
 
   uint16_t d = 0;
   while (1) {
@@ -178,7 +178,7 @@ char uart_getc(void){
  * INFO Returns value !=0 if a char has received
  * RETURN 0 if no char available
  * ------------------------------------------------------------ */
-uint16_t uart_char_received(void){
+uint16_t neo430_uart_char_received(void){
 
   return USI_UARTRTX & (1<<USI_UARTRTX_UARTRXAVAIL);
 }
@@ -190,7 +190,7 @@ uint16_t uart_char_received(void){
  * INFO This is the base for a non-blocking read access
  * RETURN received char
  * ------------------------------------------------------------ */
-char uart_char_read(void){
+char neo430_uart_char_read(void){
 
   return (char)USI_UARTRTX;
 }
@@ -200,11 +200,11 @@ char uart_char_read(void){
  * INFO Print zero-terminated string of chars via internal UART
  * PARAM *s pointer to source string
  * ------------------------------------------------------------ */
-void uart_print(char *s){
+void neo430_uart_print(char *s){
 
   char c = 0;
   while ((c = *s++))
-    uart_putc(c);
+    neo430_uart_putc(c);
 }
 
 
@@ -213,13 +213,13 @@ void uart_print(char *s){
  * Prints true line break "\r\n" for every '\n'
  * PARAM *s pointer to source string
  * ------------------------------------------------------------ */
-void uart_br_print(char *s){
+void neo430_uart_br_print(char *s){
 
   char c = 0;
   while ((c = *s++)) {
     if (c == '\n')
-      uart_putc('\r');
-    uart_putc(c);
+      neo430_uart_putc('\r');
+    neo430_uart_putc(c);
   }
 }
 
@@ -229,18 +229,21 @@ void uart_br_print(char *s){
  * Input is acknowledged by ENTER, local echo, chars can be deleted using BACKSPACE.
  * PARAM buffer to store string to
  * PARAM size of buffer (=max string length incl. zero-termination)
+ * PARAM activate local echo when =! 0
  * RETURN Length of string (without zero-termination character)
  * ------------------------------------------------------------ */
-uint16_t uart_scan(char *buffer, uint16_t max_size) {
+uint16_t neo430_uart_scan(char *buffer, uint16_t max_size, uint16_t echo) {
 
   char c = 0;
   uint16_t length = 0;
 
   while (1) {
-    c = uart_getc();
+    c = neo430_uart_getc();
     if (c == '\b') { // BACKSPACE
       if (length != 0) {
-        uart_print("\b \b"); // delete last char
+        if (echo) {
+          neo430_uart_print("\b \b"); // delete last char in console
+        }
         buffer--;
         length--;
       }
@@ -248,7 +251,9 @@ uint16_t uart_scan(char *buffer, uint16_t max_size) {
     else if (c == '\r') // ENTER
       break;
     else if ((c >= ' ') && (c <= '~') && (length < (max_size-1))) {
-      uart_putc(c); // echo
+      if (echo) {
+        neo430_uart_putc(c); // echo
+      }
       *buffer++ = c;
       length++;
     }
@@ -263,14 +268,14 @@ uint16_t uart_scan(char *buffer, uint16_t max_size) {
  * INFO Print single (capital) hexadecimal value (1 digit)
  * PARAM char to be printed
  * ------------------------------------------------------------ */
-void uart_print_hex_char(char c) {
+void neo430_uart_print_hex_char(char c) {
 
   char d = c & 15;
   if (d < 10)
     d += '0';
   else
     d += 'A'-10;
-  uart_putc(d);
+  neo430_uart_putc(d);
 }
 
 
@@ -278,10 +283,10 @@ void uart_print_hex_char(char c) {
  * INFO Print 8-bit hexadecimal value (2 digits)
  * PARAM uint8_t value to be printed
  * ------------------------------------------------------------ */
-void uart_print_hex_byte(uint8_t b) {
+void neo430_uart_print_hex_byte(uint8_t b) {
 
-  uart_print_hex_char((char)(b >> 4));
-  uart_print_hex_char((char)(b >> 0));
+  neo430_uart_print_hex_char((char)(b >> 4));
+  neo430_uart_print_hex_char((char)(b >> 0));
 }
 
 
@@ -289,10 +294,10 @@ void uart_print_hex_byte(uint8_t b) {
  * INFO Print 16-bit hexadecimal value (4 digits)
  * PARAM uint16_t value to be printed
  * ------------------------------------------------------------ */
-void uart_print_hex_word(uint16_t w) {
+void neo430_uart_print_hex_word(uint16_t w) {
 
-  uart_print_hex_byte((uint8_t)(w >> 8));
-  uart_print_hex_byte((uint8_t)(w >> 0));
+  neo430_uart_print_hex_byte((uint8_t)(w >> 8));
+  neo430_uart_print_hex_byte((uint8_t)(w >> 0));
 }
 
 
@@ -300,10 +305,10 @@ void uart_print_hex_word(uint16_t w) {
  * INFO Print 32-bit hexadecimal value (8 digits)
  * PARAM uint32_t value to be printed
  * ------------------------------------------------------------ */
-void uart_print_hex_dword(uint32_t dw) {
+void neo430_uart_print_hex_dword(uint32_t dw) {
 
-  uart_print_hex_word((uint16_t)(dw >> 16));
-  uart_print_hex_word((uint16_t)(dw >>  0));
+  neo430_uart_print_hex_word((uint16_t)(dw >> 16));
+  neo430_uart_print_hex_word((uint16_t)(dw >>  0));
 }
 
 
@@ -311,14 +316,14 @@ void uart_print_hex_dword(uint32_t dw) {
  * INFO Print 8-bit binary value (8 digits)
  * PARAM uint8_t value to be printed
  * ------------------------------------------------------------ */
-void uart_print_bin_byte(uint8_t b) {
+void neo430_uart_print_bin_byte(uint8_t b) {
 
   uint8_t i;
   for (i=0x80; i!=0; i>>=1) {
     if (b & i)
-      uart_putc('1');
+      neo430_uart_putc('1');
     else
-      uart_putc('0');
+      neo430_uart_putc('0');
   }
 }
 
@@ -327,10 +332,10 @@ void uart_print_bin_byte(uint8_t b) {
  * INFO Print 16-bit decimal value (16 digits)
  * PARAM uint16_t value to be printed
  * ------------------------------------------------------------ */
-void uart_print_bin_word(uint16_t w) {
+void neo430_uart_print_bin_word(uint16_t w) {
 
-  uart_print_bin_byte((uint8_t)(w >> 8));
-  uart_print_bin_byte((uint8_t)(w >> 0));
+  neo430_uart_print_bin_byte((uint8_t)(w >> 8));
+  neo430_uart_print_bin_byte((uint8_t)(w >> 0));
 }
 
 
@@ -338,10 +343,10 @@ void uart_print_bin_word(uint16_t w) {
  * INFO Print 32-bit decimal value (32 digits)
  * PARAM uint32_t value to be printed
  * ------------------------------------------------------------ */
-void uart_print_bin_dword(uint32_t dw) {
+void neo430_uart_print_bin_dword(uint32_t dw) {
 
-  uart_print_bin_word((uint16_t)(dw >> 16));
-  uart_print_bin_word((uint16_t)(dw >>  0));
+  neo430_uart_print_bin_word((uint16_t)(dw >> 16));
+  neo430_uart_print_bin_word((uint16_t)(dw >>  0));
 }
 
 
@@ -350,7 +355,7 @@ void uart_print_bin_dword(uint32_t dw) {
  * INFO Slow custom version of itoa
  * PARAM 32-bit value to be printed as decimal number
  * ------------------------------------------------------------ */
-void _itoa(uint32_t x) {
+void _neo430_itoa(uint32_t x) {
 
   static const char numbers[10] = "0123456789";
   char buffer1[11], buffer2[11];
@@ -382,7 +387,7 @@ void _itoa(uint32_t x) {
 
   buffer2[j] = '\0'; // terminate result string
 
-  uart_br_print(buffer2);
+  neo430_uart_br_print(buffer2);
 }
 
 
@@ -393,7 +398,7 @@ void _itoa(uint32_t x) {
  * INFO Original from http://forum.43oh.com/topic/1289-tiny-printf-c-version/
  * PARAM Argument string
  * ------------------------------------------------------------ */
-void _printf(char *format, ...) {
+void _neo430_printf(char *format, ...) {
 
   char c;
   int16_t i;
@@ -407,38 +412,38 @@ void _printf(char *format, ...) {
       c = *format++;
       switch (c) {
         case 's': // string
-          uart_print(va_arg(a, char*));
+          neo430_uart_print(va_arg(a, char*));
           break;
         case 'c': // char
-          uart_putc((char)va_arg(a, int));
+          neo430_uart_putc((char)va_arg(a, int));
           break;
         case 'i': // 16-bit integer
           i = va_arg(a, int);
           if (i < 0) {
             i = -i;
-            uart_putc('-');
+            neo430_uart_putc('-');
           }
-          _itoa((uint32_t)i);
+          _neo430_itoa((uint32_t)i);
           break;
         case 'u': // 16-bit unsigned
-          _itoa((uint32_t)va_arg(a, unsigned int));
+          _neo430_itoa((uint32_t)va_arg(a, unsigned int));
           break;
         case 'l': // 32-bit long
           n = va_arg(a, int32_t);
           if (n < 0) {
             n = -n;
-            uart_putc('-');
+            neo430_uart_putc('-');
           }
-          _itoa((uint32_t)n);
+          _neo430_itoa((uint32_t)n);
           break;
         case 'n': // 32-bit unsigned long
-          _itoa(va_arg(a, uint32_t));
+          _neo430_itoa(va_arg(a, uint32_t));
           break;
         case 'x': // 16-bit hexadecimal
-          uart_print_hex_word(va_arg(a, unsigned int));
+          neo430_uart_print_hex_word(va_arg(a, unsigned int));
           break;
         case 'X': // 32-bit hexadecimal
-          uart_print_hex_dword(va_arg(a, uint32_t));
+          neo430_uart_print_hex_dword(va_arg(a, uint32_t));
           break;
         default:
           return;
@@ -446,8 +451,8 @@ void _printf(char *format, ...) {
     }
     else {
       if (c == '\n')
-        uart_putc('\r');
-      uart_putc(c);
+        neo430_uart_putc('\r');
+      neo430_uart_putc(c);
     }
   }
   va_end(a);
@@ -460,7 +465,7 @@ void _printf(char *format, ...) {
  * PARAM Number of hex chars to convert (1..8)
  * RETURN Conversion result
  * ------------------------------------------------------------ */
-uint32_t hexstr_to_uint(char *buffer, uint8_t length) {
+uint32_t neo430_hexstr_to_uint(char *buffer, uint8_t length) {
 
   uint32_t res = 0, d = 0;
   char c = 0;

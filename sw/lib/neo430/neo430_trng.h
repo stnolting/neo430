@@ -19,22 +19,22 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               24.04.2018  #
+// # Stephan Nolting, Hannover, Germany                                                 04.07.2018 #
 // #################################################################################################
 
 #ifndef neo430_trng_h
 #define neo430_trng_h
 
 // prototypes
-void trng_enable(void);
-void trng_disable(void);
-uint8_t trng_get_byte(void);
+void neo430_trng_enable(void);
+void neo430_trng_disable(void);
+uint8_t neo430_trng_get_byte(void);
 
 
 /* ------------------------------------------------------------
  * INFO Enable TRNG
  * ------------------------------------------------------------ */
-void trng_enable(void) {
+void neo430_trng_enable(void) {
 
   TRNG_CT = (1<<TRNG_CT_ENABLE);
 }
@@ -43,7 +43,7 @@ void trng_enable(void) {
 /* ------------------------------------------------------------
  * INFO Disable TRNG
  * ------------------------------------------------------------ */
-void trng_disable(void) {
+void neo430_trng_disable(void) {
 
   TRNG_CT = 0;
 }
@@ -53,7 +53,7 @@ void trng_disable(void) {
  * INFO Get one random data byte from TRNG
  * RETURN Random data byte
  * ------------------------------------------------------------ */
-uint8_t trng_get_byte(void) {
+uint8_t neo430_trng_get_byte(void) {
 
   return (uint8_t)TRNG_DATA;
 }

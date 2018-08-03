@@ -19,24 +19,24 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               07.12.2017  #
+// # Stephan Nolting, Hannover, Germany                                                04.07.2018 #
 // #################################################################################################
 
 #ifndef neo430_muldiv_h
 #define neo430_muldiv_h
 
 // prototypes
-uint32_t umul32(uint16_t a, uint16_t b);
-int32_t mul32(int16_t a, int16_t b);
+uint32_t neo430_umul32(uint16_t a, uint16_t b);
+int32_t neo430_mul32(int16_t a, int16_t b);
 
-uint16_t udiv16(uint16_t dividend, uint16_t divisor);
-int16_t div16(int16_t dividend, int16_t divisor);
+uint16_t neo430_udiv16(uint16_t dividend, uint16_t divisor);
+int16_t neo430_div16(int16_t dividend, int16_t divisor);
 
-uint16_t umod16(uint16_t dividend, uint16_t divisor);
-int16_t mod16(int16_t dividend, int16_t divisor);
+uint16_t neo430_umod16(uint16_t dividend, uint16_t divisor);
+int16_t neo430_mod16(int16_t dividend, int16_t divisor);
 
-uint16_t umoddiv16(uint16_t *remainder, uint16_t dividend, uint16_t divisor);
-int16_t moddiv16(int16_t *remainder, int16_t dividend, int16_t divisor);
+uint16_t neo430_umoddiv16(uint16_t *remainder, uint16_t dividend, uint16_t divisor);
+int16_t neo430_moddiv16(int16_t *remainder, int16_t dividend, int16_t divisor);
 
 
 
@@ -46,7 +46,7 @@ int16_t moddiv16(int16_t *remainder, int16_t dividend, int16_t divisor);
  * PARAM 16-bit factor b
  * RETURN 32-bit product
  * ------------------------------------------------------------ */
-uint32_t umul32(uint16_t a, uint16_t b) {
+uint32_t neo430_umul32(uint16_t a, uint16_t b) {
 
   MULDIV_OPA = a;
   MULDIV_OPB_MUL = b;
@@ -66,7 +66,7 @@ uint32_t umul32(uint16_t a, uint16_t b) {
  * PARAM 16-bit factor b
  * RETURN 32-bit product
  * ------------------------------------------------------------ */
-int32_t mul32(int16_t a, int16_t b) {
+int32_t neo430_mul32(int16_t a, int16_t b) {
 
   int16_t sign = a ^ b;
 
@@ -99,7 +99,7 @@ int32_t mul32(int16_t a, int16_t b) {
  * PARAM 16-bit divisor
  * RETURN 16-bit quotient
  * ------------------------------------------------------------ */
-uint16_t udiv16(uint16_t dividend, uint16_t divisor) {
+uint16_t neo430_udiv16(uint16_t dividend, uint16_t divisor) {
 
   MULDIV_OPA = dividend;
   MULDIV_OPB_DIV = divisor;
@@ -119,7 +119,7 @@ uint16_t udiv16(uint16_t dividend, uint16_t divisor) {
  * PARAM 16-bit divisor
  * RETURN 16-bit quotient
  * ------------------------------------------------------------ */
-int16_t div16(int16_t dividend, int16_t divisor) {
+int16_t neo430_div16(int16_t dividend, int16_t divisor) {
 
   // make positive / unsigned
   if (dividend < 0)
@@ -150,7 +150,7 @@ int16_t div16(int16_t dividend, int16_t divisor) {
  * PARAM 16-bit divisor
  * RETURN 16-bit remainder
  * ------------------------------------------------------------ */
-uint16_t umod16(uint16_t dividend, uint16_t divisor) {
+uint16_t neo430_umod16(uint16_t dividend, uint16_t divisor) {
 
   MULDIV_OPA = dividend;
   MULDIV_OPB_DIV = divisor;
@@ -170,7 +170,7 @@ uint16_t umod16(uint16_t dividend, uint16_t divisor) {
  * PARAM 16-bit divisor
  * RETURN 16-bit remainder
  * ------------------------------------------------------------ */
-int16_t mod16(int16_t dividend, int16_t divisor) {
+int16_t neo430_mod16(int16_t dividend, int16_t divisor) {
 
   int16_t dividend_int = dividend;
 
@@ -204,7 +204,7 @@ int16_t mod16(int16_t dividend, int16_t divisor) {
  * PARAM Pointer to store 16-bit remainder
  * RETURN 16-bit quotient
  * ------------------------------------------------------------ */
-uint16_t umoddiv16(uint16_t *remainder, uint16_t dividend, uint16_t divisor) {
+uint16_t neo430_umoddiv16(uint16_t *remainder, uint16_t dividend, uint16_t divisor) {
 
   MULDIV_OPA = dividend;
   MULDIV_OPB_DIV = divisor;
@@ -226,7 +226,7 @@ uint16_t umoddiv16(uint16_t *remainder, uint16_t dividend, uint16_t divisor) {
  * PARAM Pointer to store 16-bit remainder
  * RETURN 16-bit quotient
  * ------------------------------------------------------------ */
-int16_t moddiv16(int16_t *remainder, int16_t dividend, int16_t divisor) {
+int16_t neo430_moddiv16(int16_t *remainder, int16_t dividend, int16_t divisor) {
 
   int16_t sign = dividend ^ divisor;
   int16_t dividend_int = dividend;

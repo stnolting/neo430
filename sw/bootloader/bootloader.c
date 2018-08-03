@@ -29,7 +29,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               30.05.2018  #
+// # Stephan Nolting, Hannover, Germany                                                 04.07.2018 #
 // #################################################################################################
 
 // Libraries
@@ -95,7 +95,7 @@ int  main(void) {
   // -> done in boot_crt0
 
   // disable watchdog timer
-  wdt_disable();
+  neo430_wdt_disable();
 
   // clear status register and disable interrupts, clear interrupt buffer, enable write access to IMEM
   asm volatile ("mov %0, r2" : : "i" ((1<<R_FLAG) | (1<<Q_FLAG)));
@@ -117,15 +117,15 @@ int  main(void) {
 
   // init GPIO
   GPIO_IRQMASK = 0; // no pin change interrupt please, thanks
-  gpio_port_set(1<<STATUS_LED); // activate status LED, clear all others
+  neo430_gpio_port_set(1<<STATUS_LED); // activate status LED, clear all others
 
   // set Baud rate & init USART control register:
   // enable USART, no IRQs, SPI clock mode 0, 1/1024 SPI speed, disable all 6 SPI CS lines (set high)
   USI_CT = 0; // reset USART
-  uart_set_baud(BAUD_RATE);
+  neo430_uart_set_baud(BAUD_RATE);
   USI_CT = (1<<USI_CT_EN)  | (5<<USI_CT_SPIPRSC0);
-  spi_trans(0); // clear SPI RTX buffer
-  uart_char_read(); // clear UART RX buffer
+  neo430_spi_trans(0); // clear SPI RTX buffer
+  neo430_uart_char_read(); // clear UART RX buffer
 
   // Timeout counter: init timer, irq tick @ ~1Hz (prescaler = 4096)
   // THR = f_main / (1Hz + 4096) -1
@@ -137,37 +137,37 @@ int  main(void) {
   TMR_CNT = 0;
   TIMEOUT_CNT = 0; // timeout ticker
 
-  clear_irq_buffer(); // clear all pending interrupts
-  eint(); // enable global interrupts
+  neo430_clear_irq_buffer(); // clear all pending interrupts
+  neo430_eint(); // enable global interrupts
 
 
   // ****************************************************************
   // Show bootloader intro and system information
   // ****************************************************************
-  uart_br_print("\n\nNEO430 Bootloader V20180530 by Stephan Nolting\n\n"
-                "HWV: 0x");
-  uart_print_hex_word(HW_VERSION);
-  uart_br_print("\nCLK: 0x");
-  uart_print_hex_word(CLOCKSPEED_HI);
-  uart_print_hex_word(CLOCKSPEED_LO);
-  uart_br_print("\nROM: 0x");
-  uart_print_hex_word(IMEM_SIZE);
-  uart_br_print("\nRAM: 0x");
-  uart_print_hex_word(DMEM_SIZE);
-  uart_br_print("\nSYS: 0x");
-  uart_print_hex_word(SYS_FEATURES);
+  neo430_uart_br_print("\n\nNEO430 Bootloader V20180704 by Stephan Nolting\n\n"
+                       "HWV: 0x");
+  neo430_uart_print_hex_word(HW_VERSION);
+  neo430_uart_br_print("\nCLK: 0x");
+  neo430_uart_print_hex_word(CLOCKSPEED_HI);
+  neo430_uart_print_hex_word(CLOCKSPEED_LO);
+  neo430_uart_br_print("\nROM: 0x");
+  neo430_uart_print_hex_word(IMEM_SIZE);
+  neo430_uart_br_print("\nRAM: 0x");
+  neo430_uart_print_hex_word(DMEM_SIZE);
+  neo430_uart_br_print("\nSYS: 0x");
+  neo430_uart_print_hex_word(SYS_FEATURES);
 
 
   // ****************************************************************
   // Auto boot sequence
   // ****************************************************************
-  uart_br_print("\n\nAutoboot in "xstr(AUTOBOOT_TIMEOUT)"s. Press key to abort.\n");
+  neo430_uart_br_print("\n\nAutoboot in "xstr(AUTOBOOT_TIMEOUT)"s. Press key to abort.\n");
   while (1) { // wait for any key to be pressed or timeout
 
     // timeout? start auto boot sequence
     if (TIMEOUT_CNT == 4*AUTOBOOT_TIMEOUT) { // in 0.25 seconds
       get_image(EEPROM_IMAGE); // try loading from EEPROM
-      uart_br_print("\n");
+      neo430_uart_br_print("\n");
       start_app(); // start app if loading was successful
     }
 
@@ -175,7 +175,7 @@ int  main(void) {
     if ((USI_UARTRTX & (1<<USI_UARTRTX_UARTRXAVAIL)) != 0)
       break;
   }
-  uart_br_print("Aborted.\n\n");
+  neo430_uart_br_print("Aborted.\n\n");
   print_help();
 
 
@@ -184,10 +184,10 @@ int  main(void) {
   // ****************************************************************
   while (1) {
 
-    uart_br_print("\nCMD:> ");
-    char c = uart_getc();
-    uart_putc(c); // echo
-    uart_br_print("\n");
+    neo430_uart_br_print("\nCMD:> ");
+    char c = neo430_uart_getc();
+    neo430_uart_putc(c); // echo
+    neo430_uart_br_print("\n");
 
     if (c == 'r') // restart bootloader
       asm volatile ("mov #0xF000, r0"); // jump to beginning of bootloader ROM
@@ -204,7 +204,7 @@ int  main(void) {
     else if (c == 's') // start program in RAM
       start_app();
     else // unknown command
-      uart_br_print("Bad CMD!");
+      neo430_uart_br_print("Bad CMD!");
   }
 }
 
@@ -216,7 +216,7 @@ int  main(void) {
 void __attribute__((__interrupt__)) timer_irq_handler(void) {
 
   TIMEOUT_CNT++; // increment system ticker
-  gpio_port_toggle(1<<STATUS_LED); // toggle status LED
+  neo430_gpio_port_toggle(1<<STATUS_LED); // toggle status LED
 }
 
 
@@ -227,15 +227,15 @@ void start_app(void) {
 
   // valid image in IMEM?
   if (VALID_IMAGE == 0) {
-    uart_br_print("Image still valid? Boot anyway (y/n)? ");
-    if (uart_getc() != 'y')
+    neo430_uart_br_print("Image still valid? Boot anyway (y/n)? ");
+    if (neo430_uart_getc() != 'y')
       return;
   }
 
   // deactivate IRQs, no more write access to IMEM, clear all pending IRQs
   asm volatile ("mov %0, r2" : : "i" (1<<Q_FLAG));
 
-  uart_br_print("Booting...\n\n");
+  neo430_uart_br_print("Booting...\n\n");
 
   // wait for UART to finish transmitting
   while ((USI_CT & (1<<USI_CT_UARTTXBSY)) != 0);
@@ -252,14 +252,14 @@ void start_app(void) {
  * ------------------------------------------------------------ */
 void print_help(void) {
 
-  uart_br_print("Commands:\n"
-                " d: Dump MEM\n"
-                " e: Load EEPROM\n"
-                " h: Help\n"
-                " p: Store EEPROM\n"
-                " r: Restart\n"
-                " s: Start app\n"
-                " u: Upload");
+  neo430_uart_br_print("Commands:\n"
+                       " d: Dump MEM\n"
+                       " e: Load EEPROM\n"
+                       " h: Help\n"
+                       " p: Store EEPROM\n"
+                       " r: Restart\n"
+                       " s: Start app\n"
+                       " u: Upload");
 }
 
 
@@ -273,32 +273,32 @@ void core_dump(void) {
   char c = 0;
 
   while (1) {
-    uart_br_print("\n");
-    uart_print_hex_word((uint16_t)pnt); // print address
-    uart_br_print(":  ");
+    neo430_uart_br_print("\n");
+    neo430_uart_print_hex_word((uint16_t)pnt); // print address
+    neo430_uart_br_print(":  ");
 
     // print hexadecimal data
     for (i=0; i<16; i++) {
-      uart_print_hex_byte(*(pnt+i));
-      uart_putc(' ');
+      neo430_uart_print_hex_byte(*(pnt+i));
+      neo430_uart_putc(' ');
     }
 
     // print ascii data
-    uart_br_print(" |");
+    neo430_uart_br_print(" |");
 
     // print single ascii char
     for (i=0; i<16; i++) {
       c = (char)*(pnt+i);
       if ((c >= ' ') && (c <= '~'))
-        uart_putc(c);
+        neo430_uart_putc(c);
       else
-        uart_putc('.');
+        neo430_uart_putc('.');
     }
 
-    uart_putc('|');
+    neo430_uart_putc('|');
 
     // user abort or all done?
-    if ((uart_char_received() != 0) || ((uint16_t)pnt == 0xFFF0))
+    if ((neo430_uart_char_received() != 0) || ((uint16_t)pnt == 0xFFF0))
       return;
 
     pnt += 16;
@@ -311,21 +311,21 @@ void core_dump(void) {
  * ------------------------------------------------------------ */
 void store_eeprom(void) {
 
-  uart_br_print("Proceed (y/n)?");
-  if (uart_getc() != 'y')
+  neo430_uart_br_print("Proceed (y/n)?");
+  if (neo430_uart_getc() != 'y')
     return;
 
-  uart_br_print("\nWriting... ");
+  neo430_uart_br_print("\nWriting... ");
 
-  spi_cs_en(BOOT_EEP_CS);
-  spi_trans(EEP_WREN); // write enable
-  spi_cs_dis(BOOT_EEP_CS);
+  neo430_spi_cs_en(BOOT_EEP_CS);
+  neo430_spi_trans(EEP_WREN); // write enable
+  neo430_spi_cs_dis(BOOT_EEP_CS);
 
   // check if eeprom ready (or available at all)
-  spi_cs_en(BOOT_EEP_CS);
-  spi_trans(EEP_RDSR); // read status register CMD
-  uint8_t b = spi_trans(0x00); // read status register data
-  spi_cs_dis(BOOT_EEP_CS);
+  neo430_spi_cs_en(BOOT_EEP_CS);
+  neo430_spi_trans(EEP_RDSR); // read status register CMD
+  uint8_t b = neo430_spi_trans(0x00); // read status register data
+  neo430_spi_cs_dis(BOOT_EEP_CS);
 
   if ((b & 0x8F) != 0x02)
     system_error(ERROR_EEPROM);
@@ -353,7 +353,7 @@ void store_eeprom(void) {
   // write checksum
   eeprom_write(EEP_IMAGE_BASE + 4, checksum);
 
-  uart_br_print("OK");
+  neo430_uart_br_print("OK");
 }
 
 
@@ -364,25 +364,25 @@ void store_eeprom(void) {
  * ------------------------------------------------------------ */
 void eeprom_write(uint16_t a, uint16_t d) {
 
-  spi_cs_en(BOOT_EEP_CS);
-  spi_trans(EEP_WREN); // write enable
-  spi_cs_dis(BOOT_EEP_CS);
+  neo430_spi_cs_en(BOOT_EEP_CS);
+  neo430_spi_trans(EEP_WREN); // write enable
+  neo430_spi_cs_dis(BOOT_EEP_CS);
 
-  spi_cs_en(BOOT_EEP_CS);
-  spi_trans(EEP_WRITE); // byte write instruction
-  spi_trans((uint8_t)(a >> 8));
-  spi_trans((uint8_t)(a >> 0));
-  spi_trans((uint8_t)(d >> 8));
-  spi_trans((uint8_t)(d >> 0));
-  spi_cs_dis(BOOT_EEP_CS);
+  neo430_spi_cs_en(BOOT_EEP_CS);
+  neo430_spi_trans(EEP_WRITE); // byte write instruction
+  neo430_spi_trans((uint8_t)(a >> 8));
+  neo430_spi_trans((uint8_t)(a >> 0));
+  neo430_spi_trans((uint8_t)(d >> 8));
+  neo430_spi_trans((uint8_t)(d >> 0));
+  neo430_spi_cs_dis(BOOT_EEP_CS);
 
   // wait for write to finish
   uint8_t s = 0;
   do {
-    spi_cs_en(BOOT_EEP_CS);
-    spi_trans(EEP_RDSR); // read status register CMD
-    s = spi_trans(0x00);
-    spi_cs_dis(BOOT_EEP_CS);
+    neo430_spi_cs_en(BOOT_EEP_CS);
+    neo430_spi_trans(EEP_RDSR); // read status register CMD
+    s = neo430_spi_trans(0x00);
+    neo430_spi_cs_dis(BOOT_EEP_CS);
   } while (s & 0x01); // check WIP flag
 }
 
@@ -394,15 +394,15 @@ void eeprom_write(uint16_t a, uint16_t d) {
  * ------------------------------------------------------------ */
 uint16_t eeprom_read(uint16_t a) {
 
-  spi_cs_en(BOOT_EEP_CS);
-  spi_trans(EEP_READ); // byte read instruction
-  spi_trans((uint8_t)(a >> 8));
-  spi_trans((uint8_t)(a >> 0));
-  uint8_t b0 = spi_trans(0x00);
-  uint8_t b1 = spi_trans(0x00);
-  spi_cs_dis(BOOT_EEP_CS);
+  neo430_spi_cs_en(BOOT_EEP_CS);
+  neo430_spi_trans(EEP_READ); // byte read instruction
+  neo430_spi_trans((uint8_t)(a >> 8));
+  neo430_spi_trans((uint8_t)(a >> 0));
+  uint8_t b0 = neo430_spi_trans(0x00);
+  uint8_t b1 = neo430_spi_trans(0x00);
+  neo430_spi_cs_dis(BOOT_EEP_CS);
 
-  return __combine_bytes(b0, b1);
+  return __neo430_combine_bytes(b0, b1);
 }
 
 
@@ -420,9 +420,9 @@ void get_image(uint8_t src) {
 
   // print intro
   if (src == UART_IMAGE) // boot via UART
-    uart_br_print("Awaiting BINEXE... ");
+    neo430_uart_br_print("Awaiting BINEXE... ");
   else //if (src == EEPROM_IMAGE)// boot from EEPROM
-    uart_br_print("Loading... ");
+    neo430_uart_br_print("Loading... ");
 
   // check if valid image
   if (get_image_word(0x0000, src) != 0xCAFE)
@@ -453,7 +453,7 @@ void get_image(uint8_t src) {
 
   // error during transfer?
   if (checksum == check) {
-    uart_br_print("OK");
+    neo430_uart_br_print("OK");
     VALID_IMAGE = 1;
   }
   else
@@ -473,9 +473,9 @@ uint16_t get_image_word(uint16_t a, uint8_t src) {
 
   // reads have to be consecutive when reading from the UART ;)
   if (src == UART_IMAGE) { // get image data via UART
-    uint8_t c0 = (uint8_t)uart_getc();
-    uint8_t c1 = (uint8_t)uart_getc();
-    d = __combine_bytes(c0, c1);
+    uint8_t c0 = (uint8_t)neo430_uart_getc();
+    uint8_t c1 = (uint8_t)neo430_uart_getc();
+    d = __neo430_combine_bytes(c0, c1);
   }
   else //if (src == EEPROM_IMAGE) // get image data from EEPROM
     d = eeprom_read(a);
@@ -490,11 +490,11 @@ uint16_t get_image_word(uint16_t a, uint8_t src) {
  * ------------------------------------------------------------ */
 void system_error(uint8_t err_code){
 
-  uart_br_print("\a\nERR_");
-  uart_print_hex_byte(err_code);
+  neo430_uart_br_print("\a\nERR_");
+  neo430_uart_print_hex_byte(err_code);
 
   asm volatile ("mov #0, r2"); // deactivate IRQs, no more write access to IMEM
-  gpio_port_set(1<<STATUS_LED); // permanently light up status LED
+  neo430_gpio_port_set(1<<STATUS_LED); // permanently light up status LED
 
   while(1); // freeze
 }

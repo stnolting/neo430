@@ -21,7 +21,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               08.11.2017  #
+// # Stephan Nolting, Hannover, Germany                                                04.07.2018 #
 // #################################################################################################
 
 
@@ -55,19 +55,19 @@ inline uint16_t __attribute__((always_inline)) stop_profiling(uint32_t *cpu_cycl
 int main(void) {
 
   // setup UART
-  uart_set_baud(BAUD_RATE);
+  neo430_uart_set_baud(BAUD_RATE);
   USI_CT = (1<<USI_CT_EN);
 
   // intro text
-  _printf("\r\nProfiling template\r\n");
+  _neo430_printf("\r\nProfiling template\r\n");
 
   // check if TIMER unit was synthesized, exit if no TIMER is available
   if (!(SYS_FEATURES & (1<<SYS_TIMER_EN))) {
-    uart_br_print("Error! No TIMER unit synthesized!");
+    neo430_uart_br_print("Error! No TIMER unit synthesized!");
     return 1;
   }
 
-  _printf("Starting profiling...\r\n");
+  _neo430_printf("Starting profiling...\r\n");
 
   // start runtime profiling
   start_profiling(TIMER_PRSC);
@@ -88,13 +88,13 @@ int main(void) {
   // stop runtime profiling
   uint32_t runtime = 0;
   if (stop_profiling(&runtime, TIMER_PRSC) != 0) { // use SAME prescaler as in "start_time"
-    _printf("Timer overflow! Use a greater prescaler!\r\n\r\n");
+    _neo430_printf("Timer overflow! Use a greater prescaler!\r\n\r\n");
   }
 
 
   // print results
-  _printf("Elapsed CPU cycles: %n\r\n", runtime);
-  _printf("Re-run the measurement with a smaller prescaler to increase precision.\r\n");
+  _neo430_printf("Elapsed CPU cycles: %n\r\n", runtime);
+  _neo430_printf("Re-run the measurement with a smaller prescaler to increase precision.\r\n");
 
   return 0;
 }

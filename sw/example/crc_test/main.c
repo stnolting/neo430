@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from http://www.gnu.org/licenses/lgpl-3.0.en.html                 #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               29.12.2017  #
+// # Stephan Nolting, Hannover, Germany                                                 04.07.2018 #
 // #################################################################################################
 
 
@@ -42,50 +42,50 @@ int main(void) {
   // CRC results were validated using http://crccalc.com/
 
   // setup UART
-  uart_set_baud(BAUD_RATE);
+  neo430_uart_set_baud(BAUD_RATE);
   USI_CT |= (1<<USI_CT_EN);
 
-  uart_br_print("\n<<< CRC16/CRC32 module test >>>\n");
+  neo430_uart_br_print("\n<<< CRC16/CRC32 module test >>>\n");
 
   // check if CRC unit was synthesized, exit if no WB is available
   if (!(SYS_FEATURES & (1<<SYS_CRC_EN))) {
-    uart_br_print("Error! No CRC unit synthesized!");
+    neo430_uart_br_print("Error! No CRC unit synthesized!");
     return 1;
   }
 
   // get start values
-  uart_br_print("\nEnter start value for CRC16 shift register (4hex): 0x");
-  uart_scan(buffer, 4+1);
-  uint16_t crc16_start = (uint16_t)hexstr_to_uint(buffer, 4);
+  neo430_uart_br_print("\nEnter start value for CRC16 shift register (4hex): 0x");
+  neo430_uart_scan(buffer, 4+1, 1);
+  uint16_t crc16_start = (uint16_t)neo430_hexstr_to_uint(buffer, 4);
 
-  uart_br_print("\nEnter start value for CRC32 shift register (8hex): 0x");
-  uart_scan(buffer, 8+1);
-  uint32_t crc32_start = hexstr_to_uint(buffer, 8);
+  neo430_uart_br_print("\nEnter start value for CRC32 shift register (8hex): 0x");
+  neo430_uart_scan(buffer, 8+1, 1);
+  uint32_t crc32_start = neo430_hexstr_to_uint(buffer, 8);
 
   // get polynomial masks
-  uart_br_print("\nEnter polynomial mask for CRC16 (4hex): 0x");
-  uart_scan(buffer, 4+1);
-  uint16_t crc16_poly = (uint16_t)hexstr_to_uint(buffer, 4);
+  neo430_uart_br_print("\nEnter polynomial mask for CRC16 (4hex): 0x");
+  neo430_uart_scan(buffer, 4+1, 1);
+  uint16_t crc16_poly = (uint16_t)neo430_hexstr_to_uint(buffer, 4);
 
-  uart_br_print("\nEnter polynomial mask for CRC32 (8hex): 0x");
-  uart_scan(buffer, 8+1);
-  uint32_t crc32_poly = hexstr_to_uint(buffer, 8);
+  neo430_uart_br_print("\nEnter polynomial mask for CRC32 (8hex): 0x");
+  neo430_uart_scan(buffer, 8+1, 1);
+  uint32_t crc32_poly = neo430_hexstr_to_uint(buffer, 8);
 
   while(1) {
     // get actual data
-    uart_br_print("\nEnter text for CRC16/32 computation: ");
-    uart_scan(buffer, 255);
-    uint16_t crc16_res = crc16(crc16_start, crc16_poly, (uint8_t*)buffer, strlen(buffer));
-    uint32_t crc32_res = crc32(crc32_start, crc32_poly, (uint8_t*)buffer, strlen(buffer));
+    neo430_uart_br_print("\nEnter text for CRC16/32 computation: ");
+    neo430_uart_scan(buffer, 255, 1);
+    uint16_t crc16_res = neo430_crc16(crc16_start, crc16_poly, (uint8_t*)buffer, strlen(buffer));
+    uint32_t crc32_res = neo430_crc32(crc32_start, crc32_poly, (uint8_t*)buffer, strlen(buffer));
 
     // show results
-    uart_br_print("\nCRC16 = 0x");
-    uart_print_hex_word(crc16_res);
-    uart_br_print("\nCRC32 = 0x");
-    uart_print_hex_word((uint16_t)(crc32_res >> 16));
-    uart_print_hex_word((uint16_t)crc32_res);
+    neo430_uart_br_print("\nCRC16 = 0x");
+    neo430_uart_print_hex_word(crc16_res);
+    neo430_uart_br_print("\nCRC32 = 0x");
+    neo430_uart_print_hex_word((uint16_t)(crc32_res >> 16));
+    neo430_uart_print_hex_word((uint16_t)crc32_res);
 
-    uart_br_print("\n");
+    neo430_uart_br_print("\n");
   }
 
   return 0;

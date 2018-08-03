@@ -22,7 +22,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 30.05.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 04.07.2018 #
 // #################################################################################################
 
 
@@ -60,7 +60,7 @@ uint8_t fifo_get(volatile struct uart_fifo *fifo, uint8_t *c);
 int main(void) {
 
   // setup UART
-  uart_set_baud(BAUD_RATE);
+  neo430_uart_set_baud(BAUD_RATE);
   USI_CT = (1<<USI_CT_EN);
 
 
@@ -98,10 +98,10 @@ int main(void) {
   fifo_put_string(&uart_rtx_fifo, "\r\nUART IRQ FIFO Echo Test\r\n");
 
   // enable global IRQs
-  eint();
+  neo430_eint();
 
   while(1) {
-    sleep();
+    neo430_sleep();
   }
 
   return 0;
@@ -115,7 +115,7 @@ int main(void) {
  * ------------------------------------------------------------ */
 void __attribute__((__interrupt__)) uart_irq_handler(void) {
 
-  fifo_put(&uart_rtx_fifo, (uint8_t)uart_char_read());
+  fifo_put(&uart_rtx_fifo, (uint8_t)neo430_uart_char_read());
 }
 
 

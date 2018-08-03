@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               06.10.2017  #
+// # Stephan Nolting, Hannover, Germany                                                 04.07.2018 #
 // #################################################################################################
 
 
@@ -37,47 +37,47 @@
 int main(void) {
 
   // setup UART
-  uart_set_baud(BAUD_RATE);
+  neo430_uart_set_baud(BAUD_RATE);
   USI_CT = (1<<USI_CT_EN);
 
   // intro text
-  uart_br_print("\n<<< Watchdog Test Program >>>\n\n");
+  neo430_uart_br_print("\n<<< Watchdog Test Program >>>\n\n");
 
   // check if WDT was synthesized, exit if no WDT is available
   if (!(SYS_FEATURES & (1<<SYS_WDT_EN))) {
-    uart_br_print("Error! No WDT synthesized!");
+    neo430_uart_br_print("Error! No WDT synthesized!");
     return 0;
   }
 
-  uart_br_print("Cause of last processor reset: ");
+  neo430_uart_br_print("Cause of last processor reset: ");
   if ((WDT_CT & (1<<WDT_RCAUSE)) == 0)
-    uart_br_print("EXTERNAL RESET");
+    neo430_uart_br_print("EXTERNAL RESET");
   else
-    uart_br_print("WATCHDOG");
+    neo430_uart_br_print("WATCHDOG");
 
-  uart_br_print("\n\nWill reset WDT 64 times.\n"
+  neo430_uart_br_print("\n\nWill reset WDT 64 times.\n"
                 "A system reset will be executed in the following time out.\n"
                 "Press any key to trigger manual WDT hardware reset.\n"
                 "[----------------------------------------------------------------]\n ");
 
   // init watchdog: third largest period
-  wdt_enable(WDT_PRSC_1024);
+  neo430_wdt_enable(WDT_PRSC_1024);
 
   uint8_t i;
   for (i=0; i<64; i++) {
-    uart_putc('.');
-    wdt_reset(); // reset watchdog
-    cpu_delay(4); // wait some time
+    neo430_uart_putc('.');
+    neo430_wdt_reset(); // reset watchdog
+    neo430_cpu_delay(4); // wait some time
 
     // trigger manual reset if key pressed
-    if (uart_char_received()) {
-      wdt_force_hw_reset();
+    if (neo430_uart_char_received()) {
+      neo430_wdt_force_hw_reset();
     }
   }
 
   while (1) { // wait for the watchdog time-out or key press
-    if (uart_char_received()) {
-      wdt_force_hw_reset();
+    if (neo430_uart_char_received()) {
+      neo430_wdt_force_hw_reset();
     }
   }
 

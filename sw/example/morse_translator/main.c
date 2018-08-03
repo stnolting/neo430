@@ -22,7 +22,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               06.10.2017  #
+// # Stephan Nolting, Hannover, Germany                                                04.07.2018 #
 // #################################################################################################
 
 
@@ -104,7 +104,7 @@ int main(void) {
   char buffer[MAX_STRING_LENGTH];
 
   // setup UART
-  uart_set_baud(BAUD_RATE);
+  neo430_uart_set_baud(BAUD_RATE);
   USI_CT = (1<<USI_CT_EN);
 
   // configure time base
@@ -115,23 +115,23 @@ int main(void) {
     time_base++; // time base for a 'Dit'
   }
 
-  uart_br_print("\n--- Morse code translator ---\n");
-  uart_br_print("Enter a string to translate it to Morse code.\n");
-  uart_br_print("Output via high-active LED at GPIO.out(0) (bootloader status LED).\n");
+  neo430_uart_br_print("\n--- Morse code translator ---\n");
+  neo430_uart_br_print("Enter a string to translate it to Morse code.\n");
+  neo430_uart_br_print("Output via high-active LED at GPIO.out(0) (bootloader status LED).\n");
 
   // check if GPIO unit was synthesized, exit if no GPIO is available
   if (!(SYS_FEATURES & (1<<SYS_GPIO_EN))) {
-    uart_br_print("Error! No GPIO unit synthesized!");
+    neo430_uart_br_print("Error! No GPIO unit synthesized!");
     return 1;
   }
 
-  gpio_port_set(0); // LED off
+  neo430_gpio_port_set(0); // LED off
 
   while (1) {
     // get string
-    uart_br_print("\nEnter text: ");
-    uint16_t length = uart_scan(buffer, MAX_STRING_LENGTH);
-    uart_br_print("\nSending: ");
+    neo430_uart_br_print("\nEnter text: ");
+    uint16_t length = neo430_uart_scan(buffer, MAX_STRING_LENGTH, 1);
+    neo430_uart_br_print("\nSending: ");
 
     // encode each letter
     uint16_t i = 0;
@@ -145,7 +145,7 @@ int main(void) {
       // in valid alphabet?
       if ((c >= ',') && (c <= 'Z')) {
         uint8_t index = c - ',';
-        uart_br_print(" ");
+        neo430_uart_br_print(" ");
         send_morse(morse_code[index]);
 
         uint32_t time = time_base * 3; // inter-letter pause
@@ -154,8 +154,8 @@ int main(void) {
 
       }
       // user abort?
-      if (uart_char_received() != 0) {
-        uart_br_print("\nAborted.");
+      if (neo430_uart_char_received() != 0) {
+        neo430_uart_br_print("\nAborted.");
         break;
       }
     }
@@ -177,7 +177,7 @@ void send_morse(const char *s){
 
   while ((c = *s++)) {
     
-    gpio_pin_set(LED_PIN); // LED on
+    neo430_gpio_pin_set(LED_PIN); // LED on
 
     if (c == '.')
       time = time_base;
@@ -186,13 +186,13 @@ void send_morse(const char *s){
     else
       time = 0;
 
-    uart_putc(c);
+    neo430_uart_putc(c);
 
     // wait
     while(time--)
       asm volatile ("nop");
 
-    gpio_pin_clr(LED_PIN); // LED off
+    neo430_gpio_pin_clr(LED_PIN); // LED off
 
     // inter-symbol pause
     time = time_base;

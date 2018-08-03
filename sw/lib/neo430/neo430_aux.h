@@ -19,14 +19,14 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               29.04.2018  #
+// # Stephan Nolting, Hannover, Germany                                                04.07.2018 #
 // #################################################################################################
 
 #ifndef neo430_aux_h
 #define neo430_aux_h
 
 // prototypes
-uint8_t config_timer_period(uint32_t f_timer);
+uint8_t neo430_config_timer_period(uint32_t f_timer);
 
 
 /* ------------------------------------------------------------
@@ -34,7 +34,7 @@ uint8_t config_timer_period(uint32_t f_timer);
  * PARAM Timer frequency in Hz (1Hz ... F_CPU/2)
  * RETURN 0 if successful, -1 if error
  * ------------------------------------------------------------ */
-uint8_t config_timer_period(uint32_t f_timer) {
+uint8_t neo430_config_timer_period(uint32_t f_timer) {
 
   uint32_t clock = CLOCKSPEED_32bit;
   uint32_t ticks = (clock / (f_timer*2)) >> 1; // divide by lowest prescaler (=2)
