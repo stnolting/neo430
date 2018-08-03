@@ -13,8 +13,8 @@
 -- #  - NEO430 CPU (MSP430(TM)-ISA-compatible) (CPU)                                               #
 -- #  - Internal RAM or ROM (configurable size) for code (IMEM)                                    #
 -- #  - Internal RAM (configurable size) for data (and code) (DMEM)                                #
--- #  - Optional 16-bit multiplier/divider unit (MULDIV)                                           #
 -- #  - Sysconfig (infomem for various system information) (SYSCONFIG)                             #
+-- #  - Optional 16-bit multiplier/divider unit (MULDIV)                                           #
 -- #  - Optional 16-bit IN and 16-bit OUT GPIO port with pin-change interrupt (GPIO)               #
 -- #  - Optional 32-bit Wishbone interface (WB32)                                                  #
 -- #  - Optional High precision timer (TIMER)                                                      #
@@ -44,7 +44,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 17.05.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 29.06.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -214,7 +214,7 @@ begin
     end if;
   end process clock_generator_buf;
 
-  -- clock enable select --
+  -- clock enable select - edge detectors --
   clk_gen(clk_div2_c)    <= clk_div_ff(0)  and (not clk_div(0));  -- CLK/2
   clk_gen(clk_div4_c)    <= clk_div_ff(1)  and (not clk_div(1));  -- CLK/4
   clk_gen(clk_div8_c)    <= clk_div_ff(2)  and (not clk_div(2));  -- CLK/8
