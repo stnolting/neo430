@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 24.04.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 03.08.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -54,9 +54,6 @@ entity neo430_top_axi4lite is
     IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory? (default=false)
   );
   port (
-    -- global control --
-    clk_i         : in  std_logic; -- global clock, rising edge
-    rst_i         : in  std_logic; -- global reset, async, low-active
     -- GPIO --
     gpio_o        : out std_logic_vector(15 downto 0); -- parallel output
     gpio_i        : in  std_logic_vector(15 downto 0); -- parallel input
@@ -75,8 +72,8 @@ entity neo430_top_axi4lite is
     irq_ack_o     : out std_logic; -- external interrupt request acknowledge
     -- AXI Lite-Compatible Master Interface --
     -- Clock and Reset
-    m_axi_aclk    : out std_logic;
-    m_axi_aresetn : out std_logic;
+    m_axi_aclk    : in std_logic;
+    m_axi_aresetn : in std_logic;
     -- Write Address Channel
     m_axi_awaddr  : out std_logic_vector(31 downto 0);
     m_axi_awvalid : out std_logic;
@@ -102,7 +99,7 @@ entity neo430_top_axi4lite is
   );
 end neo430_top_axi4lite;
 
-architecture neo430_top_axi4lite_rtl of neo430_top4axi_lite is
+architecture neo430_top_axi4lite_rtl of neo430_top_axi4lite is
 
   -- internal wishbone bus --
   type wb_bus_t is record
@@ -118,8 +115,6 @@ architecture neo430_top_axi4lite_rtl of neo430_top4axi_lite is
   signal wb_core : wb_bus_t;
 
   -- other signals for conversion --
-  signal clk_i_int      : std_ulogic;
-  signal rst_i_int      : std_ulogic;
   signal gpio_o_int     : std_ulogic_vector(15 downto 0);
   signal gpio_i_int     : std_ulogic_vector(15 downto 0);
   signal pwm_o_int      : std_ulogic_vector(02 downto 0);
@@ -134,12 +129,11 @@ architecture neo430_top_axi4lite_rtl of neo430_top4axi_lite is
   constant usrcode_c    : std_ulogic_vector(15 downto 0) := std_ulogic_vector(USER_CODE);
 
   -- AXI arbiter --
-  signal read_trans  : std_ulogic;
-  signal write_trans : std_ulogic;
-  signal pending_ra  : std_ulogic; -- pending read address transfer
-  signal pending_rd  : std_ulogic; -- pending read data transfer
-  signal pending_wr  : std_ulogic; -- pending write transfer
-  signal axi_resp_ok : std_ulogic;
+  signal read_trans      : std_ulogic;
+  signal write_trans     : std_ulogic;
+  signal pending_rd      : std_ulogic; -- pending read transfer
+  signal pending_wr      : std_ulogic; -- pending write transfer
+  signal adr_valid       : std_ulogic;
 
 begin
 
@@ -171,13 +165,13 @@ begin
   )
   port map (
     -- global control --
-    clk_i       => clk_i_int,         -- global clock, rising edge
-    rst_i       => rst_i_int,         -- global reset, async, low-active
+    clk_i       => m_axi_aclk,        -- global clock, rising edge
+    rst_i       => m_axi_aresetn,     -- global reset, async, LOW-active
     -- parallel io --
     gpio_o      => gpio_o_int,        -- parallel output
     gpio_i      => gpio_i_int,        -- parallel input
     -- pwm channels --
-    pwm_o       => pwm_o_int;         -- pwm channels
+    pwm_o       => pwm_o_int,         -- pwm channels
     -- serial com --
     uart_txd_o  => uart_txd_o_int,    -- UART send data
     uart_rxd_i  => uart_rxd_i_int,    -- UART receive data
@@ -202,8 +196,6 @@ begin
 
   -- Output Type Conversion ---------------------------------------------------
   -- -----------------------------------------------------------------------------
-  clk_i_int      <= std_ulogic(clk_i);
-  rst_i_int      <= std_ulogic(rst_i);
   gpio_i_int     <= std_ulogic_vector(gpio_i);
   uart_rxd_i_int <= std_ulogic(uart_rxd_i);
   spi_miso_i_int <= std_ulogic(spi_miso_i);
@@ -226,19 +218,20 @@ begin
   write_trans <= wb_core.cyc and wb_core.stb and wb_core.we;
 
   -- arbiter --
-  axi_arbiter: process(clk_i_int)
+  axi_arbiter: process(m_axi_aclk)
   begin
-    if rising_edge(clk_i_int) then
+    if rising_edge(m_axi_aclk) then
       if (wb_core.cyc = '0') then
-        pending_ra <= '0';
-        pending_rd <= '0';
-        pending_wr <= '0';
+        pending_rd   <= '0';
+        pending_wr   <= '0';
+        adr_valid    <= '0';
+        m_axi_bready <= '0';
       else
-        -- transfer read address --
-        if (read_trans = '1') then
-          pending_ra <= '1';
-        elsif (m_axi_arready = '0') then
-          pending_ra <= '0';
+        -- read/write address valid --
+        if ((wb_core.cyc and wb_core.stb) = '1') then
+          adr_valid <= '1';
+        elsif (m_axi_awready = '1') or (m_axi_arready = '1') then
+          adr_valid <= '0';
         end if;
         -- transfer read data --
         if (read_trans = '1') then
@@ -246,41 +239,42 @@ begin
         elsif (m_axi_rvalid = '1') then
           pending_rd <= '0';
         end if;
-        -- transfer write address and data --
+        -- transfer write data --
         if (write_trans = '1') then
           pending_wr <= '1';
-        elsif (m_axi_awready = '1') and (m_axi_wready = '1') then
+        elsif (m_axi_wready = '1') then
           pending_wr <= '0';
+        end if;
+        -- write response channel -
+        if (write_trans = '1') then
+          m_axi_bready <= '1';
+        elsif (m_axi_bvalid = '1') then
+          m_axi_bready <= '0';
         end if;
       end if;
     end if;
   end process axi_arbiter;
 
   -- Acknowledge Wishbone transfer --
-  wb_core.ack <= wb_core.cyc and -- valid transfer
-                 axi_resp_ok and -- transfer successful
-                 ((pending_rd and std_ulogic(m_axi_rvalid)) or -- read transfer
-                  (pending_wr and std_ulogic(m_axi_awready) and std_ulogic(m_axi_wready))); -- write transfer
-
-  -- Clock and Reset --
-  m_axi_aclk    <= clk_i;
-  m_axi_aresetn <= rst_i;
+  wb_core.ack <= (pending_rd and std_ulogic(m_axi_rvalid)) or -- read transfer
+                 (pending_wr and std_ulogic(m_axi_wready)); -- write transfer
 
   -- Read Address Channel --
   m_axi_araddr  <= std_logic_vector(wb_core.adr);
-  m_axi_arvalid <= std_logic(pending_ra);
+  m_axi_arvalid <= std_logic(adr_valid) and std_logic(pending_rd);
+
   -- Read Data Channel --
   wb_core.di    <= std_ulogic_vector(m_axi_rdata);
-  axi_resp_ok   <= '1' when (m_axi_rresp = "00") else '0';
-  m_axi_rready  <= '1';
+  m_axi_rready  <= std_logic(pending_rd);
 
   -- Write Address Channel --
   m_axi_awaddr  <= std_logic_vector(wb_core.adr);
-  m_axi_awvalid <= std_logic(pending_wr);
+  m_axi_awvalid <= std_logic(adr_valid) and std_logic(pending_wr);
+
   -- Write Data Channel --
   m_axi_wdata   <= std_logic_vector(wb_core.do);
   m_axi_wstrb   <= std_logic_vector(wb_core.sel);
   m_axi_wvalid  <= std_logic(pending_wr);
 
 
-end neo430_top_axi_lite4rtl;
+end neo430_top_axi4lite_rtl;
