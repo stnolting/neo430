@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 03.08.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 08.08.2018 #
 // #################################################################################################
 
 #ifndef neo430_usart_h
@@ -248,7 +248,7 @@ uint16_t neo430_uart_scan(char *buffer, uint16_t max_size, uint16_t echo) {
         length--;
       }
     }
-    else if (c == '\r') // ENTER
+    else if (c == '\r') // carriage return
       break;
     else if ((c >= ' ') && (c <= '~') && (length < (max_size-1))) {
       if (echo) {
