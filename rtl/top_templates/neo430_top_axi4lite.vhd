@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 03.08.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 09.08.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -33,8 +33,8 @@ entity neo430_top_axi4lite is
   generic (
     -- general configuration --
     CLOCK_SPEED : natural := 100000000; -- main clock in Hz
-    IMEM_SIZE   : natural := 4*1024; -- internal IMEM size in bytes, max 32kB (default=4kB)
-    DMEM_SIZE   : natural := 2*1024; -- internal DMEM size in bytes, max 28kB (default=2kB)
+    IMEM_SIZE   : natural := 4*1024; -- internal IMEM size in bytes, max 48kB (default=4kB)
+    DMEM_SIZE   : natural := 2*1024; -- internal DMEM size in bytes, max 12kB (default=2kB)
     -- additional configuration --
     USER_CODE   : std_logic_vector(15 downto 0) := x"0000"; -- custom user code
     -- module configuration --
@@ -54,6 +54,9 @@ entity neo430_top_axi4lite is
     IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory? (default=false)
   );
   port (
+    -- global control --
+    clk_i         : in  std_logic; -- global clock, rising edge
+    rst_i         : in  std_logic; -- global reset, async, low-active
     -- GPIO --
     gpio_o        : out std_logic_vector(15 downto 0); -- parallel output
     gpio_i        : in  std_logic_vector(15 downto 0); -- parallel input
@@ -115,6 +118,8 @@ architecture neo430_top_axi4lite_rtl of neo430_top_axi4lite is
   signal wb_core : wb_bus_t;
 
   -- other signals for conversion --
+  signal clk_i_int      : std_ulogic;
+  signal rst_i_int      : std_ulogic;
   signal gpio_o_int     : std_ulogic_vector(15 downto 0);
   signal gpio_i_int     : std_ulogic_vector(15 downto 0);
   signal pwm_o_int      : std_ulogic_vector(02 downto 0);
@@ -129,11 +134,12 @@ architecture neo430_top_axi4lite_rtl of neo430_top_axi4lite is
   constant usrcode_c    : std_ulogic_vector(15 downto 0) := std_ulogic_vector(USER_CODE);
 
   -- AXI arbiter --
-  signal read_trans      : std_ulogic;
-  signal write_trans     : std_ulogic;
-  signal pending_rd      : std_ulogic; -- pending read transfer
-  signal pending_wr      : std_ulogic; -- pending write transfer
-  signal adr_valid       : std_ulogic;
+  signal read_trans  : std_ulogic;
+  signal write_trans : std_ulogic;
+  signal pending_rd  : std_ulogic; -- pending read transfer
+  signal pending_wr  : std_ulogic; -- pending write transfer
+  signal adr_valid   : std_ulogic;
+  signal axi_resp_ok : std_ulogic;
 
 begin
 
@@ -143,8 +149,8 @@ begin
   generic map (
     -- general configuration --
     CLOCK_SPEED => CLOCK_SPEED,       -- main clock in Hz
-    IMEM_SIZE   => IMEM_SIZE,         -- internal IMEM size in bytes, max 32kB (default=4kB)
-    DMEM_SIZE   => DMEM_SIZE,         -- internal DMEM size in bytes, max 28kB (default=2kB)
+    IMEM_SIZE   => IMEM_SIZE,         -- internal IMEM size in bytes, max 48kB (default=4kB)
+    DMEM_SIZE   => DMEM_SIZE,         -- internal DMEM size in bytes, max 12kB (default=2kB)
     -- additional configuration --
     USER_CODE   => usrcode_c,         -- custom user code
     -- module configuration --
@@ -196,6 +202,8 @@ begin
 
   -- Output Type Conversion ---------------------------------------------------
   -- -----------------------------------------------------------------------------
+  clk_i_int      <= std_ulogic(clk_i);
+  rst_i_int      <= std_ulogic(rst_i);
   gpio_i_int     <= std_ulogic_vector(gpio_i);
   uart_rxd_i_int <= std_ulogic(uart_rxd_i);
   spi_miso_i_int <= std_ulogic(spi_miso_i);
@@ -222,12 +230,11 @@ begin
   begin
     if rising_edge(m_axi_aclk) then
       if (wb_core.cyc = '0') then
-        pending_rd   <= '0';
-        pending_wr   <= '0';
-        adr_valid    <= '0';
-        m_axi_bready <= '0';
+        pending_rd <= '0';
+        pending_wr <= '0';
+        adr_valid  <= '0';
       else
-        -- read/write address valid --
+        -- address valid?
         if ((wb_core.cyc and wb_core.stb) = '1') then
           adr_valid <= '1';
         elsif (m_axi_awready = '1') or (m_axi_arready = '1') then
@@ -245,36 +252,35 @@ begin
         elsif (m_axi_wready = '1') then
           pending_wr <= '0';
         end if;
-        -- write response channel -
-        if (write_trans = '1') then
-          m_axi_bready <= '1';
-        elsif (m_axi_bvalid = '1') then
-          m_axi_bready <= '0';
-        end if;
       end if;
     end if;
   end process axi_arbiter;
 
   -- Acknowledge Wishbone transfer --
   wb_core.ack <= (pending_rd and std_ulogic(m_axi_rvalid)) or -- read transfer
-                 (pending_wr and std_ulogic(m_axi_wready)); -- write transfer
+                 (pending_wr and std_ulogic(m_axi_wready)) or -- write transfer
+                 (axi_resp_ok and m_axi_bvalid); -- response channel
 
   -- Read Address Channel --
   m_axi_araddr  <= std_logic_vector(wb_core.adr);
-  m_axi_arvalid <= std_logic(adr_valid) and std_logic(pending_rd);
+  m_axi_arvalid <= adr_valid;
 
   -- Read Data Channel --
   wb_core.di    <= std_ulogic_vector(m_axi_rdata);
-  m_axi_rready  <= std_logic(pending_rd);
+  m_axi_rready  <= (not adr_valid) and pending_rd;
 
   -- Write Address Channel --
   m_axi_awaddr  <= std_logic_vector(wb_core.adr);
-  m_axi_awvalid <= std_logic(adr_valid) and std_logic(pending_wr);
+  m_axi_awvalid <= adr_valid;
 
   -- Write Data Channel --
   m_axi_wdata   <= std_logic_vector(wb_core.do);
   m_axi_wstrb   <= std_logic_vector(wb_core.sel);
-  m_axi_wvalid  <= std_logic(pending_wr);
+  m_axi_wvalid  <= (not adr_valid) and std_logic(pending_wr);
+
+  -- Write Response Channel --
+  axi_resp_ok   <= '1' when (m_axi_rresp = "00") else '0';
+  m_axi_bready  <= wb_core.cyc;
 
 
 end neo430_top_axi4lite_rtl;

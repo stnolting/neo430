@@ -24,7 +24,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 27.04.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 09.08.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -104,9 +104,13 @@ begin
   -- -----------------------------------------------------------------------------
   imem_file_access: process(clk_i)
   begin
+    -- check max size --
+    if (IMEM_SIZE > 48*1024) then
+      assert false report "I-mem size out of range! Max 48kB!" severity error;
+    end if;
     if rising_edge(clk_i) then
       rden <= rden_i and acc_en;
-      if (acc_en = '1') then
+      if (acc_en = '1') then -- reduce switching activity when not accessed
         if (IMEM_AS_ROM = false) then -- implement IMEM as RAM
           if (wren_i(0) = '1') and (upen_i = '1') then
             imem_file_ram_l(addr) <= data_i(07 downto 0);

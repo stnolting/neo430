@@ -70,7 +70,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 ## Differences to TI's Original MSP430(TM) Processors
 
 - Completely different processor modules with different functionality
-- Maximum of 32kB instruction memory and 28kB data memory
+- Up to 48kB instruction memory and 12kB data memory
 - Specific memory map – included NEO430 linker script and compilation script required
 - Custom binary executable format
 - Only 4 CPU interrupt channels (instead of 16)

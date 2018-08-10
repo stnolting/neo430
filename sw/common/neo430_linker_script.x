@@ -19,7 +19,7 @@
 /* # You should have received a copy of the GNU Lesser General Public License along with this      # */
 /* # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                # */
 /* # ********************************************************************************************* # */
-/* #  Stephan Nolting, Hannover, Germany                                               22.04.2017  # */
+/* #  Stephan Nolting, Hannover, Germany                                               09.08.2018  # */
 /* ################################################################################################# */
 
 OUTPUT_ARCH(msp430)
@@ -29,7 +29,7 @@ OUTPUT_ARCH(msp430)
 MEMORY
 {
   rom  (rx) : ORIGIN = 0x0000, LENGTH = 0x1000
-  ram (rwx) : ORIGIN = 0x8008, LENGTH = 0x0800 - 8
+  ram (rwx) : ORIGIN = 0xC008, LENGTH = 0x0800 - 8
 }
 
 /* Final executable layout */

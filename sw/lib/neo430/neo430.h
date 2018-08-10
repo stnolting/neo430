@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 24.04.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 09.08.2018 #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -49,7 +49,7 @@
 // ----------------------------------------------------------------------------
 // Start of data memory (DMEN)
 // ----------------------------------------------------------------------------
-#define DMEM_ADDR_BASE 0x8000
+#define DMEM_ADDR_BASE 0xC000
 
 
 // ----------------------------------------------------------------------------

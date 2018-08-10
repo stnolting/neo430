@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hanover, Germany                                                  17.05.2018 #
+-- # Stephan Nolting, Hanover, Germany                                                  09.08.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -86,8 +86,8 @@ begin
   generic map (
     -- general configuration --
     CLOCK_SPEED => f_clk_c,           -- main clock in Hz
-    IMEM_SIZE   => 4*1024,            -- internal IMEM size in bytes, max 32kB (default=4kB)
-    DMEM_SIZE   => 2*1024,            -- internal DMEM size in bytes, max 28kB (default=2kB)
+    IMEM_SIZE   => 4*1024,            -- internal IMEM size in bytes, max 48kB (default=4kB)
+    DMEM_SIZE   => 2*1024,            -- internal DMEM size in bytes, max 12kB (default=2kB)
     -- additional configuration --
     USER_CODE   => x"4788",           -- custom user code
     -- module configuration --
