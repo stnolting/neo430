@@ -64,7 +64,7 @@ architecture neo430_boot_rom_rtl of neo430_boot_rom is
   signal addr   : natural range 0 to boot_size_c/2-1;
 
   -- bootloader image --
-  constant boot_img : boot_img_t := init_boot_rom(bootloader_init_image);
+  signal boot_img : boot_img_t := init_boot_rom(bootloader_init_image);
 
 begin
 
