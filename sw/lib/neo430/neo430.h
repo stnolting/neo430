@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 09.08.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 29.09.2018 #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -100,7 +100,6 @@
 #define WB32_RA_32bit (*(REG32 (&WB32_LRA))) // -/w: address for read transfer (+trigger)
 #define WB32_WA_32bit (*(REG32 (&WB32_LWA))) // -/w: address for write transfer (+trigger)
 #define WB32_D_32bit  (*(REG32 (&WB32_LD)))  // r/w: read/write data (for 32-bit access)
-#define WB32_D_8bit   (*(REG8  (&WB32_LD)))  // r/w: read/write data (for 8-bit access)
 
 // WB32 control register
 #define WB32_CT_WBSEL0   0 // -/w: wishbone data byte enable bit 0

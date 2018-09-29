@@ -24,7 +24,7 @@
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
 // # Thanks to Edward Sherriff!                                                                    #
-// # Stephan Nolting, Hannover, Germany                                                 14.07.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 29.09.2018 #
 // #################################################################################################
 
 #ifndef neo430_wishbone_h
@@ -209,9 +209,17 @@ uint8_t neo430_wishbone32_read8(uint32_t a) {
   // wait for access to be completed - blocking!
   while((WB32_CT & (1<<WB32_CT_PENDING)) != 0);
 
-  // select correct byte to be written
-  volatile uint8_t* in = (uint8_t*)(&WB32_D_8bit + ((uint8_t)a & 3));
-  return *in;
+  // select correct byte to be read
+  uint16_t data;
+  if (a & 2)
+    data = WB32_HD;
+  else
+    data = WB32_LD;
+
+  if (a & 1)
+    data = __neo430_bswap(data);
+
+  return (uint8_t)data;
 }
 
 
@@ -227,8 +235,10 @@ void neo430_wishbone32_write8(uint32_t a, uint8_t d) {
   WB32_CT = 1 << (a & 3); // corresponding byte enable
 
   // select correct byte to be written
-  volatile uint8_t* out = (uint8_t*)(&WB32_D_8bit + ((uint8_t)a & 3));
-  *out = d;
+  uint16_t data = (uint16_t)d;
+  data = (data << 8) | data;
+  WB32_LD = data;
+  WB32_HD = data;
 
   // device address aligned to 8-bit + transfer trigger
   WB32_WA_32bit = a;
@@ -337,12 +347,14 @@ void neo430_wishbone32_read8_start(uint32_t a) {
  * ------------------------------------------------------------ */
 void neo430_wishbone32_write8_start(uint32_t a, uint8_t d) {
 
+  // select correct byte to be written
+  uint16_t data = (uint16_t)d;
+  data = (data << 8) | data;
+  WB32_LD = data;
+  WB32_HD = data;
+
   // 8-bit transfer
   WB32_CT = 1 << (a & 3); // corresponding byte enable
-
-  // select correct byte to be written
-  volatile uint8_t* out = (uint8_t*)(&WB32_D_8bit + ((uint8_t)a & 3));
-  *out = d;
 
   // device address aligned to 8-bit + transfer trigger
   WB32_WA_32bit = a;
@@ -381,9 +393,17 @@ uint16_t neo430_wishbone32_get_data16(uint32_t a) {
  * ------------------------------------------------------------ */
 uint8_t neo430_wishbone32_get_data8(uint32_t a) {
 
-  // select correct byte to be written
-  volatile uint8_t* in = (uint8_t*)(&WB32_D_8bit + ((uint8_t)a & 3));
-  return *in;
+  // select correct byte to be read
+  uint16_t data;
+  if (a & 2)
+    data = WB32_HD;
+  else
+    data = WB32_LD;
+
+  if (a & 1)
+    data = __neo430_bswap(data);
+
+  return (uint8_t)data;
 }
 
 
