@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 01.06.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 29.09.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -34,7 +34,7 @@ entity neo430_wb_interface is
     -- host access --
     clk_i    : in  std_ulogic; -- global clock line
     rden_i   : in  std_ulogic; -- read enable
-    wren_i   : in  std_ulogic_vector(01 downto 0); -- write enable
+    wren_i   : in  std_ulogic; -- write enable
     addr_i   : in  std_ulogic_vector(15 downto 0); -- address
     data_i   : in  std_ulogic_vector(15 downto 0); -- data in
     data_o   : out std_ulogic_vector(15 downto 0); -- data out
@@ -84,7 +84,7 @@ begin
   -- -----------------------------------------------------------------------------
   acc_en <= '1' when (addr_i(hi_abb_c downto lo_abb_c) = wb32_base_c(hi_abb_c downto lo_abb_c)) else '0';
   addr   <= wb32_base_c(15 downto lo_abb_c) & addr_i(lo_abb_c-1 downto 1) & '0'; -- word aligned
-  wr_en  <= acc_en and wren_i(0) and wren_i(1);
+  wr_en  <= acc_en and wren_i;
 
 
   -- Write access -------------------------------------------------------------
@@ -92,39 +92,33 @@ begin
   wr_access: process(clk_i)
   begin
     if rising_edge(clk_i) then
-      for i in 0 to 1 loop
-        if (acc_en = '1') and (wren_i(i) = '1') then -- valid byte write
-          case addr is
-            when wb32_rd_adr_lo_addr_c =>
-              wb_addr(7+i*8 downto 0+i*8) <= data_i(7+i*8 downto 0+i*8);
-              wb_we_o <= '0';
-            when wb32_rd_adr_hi_addr_c =>
-              wb_addr(23+i*8 downto 16+i*8) <= data_i(7+i*8 downto 0+i*8);
-              wb_we_o <= '0';
-            when wb32_wr_adr_lo_addr_c =>
-              wb_addr(7+i*8 downto 0+i*8) <= data_i(7+i*8 downto 0+i*8);
-              wb_we_o <= '1';
-            when wb32_wr_adr_hi_addr_c =>
-              wb_addr(23+i*8 downto 16+i*8) <= data_i(7+i*8 downto 0+i*8);
-              wb_we_o <= '1';
-            when wb32_data_lo_addr_c =>
-              wb_wdata(7+i*8 downto 0+i*8) <= data_i(7+i*8 downto 0+i*8);
-            when wb32_data_hi_addr_c =>
-              wb_wdata(23+i*8 downto 16+i*8) <= data_i(7+i*8 downto 0+i*8);
-            when wb32_ctrl_addr_c =>
-              if (i = 0) then
-                byte_en(0) <= data_i(ctrl_byte_en0_c);
-                byte_en(1) <= data_i(ctrl_byte_en1_c);
-                byte_en(2) <= data_i(ctrl_byte_en2_c);
-                byte_en(3) <= data_i(ctrl_byte_en3_c);
-              else
-                NULL;
-              end if;
-            when others =>
-              NULL;
-          end case;
-        end if;
-      end loop; -- i
+      if (wr_en = '1') then -- valid word write
+        case addr is
+          when wb32_rd_adr_lo_addr_c =>
+            wb_addr(15 downto 0) <= data_i;
+            wb_we_o <= '0';
+          when wb32_rd_adr_hi_addr_c =>
+            wb_addr(31 downto 16) <= data_i;
+            wb_we_o <= '0';
+          when wb32_wr_adr_lo_addr_c =>
+            wb_addr(15 downto 0) <= data_i;
+            wb_we_o <= '1';
+          when wb32_wr_adr_hi_addr_c =>
+            wb_addr(31 downto 16) <= data_i;
+            wb_we_o <= '1';
+          when wb32_data_lo_addr_c =>
+            wb_wdata(15 downto 0) <= data_i;
+          when wb32_data_hi_addr_c =>
+            wb_wdata(31 downto 16) <= data_i;
+          when wb32_ctrl_addr_c =>
+            byte_en(0) <= data_i(ctrl_byte_en0_c);
+            byte_en(1) <= data_i(ctrl_byte_en1_c);
+            byte_en(2) <= data_i(ctrl_byte_en2_c);
+            byte_en(3) <= data_i(ctrl_byte_en3_c);
+          when others =>
+            NULL;
+        end case;
+      end if;
     end if;
   end process wr_access;
 

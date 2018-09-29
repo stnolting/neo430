@@ -44,7 +44,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 09.08.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 29.09.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -138,7 +138,7 @@ architecture neo430_top_rtl of neo430_top is
   -- main CPU communication bus --
   signal cpu_bus  : cpu_bus_t;
   signal io_acc   : std_ulogic;
-  signal io_wr_en : std_ulogic_vector(01 downto 0);
+  signal io_wr_en : std_ulogic;
   signal io_rd_en : std_ulogic;
 
   -- read-back data buses --
@@ -326,8 +326,8 @@ begin
   -- IO Access? ---------------------------------------------------------------
   -- -----------------------------------------------------------------------------
   io_acc   <= '1' when (cpu_bus.addr(15 downto index_size_f(io_size_c)) = io_base_c(15 downto index_size_f(io_size_c))) else '0';
-  io_rd_en <= cpu_bus.rd_en when (io_acc = '1') else '0';
-  io_wr_en <= cpu_bus.wr_en when (io_acc = '1') else "00";
+  io_rd_en <= cpu_bus.rd_en and io_acc;
+  io_wr_en <= (cpu_bus.wr_en(0) or cpu_bus.wr_en(1)) and io_acc;
 
 
   -- Multiplier/Divider Unit --------------------------------------------------

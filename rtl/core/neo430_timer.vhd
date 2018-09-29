@@ -24,7 +24,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  tephan Nolting, Hannover, Germany                                                 23.01.2018 #
+-- #  tephan Nolting, Hannover, Germany                                                 29.09.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -39,7 +39,7 @@ entity neo430_timer is
     -- host access --
     clk_i       : in  std_ulogic; -- global clock line
     rden_i      : in  std_ulogic; -- read enable
-    wren_i      : in  std_ulogic_vector(01 downto 0); -- write enable
+    wren_i      : in  std_ulogic; -- write enable
     addr_i      : in  std_ulogic_vector(15 downto 0); -- address
     data_i      : in  std_ulogic_vector(15 downto 0); -- data in
     data_o      : out std_ulogic_vector(15 downto 0); -- data out
@@ -89,7 +89,7 @@ begin
   -- -----------------------------------------------------------------------------
   acc_en <= '1' when (addr_i(hi_abb_c downto lo_abb_c) = timer_base_c(hi_abb_c downto lo_abb_c)) else '0';
   addr   <= timer_base_c(15 downto lo_abb_c) & addr_i(lo_abb_c-1 downto 1) & '0'; -- word aligned
-  wr_en  <= acc_en and wren_i(1) and wren_i(0);
+  wr_en  <= acc_en and wren_i;
 
 
   -- Write access and timer update --------------------------------------------

@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 24.04.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 29.09.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -59,7 +59,7 @@ entity neo430_sysconfig is
   port (
     clk_i  : in  std_ulogic; -- global clock line
     rden_i : in  std_ulogic; -- read enable
-    wren_i : in  std_ulogic_vector(01 downto 0); -- write enable
+    wren_i : in  std_ulogic; -- write enable
     addr_i : in  std_ulogic_vector(15 downto 0); -- address
     data_i : in  std_ulogic_vector(15 downto 0); -- data in
     data_o : out std_ulogic_vector(15 downto 0)  -- data out

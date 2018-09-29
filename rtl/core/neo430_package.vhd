@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 09.08.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 29.09.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -30,7 +30,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0185"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0186"; -- no touchy!
 
   -- Danger Zone! ---------------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -513,7 +513,7 @@ package neo430_package is
       -- host access --
       clk_i  : in  std_ulogic; -- global clock line
       rden_i : in  std_ulogic; -- read enable
-      wren_i : in  std_ulogic_vector(01 downto 0); -- write enable
+      wren_i : in  std_ulogic; -- write enable
       addr_i : in  std_ulogic_vector(15 downto 0); -- address
       data_i : in  std_ulogic_vector(15 downto 0); -- data in
       data_o : out std_ulogic_vector(15 downto 0)  -- data out
@@ -527,7 +527,7 @@ package neo430_package is
       -- host access --
       clk_i    : in  std_ulogic; -- global clock line
       rden_i   : in  std_ulogic; -- read enable
-      wren_i   : in  std_ulogic_vector(01 downto 0); -- write enable
+      wren_i   : in  std_ulogic; -- write enable
       addr_i   : in  std_ulogic_vector(15 downto 0); -- address
       data_i   : in  std_ulogic_vector(15 downto 0); -- data in
       data_o   : out std_ulogic_vector(15 downto 0); -- data out
@@ -550,7 +550,7 @@ package neo430_package is
       -- host access --
       clk_i       : in  std_ulogic; -- global clock line
       rden_i      : in  std_ulogic; -- read enable
-      wren_i      : in  std_ulogic_vector(01 downto 0); -- write enable
+      wren_i      : in  std_ulogic; -- write enable
       addr_i      : in  std_ulogic_vector(15 downto 0); -- address
       data_i      : in  std_ulogic_vector(15 downto 0); -- data in
       data_o      : out std_ulogic_vector(15 downto 0); -- data out
@@ -576,7 +576,7 @@ package neo430_package is
       -- host access --
       clk_i  : in  std_ulogic; -- global clock line
       rden_i : in  std_ulogic; -- read enable
-      wren_i : in  std_ulogic_vector(01 downto 0); -- write enable
+      wren_i : in  std_ulogic; -- write enable
       addr_i : in  std_ulogic_vector(15 downto 0); -- address
       data_i : in  std_ulogic_vector(15 downto 0); -- data in
       data_o : out std_ulogic_vector(15 downto 0); -- data out
@@ -595,7 +595,7 @@ package neo430_package is
       -- host access --
       clk_i       : in  std_ulogic; -- global clock line
       rden_i      : in  std_ulogic; -- read enable
-      wren_i      : in  std_ulogic_vector(01 downto 0); -- write enable
+      wren_i      : in  std_ulogic; -- write enable
       addr_i      : in  std_ulogic_vector(15 downto 0); -- address
       data_i      : in  std_ulogic_vector(15 downto 0); -- data in
       data_o      : out std_ulogic_vector(15 downto 0); -- data out
@@ -615,7 +615,7 @@ package neo430_package is
       clk_i       : in  std_ulogic; -- global clock line
       rst_i       : in  std_ulogic; -- global (external) reset, low-active, use as async
       rden_i      : in  std_ulogic; -- read enable
-      wren_i      : in  std_ulogic_vector(01 downto 0); -- write enable
+      wren_i      : in  std_ulogic; -- write enable
       addr_i      : in  std_ulogic_vector(15 downto 0); -- address
       data_i      : in  std_ulogic_vector(15 downto 0); -- data in
       data_o      : out std_ulogic_vector(15 downto 0); -- data out
@@ -634,7 +634,7 @@ package neo430_package is
       -- host access --
       clk_i  : in  std_ulogic; -- global clock line
       rden_i : in  std_ulogic; -- read enable
-      wren_i : in  std_ulogic_vector(01 downto 0); -- write enable
+      wren_i : in  std_ulogic; -- write enable
       addr_i : in  std_ulogic_vector(15 downto 0); -- address
       data_i : in  std_ulogic_vector(15 downto 0); -- data in
       data_o : out std_ulogic_vector(15 downto 0)  -- data out
@@ -648,7 +648,7 @@ package neo430_package is
       -- host access --
       clk_i  : in  std_ulogic; -- global clock line
       rden_i : in  std_ulogic; -- read enable
-      wren_i : in  std_ulogic_vector(01 downto 0); -- write enable
+      wren_i : in  std_ulogic; -- write enable
       addr_i : in  std_ulogic_vector(15 downto 0); -- address
       data_i : in  std_ulogic_vector(15 downto 0); -- data in
       data_o : out std_ulogic_vector(15 downto 0)  -- data out
@@ -664,7 +664,7 @@ package neo430_package is
       -- host access --
       clk_i       : in  std_ulogic; -- global clock line
       rden_i      : in  std_ulogic; -- read enable
-      wren_i      : in  std_ulogic_vector(01 downto 0); -- write enable
+      wren_i      : in  std_ulogic; -- write enable
       addr_i      : in  std_ulogic_vector(15 downto 0); -- address
       data_i      : in  std_ulogic_vector(15 downto 0); -- data in
       data_o      : out std_ulogic_vector(15 downto 0); -- data out
@@ -683,7 +683,7 @@ package neo430_package is
       -- host access --
       clk_i  : in  std_ulogic; -- global clock line
       rden_i : in  std_ulogic; -- read enable
-      wren_i : in  std_ulogic_vector(01 downto 0); -- write enable
+      wren_i : in  std_ulogic; -- write enable
       addr_i : in  std_ulogic_vector(15 downto 0); -- address
       data_i : in  std_ulogic_vector(15 downto 0); -- data in
       data_o : out std_ulogic_vector(15 downto 0)  -- data out
@@ -719,7 +719,7 @@ package neo430_package is
     port (
       clk_i  : in  std_ulogic; -- global clock line
       rden_i : in  std_ulogic; -- read enable
-      wren_i : in  std_ulogic_vector(01 downto 0); -- write enable
+      wren_i : in  std_ulogic; -- write enable
       addr_i : in  std_ulogic_vector(15 downto 0); -- address
       data_i : in  std_ulogic_vector(15 downto 0); -- data in
       data_o : out std_ulogic_vector(15 downto 0)  -- data out
