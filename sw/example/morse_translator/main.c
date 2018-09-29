@@ -28,7 +28,7 @@
 
 // Libraries
 #include <stdint.h>
-#include "../../lib/neo430/neo430.h"
+#include <neo430.h>
 
 // Configuration
 #define MAX_STRING_LENGTH 128 // max length of plain morse text

@@ -29,7 +29,7 @@
 // Libraries
 #include <stdint.h>
 #include <string.h>
-#include "../../lib/neo430/neo430.h"
+#include <neo430.h>
 
 // Global variables
 uint8_t wb_config = 0;

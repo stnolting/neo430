@@ -22,7 +22,7 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 # ********************************************************************************************* #
-# Stephan Nolting, Hannover, Germany                                                 29.06.2018 #
+# Stephan Nolting, Hannover, Germany                                                 29.09.2018 #
 #################################################################################################
 
 
@@ -31,6 +31,8 @@
 #-------------------------------------------------------------------------------
 # Path of compiler binaries:
 MSP430GCC_BIN_PATH ?= /mnt/c/msp430-gcc-7.3.1.24_linux64/bin
+# Path to main include path
+NEO430_LIB_PATH=../lib/neo430
 
 # Compiler effort (-Os = optimize for size)
 EFFORT = -Os
@@ -98,11 +100,11 @@ $(IMAGE_GEN): $(TOOL_PATH)/image_gen/main.cpp
 #-------------------------------------------------------------------------------
 # Assemble startup code
 crt0.elf: $(COMMON_PATH)/crt0.asm
-	@$(AS) -g -mY -mcpu=msp430 $< -o $@
+	@$(AS) -g -mY -mcpu=msp430 -I $(NEO430_LIB_PATH) $< -o $@
 
 # Compile app sources
 main.elf: $(APP_SRC) crt0.elf
-	@$(CC) $(CC_OPTS) $(EFFORT) -mcpu=msp430 -hwmult=none $< -T neo430_linker_script.x -o $@ -lm
+	@$(CC) $(CC_OPTS) $(EFFORT) -I $(NEO430_LIB_PATH) -mcpu=msp430 -hwmult=none $< -T neo430_linker_script.x -o $@ -lm
 	@echo Memory utilization:
 	@$(SIZE) main.elf
 

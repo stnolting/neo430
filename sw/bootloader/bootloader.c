@@ -34,7 +34,7 @@
 
 // Libraries
 #include <stdint.h>
-#include "../lib/neo430/neo430.h"
+#include <neo430.h>
 
 // Macros
 #define xstr(a) str(a)

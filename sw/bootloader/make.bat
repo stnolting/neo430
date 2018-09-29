@@ -22,13 +22,15 @@
 @REM # You should have received a copy of the GNU Lesser General Public License along with this      #
 @REM # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 @REM # ********************************************************************************************* #
-@REM # Stephan Nolting, Hannover, Germany                                                 29.06.2018 #
+@REM # Stephan Nolting, Hannover, Germany                                                 29.09.2018 #
 @REM #################################################################################################
 
 
 @REM ----------------------USER CONFIGURATION----------------------
 @REM Path of MSPGCC binaries:
 @if "%MSP430GCC_BIN_PATH%" == "" set MSP430GCC_BIN_PATH=C:\msp430-gcc-7.3.1.24_win64\bin
+@REM Path to main include path
+@set NEO430_LIB_PATH=..\lib\neo430
 @REM --------------------------------------------------------------
 
 @REM Tools
@@ -48,10 +50,10 @@
 
 
 @REM Assemble startup code
-@%AS% -mcpu=msp430 boot_crt0.asm -mY -o crt0.elf
+@%AS% -mcpu=msp430 -I %NEO430_LIB_PATH% boot_crt0.asm -mY -o crt0.elf
 
 @REM Compile app sources
-@%CC% %CC_OPTS% bootloader.c -o main.elf
+@%CC% %CC_OPTS% -I %NEO430_LIB_PATH% bootloader.c -o main.elf
 
 @REM Print memory utilization
 @echo Memory utilization:

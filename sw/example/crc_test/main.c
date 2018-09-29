@@ -26,7 +26,7 @@
 // Libraries
 #include <stdint.h>
 #include <string.h>
-#include "../../lib/neo430/neo430.h"
+#include <neo430.h>
 
 // Configuration
 #define BAUD_RATE 19200
