@@ -12,15 +12,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="295660916667fs"></ZoomStartTime>
-      <ZoomEndTime time="296225416668fs"></ZoomEndTime>
-      <Cursor1Time time="295855917000fs"></Cursor1Time>
+      <ZoomStartTime time="26193350000000fs"></ZoomStartTime>
+      <ZoomEndTime time="26193560000001fs"></ZoomEndTime>
+      <Cursor1Time time="26193441000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="135"></NameColumnWidth>
-      <ValueColumnWidth column_width="58"></ValueColumnWidth>
+      <NameColumnWidth column_width="167"></NameColumnWidth>
+      <ValueColumnWidth column_width="105"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="111" />
+   <WVObjectSize size="105" />
    <wvobject type="divider" fp_name="divider6">
       <obj_property name="label">Global</obj_property>
       <obj_property name="DisplayName">label</obj_property>
@@ -99,7 +99,6 @@
    <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_cpu_inst/neo430_reg_file_inst/sreg" type="array">
       <obj_property name="ElementShortName">sreg[15:0]</obj_property>
       <obj_property name="ObjectShortName">sreg[15:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_cpu_inst/neo430_reg_file_inst/reg_file" type="array">
       <obj_property name="ElementShortName">reg_file[15:0][15:0]</obj_property>
@@ -180,18 +179,6 @@
    <wvobject fp_name="/neo430_tb/neo430_top_inst/imem_up_en" type="logic">
       <obj_property name="ElementShortName">imem_up_en</obj_property>
       <obj_property name="ObjectShortName">imem_up_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_imem_inst/imem_file_h" type="array">
-      <obj_property name="ElementShortName">imem_file_h[0:2047][7:0]</obj_property>
-      <obj_property name="ObjectShortName">imem_file_h[0:2047][7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_imem_inst/imem_file_l" type="array">
-      <obj_property name="ElementShortName">imem_file_l[0:2047][7:0]</obj_property>
-      <obj_property name="ObjectShortName">imem_file_l[0:2047][7:0]</obj_property>
-   </wvobject>
-   <wvobject type="divider" fp_name="divider44">
-      <obj_property name="label">Bootloader ROM</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
    </wvobject>
    <wvobject type="divider" fp_name="divider44">
       <obj_property name="label">IO: USART</obj_property>
@@ -470,17 +457,5 @@
    <wvobject type="divider" fp_name="divider22">
       <obj_property name="label">PWM</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_pwm_inst_true/neo430_pwm_inst/enable" type="logic">
-      <obj_property name="ElementShortName">enable</obj_property>
-      <obj_property name="ObjectShortName">enable</obj_property>
-   </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_pwm_inst_true/neo430_pwm_inst/pwm_o" type="array">
-      <obj_property name="ElementShortName">pwm_o[2:0]</obj_property>
-      <obj_property name="ObjectShortName">pwm_o[2:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_pwm_inst_true/neo430_pwm_inst/prsc_tick" type="logic">
-      <obj_property name="ElementShortName">prsc_tick</obj_property>
-      <obj_property name="ObjectShortName">prsc_tick</obj_property>
    </wvobject>
 </wave_config>

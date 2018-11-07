@@ -44,7 +44,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 29.09.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 01.11.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -163,7 +163,7 @@ architecture neo430_top_rtl of neo430_top is
   signal timer_irq : std_ulogic;
   signal usart_irq : std_ulogic;
   signal gpio_irq  : std_ulogic;
-  signal xirq_sync : std_ulogic_vector(01 downto 0);
+  signal xirq_sync : std_ulogic;
 
   -- misc --
   signal imem_up_en : std_ulogic;
@@ -258,15 +258,15 @@ begin
   external_irq_sync: process(clk_i)
   begin
     if rising_edge(clk_i) then
-      xirq_sync <= xirq_sync(0) & irq_i;
+      xirq_sync <= irq_i;
     end if;
   end process external_irq_sync;
 
   -- interrupt priority assignment --
-  irq(0) <= timer_irq;    -- timer match (highest priority)
-  irq(1) <= usart_irq;    -- UART Rx available [OR] UART Tx done [OR] SPI RTX done
-  irq(2) <= gpio_irq;     -- GPIO input pin change
-  irq(3) <= xirq_sync(1); -- external interrupt request (lowest priority)
+  irq(0) <= timer_irq; -- timer match (highest priority)
+  irq(1) <= usart_irq; -- UART Rx available [OR] UART Tx done [OR] SPI RTX done
+  irq(2) <= gpio_irq;  -- GPIO input pin change
+  irq(3) <= xirq_sync; -- external interrupt request (lowest priority)
 
   -- external interrupt acknowledge --
   irq_ack_o <= irq_ack(3); -- the internal irq sources do not require an acknowledge

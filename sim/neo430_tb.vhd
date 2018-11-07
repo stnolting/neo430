@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hanover, Germany                                                  09.08.2018 #
+-- # Stephan Nolting, Hanover, Germany                                                  01.11.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -60,6 +60,7 @@ architecture neo430_tb_rtl of neo430_tb is
 
   -- generators --
   signal clk_gen, rst_gen : std_ulogic := '0';
+  signal irq, irq_ack     : std_ulogic;
 
   -- local signals --
   signal uart_txd : std_ulogic;
@@ -132,12 +133,27 @@ begin
     wb_cyc_o   => open,               -- valid cycle
     wb_ack_i   => '0',                -- transfer acknowledge
     -- external interrupt --
-    irq_i      => '0',                -- external interrupt request line
-    irq_ack_o  => open                -- external interrupt request acknowledge
+    irq_i      => irq,                -- external interrupt request line
+    irq_ack_o  => irq_ack             -- external interrupt request acknowledge
   );
 
 
-  -- Dummy UART Receiver ------------------------------------------------------
+  -- Interrupt Generator ------------------------------------------------------
+  -- -----------------------------------------------------------------------------
+  interrupt_gen: process
+  begin
+    irq <= '0';
+    wait for 20 ms;
+    wait until rising_edge(clk_gen);
+    irq <= '1';
+    wait for t_clock_c;
+    wait until rising_edge(irq_ack);
+    irq <= '0';
+    wait;
+  end process interrupt_gen;
+
+
+  -- Console UART Receiver ----------------------------------------------------
   -- -----------------------------------------------------------------------------
   uart_rx_unit: process(clk_gen)
     variable i, j     : integer;

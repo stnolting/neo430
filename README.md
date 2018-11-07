@@ -139,6 +139,13 @@ If you have any questions, bug reports, ideas or if you are facing problems with
   stnolting@gmail.com
 
 
+## Citation
+
+If you are using the NEO430 for some publication, please cite it as follows:
+
+> S. Nolting, "The NEO430 Processor", github.com/stnolting/neo430
+
+
 ## Proprietary Notice
 
 "MSP430" is a trademark of Texas Instruments Corporation.
