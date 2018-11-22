@@ -30,7 +30,7 @@
 # USER CONFIGURATION
 #-------------------------------------------------------------------------------
 # Path of compiler binaries:
-MSP430GCC_BIN_PATH ?= /mnt/c/msp430-gcc-7.3.1.24_linux64/bin
+MSP430GCC_BIN_PATH ?= /mnt/c/msp430-gcc-7.3.2.154_linux64/bin
 # Path to main include path
 NEO430_LIB_PATH=../lib/neo430
 

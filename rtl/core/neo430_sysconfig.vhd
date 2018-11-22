@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 29.09.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -47,11 +47,12 @@ entity neo430_sysconfig is
     WDT_USE     : boolean := true; -- implement WDT?
     GPIO_USE    : boolean := true; -- implement GPIO unit?
     TIMER_USE   : boolean := true; -- implement timer?
-    USART_USE   : boolean := true; -- implement USART?
+    UART_USE    : boolean := true; -- implement UART?
     CRC_USE     : boolean := true; -- implement CRC unit?
     CFU_USE     : boolean := true; -- implement CF unit?
     PWM_USE     : boolean := true; -- implement PWM controller?
-    TRNG_USE    : boolean := true; -- implement TRNG?
+    TWI_USE     : boolean := true; -- implement TWI?
+    SPI_USE     : boolean := true; -- implement SPI?
     -- boot configuration --
     BOOTLD_USE  : boolean := true; -- implement and use bootloader?
     IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory?
@@ -107,15 +108,16 @@ begin
   sysinfo_mem(1)(02) <= bool_to_ulogic_f(WDT_USE);     -- WDT present?
   sysinfo_mem(1)(03) <= bool_to_ulogic_f(GPIO_USE);    -- GPIO present?
   sysinfo_mem(1)(04) <= bool_to_ulogic_f(TIMER_USE);   -- TIMER present?
-  sysinfo_mem(1)(05) <= bool_to_ulogic_f(USART_USE);   -- USART present?
+  sysinfo_mem(1)(05) <= bool_to_ulogic_f(UART_USE);    -- UART present?
   sysinfo_mem(1)(06) <= bool_to_ulogic_f(DADD_USE);    -- DADD instruction present?
   sysinfo_mem(1)(07) <= bool_to_ulogic_f(BOOTLD_USE);  -- bootloader present?
   sysinfo_mem(1)(08) <= bool_to_ulogic_f(IMEM_AS_ROM); -- IMEM implemented as true ROM?
   sysinfo_mem(1)(09) <= bool_to_ulogic_f(CRC_USE);     -- CRC present?
   sysinfo_mem(1)(10) <= bool_to_ulogic_f(CFU_USE);     -- CFU present?
   sysinfo_mem(1)(11) <= bool_to_ulogic_f(PWM_USE);     -- PWM present?
-  sysinfo_mem(1)(12) <= bool_to_ulogic_f(TRNG_USE);    -- TRNG present?
-  sysinfo_mem(1)(15 downto 13) <= (others => '0');   -- reserved
+  sysinfo_mem(1)(12) <= bool_to_ulogic_f(TWI_USE);     -- TWI present?
+  sysinfo_mem(1)(13) <= bool_to_ulogic_f(SPI_USE);     -- SPI present?
+  sysinfo_mem(1)(15 downto 14) <= (others => '0');     -- reserved
 
   -- CPUID2: User code --
   sysinfo_mem(2) <= USER_CODE;

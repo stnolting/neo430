@@ -10,7 +10,7 @@ This processor is based on the Texas Instruments MSP430(TM) ISA and provides 100
 compatibility with the original instruction set. The NEO430 is not an MSP430
 clone – it is more a complete new implementation from the bottom up. The
 processor features a very small outline, already implementing standard
-features like a timer, a watchdog, UART and SPI serial interfaces, general
+features like a timer, a watchdog, UART, TWI and SPI serial interfaces, general
 purpose IO ports, an internal bootloader and of course internal memory for
 program code and data. All of the peripheral modules are optional – so if you
 do not need them, you can exclude them from implementation to reduce the size
@@ -19,21 +19,22 @@ can be connected via a Wishbone-compatible bus interface. By this, you can
 built a system, that perfectly fits your needs.
 
 It is up to you to use the NEO430 as stand-alone, configurable and extensible
-microcontroller, or to include  it as controller within a more complex SoC
+microcontroller, or to include it as controller within a more complex SoC
 design.
 
 The high-level software development is based on the free TI msp430-gcc
-compiler tool chain. You can either use Windows or Linux/Cygwin as build
+compiler tool chain. You can either use Windows or Linux as build
 environment for your applications – the project comes with build scripts
-for both worlds. The example folder of this project features several demo
-programs, from which you can start creating your own NEO430 applications.
+for both worlds. The sw\example folder of this project features several demo
+programs from which you can start creating your own NEO430 applications.
 
 This project is intended to work "out of the box". Just synthesize the test
-setup from this project, upload it to your FPGA board of choice and start
-exploring the capabilities of the NEO430 processor. Application program
-generation (and even installation) works by executing a single "make" command.
-Jump to the "Let’s Get It Started" chapter, which provides a lot of guides and
-tutorials to make your first NEO430 setup run:
+setup from this project, upload it to your FPGA board of choice (the NEO430 uses
+a vendor-independent VHDL description) and start exploring the capabilities of
+the NEO430 processor. Application program generation (and installation) works
+by executing a single "make" command. Jump to the "Let’s Get It Started"
+chapter, which provides a lot of guides and tutorials to make your first
+NEO430 setup run:
 https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 
@@ -56,14 +57,15 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Customizable processor hardware configuration
 - Optional multiplier/divider unit (MULDIV)
 - Optional high-precision timer (TIMER)
-- Optional USART interface; UART and SPI in parallel (USART)
+- Optional universal asynchronous receiver and transmitter (UART)
+- Optional serial peripheral unit (SPI)
+- Optional two wire serial interface (TWI)
 - Optional general purpose parallel IO port (GPIO), 16 inputs, 16 outputs, with pin-change interrupt
-- Optional 32-bit Wishbone bus interface adapter (WB32) - including bridges to Avalon(TM) bus and AXI-Lite(TM)
+- Optional 32-bit Wishbone bus interface adapter (WB32) - including bridges to Avalon(TM) bus and AXI4-Lite(TM)
 - Optional watchdog timer (WDT)
 - Optional cyclic redundancy check unit (CRC16/32)
 - Optional custom functions unit (CFU) for user-defined processor extensions
 - Optional 3 channel 8-bit PWM controller (PWM)
-- Optional true random number generator (TRNG)
 - Optional internal bootloader (2kB ROM) with serial user console and automatic boot from external SPI EEPROM
 
 
@@ -84,23 +86,18 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 ## Implementation Results
 
-Mapping results generated for HW version 0x0180. The full (default) configuration includes
-all optional processor modules (excluding the CFU and the TRNG).
+Mapping results generated for HW version 0x0200. The full (default) configuration includes
+all optional processor modules (excluding the CFU), an IMEM size of 4kB and a DMEM size of 2kB.
 
-| __Xilinx Artix-7 (XC7A35TICSG324-1L)__  | LUTs | FFs | BRAMs | DSPs | f*      |
-|:----------------------------------------|:----:|:---:|:-----:|:----:|:-------:|
-| Full (default) configuration:           | 925  | 856 | 2.5   | 0    | 100 MHz |
-| Minimal configuration (CPU + GPIO):     | 726  | 291 | 1     | 0    | 100 MHz |
+| __Xilinx Artix-7 (XC7A35TICSG324-1L)__  | LUTs     | FFs      | BRAMs    | DSPs   | f_max*  |
+|:----------------------------------------|:--------:|:--------:|:--------:|:------:|:-------:|
+| Full (default) configuration:           | 993 (5%) | 922 (2%) | 2.5 (5%) | 0 (0%) | 200 MHz |
+| Minimal configuration (CPU + GPIO):     | 754 (4%) | 287 (1%) |   1 (2%) | 0 (0%) | 200 MHz |
 
-| __Xilinx Virtex-6 (XC6VLX240T-1FFG1156)__  | LUTs | FFs | BRAMs | DSPs | f_max   |
-|:-------------------------------------------|:----:|:---:|:-----:|:----:|:-------:|
-| Full (default) configuration:              | 1074 | 825 | 5     | 0    | 156 MHz |
-| Minimal configuration (CPU + GPIO):        |  402 | 241 | 4     | 0    | 204 MHz |
-
-| __Intel/Altera Cyclone IV (EP4CE22F17C6)__  | LUTs | FFs | Memory bits | DSPs | f_max   |
-|:--------------------------------------------|:----:|:---:|:-----------:|:----:|:-------:|
-| Full (default) configuration:               | 1527 | 863 | 65792       | 0    | 115 MHz |
-| Minimal configuration (CPU + GPIO):         |  626 | 232 | 49408       | 0    | 117 MHz |
+| __Intel/Altera Cyclone IV (EP4CE22F17C6)__  | LUTs      | FFs      | Memory bits  | DSPs   | f_max   |
+|:--------------------------------------------|:---------:|:--------:|:------------:|:------:|:-------:|
+| Full (default) configuration:               | 1637 (7%) | 910 (4%) | 65792  (11%) | 0 (0%) | 115 MHz |
+| Minimal configuration (CPU + GPIO):         |  598 (3%) | 228 (1%) | 49408   (8%) | 0 (0%) | 122 MHz |
 
 *) Constrained
 
@@ -141,7 +138,7 @@ If you have any questions, bug reports, ideas or if you are facing problems with
 
 ## Citation
 
-If you are using the NEO430 for some publication, please cite it as follows:
+If you are using the NEO430 for some kind of publication, please cite it as follows:
 
 > S. Nolting, "The NEO430 Processor", github.com/stnolting/neo430
 
@@ -150,9 +147,11 @@ If you are using the NEO430 for some publication, please cite it as follows:
 
 "MSP430" is a trademark of Texas Instruments Corporation.
 
+"Windows" is a trademark of Microsoft Corporation.
+
 "Virtex", "Artix", "ISE" and "Vivado" are trademarks of Xilinx Inc.
 
-"Cyclone", "Quartus" and "Avalon bus" are trademarks of Intel Corporation.
+"Cyclone", "Quartus" and "Avalon Bus" are trademarks of Intel Corporation.
 
 "AXI", "AXI4" and "AXI4-Lite" are trademarks of Arm Holdings plc.
 

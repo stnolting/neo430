@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 01.11.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -30,7 +30,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0187"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0200"; -- no touchy!
 
   -- Danger Zone! ---------------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -100,14 +100,19 @@ package neo430_package is
   constant wb32_data_hi_addr_c   : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"000C");
 --constant wb32_???_addr_c       : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(wb32_base_c) + x"000E");
 
-  -- IO: Universal synchronous/asynchronous receiver and transmitter (USART) --
-  constant usart_base_c : std_ulogic_vector(15 downto 0) := x"FFA0";
-  constant usart_size_c : natural := 8; -- bytes
+  -- IO: Universal asynchronous receiver and transmitter (UART) --
+  constant uart_base_c : std_ulogic_vector(15 downto 0) := x"FFA0";
+  constant uart_size_c : natural := 4; -- bytes
 
-  constant usart_ctrl_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(usart_base_c) + x"0000");
-  constant usart_spi_rtx_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(usart_base_c) + x"0002");
-  constant usart_uart_rtx_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(usart_base_c) + x"0004");
-  constant usart_baud_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(usart_base_c) + x"0006");
+  constant uart_ctrl_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(uart_base_c) + x"0000");
+  constant uart_rtx_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(uart_base_c) + x"0002");
+
+  -- IO: Serial Peripheral Interface (SPI) --
+  constant spi_base_c : std_ulogic_vector(15 downto 0) := x"FFA4";
+  constant spi_size_c : natural := 4; -- bytes
+
+  constant spi_ctrl_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(spi_base_c) + x"0000");
+  constant spi_rtx_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(spi_base_c) + x"0002");
 
   -- IO: General purpose input/output port (GPIO)  --
   constant gpio_base_c : std_ulogic_vector(15 downto 0) := x"FFA8";
@@ -168,19 +173,19 @@ package neo430_package is
   constant pwm_ch1_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(pwm_base_c) + x"0004");
   constant pwm_ch2_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(pwm_base_c) + x"0006");
 
-  -- IO: True Random Number Generator --
-  constant trng_base_c : std_ulogic_vector(15 downto 0) := x"FFE8";
-  constant trng_size_c : natural := 2; -- bytes
+  -- IO: Two Wire Serial Interface --
+  constant twi_base_c : std_ulogic_vector(15 downto 0) := x"FFE8";
+  constant twi_size_c : natural := 4; -- bytes
 
-  constant trng_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(trng_base_c) + x"0000");
+  constant twi_ctrl_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(twi_base_c) + x"0000");
+  constant twi_rtx_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(twi_base_c) + x"0002");
 
   -- IO: RESERVED --
---constant ???_base_c : std_ulogic_vector(15 downto 0) := x"FFFA";
---constant ???_size_c : natural := 6; -- bytes
+--constant ???_base_c : std_ulogic_vector(15 downto 0) := x"FFFC";
+--constant ???_size_c : natural := 2; -- bytes
 
 --constant ???_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0000");
 --constant ???_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0002");
---constant ???_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0004");
 
   -- IO: System Configuration --
   constant sysconfig_base_c : std_ulogic_vector(15 downto 0) := x"FFF0";
@@ -309,11 +314,12 @@ package neo430_package is
       WDT_USE     : boolean := true; -- implement WDT? (default=true)
       GPIO_USE    : boolean := true; -- implement GPIO unit? (default=true)
       TIMER_USE   : boolean := true; -- implement timer? (default=true)
-      USART_USE   : boolean := true; -- implement USART? (default=true)
+      UART_USE    : boolean := true; -- implement UART? (default=true)
       CRC_USE     : boolean := true; -- implement CRC unit? (default=true)
       CFU_USE     : boolean := false; -- implement custom functions unit? (default=false)
       PWM_USE     : boolean := true; -- implement PWM controller? (default = true)
-      TRNG_USE    : boolean := false; -- implement true random number generator? (default=false)
+      TWI_USE     : boolean := true; -- implement two wire serial interface? (default=true)
+      SPI_USE     : boolean := true; -- implement SPI? (default=true)
       -- boot configuration --
       BOOTLD_USE  : boolean := true; -- implement and use bootloader? (default=true)
       IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory? (default=false)
@@ -333,7 +339,9 @@ package neo430_package is
       spi_sclk_o : out std_ulogic; -- serial clock line
       spi_mosi_o : out std_ulogic; -- serial data line out
       spi_miso_i : in  std_ulogic; -- serial data line in
-      spi_cs_o   : out std_ulogic_vector(05 downto 0); -- SPI CS 0..5
+      spi_cs_o   : out std_ulogic_vector(07 downto 0); -- SPI CS 0..7
+      twi_sda_io : inout std_logic; -- twi serial data line
+      twi_scl_io : inout std_logic; -- twi serial clock line
       -- 32-bit wishbone interface --
       wb_adr_o   : out std_ulogic_vector(31 downto 0); -- address
       wb_dat_i   : in  std_ulogic_vector(31 downto 0); -- read data
@@ -543,9 +551,9 @@ package neo430_package is
     );
   end component;
 
-  -- Component: USART -----------------------------------------------------------------------
+  -- Component: UART ------------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  component neo430_usart
+  component neo430_uart
     port (
       -- host access --
       clk_i       : in  std_ulogic; -- global clock line
@@ -560,12 +568,32 @@ package neo430_package is
       -- com lines --
       uart_txd_o  : out std_ulogic;
       uart_rxd_i  : in  std_ulogic;
+      -- interrupts --
+      uart_irq_o  : out std_ulogic  -- uart rx/tx interrupt
+    );
+  end component;
+
+  -- Component: SPI -------------------------------------------------------------------------
+  -- -------------------------------------------------------------------------------------------
+  component neo430_spi
+    port (
+      -- host access --
+      clk_i       : in  std_ulogic; -- global clock line
+      rden_i      : in  std_ulogic; -- read enable
+      wren_i      : in  std_ulogic; -- write enable
+      addr_i      : in  std_ulogic_vector(15 downto 0); -- address
+      data_i      : in  std_ulogic_vector(15 downto 0); -- data in
+      data_o      : out std_ulogic_vector(15 downto 0); -- data out
+      -- clock generator --
+      clkgen_en_o : out std_ulogic; -- enable clock generator
+      clkgen_i    : in  std_ulogic_vector(07 downto 0);
+      -- com lines --
       spi_sclk_o  : out std_ulogic; -- SPI serial clock
       spi_mosi_o  : out std_ulogic; -- SPI master out, slave in
       spi_miso_i  : in  std_ulogic; -- SPI master in, slave out
-      spi_cs_o    : out std_ulogic_vector(05 downto 0); -- SPI CS 0..5
-      -- interrupts --
-      usart_irq_o : out std_ulogic  -- spi transmission done / uart rx/tx interrupt
+      spi_cs_o    : out std_ulogic_vector(07 downto 0); -- SPI CS 0..7
+      -- interrupt --
+      spi_irq_o   : out std_ulogic -- transmission done interrupt
     );
   end component;
 
@@ -676,17 +704,25 @@ package neo430_package is
     );
   end component;
 
-  -- Component: True Random Number Generator ------------------------------------------------
+  -- Component: Serial Two Wire Interfcae ---------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  component neo430_trng
+  component neo430_twi
     port (
       -- host access --
-      clk_i  : in  std_ulogic; -- global clock line
-      rden_i : in  std_ulogic; -- read enable
-      wren_i : in  std_ulogic; -- write enable
-      addr_i : in  std_ulogic_vector(15 downto 0); -- address
-      data_i : in  std_ulogic_vector(15 downto 0); -- data in
-      data_o : out std_ulogic_vector(15 downto 0)  -- data out
+      clk_i       : in  std_ulogic; -- global clock line
+      rden_i      : in  std_ulogic; -- read enable
+      wren_i      : in  std_ulogic; -- write enable
+      addr_i      : in  std_ulogic_vector(15 downto 0); -- address
+      data_i      : in  std_ulogic_vector(15 downto 0); -- data in
+      data_o      : out std_ulogic_vector(15 downto 0); -- data out
+      -- clock generator --
+      clkgen_en_o : out std_ulogic; -- enable clock generator
+      clkgen_i    : in  std_ulogic_vector(07 downto 0);
+      -- com lines --
+      twi_sda_io  : inout std_logic; -- serial data line
+      twi_scl_io  : inout std_logic; -- serial clock line
+      -- interrupt --
+      twi_irq_o   : out std_ulogic -- transfer done IRQ
     );
   end component;
 
@@ -707,11 +743,12 @@ package neo430_package is
       WDT_USE     : boolean := true; -- implement WDT?
       GPIO_USE    : boolean := true; -- implement GPIO unit?
       TIMER_USE   : boolean := true; -- implement timer?
-      USART_USE   : boolean := true; -- implement USART?
+      UART_USE    : boolean := true; -- implement UART?
       CRC_USE     : boolean := true; -- implement CRC unit?
       CFU_USE     : boolean := true; -- implement CF unit?
       PWM_USE     : boolean := true; -- implement PWM controller?
-      TRNG_USE    : boolean := true; -- implement TRNG?
+      TWI_USE     : boolean := true; -- implement TWI?
+      SPI_USE     : boolean := true; -- implement SPI?
       -- boot configuration --
       BOOTLD_USE  : boolean := true; -- implement and use bootloader?
       IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory?

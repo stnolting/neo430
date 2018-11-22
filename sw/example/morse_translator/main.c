@@ -22,7 +22,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                04.07.2018 #
+// # Stephan Nolting, Hannover, Germany                                                17.11.2018 #
 // #################################################################################################
 
 
@@ -104,8 +104,7 @@ int main(void) {
   char buffer[MAX_STRING_LENGTH];
 
   // setup UART
-  neo430_uart_set_baud(BAUD_RATE);
-  USI_CT = (1<<USI_CT_EN);
+  neo430_uart_setup(BAUD_RATE);
 
   // configure time base
   uint32_t clock = CLOCKSPEED_32bit;

@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 23.08.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -44,11 +44,12 @@ entity neo430_top_axi4lite is
     WDT_USE     : boolean := true; -- implement WDT? (default=true)
     GPIO_USE    : boolean := true; -- implement GPIO unit? (default=true)
     TIMER_USE   : boolean := true; -- implement timer? (default=true)
-    USART_USE   : boolean := true; -- implement USART? (default=true)
+    UART_USE    : boolean := true; -- implement UART? (default=true)
     CRC_USE     : boolean := true; -- implement CRC unit? (default=true)
     CFU_USE     : boolean := false; -- implement custom functions unit? (default=false)
     PWM_USE     : boolean := true; -- implement PWM controller?
-    TRNG_USE    : boolean := false; -- implement true random number generator? (default=false)
+    TWI_USE     : boolean := true; -- implement two wire serial interface? (default=true)
+    SPI_USE     : boolean := true; -- implement SPI? (default=true)
     -- boot configuration --
     BOOTLD_USE  : boolean := true; -- implement and use bootloader? (default=true)
     IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory? (default=false)
@@ -66,7 +67,9 @@ entity neo430_top_axi4lite is
     spi_sclk_o    : out std_logic; -- serial clock line
     spi_mosi_o    : out std_logic; -- serial data line out
     spi_miso_i    : in  std_logic; -- serial data line in
-    spi_cs_o      : out std_logic_vector(5 downto 0); -- SPI CS 0..5
+    spi_cs_o      : out std_logic_vector(07 downto 0); -- SPI CS 0..7
+    twi_sda_io    : inout std_logic; -- twi serial data line
+    twi_scl_io    : inout std_logic; -- twi serial clock line
     -- interrupts --
     irq_i         : in  std_logic; -- external interrupt request line
     irq_ack_o     : out std_logic; -- external interrupt request acknowledge
@@ -125,7 +128,7 @@ architecture neo430_top_axi4lite_rtl of neo430_top_axi4lite is
   signal spi_sclk_o_int : std_ulogic;
   signal spi_mosi_o_int : std_ulogic;
   signal spi_miso_i_int : std_ulogic;
-  signal spi_cs_o_int   : std_ulogic_vector(05 downto 0);
+  signal spi_cs_o_int   : std_ulogic_vector(07 downto 0);
   signal irq_i_int      : std_ulogic;
   signal irq_ack_o_int  : std_ulogic;
   constant usrcode_c    : std_ulogic_vector(15 downto 0) := std_ulogic_vector(USER_CODE);
@@ -157,11 +160,12 @@ begin
     WDT_USE     => WDT_USE,           -- implement WDT? (default=true)
     GPIO_USE    => GPIO_USE,          -- implement GPIO unit? (default=true)
     TIMER_USE   => TIMER_USE,         -- implement timer? (default=true)
-    USART_USE   => USART_USE,         -- implement USART? (default=true)
+    UART_USE    => UART_USE,          -- implement UART? (default=true)
     CRC_USE     => CRC_USE,           -- implement CRC unit? (default=true)
     CFU_USE     => CFU_USE,           -- implement CF unit? (default=false)
     PWM_USE     => PWM_USE,           -- implement PWM controller? (default=true)
-    TRNG_USE    => TRNG_USE,          -- implement true random number generator? (default=false)
+    TWI_USE     => TWI_USE,           -- implement two wire serial interface? (default=true)
+    SPI_USE     => SPI_USE,           -- implement SPI? (default=true)
     -- boot configuration --
     BOOTLD_USE  => BOOTLD_USE,        -- implement and use bootloader? (default=true)
     IMEM_AS_ROM => IMEM_AS_ROM        -- implement IMEM as read-only memory? (default=false)
@@ -181,7 +185,9 @@ begin
     spi_sclk_o  => spi_sclk_o_int,    -- serial clock line
     spi_mosi_o  => spi_mosi_o_int,    -- serial data line out
     spi_miso_i  => spi_miso_i_int,    -- serial data line in
-    spi_cs_o    => spi_cs_o_int,      -- SPI CS 0..5
+    spi_cs_o    => spi_cs_o_int,      -- SPI CS 0..7
+    twi_sda_io  => twi_sda_io,        -- twi serial data line
+    twi_scl_io  => twi_scl_io,        -- twi serial clock line
     -- 32-bit wishbone interface --
     wb_adr_o    => wb_core.adr,       -- address
     wb_dat_i    => wb_core.di,        -- read data

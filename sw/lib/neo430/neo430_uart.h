@@ -1,5 +1,5 @@
 // #################################################################################################
-// #  < neo430_usart.h - Internal USART/USI UART & SPI control / AUX functions >                   #
+// #  < neo430_usart.h - Internal UARt driver functions >                                          #
 // # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 // # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -19,93 +19,34 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 08.08.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
 // #################################################################################################
 
-#ifndef neo430_usart_h
-#define neo430_usart_h
+#ifndef neo430_uart_h
+#define neo430_uart_h
 
 // Libs required by functions
 #include <stdarg.h>
 
-// prototypes (SPI)
-void neo430_spi_cs_en(uint8_t cs);
-void neo430_spi_cs_dis(uint8_t cs);
-void neo430_spi_cs_dis_all(void);
-uint8_t neo430_spi_trans(uint8_t d);
-
-// prototypes (UART)
-void neo430_uart_set_baud(uint32_t baudrate);
-void neo430_uart_putc(char c);
-char neo430_uart_getc(void);
-uint16_t neo430_uart_char_received(void);
-char neo430_uart_char_read(void);
-void neo430_uart_print(char *s);
-void neo430_uart_br_print(char *s);
-uint16_t neo430_uart_scan(char *buffer, uint16_t max_size, uint16_t echo);
-void neo430_uart_print_hex_char(char c);
-void neo430_uart_print_hex_byte(uint8_t b);
-void neo430_uart_print_hex_word(uint16_t w);
-void neo430_uart_print_hex_dword(uint32_t dw);
-void neo430_uart_print_bin_byte(uint8_t b);
-void neo430_uart_print_bin_word(uint16_t w);
-void neo430_uart_print_bin_dword(uint32_t dw);
-void _neo430_itoa(uint32_t x);
-void _neo430_printf(char *format, ...);
-uint32_t neo430_hexstr_to_uint(char *buffer, uint8_t length);
-
-
-/* ------------------------------------------------------------
- * INFO Enable SPI CSx (set low)
- * PARAM CS line (0..5)
- * ------------------------------------------------------------ */
-void neo430_spi_cs_en(uint8_t cs) {
-
-  USI_CT |= 1 << (USI_CT_SPICS0 + cs);
-}
-
-
-/* ------------------------------------------------------------
- * INFO Disable SPI CSx (set high)
- * PARAM CS line (0..5)
- * ------------------------------------------------------------ */
-void neo430_spi_cs_dis(uint8_t cs) {
-
-  USI_CT &= ~(1 << (USI_CT_SPICS0 + cs));
-}
-
-
-/* ------------------------------------------------------------
- * INFO Disable all SPI CS lines
- * ------------------------------------------------------------ */
-void neo430_spi_cs_dis_all(void) {
-
-  USI_CT &= 0x03FF;
-}
-
-
-/* ------------------------------------------------------------
- * INFO SPI RTX byte transfer
- * INFO SPI SCK speed: f_main/(2*PRSC), PRSC = see below (control reg)
- * SPI clock prescaler select:
- *  0: CLK/2
- *  1: CLK/4
- *  2: CLK/8
- *  3: CLK/64
- *  4: CLK/128
- *  5: CLK/1024
- *  6: CLK/2048
- *  7: CLK/4096
- * PARAM d byte to be send
- * RETURN received byte
- * ------------------------------------------------------------ */
-uint8_t neo430_spi_trans(uint8_t d) {
-
-  USI_SPIRTX = (uint16_t)d; // trigger transfer
-  while((USI_CT & (1<<USI_CT_SPIBSY)) != 0); // wait for current transfer to finish
-
-  return (uint8_t)USI_SPIRTX;
-}
+// prototypes
+void neo430_uart_set_baud(uint32_t baudrate);                              // activate and configure UART
+void neo430_uart_putc(char c);                                             // send single char
+char neo430_uart_getc(void);                                               // wait and read single char
+uint16_t neo430_uart_char_received(void);                                  // test if a char has been received
+char neo430_uart_char_read(void);                                          // get a received char
+void neo430_uart_print(char *s);                                           // print a text string
+void neo430_uart_br_print(char *s);                                        // print a text string and allow easy line breaks
+uint16_t neo430_uart_scan(char *buffer, uint16_t max_size, uint16_t echo); // read several chars into buffer
+void neo430_uart_print_hex_char(char c);                                   // print byte as a hex char
+void neo430_uart_print_hex_byte(uint8_t b);                                // print byte as 2 hex numbers
+void neo430_uart_print_hex_word(uint16_t w);                               // print word as 4 hex numbers
+void neo430_uart_print_hex_dword(uint32_t dw);                             // print double word as 8 hex numbers
+void neo430_uart_print_bin_byte(uint8_t b);                                // print byte in binary form
+void neo430_uart_print_bin_word(uint16_t w);                               // print word in binary form
+void neo430_uart_print_bin_dword(uint32_t dw);                             // print double word in binary form
+void _neo430_itoa(uint32_t x);                                             // convert double word to decimal number
+void _neo430_printf(char *format, ...);                                    // print format string
+uint32_t neo430_hexstr_to_uint(char *buffer, uint8_t length);              // convert hex string to number
 
 
 /* ------------------------------------------------------------
@@ -122,7 +63,7 @@ uint8_t neo430_spi_trans(uint8_t d) {
  *  7: CLK/4096
  * PARAM actual baudrate to be used
  * ------------------------------------------------------------ */
-void neo430_uart_set_baud(uint32_t baudrate){
+void neo430_uart_setup(uint32_t baudrate){
 
   // raw baud rate prescaler
   uint32_t clock = CLOCKSPEED_32bit;
@@ -142,7 +83,8 @@ void neo430_uart_set_baud(uint32_t baudrate){
     p++;
   }
 
-  USI_BAUD = ((uint16_t)p << 8) | i;
+  UART_CT = 0;
+  UART_CT = (1<<UART_CT_EN) | ((uint16_t)p << UART_CT_PRSC0) | (i << UART_CT_BAUD0);
 }
 
 
@@ -153,8 +95,8 @@ void neo430_uart_set_baud(uint32_t baudrate){
 void neo430_uart_putc(char c){
 
   // wait for previous transfer to finish
-  while ((USI_CT & (1<<USI_CT_UARTTXBSY)) != 0);
-  USI_UARTRTX = (uint16_t)c;
+  while ((UART_CT & (1<<UART_CT_TX_BUSY)) != 0);
+  UART_RTX = (uint16_t)c;
 }
 
 
@@ -167,8 +109,8 @@ char neo430_uart_getc(void){
 
   uint16_t d = 0;
   while (1) {
-    d = USI_UARTRTX;
-    if ((d & (1<<USI_UARTRTX_UARTRXAVAIL)) != 0) // char received?
+    d = UART_RTX;
+    if ((d & (1<<UART_RTX_AVAIL)) != 0) // char received?
       return (char)d;
   }
 }
@@ -180,7 +122,7 @@ char neo430_uart_getc(void){
  * ------------------------------------------------------------ */
 uint16_t neo430_uart_char_received(void){
 
-  return USI_UARTRTX & (1<<USI_UARTRTX_UARTRXAVAIL);
+  return UART_RTX & (1<<UART_RTX_AVAIL);
 }
 
 
@@ -192,7 +134,7 @@ uint16_t neo430_uart_char_received(void){
  * ------------------------------------------------------------ */
 char neo430_uart_char_read(void){
 
-  return (char)USI_UARTRTX;
+  return (char)UART_RTX;
 }
 
 
@@ -489,4 +431,4 @@ uint32_t neo430_hexstr_to_uint(char *buffer, uint8_t length) {
 }
 
 
-#endif // neo430_usart_h
+#endif // neo430_uart_h

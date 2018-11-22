@@ -23,7 +23,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 09.08.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
 -- #################################################################################################
 
 library ieee;
@@ -51,6 +51,8 @@ architecture neo430_test_rtl of neo430_test is
   -- local signals --
   signal gpio_out : std_ulogic_vector(15 downto 0);
   signal rst_int  : std_ulogic;
+  signal twi_sda  : std_logic;
+  signal twi_scl  : std_logic;
 
 begin
 
@@ -71,11 +73,12 @@ begin
     WDT_USE     => true,              -- implement WDT? (default=true)
     GPIO_USE    => true,              -- implement GPIO unit? (default=true)
     TIMER_USE   => true,              -- implement timer? (default=true)
-    USART_USE   => true,              -- implement USART? (default=true)
+    UART_USE    => true,              -- implement UART? (default=true)
     CRC_USE     => true,              -- implement CRC unit? (default=true)
     CFU_USE     => false,             -- implement custom functions unit? (default=false)
     PWM_USE     => true,              -- implement PWM controller? (default=true)
-    TRNG_USE    => false,             -- implement true random number generator? (default=false)
+    TWI_USE     => true,              -- implement two wire serial interface? (default=true)
+    SPI_USE     => true,              -- implement SPI? (default=true)
     -- boot configuration --
     BOOTLD_USE  => true,              -- implement and use bootloader? (default=true)
     IMEM_AS_ROM => false              -- implement IMEM as read-only memory? (default=false)
@@ -95,7 +98,9 @@ begin
     spi_sclk_o => open,               -- serial clock line
     spi_mosi_o => open,               -- serial data line out
     spi_miso_i => '0',                -- serial data line in
-    spi_cs_o   => open,               -- SPI CS 0..5
+    spi_cs_o   => open,               -- SPI CS 0..7
+    twi_sda_io => twi_sda,            -- twi serial data line
+    twi_scl_io => twi_scl,            -- twi serial clock line
     -- 32-bit wishbone interface --
     wb_adr_o   => open,               -- address
     wb_dat_i   => x"00000000",        -- read data
@@ -115,6 +120,10 @@ begin
 
   -- internal reset (must be low-active!) --
   rst_int <= rst_i; -- invert me?!
+
+  -- twi --
+  twi_sda <= 'H';
+  twi_scl <= 'H';
 
 
 end neo430_test_rtl;

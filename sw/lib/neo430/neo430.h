@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 29.09.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -55,10 +55,10 @@
 // ----------------------------------------------------------------------------
 // Interrupt vectors, located at the beginning of DMEM
 // ----------------------------------------------------------------------------
-#define IRQVEC_TIMER (*(REG16 (DMEM_ADDR_BASE + 0))) // r/w: timer match
-#define IRQVEC_USART (*(REG16 (DMEM_ADDR_BASE + 2))) // r/w: uart rx avail / spi rtx done
-#define IRQVEC_GPIO  (*(REG16 (DMEM_ADDR_BASE + 4))) // r/w: gpio pin change
-#define IRQVEC_EXT   (*(REG16 (DMEM_ADDR_BASE + 6))) // r/w: external IRQ
+#define IRQVEC_TIMER  (*(REG16 (DMEM_ADDR_BASE + 0))) // r/w: timer match
+#define IRQVEC_SERIAL (*(REG16 (DMEM_ADDR_BASE + 2))) // r/w: uart/spi/twi irqs
+#define IRQVEC_GPIO   (*(REG16 (DMEM_ADDR_BASE + 4))) // r/w: gpio pin change
+#define IRQVEC_EXT    (*(REG16 (DMEM_ADDR_BASE + 6))) // r/w: external IRQ
 
 
 // ----------------------------------------------------------------------------
@@ -66,15 +66,17 @@
 // Beginning of IO area: 0xFF80
 // Size of IO area: 128 bytes
 // ----------------------------------------------------------------------------
-#define REG8  (volatile uint8_t*)
-#define REG16 (volatile uint16_t*)
-#define REG32 (volatile uint32_t*)
+#define REG8  (volatile uint8_t*)        // memory-mapped register
+#define REG16 (volatile uint16_t*)       // memory-mapped register
+#define REG32 (volatile uint32_t*)       // memory-mapped register
 #define ROM8  (const volatile uint8_t*)  // read-only
 #define ROM16 (const volatile uint16_t*) // read-only
 #define ROM32 (const volatile uint32_t*) // read-only
 
 
-/* --- Unsigned Multiplier/Divider Unit (MULDIV) --- */
+// ----------------------------------------------------------------------------
+// Unsigned Multiplier/Divider Unit (MULDIV)
+// ----------------------------------------------------------------------------
 #define MULDIV_OPA     (*(REG16 0xFF80)) // -/w: operand A (dividend or factor1)
 #define MULDIV_OPB_DIV (*(REG16 0xFF82)) // -/w: operand B (divisor) for division
 #define MULDIV_OPB_MUL (*(REG16 0xFF84)) // -/w: operand B (factor2) for multiplication
@@ -86,7 +88,9 @@
 #define MULDIV_R32bit  (*(ROM32 (&MULDIV_RESX))) // r/-: read result as 32-bit data word
 
 
-/* --- Wishbone Bus Adapter (WB32) --- */
+// ----------------------------------------------------------------------------
+// Wishbone Bus Adapter (WB32)
+// ----------------------------------------------------------------------------
 #define WB32_CT  (*(REG16 0xFF90)) // r/w: control register
 #define WB32_LRA (*(REG16 0xFF92)) // -/w: low address for read transfer
 #define WB32_HRA (*(REG16 0xFF94)) // -/w: high address for read transfer (+trigger)
@@ -109,63 +113,87 @@
 #define WB32_CT_PENDING 15 // r/-: pending transfer
 
 
-/* --- Universal Serial Transceiver (USART/USI) --- */
-#define USI_CT      (*(REG16 0xFFA0)) // r/w: control register
-#define USI_SPIRTX  (*(REG16 0xFFA2)) // r/w: spi receive/transmit register
-#define USI_UARTRTX (*(REG16 0xFFA4)) // r/w: uart receive/transmit register
-#define USI_BAUD    (*(REG16 0xFFA6)) // r/w: uart baud rate generator value
+// ----------------------------------------------------------------------------
+// Universal Asynchronous Receiver and Transmitter (UART)
+// ----------------------------------------------------------------------------
+#define UART_CT  (*(REG16 0xFFA0)) // r/w: control register
+#define UART_RTX (*(REG16 0xFFA2)) // r/w: receive/transmit register
 
-// UART USI_BAUD[7:0]:  baud rate value (remainder)
-// UART USI_BAUD[10:8]: baud prescaler select:
-#define USI_UART_PRSC_2    0 // CLK/2
-#define USI_UART_PRSC_4    1 // CLK/4
-#define USI_UART_PRSC_8    2 // CLK/8
-#define USI_UART_PRSC_64   3 // CLK/64
-#define USI_UART_PRSC_128  4 // CLK/128
-#define USI_UART_PRSC_1024 5 // CLK/1024
-#define USI_UART_PRSC_2048 6 // CLK/2048
-#define USI_UART_PRSC_4096 7 // CLK/4096
+// UART control register
+#define UART_CT_BAUD0     0 // r/w: baud config bit 0
+#define UART_CT_BAUD1     1 // r/w: baud config bit 1
+#define UART_CT_BAUD2     2 // r/w: baud config bit 2
+#define UART_CT_BAUD3     3 // r/w: baud config bit 3
+#define UART_CT_BAUD4     4 // r/w: baud config bit 4
+#define UART_CT_BAUD5     5 // r/w: baud config bit 5
+#define UART_CT_BAUD6     6 // r/w: baud config bit 6
+#define UART_CT_BAUD7     7 // r/w: baud config bit 7
+#define UART_CT_PRSC0     8 // r/w: baud presclaer bit 0
+#define UART_CT_PRSC1     9 // r/w: baud presclaer bit 1
+#define UART_CT_PRSC2    10 // r/w: baud presclaer bit 2
 
-// USART UART RTX register
-#define USI_UARTRTX_UARTRXAVAIL 15 // r/-: uart receiver data available
+#define UART_CT_EN       12 // r/w: UART enable
+#define UART_CT_RX_IRQ   13 // r/w: Rx done interrupt enable
+#define UART_CT_TX_IRQ   14 // r/w: Tx done interrupt enable
+#define UART_CT_TX_BUSY  15 // r/-: transmitter busy
 
-// USART control register
-#define USI_CT_EN         0 // r/w: USART enable
-#define USI_CT_UARTRXIRQ  1 // r/w: uart rx done interrupt enable
-#define USI_CT_UARTTXIRQ  2 // r/w: uart tx done interrupt enable
-#define USI_CT_UARTTXBSY  3 // r/-: uart transmitter is busy
-#define USI_CT_SPICPHA    4 // r/w: spi clock phase (idle polarity = '0')
-#define USI_CT_SPIIRQ     5 // r/w: spi transmission done interrupt enable
-#define USI_CT_SPIBSY     6 // r/-: spi transceiver is busy
-#define USI_CT_SPIPRSC0   7 // r/w: spi prescaler select bit 0
-#define USI_CT_SPIPRSC1   8 // r/w: spi prescaler select bit 1
-#define USI_CT_SPIPRSC2   9 // r/w: spi prescaler select bit 2
-#define USI_CT_SPICS0    10 // r/w: spi direct CS 0, CS is LOW (active) when bit is set
-#define USI_CT_SPICS1    11 // r/w: spi direct CS 1, CS is LOW (active) when bit is set
-#define USI_CT_SPICS2    12 // r/w: spi direct CS 2, CS is LOW (active) when bit is set
-#define USI_CT_SPICS3    13 // r/w: spi direct CS 3, CS is LOW (active) when bit is set
-#define USI_CT_SPICS4    14 // r/w: spi direct CS 4, CS is LOW (active) when bit is set
-#define USI_CT_SPICS5    15 // r/w: spi direct CS 5, CS is LOW (active) when bit is set
+// UART RTX register flags
+#define UART_RTX_AVAIL 15 // r/-: uart receiver data available
 
-// SPI clock prescaler select:
-#define USI_SPI_PRSC_2    0 // CLK/2
-#define USI_SPI_PRSC_4    1 // CLK/4
-#define USI_SPI_PRSC_8    2 // CLK/8
-#define USI_SPI_PRSC_64   3 // CLK/64
-#define USI_SPI_PRSC_128  4 // CLK/128
-#define USI_SPI_PRSC_1024 5 // CLK/1024
-#define USI_SPI_PRSC_2048 6 // CLK/2048
-#define USI_SPI_PRSC_4096 7 // CLK/4096
+// clock prescalers 
+#define UART_PRSC_2    0 // CLK/2
+#define UART_PRSC_4    1 // CLK/4
+#define UART_PRSC_8    2 // CLK/8
+#define UART_PRSC_64   3 // CLK/64
+#define UART_PRSC_128  4 // CLK/128
+#define UART_PRSC_1024 5 // CLK/1024
+#define UART_PRSC_2048 6 // CLK/2048
+#define UART_PRSC_4096 7 // CLK/4096
 
 
-/* --- General Purpose Inputs/Outputs (GPIO) --- */
+// ----------------------------------------------------------------------------
+// Serial Peripheral Interface (SPI)
+// ----------------------------------------------------------------------------
+#define SPI_CT  (*(REG16 0xFFA4)) // r/w: control register
+#define SPI_RTX (*(REG16 0xFFA6)) // r/w: receive/transmit register
+
+// SPI control register
+#define SPI_CT_EN       0 // r/w: spi enable
+#define SPI_CT_CPHA     1 // r/w: spi clock phase (idle polarity = '0')
+#define SPI_CT_IRQ      2 // r/w: spi transmission done interrupt enable
+#define SPI_CT_PRSC0    3 // r/w: spi clock prescaler select bit 0
+#define SPI_CT_PRSC1    4 // r/w: spi clock prescaler select bit 1
+#define SPI_CT_PRSC2    5 // r/w: spi clock prescaler select bit 2
+#define SPI_CT_CS_SEL0  6 // r/w: spi CS select 0
+#define SPI_CT_CS_SEL1  7 // r/w: spi CS select 1
+#define SPI_CT_CS_SEL2  8 // r/w: spi CS select 2
+#define SPI_CT_CS_SET   9 // r/w: selected CS becomes active ('0') when set
+
+#define SPI_CT_BUSY    15 // r/-: spi transceiver is busy
+
+// clock prescalers 
+#define SPI_PRSC_2    0 // CLK/2
+#define SPI_PRSC_4    1 // CLK/4
+#define SPI_PRSC_8    2 // CLK/8
+#define SPI_PRSC_64   3 // CLK/64
+#define SPI_PRSC_128  4 // CLK/128
+#define SPI_PRSC_1024 5 // CLK/1024
+#define SPI_PRSC_2048 6 // CLK/2048
+#define SPI_PRSC_4096 7 // CLK/4096
+
+
+// ----------------------------------------------------------------------------
+// General Purpose Inputs/Outputs (GPIO)
+// ----------------------------------------------------------------------------
 //#define reserved   (*(REG16 0xFFA8)) // reserved
 #define GPIO_IRQMASK (*(REG16 0xFFAA)) // -/w: irq mask register
 #define GPIO_IN      (*(ROM16 0xFFAC)) // r/-: parallel input
 #define GPIO_OUT     (*(REG16 0xFFAE)) // r/w: parallel output
 
 
-/* --- High-Precision Timer (TIMER) --- */
+// ----------------------------------------------------------------------------
+// High-Precision Timer (TIMER)
+// ----------------------------------------------------------------------------
 #define TMR_CT    (*(REG16 0xFFB0)) // r/w: control register
 #define TMR_CNT   (*(REG16 0xFFB2)) // r/w: counter register
 #define TMR_THRES (*(REG16 0xFFB4)) // r/w: threshold register
@@ -175,9 +203,9 @@
 #define TMR_CT_EN    0 // r/w: timer enable
 #define TMR_CT_ARST  1 // r/w: auto reset on match
 #define TMR_CT_IRQ   2 // r/w: interrupt enable
-#define TMR_CT_PRSC0 3 // r/w: prescaler select bit 0
-#define TMR_CT_PRSC1 4 // r/w: prescaler select bit 1
-#define TMR_CT_PRSC2 5 // r/w: prescaler select bit 2
+#define TMR_CT_PRSC0 3 // r/w: clock prescaler select bit 0
+#define TMR_CT_PRSC1 4 // r/w: clock prescaler select bit 1
+#define TMR_CT_PRSC2 5 // r/w: clock prescaler select bit 2
 
 // Timer clock prescaler select:
 #define TMR_PRSC_2    0 // CLK/2
@@ -190,14 +218,16 @@
 #define TMR_PRSC_4096 7 // CLK/4096
 
 
-/* --- Watchdog Timer (WTD) --- */
+// ----------------------------------------------------------------------------
+// Watchdog Timer (WTD)
+// ----------------------------------------------------------------------------
 #define WDT_CT (*(REG16 0xFFB8)) // r/w: Watchdog control register
 
 // Watchdog control register
 #define WDT_PASSWORD 0x47 // must be set in the upper 8 bits of the WDT CTRL register
-#define WDT_CLKSEL0  0 // r/w: prescaler select bit 0
-#define WDT_CLKSEL1  1 // r/w: prescaler select bit 1
-#define WDT_CLKSEL2  2 // r/w: prescaler select bit 2
+#define WDT_PRSC0    0 // r/w: clock prescaler select bit 0
+#define WDT_PRSC1    1 // r/w: clock prescaler select bit 1
+#define WDT_PRSC2    2 // r/w: clock prescaler select bit 2
 #define WDT_ENABLE   3 // r/w: WDT enable
 #define WDT_RCAUSE   4 // r/-: reset cause (0: external, 1: watchdog timeout)
 
@@ -212,7 +242,9 @@
 #define WDT_PRSC_4096 7 // CLK/4096
 
 
-/* --- Cyclic Redundancy Check (CRC16/32) --- */
+// ----------------------------------------------------------------------------
+// Cyclic Redundancy Check (CRC16/32)
+// ----------------------------------------------------------------------------
 #define CRC_POLY_LO (*(REG16 0xFFC0)) // -/w: low part of polynomial
 #define CRC_POLY_HI (*(REG16 0xFFC2)) // -/w: high part of polynomial
 #define CRC_CRC16IN (*(REG16 0xFFC4)) // -/w: input for CRC16
@@ -226,7 +258,9 @@
 #define CRC_R32bit    (*(REG32 (&CRC_RESX)))    // r/w: crc shift register as 32-bit data word
 
 
-/* --- Custom Functions Unit (CFU) --- */
+// ----------------------------------------------------------------------------
+// Custom Functions Unit (CFU)
+// ----------------------------------------------------------------------------
 #define CFU_REG0 (*(REG16 0xFFD0)) // r/w: user defined...
 #define CFU_REG1 (*(REG16 0xFFD2)) // r/w: user defined...
 #define CFU_REG2 (*(REG16 0xFFD4)) // r/w: user defined...
@@ -237,7 +271,9 @@
 #define CFU_REG7 (*(REG16 0xFFDE)) // r/w: user defined...
 
 
-/* --- Pulse Width Modulation Controller --- */
+// ----------------------------------------------------------------------------
+// Pulse Width Modulation Controller (PWM)
+// ----------------------------------------------------------------------------
 #define PWM_CT  (*(REG16 0xFFE0)) // -/w: control register
 #define PWM_CH0 (*(REG16 0xFFE2)) // -/w: duty cycle channel 0
 #define PWM_CH1 (*(REG16 0xFFE4)) // -/w: duty cycle channel 1
@@ -248,21 +284,46 @@
 #define PWM_CT_FMODE  1 // r/w: 0 = slow PWM mode, 1 = fast PWM mode
 
 
-/* --- True Random Number Generator --- */
-#define TRNG_CT   (*(REG16 0xFFE8)) // -/w: control register
-#define TRNG_DATA (*(REG16 0xFFE8)) // r/-: random data (bytes)
+// ----------------------------------------------------------------------------
+// Two Wire Serial Interface (TWI)
+// ----------------------------------------------------------------------------
+#define TWI_CT   (*(REG16 0xFFE8)) // r/w: control register
+#define TWI_DATA (*(REG16 0xFFEA)) // r/w: RX (r) / TX (w) data
 
-// TRNG control register
-#define TRNG_CT_ENABLE 0 // -/w: TRNG enable
+// TWI control register
+#define TWI_CT_ENABLE   0 // r/w: TWI enable
+#define TWI_CT_START    1 // -/w: generate START condition
+#define TWI_CT_STOP     2 // -/w: generate STOP condition
+#define TWI_CT_BUSY     3 // r/-: TWI busy
+#define TWI_CT_PRSC0    4 // r/w: clock prescaler select bit 0
+#define TWI_CT_PRSC1    5 // r/w: clock prescaler select bit 1
+#define TWI_CT_PRSC2    6 // r/w: clock prescaler select bit 2
+#define TWI_CT_IRQ_EN   7 // r/w: transmission done interrupt enable
+
+// TWI clock prescaler select:
+#define TWI_PRSC_2    0 // CLK/2
+#define TWI_PRSC_4    1 // CLK/4
+#define TWI_PRSC_8    2 // CLK/8
+#define TWI_PRSC_64   3 // CLK/64
+#define TWI_PRSC_128  4 // CLK/128
+#define TWI_PRSC_1024 5 // CLK/1024
+#define TWI_PRSC_2048 6 // CLK/2048
+#define TWI_PRSC_4096 7 // CLK/4096
+
+// TWI data register flags
+#define TWI_DT_ACK     15 // r/-: ACK received
 
 
-/* --- Reserved --- */
-//#define ? (*(REG16 0xFFEA))
+// ----------------------------------------------------------------------------
+// Reserved
+// ----------------------------------------------------------------------------
 //#define ? (*(REG16 0xFFEC))
 //#define ? (*(REG16 0xFFEE))
 
 
-/* --- System Configuration (SYSCONFIG) --- */
+// ----------------------------------------------------------------------------
+// System Configuration (SYSCONFIG)
+// ----------------------------------------------------------------------------
 #define CPUID0 (*(ROM16 0xFFF0)) // r/-: HW version
 #define CPUID1 (*(ROM16 0xFFF2)) // r/-: system configuration
 #define CPUID2 (*(ROM16 0xFFF4)) // r/-: CPU identifier
@@ -291,14 +352,15 @@
 #define SYS_WDT_EN    2 // WDT synthesized
 #define SYS_GPIO_EN   3 // GPIO synthesized
 #define SYS_TIMER_EN  4 // timer synthesized
-#define SYS_USART_EN  5 // USART synthesized
+#define SYS_UART_EN   5 // UART synthesized
 #define SYS_DADD_EN   6 // DADD instruction synthesized
 #define SYS_BTLD_EN   7 // Bootloader installed and enabled?
 #define SYS_IROM_EN   8 // Implement IMEM as true ROM?
 #define SYS_CRC_EN    9 // CRC synthesized
 #define SYS_CFU_EN   10 // CFU synthesized
 #define SYS_PWM_EN   11 // PWM controller synthesized
-#define SYS_TRNG_EN  12 // TRNG synthesized
+#define SYS_TWI_EN   12 // TWI synthesized
+#define SYS_SPI_EN   13 // SPI synthesized
 
 
 // ----------------------------------------------------------------------------
@@ -310,8 +372,9 @@
 #include "neo430_gpio.h"
 #include "neo430_muldiv.h"
 #include "neo430_pwm.h"
-#include "neo430_trng.h"
-#include "neo430_usart.h"
+#include "neo430_spi.h"
+#include "neo430_twi.h"
+#include "neo430_uart.h"
 #include "neo430_wdt.h"
 #include "neo430_wishbone.h"
 

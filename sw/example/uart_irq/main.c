@@ -22,7 +22,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 04.07.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
 // #################################################################################################
 
 
@@ -60,8 +60,7 @@ uint8_t fifo_get(volatile struct uart_fifo *fifo, uint8_t *c);
 int main(void) {
 
   // setup UART
-  neo430_uart_set_baud(BAUD_RATE);
-  USI_CT = (1<<USI_CT_EN);
+  neo430_uart_setup(BAUD_RATE);
 
 
   // init fifo
@@ -72,15 +71,15 @@ int main(void) {
   GPIO_OUT = 0;
 
   // set address of UART, TIMER and GPIO IRQ handlers
-  IRQVEC_USART = (uint16_t)(&uart_irq_handler);
-  IRQVEC_TIMER = (uint16_t)(&timer_irq_handler);
-  IRQVEC_GPIO  = (uint16_t)(&gpio_irq_handler);
+  IRQVEC_SERIAL = (uint16_t)(&uart_irq_handler);
+  IRQVEC_TIMER  = (uint16_t)(&timer_irq_handler);
+  IRQVEC_GPIO   = (uint16_t)(&gpio_irq_handler);
 
   // configure GPIO pin-change interrupt
   GPIO_IRQMASK = 0xFFFF; // use all input pins as trigger
 
   // configure UART RX interrupt
-  USI_CT |= (1<<USI_CT_UARTRXIRQ);
+  UART_CT |= (1<<UART_CT_RX_IRQ);
 
   // configure TIMER period
   TMR_THRES = 1; // very high sample rate ;)
@@ -129,10 +128,10 @@ void __attribute__((__interrupt__)) timer_irq_handler(void) {
   uint8_t c;
 
   // UART transceiver idle?
-  if ((USI_CT & (1<<USI_CT_UARTTXBSY)) == 0) {
+  if ((UART_CT & (1<<UART_CT_TX_BUSY)) == 0) {
     // char in buffer available?
     if (fifo_get(&uart_rtx_fifo, &c) == 0) {
-      USI_UARTRTX = (uint16_t)c;
+      UART_RTX = (uint16_t)c;
     }
   }
 }

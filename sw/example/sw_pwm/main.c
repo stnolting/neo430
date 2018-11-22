@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                04.07.2018 #
+// # Stephan Nolting, Hannover, Germany                                                17.11.2018 #
 // #################################################################################################
 
 
@@ -51,8 +51,7 @@ volatile uint8_t led_brightness;
 int main(void) {
 
   // setup UART
-  neo430_uart_set_baud(BAUD_RATE);
-  USI_CT = (1<<USI_CT_EN);
+  neo430_uart_setup(BAUD_RATE);
 
   // intro text
   neo430_uart_br_print("\nSoftware PWM demo.\n");

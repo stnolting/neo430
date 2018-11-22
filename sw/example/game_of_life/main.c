@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 04.07.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
 // #################################################################################################
 
 
@@ -53,8 +53,7 @@ int main(void) {
   int16_t x, y;
 
   // setup UART
-  neo430_uart_set_baud(BAUD_RATE);
-  USI_CT = (1<<USI_CT_EN);
+  neo430_uart_setup(BAUD_RATE);
 
 
   // initialize universe
@@ -68,28 +67,17 @@ int main(void) {
   _neo430_printf("You can pause/restart the simulation by pressing any key.\n");
 
   // randomize until key pressed
-  if ((SYS_FEATURES & (1<<SYS_TRNG_EN))) {
-    neo430_trng_enable();
-    _neo430_printf("\nTRNG detected. Will use TRNG to initialize universe.\n");
-    while (neo430_uart_char_received() == 0);
-  }
-  else {
-    while (neo430_uart_char_received() == 0) {
-      __neo430_xorshift32();
-    }
+  while (neo430_uart_char_received() == 0) {
+    __neo430_xorshift32();
   }
 
 
   // initialize universe using random data
   for (x=0; x<NUM_CELLS_X/8; x++) {
     for (y=0; y<NUM_CELLS_Y; y++) {
-      if ((SYS_FEATURES & (1<<SYS_TRNG_EN))) 
-        universe[0][x][y] = neo430_trng_get_byte();
-      else
-        universe[0][x][y] = (uint8_t)__neo430_xorshift32();
+      universe[0][x][y] = (uint8_t)__neo430_xorshift32();
     }
   }
-  neo430_trng_disable();
 
   while(1) {
 

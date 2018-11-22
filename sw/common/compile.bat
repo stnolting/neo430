@@ -28,7 +28,7 @@
 
 @REM ----------------------USER CONFIGURATION----------------------
 @REM Path of compiler binaries:
-@if "%MSP430GCC_BIN_PATH%" == "" set MSP430GCC_BIN_PATH=C:\msp430-gcc-7.3.1.24_win64\bin
+@if "%MSP430GCC_BIN_PATH%" == "" set MSP430GCC_BIN_PATH=C:\msp430-gcc-7.3.2.154_win64\bin
 @REM Path to main include path
 @set NEO430_LIB_PATH=..\lib\neo430
 

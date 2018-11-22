@@ -21,7 +21,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 04.07.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
 // #################################################################################################
 
 
@@ -43,8 +43,7 @@ void print_state(uint16_t d);
 int main(void) {
 
   // setup UART
-  neo430_uart_set_baud(BAUD_RATE);
-  USI_CT = (1<<USI_CT_EN);
+  neo430_uart_setup(BAUD_RATE);
 
   // intro text
   _neo430_printf("\nNEO430 Hardware Analysis Tool\n\n");
@@ -68,9 +67,9 @@ int main(void) {
   _neo430_printf("DMEM/RAM:         %u bytes @ 0x%x\n", DMEM_SIZE, DMEM_BASE);
 
   // UART baud rate
-  uint16_t baud = USI_BAUD & 0x00FF;
+  uint16_t baud = UART_CT & 0x00FF;
   uint16_t prsc;
-  switch ((USI_BAUD >> 8) & 0x0007) {
+  switch ((UART_CT >> 8) & 0x0007) {
     case 0:  prsc = 2; break;
     case 1:  prsc = 4; break;
     case 2:  prsc = 8; break;
@@ -104,9 +103,12 @@ int main(void) {
   // TIMER
   _neo430_printf("- High-precision timer:  ");
   print_state(ft & (1<<SYS_TIMER_EN));
-  // USART
-  _neo430_printf("- USART:                 ");
-  print_state(ft & (1<<SYS_USART_EN));
+  // UART
+  _neo430_printf("- UART:                  ");
+  print_state(ft & (1<<SYS_UART_EN));
+  // SPI
+  _neo430_printf("- SPI:                   ");
+  print_state(ft & (1<<SYS_SPI_EN));
   // DADD
   _neo430_printf("- DADD instruction:      ");
   print_state(ft & (1<<SYS_DADD_EN));
@@ -125,9 +127,9 @@ int main(void) {
   // PWM
   _neo430_printf("- PWM Controller:        ");
   print_state(ft & (1<<SYS_PWM_EN));
-  // TRNG
-  _neo430_printf("- True Random Generator: ");
-  print_state(ft & (1<<SYS_TRNG_EN));
+  // TWI
+  _neo430_printf("- Two Wire Interface:    ");
+  print_state(ft & (1<<SYS_TWI_EN));
 
 
   // Exit

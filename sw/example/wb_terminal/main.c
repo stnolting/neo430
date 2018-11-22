@@ -22,7 +22,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 05.07.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
 // #################################################################################################
 
 
@@ -51,8 +51,7 @@ void dump_wb(void);
 int main(void) {
 
   // setup UART
-  neo430_uart_set_baud(BAUD_RATE);
-  USI_CT = (1<<USI_CT_EN);
+  neo430_uart_setup(BAUD_RATE);
 
   char buffer[MAX_CMD_LENGTH];
   uint16_t length = 0;
@@ -134,7 +133,7 @@ int main(void) {
         break;
 
       case 6: // restart
-        while ((USI_CT & (1<<USI_CT_UARTTXBSY)) != 0); // wait for current UART transmission
+        while ((UART_CT & (1<<UART_CT_TX_BUSY)) != 0); // wait for current UART transmission
         neo430_soft_reset();
         break;
 
