@@ -1,0 +1,165 @@
+// #################################################################################################
+// #  < TWI bus explorer >                                                                         #
+// # ********************************************************************************************* #
+// # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
+// # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
+// #                                                                                               #
+// # This source file may be used and distributed without restriction provided that this copyright #
+// # statement is not removed from the file and that any derivative work contains the original     #
+// # copyright notice and the associated disclaimer.                                               #
+// #                                                                                               #
+// # This source file is free software; you can redistribute it and/or modify it under the terms   #
+// # of the GNU Lesser General Public License as published by the Free Software Foundation,        #
+// # either version 3 of the License, or (at your option) any later version.                       #
+// #                                                                                               #
+// # This source is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;      #
+// # without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.     #
+// # See the GNU Lesser General Public License for more details.                                   #
+// #                                                                                               #
+// # You should have received a copy of the GNU Lesser General Public License along with this      #
+// # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
+// # ********************************************************************************************* #
+// # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
+// #################################################################################################
+
+
+// Libraries
+#include <stdint.h>
+#include <string.h>
+#include <neo430.h>
+
+// Prototypes
+void scan_twi(void);
+void send_twi(void);
+
+// Configuration
+#define BAUD_RATE 19200
+
+
+/* ------------------------------------------------------------
+ * INFO Main function
+ * ------------------------------------------------------------ */
+int main(void) {
+
+  // setup UART
+  neo430_uart_setup(BAUD_RATE);
+
+  char buffer[8];
+  uint16_t length = 0;
+
+  neo430_uart_br_print("\n---------------------------------\n"
+                         "--- TWI Bus Explorer Terminal ---\n"
+                         "---------------------------------\n\n");
+
+  // check if TWI unit was synthesized, exit if no TWI is available
+  if (!(SYS_FEATURES & (1<<SYS_TWI_EN))) {
+    neo430_uart_br_print("Error! No TWI synthesized!");
+    return 1;
+  }
+
+  neo430_uart_br_print("This program allows to create TWI transfers by hand.\n"
+                       "Type 'help' to see the help menu.\n\n");
+
+  // init TWI
+  // SCL clock speed = f_cpu / (4 * PRSC)
+  neo430_twi_enable(TWI_PRSC_2048); // second slowest
+
+  // Main menu
+  for (;;) {
+    neo430_uart_br_print("TWI_EXPLORER:> ");
+    length = neo430_uart_scan(buffer, 8, 1);
+    neo430_uart_br_print("\n");
+
+    if (!length) // nothing to be done
+     continue;
+
+    // decode input and execute command
+    if (!strcmp(buffer, "help")) {
+      neo430_uart_br_print("Available commands:\n"
+                           " help  - show this text\n"
+                           " scan  - scan bus for devices\n"
+                           " start - generate START condition\n"
+                           " stop  - generate STOP condition\n"
+                           " send  - write/read single byte to/from bus\n"
+                           " reset - perform soft-reset\n"
+                           " exit  - exit program and return to bootloader\n");
+    }
+    else if (!strcmp(buffer, "start")) {
+      neo430_twi_generate_start(); // generate START condition
+    }
+    else if (!strcmp(buffer, "stop")) {
+      neo430_twi_stop_trans(); // generate STOP condition
+    }
+    else if (!strcmp(buffer, "scan")) {
+      scan_twi();
+    }
+    else if (!strcmp(buffer, "send")) {
+      send_twi();
+    }
+    else if (!strcmp(buffer, "reset")) {
+      while ((UART_CT & (1<<UART_CT_TX_BUSY)) != 0); // wait for current UART transmission
+      neo430_twi_disable();
+      neo430_soft_reset();
+    }
+    else if (!strcmp(buffer, "exit")) {
+      if (!(SYS_FEATURES & (1<<SYS_BTLD_EN)))
+        neo430_uart_br_print("No bootloader installed!\n");
+      else
+        asm volatile ("mov #0xF000, r0");
+    }
+    else {
+      neo430_uart_br_print("Invalid command. Type 'help' to see all commands.\n");
+    }
+  }
+
+  return 0;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Scan 7-bit TWI address space
+ * ------------------------------------------------------------ */
+void scan_twi(void) {
+
+  neo430_uart_br_print("Scanning TWI bus...\n");
+  uint8_t i, num_devices = 0;
+  for (i=0; i<128; i++) {
+    uint8_t twi_ack = neo430_twi_start_trans((uint8_t)(2*i+1));
+    neo430_twi_stop_trans();
+
+    if (twi_ack == 0) {
+      neo430_uart_br_print(" Found device at address (shifted left by 1 bit): 0x");
+      neo430_uart_print_hex_byte(2*i);
+      neo430_uart_br_print("\n");
+      num_devices++;
+    }
+  }
+
+  if (!num_devices) {
+    neo430_uart_br_print("No devices found.\n");
+  }
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Read/write 1 byte from/to bus
+ * ------------------------------------------------------------ */
+void send_twi(void) {
+
+  char terminal_buffer[4];
+
+  // enter data
+  neo430_uart_br_print("Enterdata (2 hex chars): ");
+  neo430_uart_scan(terminal_buffer, 3, 1); // 2 hex chars for address plus '\0'
+  uint8_t tmp = (uint8_t)neo430_hexstr_to_uint(terminal_buffer, strlen(terminal_buffer));
+  uint8_t res = neo430_twi_trans(tmp);
+  neo430_uart_br_print("\nRX data:  0x");
+  neo430_uart_print_hex_byte(neo430_twi_get_data());
+  neo430_uart_br_print("\nResponse: ");
+  if (res == 0)
+    neo430_uart_br_print("ACK\n");
+  else
+    neo430_uart_br_print("NACK\n");
+
+}
+
