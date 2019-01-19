@@ -61,21 +61,21 @@ int main(void) {
   clear_universe(0);
   clear_universe(1);
 
-  _neo430_printf("\n\n### Conways's Game of Life ###\n\n");
-  _neo430_printf("This program requires a terminal resolution of at least %ux%u characters.\n", NUM_CELLS_X+2, NUM_CELLS_Y+3);
-  _neo430_printf("Press any key to start a random-initialized torus-style universe of %ux%u cells.\n", NUM_CELLS_X, NUM_CELLS_Y);
-  _neo430_printf("You can pause/restart the simulation by pressing any key.\n");
+  neo430_printf("\n\n### Conways's Game of Life ###\n\n");
+  neo430_printf("This program requires a terminal resolution of at least %ux%u characters.\n", NUM_CELLS_X+2, NUM_CELLS_Y+3);
+  neo430_printf("Press any key to start a random-initialized torus-style universe of %ux%u cells.\n", NUM_CELLS_X, NUM_CELLS_Y);
+  neo430_printf("You can pause/restart the simulation by pressing any key.\n");
 
   // randomize until key pressed
   while (neo430_uart_char_received() == 0) {
-    __neo430_xorshift32();
+    neo430_xorshift32();
   }
 
 
   // initialize universe using random data
   for (x=0; x<NUM_CELLS_X/8; x++) {
     for (y=0; y<NUM_CELLS_Y; y++) {
-      universe[0][x][y] = (uint8_t)__neo430_xorshift32();
+      universe[0][x][y] = (uint8_t)neo430_xorshift32();
     }
   }
 
@@ -83,14 +83,14 @@ int main(void) {
 
     // user abort?
     if (neo430_uart_char_received()) {
-      _neo430_printf("\nRestart (y/n)?");
+      neo430_printf("\nRestart (y/n)?");
       if (neo430_uart_getc() == 'y') {
         neo430_soft_reset();
       }
     }
 
     // print generation, population count and the current universe
-    _neo430_printf("\n\nGeneration %l, %u living cells\n", generation, pop_count(u));
+    neo430_printf("\n\nGeneration %l, %u living cells\n", generation, pop_count(u));
     print_universe(u);
 
     // compute next generation

@@ -58,7 +58,7 @@ int main(void) {
   neo430_uart_setup(BAUD_RATE);
 
   // intro text
-  _neo430_printf("\r\nProfiling template\r\n");
+  neo430_printf("\r\nProfiling template\r\n");
 
   // check if TIMER unit was synthesized, exit if no TIMER is available
   if (!(SYS_FEATURES & (1<<SYS_TIMER_EN))) {
@@ -66,7 +66,7 @@ int main(void) {
     return 1;
   }
 
-  _neo430_printf("Starting profiling...\r\n");
+  neo430_printf("Starting profiling...\r\n");
 
   // start runtime profiling
   start_profiling(TIMER_PRSC);
@@ -87,13 +87,13 @@ int main(void) {
   // stop runtime profiling
   uint32_t runtime = 0;
   if (stop_profiling(&runtime, TIMER_PRSC) != 0) { // use SAME prescaler as in "start_time"
-    _neo430_printf("Timer overflow! Use a greater prescaler!\r\n\r\n");
+    neo430_printf("Timer overflow! Use a greater prescaler!\r\n\r\n");
   }
 
 
   // print results
-  _neo430_printf("Elapsed CPU cycles: %n\r\n", runtime);
-  _neo430_printf("Re-run the measurement with a smaller prescaler to increase precision.\r\n");
+  neo430_printf("Elapsed CPU cycles: %n\r\n", runtime);
+  neo430_printf("Re-run the measurement with a smaller prescaler to increase precision.\r\n");
 
   return 0;
 }

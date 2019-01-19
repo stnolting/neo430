@@ -46,25 +46,25 @@ int main(void) {
   neo430_uart_setup(BAUD_RATE);
 
   // intro text
-  _neo430_printf("\nNEO430 Hardware Analysis Tool\n\n");
+  neo430_printf("\nNEO430 Hardware Analysis Tool\n\n");
 
   // General information
   // --------------------------------------------
   // HW version
-  _neo430_printf("Hardware version: 0x%x\n", HW_VERSION);
+  neo430_printf("Hardware version: 0x%x\n", HW_VERSION);
 
   // HW user code
-  _neo430_printf("User code:        0x%x\n", USER_CODE);
+  neo430_printf("User code:        0x%x\n", USER_CODE);
   
   // Clock speed
   uint32_t clock = CLOCKSPEED_32bit;
-  _neo430_printf("Clock speed:      %n Hz\n", clock);
+  neo430_printf("Clock speed:      %n Hz\n", clock);
 
   // ROM/IMEM
-  _neo430_printf("IMEM/ROM:         %u bytes @ 0x0000\n", IMEM_SIZE);
+  neo430_printf("IMEM/ROM:         %u bytes @ 0x0000\n", IMEM_SIZE);
 
   // RAM/DMEM
-  _neo430_printf("DMEM/RAM:         %u bytes @ 0x%x\n", DMEM_SIZE, DMEM_BASE);
+  neo430_printf("DMEM/RAM:         %u bytes @ 0x%x\n", DMEM_SIZE, DMEM_BASE);
 
   // UART baud rate
   uint16_t baud = UART_CT & 0x00FF;
@@ -81,64 +81,64 @@ int main(void) {
     default: prsc = 0; break;
   }
   uint32_t baud_value = clock / (uint32_t)(prsc * baud);
-  _neo430_printf("UART Baud rate:   %n\n", baud_value);
+  neo430_printf("UART Baud rate:   %n\n", baud_value);
 
 
   // System features
   // --------------------------------------------
   uint16_t ft = SYS_FEATURES;
-  _neo430_printf("\n\nSystem features\n");
+  neo430_printf("\n\nSystem features\n");
   // CFU
-  _neo430_printf("- Multiplier/Divider:    ");
+  neo430_printf("- Multiplier/Divider:    ");
   print_state(ft & (1<<SYS_MULDIV_EN));
   // WB32
-  _neo430_printf("- Wishbone adapter:      ");
+  neo430_printf("- Wishbone adapter:      ");
   print_state(ft & (1<<SYS_WB32_EN));
   // WDT
-  _neo430_printf("- Watchdog timer:        ");
+  neo430_printf("- Watchdog timer:        ");
   print_state(ft & (1<<SYS_WDT_EN));
   // GPIO
-  _neo430_printf("- GPIO unit:             ");
+  neo430_printf("- GPIO unit:             ");
   print_state(ft & (1<<SYS_GPIO_EN));
   // TIMER
-  _neo430_printf("- High-precision timer:  ");
+  neo430_printf("- High-precision timer:  ");
   print_state(ft & (1<<SYS_TIMER_EN));
   // UART
-  _neo430_printf("- UART:                  ");
+  neo430_printf("- UART:                  ");
   print_state(ft & (1<<SYS_UART_EN));
   // SPI
-  _neo430_printf("- SPI:                   ");
+  neo430_printf("- SPI:                   ");
   print_state(ft & (1<<SYS_SPI_EN));
   // DADD
-  _neo430_printf("- DADD instruction:      ");
+  neo430_printf("- DADD instruction:      ");
   print_state(ft & (1<<SYS_DADD_EN));
   // Bootloader installed
-  _neo430_printf("- Internal bootloader:   ");
+  neo430_printf("- Internal bootloader:   ");
   print_state(ft & (1<<SYS_BTLD_EN));
   // is IMEM true ROM?
-  _neo430_printf("- IMEM as true ROM:      ");
+  neo430_printf("- IMEM as true ROM:      ");
   print_state(ft & (1<<SYS_IROM_EN));
   // CRC
-  _neo430_printf("- CRC16/CRC32:           ");
+  neo430_printf("- CRC16/CRC32:           ");
   print_state(ft & (1<<SYS_CRC_EN));
   // CFU
-  _neo430_printf("- Custom Functions Unit: ");
+  neo430_printf("- Custom Functions Unit: ");
   print_state(ft & (1<<SYS_CFU_EN));
   // PWM
-  _neo430_printf("- PWM Controller:        ");
+  neo430_printf("- PWM Controller:        ");
   print_state(ft & (1<<SYS_PWM_EN));
   // TWI
-  _neo430_printf("- Two Wire Interface:    ");
+  neo430_printf("- Two Wire Interface:    ");
   print_state(ft & (1<<SYS_TWI_EN));
 
 
   // Exit
   // --------------------------------------------
-  _neo430_printf("\n\nPress any key to return to bootloader.\n");
+  neo430_printf("\n\nPress any key to return to bootloader.\n");
   while(!neo430_uart_char_received());
 
   if (!(SYS_FEATURES & (1<<SYS_BTLD_EN)))
-    _neo430_printf("No bootloader installed!\n");
+    neo430_printf("No bootloader installed!\n");
   else
     asm volatile ("mov #0xF000, r0");
 
@@ -152,7 +152,7 @@ int main(void) {
 void print_state(uint16_t d) {
 
   if (d)
-    _neo430_printf("enabled\n");
+    neo430_printf("enabled\n");
   else
-    _neo430_printf("DISABLED\n");
+    neo430_printf("DISABLED\n");
 }

@@ -24,7 +24,7 @@
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
 // # Thanks to Edward Sherriff!                                                                    #
-// # Stephan Nolting, Hannover, Germany                                                 29.09.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 18.01.2019 #
 // #################################################################################################
 
 #ifndef neo430_wishbone_h
@@ -217,7 +217,7 @@ uint8_t neo430_wishbone32_read8(uint32_t a) {
     data = WB32_LD;
 
   if (a & 1)
-    data = __neo430_bswap(data);
+    data = neo430_bswap(data);
 
   return (uint8_t)data;
 }
@@ -401,7 +401,7 @@ uint8_t neo430_wishbone32_get_data8(uint32_t a) {
     data = WB32_LD;
 
   if (a & 1)
-    data = __neo430_bswap(data);
+    data = neo430_bswap(data);
 
   return (uint8_t)data;
 }

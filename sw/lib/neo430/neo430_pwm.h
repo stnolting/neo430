@@ -19,35 +19,37 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 04.07.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 18.01.2019 #
 // #################################################################################################
 
 #ifndef neo430_pwm_h
 #define neo430_pwm_h
 
 // prototypes
-inline void neo430_pwm_enable_slow_mode(void);
-inline void neo430_pwm_enable_fast_mode(void);
-inline void neo430_pwm_disable(void);
-inline void neo430_pwm_set_ch0(uint8_t dc);
-inline void neo430_pwm_set_ch1(uint8_t dc);
-inline void neo430_pwm_set_ch2(uint8_t dc);
+void neo430_pwm_enable_slow_mode(void);
+void neo430_pwm_enable_fast_mode(void);
+void neo430_pwm_disable(void);
+void neo430_pwm_set_ch0(uint8_t dc);
+void neo430_pwm_set_ch1(uint8_t dc);
+void neo430_pwm_set_ch2(uint8_t dc);
 
 
 /* ------------------------------------------------------------
- * INFO Activate PWM controller in slow mode
+ * INFO Reset and activate PWM controller in slow mode
  * ------------------------------------------------------------ */
-inline void neo430_pwm_enable_slow_mode(void) {
+void neo430_pwm_enable_slow_mode(void) {
 
+  PWM_CT = 0;
   PWM_CT = (1<<PWM_CT_ENABLE) | (0<<PWM_CT_FMODE);
 }
 
 
 /* ------------------------------------------------------------
- * INFO Activate PWM controller in fast mode
+ * INFO Reset and activate PWM controller in fast mode
  * ------------------------------------------------------------ */
-inline void neo430_pwm_enable_fast_mode(void) {
+void neo430_pwm_enable_fast_mode(void) {
 
+  PWM_CT = 0;
   PWM_CT = (1<<PWM_CT_ENABLE) | (1<<PWM_CT_FMODE);
 }
 
@@ -55,7 +57,7 @@ inline void neo430_pwm_enable_fast_mode(void) {
 /* ------------------------------------------------------------
  * INFO Disable PWM controller
  * ------------------------------------------------------------ */
-inline void neo430_pwm_disable(void) {
+void neo430_pwm_disable(void) {
 
   PWM_CT = 0;
 }
@@ -65,7 +67,7 @@ inline void neo430_pwm_disable(void) {
  * INFO Set duty cycle of PWM channel 0
  * PARAM 8-bit duty cycle
  * ------------------------------------------------------------ */
-inline void neo430_pwm_set_ch0(uint8_t dc) {
+void neo430_pwm_set_ch0(uint8_t dc) {
 
   PWM_CH0 = (uint16_t)dc;
 }
@@ -75,7 +77,7 @@ inline void neo430_pwm_set_ch0(uint8_t dc) {
  * INFO Set duty cycle of PWM channel 1
  * PARAM 8-bit duty cycle
  * ------------------------------------------------------------ */
-inline void neo430_pwm_set_ch1(uint8_t dc) {
+void neo430_pwm_set_ch1(uint8_t dc) {
 
   PWM_CH1 = (uint16_t)dc;
 }
@@ -85,7 +87,7 @@ inline void neo430_pwm_set_ch1(uint8_t dc) {
  * INFO Set duty cycle of PWM channel 2
  * PARAM 8-bit duty cycle
  * ------------------------------------------------------------ */
-inline void neo430_pwm_set_ch2(uint8_t dc) {
+void neo430_pwm_set_ch2(uint8_t dc) {
 
   PWM_CH2 = (uint16_t)dc;
 }

@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 07.12.2018 #
 // #################################################################################################
 
 
@@ -30,6 +30,7 @@
 
 // Prototypes
 void scan_twi(void);
+void set_speed(void);
 void send_twi(void);
 
 // Configuration
@@ -81,6 +82,7 @@ int main(void) {
                            " start - generate START condition\n"
                            " stop  - generate STOP condition\n"
                            " send  - write/read single byte to/from bus\n"
+                           " speed - select bus clock\n"
                            " reset - perform soft-reset\n"
                            " exit  - exit program and return to bootloader\n");
     }
@@ -92,6 +94,9 @@ int main(void) {
     }
     else if (!strcmp(buffer, "scan")) {
       scan_twi();
+    }
+    else if (!strcmp(buffer, "speed")) {
+      set_speed();
     }
     else if (!strcmp(buffer, "send")) {
       send_twi();
@@ -117,6 +122,26 @@ int main(void) {
 
 
 /* ------------------------------------------------------------
+ * INFO Set TWI speed
+ * ------------------------------------------------------------ */
+void set_speed(void) {
+
+  char terminal_buffer[2];
+
+  neo430_uart_br_print("Select new clock prescaler (0..7): ");
+  neo430_uart_scan(terminal_buffer, 2, 1); // 1 hex char plus '\0'
+  uint8_t prsc = (uint8_t)neo430_hexstr_to_uint(terminal_buffer, strlen(terminal_buffer));
+  if ((prsc >= 0) && (prsc < 8)) { // valid?
+    TWI_CT = 0; // reset
+    TWI_CT = (1 << TWI_CT_ENABLE) | (prsc << TWI_CT_PRSC0);
+    neo430_uart_br_print("\nDone.\n");
+  }
+  else
+    neo430_uart_br_print("\nInvalid selection!\n");
+}
+
+
+/* ------------------------------------------------------------
  * INFO Scan 7-bit TWI address space
  * ------------------------------------------------------------ */
 void scan_twi(void) {
@@ -128,7 +153,7 @@ void scan_twi(void) {
     neo430_twi_stop_trans();
 
     if (twi_ack == 0) {
-      neo430_uart_br_print(" Found device at address (shifted left by 1 bit): 0x");
+      neo430_uart_br_print(" * Found device at address (shifted left by 1 bit): 0x");
       neo430_uart_print_hex_byte(2*i);
       neo430_uart_br_print("\n");
       num_devices++;
@@ -149,7 +174,7 @@ void send_twi(void) {
   char terminal_buffer[4];
 
   // enter data
-  neo430_uart_br_print("Enterdata (2 hex chars): ");
+  neo430_uart_br_print("Enter TX data (2 hex chars): ");
   neo430_uart_scan(terminal_buffer, 3, 1); // 2 hex chars for address plus '\0'
   uint8_t tmp = (uint8_t)neo430_hexstr_to_uint(terminal_buffer, strlen(terminal_buffer));
   uint8_t res = neo430_twi_trans(tmp);

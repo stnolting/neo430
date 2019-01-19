@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 18.01.2019 #
 // #################################################################################################
 
 #ifndef neo430_uart_h
@@ -44,13 +44,13 @@ void neo430_uart_print_hex_dword(uint32_t dw);                             // pr
 void neo430_uart_print_bin_byte(uint8_t b);                                // print byte in binary form
 void neo430_uart_print_bin_word(uint16_t w);                               // print word in binary form
 void neo430_uart_print_bin_dword(uint32_t dw);                             // print double word in binary form
-void _neo430_itoa(uint32_t x);                                             // convert double word to decimal number
-void _neo430_printf(char *format, ...);                                    // print format string
+void neo430_itoa(uint32_t x);                                             // convert double word to decimal number
+void neo430_printf(char *format, ...);                                    // print format string
 uint32_t neo430_hexstr_to_uint(char *buffer, uint8_t length);              // convert hex string to number
 
 
 /* ------------------------------------------------------------
- * INFO Set the Baud rate of UART transceiver
+ * INFO Reset UART, set the Baud rate of UART transceiver
  * INFO UART_BAUD reg (8 bit) = f_main/(prsc*desired_BAUDRATE)
  * INFO PRSC (Baud register bits 10..8):
  *  0: CLK/2
@@ -297,7 +297,7 @@ void neo430_uart_print_bin_dword(uint32_t dw) {
  * INFO Slow custom version of itoa
  * PARAM 32-bit value to be printed as decimal number
  * ------------------------------------------------------------ */
-void _neo430_itoa(uint32_t x) {
+void neo430_itoa(uint32_t x) {
 
   static const char numbers[10] = "0123456789";
   char buffer1[11], buffer2[11];
@@ -340,7 +340,7 @@ void _neo430_itoa(uint32_t x) {
  * INFO Original from http://forum.43oh.com/topic/1289-tiny-printf-c-version/
  * PARAM Argument string
  * ------------------------------------------------------------ */
-void _neo430_printf(char *format, ...) {
+void neo430_printf(char *format, ...) {
 
   char c;
   int16_t i;
@@ -365,10 +365,10 @@ void _neo430_printf(char *format, ...) {
             i = -i;
             neo430_uart_putc('-');
           }
-          _neo430_itoa((uint32_t)i);
+          neo430_itoa((uint32_t)i);
           break;
         case 'u': // 16-bit unsigned
-          _neo430_itoa((uint32_t)va_arg(a, unsigned int));
+          neo430_itoa((uint32_t)va_arg(a, unsigned int));
           break;
         case 'l': // 32-bit long
           n = va_arg(a, int32_t);
@@ -376,10 +376,10 @@ void _neo430_printf(char *format, ...) {
             n = -n;
             neo430_uart_putc('-');
           }
-          _neo430_itoa((uint32_t)n);
+          neo430_itoa((uint32_t)n);
           break;
         case 'n': // 32-bit unsigned long
-          _neo430_itoa(va_arg(a, uint32_t));
+          neo430_itoa(va_arg(a, uint32_t));
           break;
         case 'x': // 16-bit hexadecimal
           neo430_uart_print_hex_word(va_arg(a, unsigned int));

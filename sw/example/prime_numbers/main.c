@@ -43,8 +43,8 @@ int main(void) {
   neo430_uart_setup(BAUD_RATE);
 
   // intro text
-  _neo430_printf("\n\nGenerating prime numbers between 3 and %n", 0xFFFFFFFF);
-  _neo430_printf(".\n"
+  neo430_printf("\n\nGenerating prime numbers between 3 and %n", 0xFFFFFFFF);
+  neo430_printf(".\n"
                  "Press any key to start.\n"
                  "You can abort the program by pressing any key again.\n");
 
@@ -68,7 +68,7 @@ int main(void) {
 
     // output prime number in decimal representation
     if (is_prime)
-      _neo430_printf("%n, ", n);
+      neo430_printf("%n, ", n);
 
     // abort?
     if (neo430_uart_char_received()) // any key input?

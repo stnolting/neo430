@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 04.07.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 18.01.2019 #
 // #################################################################################################
 
 #ifndef neo430_cpu_h
@@ -38,14 +38,14 @@ void neo430_cpu_delay_ms(uint16_t ms);
 inline void neo430_soft_reset(void);
 inline void neo430_jump_address(uint16_t addr);
 inline void neo430_call_address(uint16_t addr);
-inline uint16_t __neo430_bswap(uint16_t a);
-inline uint16_t __neo430_combine_bytes(uint8_t hi, uint8_t lo);
-inline uint16_t __neo430_dadd(uint16_t a, uint16_t b);
-void __neo430_memset(uint8_t *dst, uint8_t data, uint16_t num);
-uint8_t __neo430_memcmp(uint8_t *dst, uint8_t *src, uint16_t num);
-void __neo430_memcpy(uint8_t *dst, uint8_t *src, uint16_t num);
-uint16_t __neo430_bit_rev16(uint16_t x);
-uint32_t __neo430_xorshift32(void);
+inline uint16_t neo430_bswap(uint16_t a);
+inline uint16_t neo430_combine_bytes(uint8_t hi, uint8_t lo);
+inline uint16_t neo430_dadd(uint16_t a, uint16_t b);
+void neo430_memset(uint8_t *dst, uint8_t data, uint16_t num);
+uint8_t neo430_memcmp(uint8_t *dst, uint8_t *src, uint16_t num);
+void neo430_memcpy(uint8_t *dst, uint8_t *src, uint16_t num);
+uint16_t neo430_bit_rev16(uint16_t x);
+uint32_t neo430_xorshift32(void);
 
 
 /* ------------------------------------------------------------
@@ -189,7 +189,7 @@ inline void neo430_call_address(uint16_t addr) {
  * PARAM 16-bit input word
  * RETURN 16-bit word with swapped bytes
  * ------------------------------------------------------------ */
-inline uint16_t __neo430_bswap(uint16_t a) {
+inline uint16_t neo430_bswap(uint16_t a) {
 
   register uint16_t r = a;
   asm volatile ("swpb %0, %1" : "=r" (r) : "r" (r));
@@ -203,9 +203,9 @@ inline uint16_t __neo430_bswap(uint16_t a) {
  * PARAM lo will be put in result's low byte
  * RETURN 16-bit combined word
  * ------------------------------------------------------------ */
-inline uint16_t __neo430_combine_bytes(uint8_t hi, uint8_t lo) {
+inline uint16_t neo430_combine_bytes(uint8_t hi, uint8_t lo) {
 
-  register uint16_t r = __neo430_bswap((uint16_t)hi);
+  register uint16_t r = neo430_bswap((uint16_t)hi);
   return r | (uint16_t)lo;
 }
 
@@ -216,7 +216,7 @@ inline uint16_t __neo430_combine_bytes(uint8_t hi, uint8_t lo) {
  * PARAM 2x 16-bit BCD operands (4 digits)
  * RETURN 16-bit BCD result (4 digits)
  * ------------------------------------------------------------ */
-inline uint16_t __neo430_dadd(uint16_t a, uint16_t b) {
+inline uint16_t neo430_dadd(uint16_t a, uint16_t b) {
 
   register uint16_t z = a;
   asm volatile ("clrc");
@@ -231,7 +231,7 @@ inline uint16_t __neo430_dadd(uint16_t a, uint16_t b) {
  * PARAM data: Init data
  * PARAM num: Number of bytes to initialize
  * ------------------------------------------------------------ */
-void __neo430_memset(uint8_t *dst, uint8_t data, uint16_t num) {
+void neo430_memset(uint8_t *dst, uint8_t data, uint16_t num) {
 
   while (num--)
     *dst++ = data;
@@ -245,7 +245,7 @@ void __neo430_memset(uint8_t *dst, uint8_t data, uint16_t num) {
  * PARAM num: Number of bytes to compare
  * RETURN 0 if src == dst
  * ------------------------------------------------------------ */
-uint8_t __neo430_memcmp(uint8_t *dst, uint8_t *src, uint16_t num) {
+uint8_t neo430_memcmp(uint8_t *dst, uint8_t *src, uint16_t num) {
 
   while (num--) {
     if (*dst++ != *src++)
@@ -261,7 +261,7 @@ uint8_t __neo430_memcmp(uint8_t *dst, uint8_t *src, uint16_t num) {
  * PARAM src: Pointer to beginning source memory space
  * PARAM num: Number of bytes to copy
  * ------------------------------------------------------------ */
-void __neo430_memcpy(uint8_t *dst, uint8_t *src, uint16_t num) {
+void neo430_memcpy(uint8_t *dst, uint8_t *src, uint16_t num) {
 
   while (num--)
     *dst++ = *src++;
@@ -273,7 +273,7 @@ void __neo430_memcpy(uint8_t *dst, uint8_t *src, uint16_t num) {
  * PARAM input operand to be reversed
  * RETURN reversed bit pattern
  * ------------------------------------------------------------ */
-uint16_t __neo430_bit_rev16(uint16_t x) {
+uint16_t neo430_bit_rev16(uint16_t x) {
 
   register uint16_t z = x;
   register uint16_t y = 0;
@@ -294,7 +294,7 @@ uint16_t __neo430_bit_rev16(uint16_t x) {
  * INFO Pseudo-random number generator
  * RETURN 32-bit random data
  * ------------------------------------------------------------ */
-uint32_t __neo430_xorshift32(void) {
+uint32_t neo430_xorshift32(void) {
 
   static uint32_t x32 = 314159265;
 

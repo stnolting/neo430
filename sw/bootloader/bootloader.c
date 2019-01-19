@@ -29,7 +29,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 18.01.2019 #
 // #################################################################################################
 
 // Libraries
@@ -127,8 +127,7 @@ int  main(void) {
 
   // set SPI config:
   // enable SPI, no IRQs, SPI clock mode 0, 1/1024 SPI speed, disable all 6 SPI CS lines (set high)
-  SPI_CT = 0; // reset SPI
-  SPI_CT = (1<<SPI_CT_EN) | (SPI_PRSC_1024<<SPI_CT_PRSC0);
+  neo430_spi_enable(SPI_PRSC_1024); // this also resets the SPI module
   neo430_spi_trans(0); // clear SPI RTX buffer
 
   // Timeout counter: init timer, irq tick @ ~1Hz (prescaler = 4096)
@@ -148,7 +147,7 @@ int  main(void) {
   // ****************************************************************
   // Show bootloader intro and system information
   // ****************************************************************
-  neo430_uart_br_print("\n\nNEO430 Bootloader V20181117 by Stephan Nolting\n\n"
+  neo430_uart_br_print("\n\nNEO430 Bootloader V20190118 by Stephan Nolting\n\n"
                        "HWV: 0x");
   neo430_uart_print_hex_word(HW_VERSION);
   neo430_uart_br_print("\nCLK: 0x");
@@ -483,7 +482,7 @@ uint16_t get_image_word(uint16_t a, uint8_t src) {
     c1 = eeprom_read(a+1);
   }
 
-  return __neo430_combine_bytes(c0, c1);
+  return neo430_combine_bytes(c0, c1);
 }
 
 

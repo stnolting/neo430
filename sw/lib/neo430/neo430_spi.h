@@ -19,31 +19,42 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 19.11.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 19.01.2019 #
 // #################################################################################################
 
 #ifndef neo430_spi_h
 #define neo430_spi_h
 
 // prototypes
-void    neo430_spi_enable(void);   // configure and activate TWI module
-void    neo430_spi_disable(void);          // deactivate TWI module
+void    neo430_spi_enable(uint8_t prsc);   // configure and activate SPI module
+void    neo430_spi_disable(void);          // deactivate SPI module
 void    neo430_spi_cs_en(uint8_t cs);      // activate slave
 void    neo430_spi_cs_dis(uint8_t cs);     // deactivate slave
 uint8_t neo430_spi_trans(uint8_t d);       // RTX transfer
 
 
 /* ------------------------------------------------------------
- * INFO Enable SPI CSx (set low)
+ * INFO Reset, activate, configure and enable SPI module
+ * INFO SPI SCK speed: f_main/(2*PRSC), prsc = see below (control reg)
+ * SPI clock prescaler select:
+ *  0: CLK/2
+ *  1: CLK/4
+ *  2: CLK/8
+ *  3: CLK/64
+ *  4: CLK/128
+ *  5: CLK/1024
+ *  6: CLK/2048
+ *  7: CLK/4096
  * ------------------------------------------------------------ */
-void neo430_spi_enable(void) {
+void neo430_spi_enable(uint8_t prsc) {
 
-  SPI_CT = (1 << SPI_CT_EN);
+  SPI_CT = 0;
+  SPI_CT = (1 << SPI_CT_EN) | (prsc<<SPI_CT_PRSC0);;
 }
 
 
 /* ------------------------------------------------------------
- * INFO Enable SPI CSx (set low)
+ * INFO Enable SPI module
  * ------------------------------------------------------------ */
 void neo430_spi_disable(void) {
 
@@ -76,16 +87,6 @@ void neo430_spi_cs_dis(uint8_t cs) {
 
 /* ------------------------------------------------------------
  * INFO SPI RTX byte transfer
- * INFO SPI SCK speed: f_main/(2*PRSC), PRSC = see below (control reg)
- * SPI clock prescaler select:
- *  0: CLK/2
- *  1: CLK/4
- *  2: CLK/8
- *  3: CLK/64
- *  4: CLK/128
- *  5: CLK/1024
- *  6: CLK/2048
- *  7: CLK/4096
  * PARAM d byte to be send
  * RETURN received byte
  * ------------------------------------------------------------ */
