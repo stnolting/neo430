@@ -1,9 +1,8 @@
 // #################################################################################################
-// #  < Software PWM generating a "heartbeat" >                                                    #
+// #  < Nested IRQs example >                                                                      #
 // # ********************************************************************************************* #
-// # Generates a heartbeat with software PWM using the internal timer.                             #
-// # PWM refresh rate: 1MHz.                                                                       #
-// # Output via GPIO.out(0) (bootloader status LED)                                                #
+// # Generates a run time clock using the timer IRQ.                                               #
+// # Whenever a char via the UART is received, the according ISR show the current time.            #
 // # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 // # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -23,7 +22,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                17.11.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 20.04.2019 #
 // #################################################################################################
 
 
@@ -31,18 +30,16 @@
 #include <stdint.h>
 #include <neo430.h>
 
+// Configuration
+#define BAUD_RATE  19200
+#define CLOCK_FREQ 1000 // in Hz
+
 // Function prototypes
 void __attribute__((__interrupt__)) timer_irq_handler(void);
+void __attribute__((__interrupt__)) uart_irq_handler(void);
 
-// Global variables
-volatile uint8_t pwm_cnt;
-volatile uint8_t led_brightness;
-
-// Configuration
-#define LED_PIN 0   // GPIO output pin #0
-#define MIN_VAL 5   // minimum intensity (0 = 0%)
-#define MAX_VAL 255 // maximum intensity (255 = 100%)
-#define BAUD_RATE 19200
+// Variable
+volatile uint64_t time;
 
 
 /* ------------------------------------------------------------
@@ -53,8 +50,6 @@ int main(void) {
   // setup UART
   neo430_uart_setup(BAUD_RATE);
 
-  // intro text
-  neo430_uart_br_print("\nSoftware PWM demo.\n");
 
   // check if TIMER unit was synthesized, exit if no TIMER is available
   if (!(SYS_FEATURES & (1<<SYS_TIMER_EN))) {
@@ -62,60 +57,45 @@ int main(void) {
     return 1;
   }
 
-  // check if GPIO unit was synthesized, exit if no GPIO is available
-  if (!(SYS_FEATURES & (1<<SYS_GPIO_EN))) {
-    neo430_uart_br_print("Error! No GPIO unit synthesized!");
-    return 1;
-  }
 
-  // deactivate all LEDs
-  neo430_gpio_port_set(0);
+  // reset time
+  time = 0;
+
+
+  // intro text
+  neo430_uart_br_print("\nClock example. Press any key to show the current time.\n");
+
+
+  // init TIMER IRQ
+  // ------------------------------------------------------
 
   // set address of timer IRQ handler
   IRQVEC_TIMER = (uint16_t)(&timer_irq_handler);
 
-  // set timer configuration:
-  // PWM frequency = 10kHz
-  // f_tick := 10kHz @ PRSC := 128
-  // f_tick = 10kHz = f_clock / (PRSC * (TMR_THRES + 1))
-  // TMR_THRES = f_clock / (f_tick * PRSC) - 1
-  //           = f_clock / (10000 * 128) - 1
-  //           = f_clock / 1280000 - 1
-  uint32_t f_clock = ((uint32_t)CLOCKSPEED_HI<<16) | (uint32_t)CLOCKSPEED_LO;
-  TMR_THRES = (uint16_t)((f_clock / 1280000) - 1);
+  // configure timer frequency
+  if (neo430_config_timer_period(CLOCK_FREQ))
+    neo430_uart_br_print("Invalid TIMER frequency!\n");
 
-  // configure timer operation
-  TMR_CT = (1<<TMR_CT_EN) |   // enable timer
-           (1<<TMR_CT_ARST) | // auto reset on threshold match
-           (1<<TMR_CT_IRQ) |  // enable IRQ
-           (4<<TMR_CT_PRSC0); // 4 -> PRSC = 128
+  TMR_CT |= (1<<TMR_CT_EN) | (1<<TMR_CT_ARST) | (1<<TMR_CT_IRQ); // enable timer, auto-reset, irq enabled
 
-  // beat
-  uint16_t beat = 0;
-  beat = (uint16_t)(f_clock / 10000);
 
-  // init IRQ variables
-  pwm_cnt = 0;
-  led_brightness = MIN_VAL;
+  // init UART RX IRQ
+  // ------------------------------------------------------
+
+  // set address of UART IRQ handler
+  IRQVEC_SERIAL = (uint16_t)(&uart_irq_handler);
+
+  // activate UART RX interrupt
+  UART_CT |= (1<<UART_CT_RX_IRQ);
+
 
   // enable global IRQs
   neo430_eint();
 
-  // generate heartbeat
-  uint8_t up_down = 0; // start with decreasing intensity
+
+  // do nothing
   while (1) {
-    // min/max reached?
-    if ((led_brightness == MAX_VAL) || (led_brightness == MIN_VAL))
-      up_down = ~up_down;
-
-    if (up_down) // increase brightness
-      led_brightness++;
-    else // decrease brightness
-      led_brightness--;
-
-    uint16_t i = 0;
-    for (i=0; i<beat; i++) // wait a moment
-      asm volatile ("nop");
+    neo430_sleep();
   }
 
   return 0;
@@ -123,17 +103,27 @@ int main(void) {
 
 
 /* ------------------------------------------------------------
- * INFO Timer interrupt handler - update PWM
+ * INFO Timer interrupt handler
  * ------------------------------------------------------------ */
 void __attribute__((__interrupt__)) timer_irq_handler(void) {
 
-  if (pwm_cnt <= led_brightness)
-    neo430_gpio_pin_set(LED_PIN); // LED on
-  else
-    neo430_gpio_pin_clr(LED_PIN); // LED off
-
-  if (pwm_cnt == 256)
-    pwm_cnt = 0;
-
-  pwm_cnt++;
+  time++;
 }
+
+
+/* ------------------------------------------------------------
+ * INFO UART interrupt handler
+ * ------------------------------------------------------------ */
+void __attribute__((__interrupt__)) uart_irq_handler(void) {
+
+  // reactive IRQs to allow nested interrupts
+  neo430_eint();
+
+  // show time
+  uint32_t current_time = time/CLOCK_FREQ; // in seconds
+  uint16_t hour   = (uint16_t)( (current_time/3600)%24 );
+  uint16_t minute = (uint16_t)( (current_time/60)%60 );
+  uint16_t second = (uint16_t)( (current_time%60) );
+  neo430_printf("Current runtime: %u:%u:%u\n", hour, minute, second);
+}
+

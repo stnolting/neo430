@@ -68,7 +68,7 @@ int main(void) {
   uart_rtx_fifo.put_pnt = 0;
 
   // deactivate all LEDs
-  GPIO_OUT = 0;
+  GPIO_OUTPUT = 0;
 
   // set address of UART, TIMER and GPIO IRQ handlers
   IRQVEC_SERIAL = (uint16_t)(&uart_irq_handler);
@@ -186,5 +186,5 @@ uint8_t fifo_get(volatile struct uart_fifo *fifo, uint8_t *c) {
  * ------------------------------------------------------------ */
 void __attribute__((__interrupt__)) gpio_irq_handler(void) {
 
-  GPIO_OUT = (GPIO_OUT + 1) & 0x00FF; // increment LED counter
+  GPIO_OUTPUT = (GPIO_OUTPUT + 1) & 0x00FF; // increment LED counter
 }

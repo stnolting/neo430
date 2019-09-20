@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from http://www.gnu.org/licenses/lgpl-3.0.en.html                 #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 20.04.2019 #
 // #################################################################################################
 
 
@@ -29,6 +29,7 @@
 
 // Configuration
 #define BAUD_RATE 19200
+#define PWM_MAX   63
 
 
 /* ------------------------------------------------------------
@@ -47,24 +48,25 @@ int main(void) {
     return 1;
   }
 
-  // enable pwm controller in fast mode
-  neo430_pwm_enable_fast_mode();
+  // enable pwm controller
+  neo430_pwm_enable(PWM_PRSC_2, 8); // max frequency, 8-bit resolution
+
+  // clear all channels
+  neo430_pwm_set(0, 0);
+  neo430_pwm_set(1, 0);
+  neo430_pwm_set(2, 0);
+  neo430_pwm_set(3, 0);
 
   uint8_t pwm = 0;
   uint8_t up = 1;
   uint8_t ch = 0;
-
-  // clear all channels
-  neo430_pwm_set_ch0(0);
-  neo430_pwm_set_ch1(0);
-  neo430_pwm_set_ch2(0);
 
   // animate!
   while(1) {
   
     // update duty cycle
     if (up) {
-      if (pwm == 127) // up to half intensity
+      if (pwm == (256/2)) // half max
         up = 0;
       else
         pwm++;
@@ -73,22 +75,15 @@ int main(void) {
       if (pwm == 0) {
         ch = (ch + 1) & 3;
         up = 1;
-        neo430_cpu_delay_ms(200);
       }
       else
         pwm--;
     }
   
     // output new duty cycle
-    if (ch == 0)
-      neo430_pwm_set_ch0(pwm);
-    if (ch == 1)
-      neo430_pwm_set_ch1(pwm);
-    if (ch == 2)
-      neo430_pwm_set_ch2(pwm);
-  
-    // wait 5ms
-    neo430_cpu_delay_ms(5);
+    neo430_pwm_set(ch, pwm);
+
+    neo430_cpu_delay_ms(4);
   }
 
   return 0;

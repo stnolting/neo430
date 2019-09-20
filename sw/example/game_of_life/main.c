@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 29.04.2019 #
 // #################################################################################################
 
 
@@ -71,7 +71,6 @@ int main(void) {
     neo430_xorshift32();
   }
 
-
   // initialize universe using random data
   for (x=0; x<NUM_CELLS_X/8; x++) {
     for (y=0; y<NUM_CELLS_Y; y++) {
@@ -90,7 +89,7 @@ int main(void) {
     }
 
     // print generation, population count and the current universe
-    neo430_printf("\n\nGeneration %l, %u living cells\n", generation, pop_count(u));
+    neo430_printf("\n\nGeneration %l, %u/%u living cells\n", generation, pop_count(u), NUM_CELLS_X*NUM_CELLS_Y);
     print_universe(u);
 
     // compute next generation
@@ -112,8 +111,8 @@ int main(void) {
     u = (u + 1) & 1; // switch universe
     generation++;
 
-    // wait some time...
-    neo430_cpu_delay((CLOCKSPEED_HI >> 6) + 1);
+    // wait 500ms
+    neo430_cpu_delay_ms(500);
   }
 
   return 0;

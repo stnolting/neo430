@@ -49,7 +49,7 @@ int main(void) {
   }
 
   neo430_uart_br_print("Cause of last processor reset: ");
-  if ((WDT_CT & (1<<WDT_RCAUSE)) == 0)
+  if ((WDT_CT & (1<<WDT_CT_RCAUSE)) == 0)
     neo430_uart_br_print("EXTERNAL RESET");
   else
     neo430_uart_br_print("WATCHDOG");

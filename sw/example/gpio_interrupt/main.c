@@ -22,7 +22,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 06.04.2019 #
 // #################################################################################################
 
 
@@ -59,7 +59,7 @@ int main(void) {
   }
 
   // deactivate all LEDs
-  GPIO_OUT = 0;
+  GPIO_OUTPUT = 0;
 
   // set address of IRQ handler
   IRQVEC_GPIO  = (uint16_t)(&gpio_irq_handler);
@@ -73,7 +73,7 @@ int main(void) {
   // go to sleep mode, increment counter whenever the CPU wakes up
   while (1) {
     neo430_sleep();
-    GPIO_OUT = (GPIO_OUT + 1) & 0x00FF; // increment LED counter
+    GPIO_OUTPUT = (GPIO_OUTPUT + 1) & 0x00FF; // increment LED counter
   }
 
   return 0;
@@ -89,7 +89,7 @@ void __attribute__((__interrupt__)) gpio_irq_handler(void) {
   // the input, which caused the IRQ
 
   neo430_uart_br_print("GPIO pin change interrupt! Current input state: 0x");
-  neo430_uart_print_hex_word(GPIO_IN);
+  neo430_uart_print_hex_word(GPIO_INPUT);
   neo430_uart_br_print("\n");
 }
 

@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 07.12.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 11.03.2019 #
 // #################################################################################################
 
 
@@ -133,11 +133,28 @@ void set_speed(void) {
   uint8_t prsc = (uint8_t)neo430_hexstr_to_uint(terminal_buffer, strlen(terminal_buffer));
   if ((prsc >= 0) && (prsc < 8)) { // valid?
     TWI_CT = 0; // reset
-    TWI_CT = (1 << TWI_CT_ENABLE) | (prsc << TWI_CT_PRSC0);
+    TWI_CT = (1 << TWI_CT_EN) | (prsc << TWI_CT_PRSC0);
     neo430_uart_br_print("\nDone.\n");
   }
-  else
+  else {
     neo430_uart_br_print("\nInvalid selection!\n");
+    return;
+  }
+
+  // print new clock frequency
+  uint32_t clock = CLOCKSPEED_32bit;
+  switch (prsc) {
+    case 0: clock = clock / 2; break;
+    case 1: clock = clock / 4; break;
+    case 2: clock = clock / 8; break;
+    case 3: clock = clock / 64; break;
+    case 4: clock = clock / 128; break;
+    case 5: clock = clock / 1024; break;
+    case 6: clock = clock / 2048; break;
+    case 7: clock = clock / 4096; break;
+    default: clock = 0; break;
+  }
+  neo430_printf("New I2C clock: %n Hz\n", clock);
 }
 
 

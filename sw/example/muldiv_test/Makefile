@@ -1,9 +1,5 @@
 #################################################################################################
-#  < NEO430 make file - Linux version >                                                         #
-# ********************************************************************************************* #
-# Application's relative path from the common folder and application's main file are passed as  #
-# arguments. Use "make MAIN=<file>" to define other main file. "make" or "make all" will build  #
-# the default main "make clean" to clean up generated files.                                    #
+#  < NEO430 Application Compile Script - Linux / Cygwin / Windows Subsystem for Linux version > #
 # ********************************************************************************************* #
 # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -23,8 +19,50 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 # ********************************************************************************************* #
-# Stephan Nolting, Hannover, Germany                                                 29.06.2018 #
+# Stephan Nolting, Hannover, Germany                                                 06.04.2019 #
 #################################################################################################
+
+
+#-------------------------------------------------------------------------------
+# USER CONFIGURATION
+#-------------------------------------------------------------------------------
+# Compiler effort (-Os = optimize for size)
+EFFORT = -Os
+
+# User's application sources (append all additional files here)
+APP_SRC = main.c 
+
+# User's application include folders (don't forget the '-I# before each entry)
+APP_INC = -I .
+
+
+#-------------------------------------------------------------------------------
+# Path of compiler binaries - SET THIS VIA YOUR ENV VARIABLES
+#-------------------------------------------------------------------------------
+ifndef MSP430GCC_BIN_PATH
+$(error Environment variable MSP430GCC_BIN_PATH pointing to the MSP430GCC compiler's bin folder is not set)
+endif
+
+
+#-------------------------------------------------------------------------------
+# NEO430 framework
+#-------------------------------------------------------------------------------
+# Path to NEO430 linker script and startup file
+NEO430_COM_PATH=../../common
+# Path to main NEO430 library include files
+NEO430_INC_PATH=../../lib/neo430/include
+# Path to main NEO430 library source files
+NEO430_SRC_PATH=../../lib/neo430/source
+# Path to NEO430 executable generator
+NEO430_EXE_PATH=../../tools/image_gen
+# Path to NEO430 core rtl folder
+NEO430_RTL_PATH=../../../rtl/core
+
+
+#-------------------------------------------------------------------------------
+# Add NEO430 sources to input SRCs
+#-------------------------------------------------------------------------------
+APP_SRC += $(wildcard $(NEO430_SRC_PATH)/*.c)
 
 
 #-------------------------------------------------------------------------------
@@ -32,41 +70,120 @@
 #-------------------------------------------------------------------------------
 .SUFFIXES:
 .PHONY: all
-.DEFAULT_GOAL = all
+.DEFAULT_GOAL := help
 
 
 #-------------------------------------------------------------------------------
-# Definitions
+# Application output definitions
 #-------------------------------------------------------------------------------
-# default main file
-ifeq ($(MAIN),)
-  MAIN = main.c
-endif
+APP_BIN = main.bin
+APP_ASM = main.s
 
-# relative path TO common foler
-COMMON_PATH	= ../../common
+all: $(APP_ASM) $(APP_BIN) neo430_application_image.vhd
 
-# relative path from common folder to current folder
-mkfile_path = $(abspath $(lastword $(MAKEFILE_LIST)))
-curr_folder = $(notdir $(patsubst %/,%,$(dir $(mkfile_path))))
-APP_PATH = ../example/$(curr_folder)
+# define all object files
+OBJ = $(APP_SRC:.c=.o)
 
 
 #-------------------------------------------------------------------------------
-# Main target
+# Tools
 #-------------------------------------------------------------------------------
-all:
-	@echo $(WARNING)
-	@make -r -s -C $(COMMON_PATH) APP_DIR=$(APP_PATH) MAIN=$(MAIN)
+#C ompiler tools
+AS        = $(MSP430GCC_BIN_PATH)/msp430-elf-as
+CC        = $(MSP430GCC_BIN_PATH)/msp430-elf-gcc
+LD        = $(MSP430GCC_BIN_PATH)/msp430-elf-ld
+STRIP     = $(MSP430GCC_BIN_PATH)/msp430-elf-strip
+OBJDUMP   = $(MSP430GCC_BIN_PATH)/msp430-elf-objdump
+OBJCOPY   = $(MSP430GCC_BIN_PATH)/msp430-elf-objcopy
+SIZE      = $(MSP430GCC_BIN_PATH)/msp430-elf-size
+IMAGE_GEN = $(NEO430_EXE_PATH)/image_gen
+
+# Compiler flags
+CC_OPTS = -mcpu=msp430 -pipe -Wall -Xassembler --mY -mhwmult=none -lm -fno-delete-null-pointer-checks
+CC_OPTS += -Wl,-static -mrelax -minrt -nostartfiles -fdata-sections -ffunction-sections -Xlinker --gc-sections -flto
+
+# Linker flags
+LD_OPTS = -mcpu=msp430 -Wl,--gc-sections -mrelax -minrt -nostartfiles -flto
+
+
+#-------------------------------------------------------------------------------
+# PC Host Compiler
+#-------------------------------------------------------------------------------
+CC_X86 = g++ -Wall -O -g
+
+
+#-------------------------------------------------------------------------------
+# Tool Targets
+#-------------------------------------------------------------------------------
+# install/compile tools
+$(IMAGE_GEN): $(NEO430_EXE_PATH)/main.cpp
+	@echo Compiling $(IMAGE_GEN)
+	@$(CC_X86) $< -o $(IMAGE_GEN)
+
+  
+#-------------------------------------------------------------------------------
+# Application Targets
+#-------------------------------------------------------------------------------
+# Assemble startup code
+crt0.elf: $(NEO430_COM_PATH)/crt0.asm
+	@$(AS) -mY -mcpu=msp430 $< -o $@
+
+# Compile app sources
+$(OBJ): %.o : %.c crt0.elf
+	@$(CC) -c $(CC_OPTS) $(EFFORT) -I $(NEO430_INC_PATH) $(APP_INC) $< -o $@
+
+# Link object files
+main.elf: $(OBJ)
+	@$(CC) $(LD_OPTS) $(EFFORT) -I $(NEO430_INC_PATH) $(APP_INC) -T $(NEO430_COM_PATH)/neo430_linker_script.x $(OBJ) -o $@
+	@echo Memory utilization:
+	@$(SIZE) main.elf
+
+# Generate final executable (from .image section only)
+image.dat: main.elf
+	@$(OBJCOPY) -I elf32-little $< -j .text   -O binary text.dat
+	@$(OBJCOPY) -I elf32-little $< -j .rodata -O binary rodata.dat
+	@$(OBJCOPY) -I elf32-little $< -j .data   -O binary data.dat
+	@cat text.dat rodata.dat data.dat > $@
+	@ rm -f text.dat rodata.dat data.dat
+
+# Assembly listing file (for debugging)
+$(APP_ASM): main.elf
+	@$(OBJDUMP) -D -S -z  $< > $@
+	@if grep -qR "dadd" $@; then echo "NEO430: WARNING! 'DADD' instruction might be used! Make sure it is synthesized!"; fi
+
+# Generate NEO430 executable image for bootloader update
+$(APP_BIN): image.dat $(IMAGE_GEN)
+	@$(IMAGE_GEN) -app_bin $< $@
+
+# Generate NEO430 executable VHDL boot image
+neo430_application_image.vhd: image.dat $(IMAGE_GEN)
+	@$(IMAGE_GEN) -app_img $< $@
+	@echo Installing application image to $(NEO430_RTL_PATH)/neo430_application_image.vhd
+	@cp neo430_application_image.vhd $(NEO430_RTL_PATH)/.
+	@rm -f neo430_application_image.vhd
+
+
+#-------------------------------------------------------------------------------
+# Help
+#-------------------------------------------------------------------------------
+help:
+	@echo "NEO430 Application Compilation Script"
+	@echo "Targets:"
+	@echo " help      - show this text"
+	@echo " all       - compile and generate VHDL boot image and *.bin executable for upload via bootloader"
+	@echo " clean     - clean up this project only"
+	@echo " clean_all - clean up everything"
 
 
 #-------------------------------------------------------------------------------
 # Clean up
 #-------------------------------------------------------------------------------
 clean:
-	@rm -f main.bin main.s
-	@make -r -s -C $(COMMON_PATH) clean
+	@rm -f *.elf *.o *.dat *.vhd *.s *.bin
 
+clean_all:
+	@rm -f $(OBJ) *.elf *.dat *.bin *.vhd *.s $(IMAGE_GEN)
 
+  
 #-------------------------------------------------------------------------------
 # eof
