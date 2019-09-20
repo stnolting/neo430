@@ -48,7 +48,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Code-efficient CISC-like instruction capabilities
 - Full support of the original MSP430 instruction set architecture
 - Tool chain based on free TI msp430-gcc compiler
-- Application compilation scripts for Windows and Linux/Cygwin
+- Application compilation scripts for Windows Powershell / Windows Subsystem for Linux / native Linux
 - Completely described in behavioral, platform-independent VHDL
 - Fully synchronous design, no latches, no gated clocks
 - Very small outline and high operating frequency
@@ -65,7 +65,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Optional watchdog timer (WDT)
 - Optional cyclic redundancy check unit (CRC16/32)
 - Optional custom functions unit (CFU) for user-defined processor extensions
-- Optional 3 channel 8-bit PWM controller (PWM)
+- Optional 4 channel PWM controller with 1 to 8 bit resolution (PWM)
 - Optional internal bootloader (2kB ROM) with serial user console and automatic boot from external SPI EEPROM
 
 
@@ -75,29 +75,30 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Up to 48kB instruction memory and 12kB data memory
 - Specific memory map – included NEO430 linker script and compilation script required
 - Custom binary executable format
-- Only 4 CPU interrupt channels (instead of 16)
+- Just 4 CPU interrupt channels
 - Single clock domain for complete processor
 - Different numbers of instruction execution cycles
 - Only one power-down (sleep) mode
 - Wishbone-compatible interface to attach custom IP
 - Internal bootloader with text interface (via UART serial port)
-- *NO* built-in support of floating point types (i.e. float & double)
+- *NO* built-in support of floating point types yet (i.e. float & double)
 
 
 ## Implementation Results
 
-Mapping results generated for HW version 0x0200. The full (default) configuration includes
+Mapping results generated for HW version 0x0300. The full (default) configuration includes
 all optional processor modules (excluding the CFU), an IMEM size of 4kB and a DMEM size of 2kB.
+Results generated with Xilinx Vivado 2017.3 and Intel Quartus Prime Lite 17.1
 
-| __Xilinx Artix-7 (XC7A35TICSG324-1L)__  | LUTs     | FFs      | BRAMs    | DSPs   | f_max*  |
-|:----------------------------------------|:--------:|:--------:|:--------:|:------:|:-------:|
-| Full (default) configuration:           | 993 (5%) | 922 (2%) | 2.5 (5%) | 0 (0%) | 200 MHz |
-| Minimal configuration (CPU + GPIO):     | 754 (4%) | 287 (1%) |   1 (2%) | 0 (0%) | 200 MHz |
+| __Xilinx Artix-7 (XC7A35TICSG324-1L)__  | LUTs      | FFs      | BRAMs    | DSPs   | f_max*  |
+|:----------------------------------------|:---------:|:--------:|:--------:|:------:|:-------:|
+| Full (default) configuration:           | 1006 (5%) | 952 (2%) | 2.5 (5%) | 0 (0%) | 100 MHz |
+| Minimal configuration (CPU + GPIO):     | 879  (4%) | 287 (1%) | 1   (2%) | 0 (0%) | 100 MHz |
 
 | __Intel/Altera Cyclone IV (EP4CE22F17C6)__  | LUTs      | FFs      | Memory bits  | DSPs   | f_max   |
 |:--------------------------------------------|:---------:|:--------:|:------------:|:------:|:-------:|
-| Full (default) configuration:               | 1637 (7%) | 910 (4%) | 65792  (11%) | 0 (0%) | 115 MHz |
-| Minimal configuration (CPU + GPIO):         |  598 (3%) | 228 (1%) | 49408   (8%) | 0 (0%) | 122 MHz |
+| Full (default) configuration:               | 1676 (8%) | 940 (4%) | 65792  (11%) | 0 (0%) | 116 MHz |
+| Minimal configuration (CPU + GPIO):         | 602  (3%) | 228 (1%) | 49408   (8%) | 0 (0%) | 124 MHz |
 
 *) Constrained
 
