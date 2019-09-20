@@ -19,7 +19,7 @@
 ; # You should have received a copy of the GNU Lesser General Public License along with this      #
 ; # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 ; # ********************************************************************************************* #
-; #  Stephan Nolting, Hannover, Germany                                               10.01.2018  #
+; # Stephan Nolting, Hannover, Germany                                                 06.04.2019 #
 ; #################################################################################################
 
   .file	"crt0.asm"
@@ -39,6 +39,7 @@ __crt0_begin:
 ; -----------------------------------------------------------
     mov  #0, r2           ; clear status register & disable interrupts
     add  r8, r1           ; r1 = stack pointer = end of RAM
+    sub  #2, r1           ; address of last entry of stack
     mov  #0x4700, &0xFFB8 ; deactivate watchdog
 
 
