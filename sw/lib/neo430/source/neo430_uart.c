@@ -19,34 +19,11 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 18.01.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 20.04.2019 #
 // #################################################################################################
 
-#ifndef neo430_uart_h
-#define neo430_uart_h
-
-// Libs required by functions
-#include <stdarg.h>
-
-// prototypes
-void neo430_uart_set_baud(uint32_t baudrate);                              // activate and configure UART
-void neo430_uart_putc(char c);                                             // send single char
-char neo430_uart_getc(void);                                               // wait and read single char
-uint16_t neo430_uart_char_received(void);                                  // test if a char has been received
-char neo430_uart_char_read(void);                                          // get a received char
-void neo430_uart_print(char *s);                                           // print a text string
-void neo430_uart_br_print(char *s);                                        // print a text string and allow easy line breaks
-uint16_t neo430_uart_scan(char *buffer, uint16_t max_size, uint16_t echo); // read several chars into buffer
-void neo430_uart_print_hex_char(char c);                                   // print byte as a hex char
-void neo430_uart_print_hex_byte(uint8_t b);                                // print byte as 2 hex numbers
-void neo430_uart_print_hex_word(uint16_t w);                               // print word as 4 hex numbers
-void neo430_uart_print_hex_dword(uint32_t dw);                             // print double word as 8 hex numbers
-void neo430_uart_print_bin_byte(uint8_t b);                                // print byte in binary form
-void neo430_uart_print_bin_word(uint16_t w);                               // print word in binary form
-void neo430_uart_print_bin_dword(uint32_t dw);                             // print double word in binary form
-void neo430_itoa(uint32_t x);                                             // convert double word to decimal number
-void neo430_printf(char *format, ...);                                    // print format string
-uint32_t neo430_hexstr_to_uint(char *buffer, uint8_t length);              // convert hex string to number
+#include "neo430.h"
+#include "neo430_uart.h"
 
 
 /* ------------------------------------------------------------
@@ -296,12 +273,13 @@ void neo430_uart_print_bin_dword(uint32_t dw) {
  * INFO Print 32-bit number as decimal number
  * INFO Slow custom version of itoa
  * PARAM 32-bit value to be printed as decimal number
+ * PARAM show leading zeros when set
  * ------------------------------------------------------------ */
-void neo430_itoa(uint32_t x) {
+void neo430_itoa(uint32_t x, const uint16_t leading_zeros) {
 
   static const char numbers[10] = "0123456789";
   char buffer1[11], buffer2[11];
-  uint8_t i, j;
+  uint16_t i, j;
 
   buffer1[10] = '\0';
   buffer2[10] = '\0';
@@ -313,7 +291,7 @@ void neo430_itoa(uint32_t x) {
   }
 
   // delete 'leading' zeros
-  for (i=9; i!=0; i--) {
+  for (i=9; i!=leading_zeros; i--) {
     if (buffer1[i] == '0')
       buffer1[i] = '\0';
     else
@@ -343,7 +321,6 @@ void neo430_itoa(uint32_t x) {
 void neo430_printf(char *format, ...) {
 
   char c;
-  int16_t i;
   int32_t n;
 
   va_list a;
@@ -360,26 +337,26 @@ void neo430_printf(char *format, ...) {
           neo430_uart_putc((char)va_arg(a, int));
           break;
         case 'i': // 16-bit integer
-          i = va_arg(a, int);
-          if (i < 0) {
-            i = -i;
-            neo430_uart_putc('-');
-          }
-          neo430_itoa((uint32_t)i);
-          break;
-        case 'u': // 16-bit unsigned
-          neo430_itoa((uint32_t)va_arg(a, unsigned int));
-          break;
-        case 'l': // 32-bit long
-          n = va_arg(a, int32_t);
+          n = (int32_t)va_arg(a, int);
           if (n < 0) {
             n = -n;
             neo430_uart_putc('-');
           }
-          neo430_itoa((uint32_t)n);
+          neo430_itoa((uint32_t)n, 0);
+          break;
+        case 'u': // 16-bit unsigned
+          neo430_itoa((uint32_t)va_arg(a, unsigned int), 0);
+          break;
+        case 'l': // 32-bit long
+          n = (int32_t)va_arg(a, int32_t);
+          if (n < 0) {
+            n = -n;
+            neo430_uart_putc('-');
+          }
+          neo430_itoa((uint32_t)n, 0);
           break;
         case 'n': // 32-bit unsigned long
-          neo430_itoa(va_arg(a, uint32_t));
+          neo430_itoa(va_arg(a, uint32_t), 0);
           break;
         case 'x': // 16-bit hexadecimal
           neo430_uart_print_hex_word(va_arg(a, unsigned int));
@@ -398,6 +375,32 @@ void neo430_printf(char *format, ...) {
     }
   }
   va_end(a);
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Print fixed point number
+ * INFO HIGHLY EXPERIMENTAL!
+ * PARAM fixed point number (32-bit)
+ * PARAM number of fractional bits
+ * ------------------------------------------------------------ */
+void neo430_fp_print(int32_t num, const uint16_t fp) {
+
+  // print integer part
+  int32_t num_int = num;
+
+  if (num_int < (int32_t)0) {
+    num_int = -num_int;
+    neo430_uart_putc('-');
+  }
+  neo430_itoa((uint32_t)num_int >> fp, 0);
+
+  neo430_uart_putc('.');
+
+  // print fractional part (3 digits)
+  uint32_t frac_part = (uint32_t)(num_int & ((1<<fp)-1));
+  frac_part = (frac_part * 1000) / (1<<fp);
+  neo430_itoa(frac_part, 2);
 }
 
 
@@ -429,6 +432,3 @@ uint32_t neo430_hexstr_to_uint(char *buffer, uint8_t length) {
 
   return res;
 }
-
-
-#endif // neo430_uart_h

@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 19.09.2019 #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -47,6 +47,19 @@
 
 
 // ----------------------------------------------------------------------------
+// Processor peripheral/IO devices
+// Beginning of IO area: 0xFF80
+// Size of IO area: 128 bytes
+// ----------------------------------------------------------------------------
+#define REG8  (volatile uint8_t*)        // memory-mapped register
+#define REG16 (volatile uint16_t*)       // memory-mapped register
+#define REG32 (volatile uint32_t*)       // memory-mapped register
+#define ROM8  (const volatile uint8_t*)  // read-only
+#define ROM16 (const volatile uint16_t*) // read-only
+#define ROM32 (const volatile uint32_t*) // read-only
+
+
+// ----------------------------------------------------------------------------
 // Start of data memory (DMEN)
 // ----------------------------------------------------------------------------
 #define DMEM_ADDR_BASE 0xC000
@@ -59,19 +72,6 @@
 #define IRQVEC_SERIAL (*(REG16 (DMEM_ADDR_BASE + 2))) // r/w: uart/spi/twi irqs
 #define IRQVEC_GPIO   (*(REG16 (DMEM_ADDR_BASE + 4))) // r/w: gpio pin change
 #define IRQVEC_EXT    (*(REG16 (DMEM_ADDR_BASE + 6))) // r/w: external IRQ
-
-
-// ----------------------------------------------------------------------------
-// Processor peripheral/IO devices
-// Beginning of IO area: 0xFF80
-// Size of IO area: 128 bytes
-// ----------------------------------------------------------------------------
-#define REG8  (volatile uint8_t*)        // memory-mapped register
-#define REG16 (volatile uint16_t*)       // memory-mapped register
-#define REG32 (volatile uint32_t*)       // memory-mapped register
-#define ROM8  (const volatile uint8_t*)  // read-only
-#define ROM16 (const volatile uint16_t*) // read-only
-#define ROM32 (const volatile uint32_t*) // read-only
 
 
 // ----------------------------------------------------------------------------
@@ -187,8 +187,8 @@
 // ----------------------------------------------------------------------------
 //#define reserved   (*(REG16 0xFFA8)) // reserved
 #define GPIO_IRQMASK (*(REG16 0xFFAA)) // -/w: irq mask register
-#define GPIO_IN      (*(ROM16 0xFFAC)) // r/-: parallel input
-#define GPIO_OUT     (*(REG16 0xFFAE)) // r/w: parallel output
+#define GPIO_INPUT   (*(ROM16 0xFFAC)) // r/-: parallel input
+#define GPIO_OUTPUT  (*(REG16 0xFFAE)) // r/w: parallel output
 
 
 // ----------------------------------------------------------------------------
@@ -224,12 +224,12 @@
 #define WDT_CT (*(REG16 0xFFB8)) // r/w: Watchdog control register
 
 // Watchdog control register
-#define WDT_PASSWORD 0x47 // must be set in the upper 8 bits of the WDT CTRL register
-#define WDT_PRSC0    0 // r/w: clock prescaler select bit 0
-#define WDT_PRSC1    1 // r/w: clock prescaler select bit 1
-#define WDT_PRSC2    2 // r/w: clock prescaler select bit 2
-#define WDT_ENABLE   3 // r/w: WDT enable
-#define WDT_RCAUSE   4 // r/-: reset cause (0: external, 1: watchdog timeout)
+#define WDT_CT_PASSWORD 0x47 // must be set in the upper 8 bits of the WDT CTRL register
+#define WDT_CT_PRSC0    0 // r/w: clock prescaler select bit 0
+#define WDT_CT_PRSC1    1 // r/w: clock prescaler select bit 1
+#define WDT_CT_PRSC2    2 // r/w: clock prescaler select bit 2
+#define WDT_CT_EN       3 // r/w: WDT enable
+#define WDT_CT_RCAUSE   4 // r/-: reset cause (0: external, 1: watchdog timeout)
 
 // Watchdog clock prescaler select:
 #define WDT_PRSC_2    0 // CLK/2
@@ -274,14 +274,28 @@
 // ----------------------------------------------------------------------------
 // Pulse Width Modulation Controller (PWM)
 // ----------------------------------------------------------------------------
-#define PWM_CT  (*(REG16 0xFFE0)) // -/w: control register
-#define PWM_CH0 (*(REG16 0xFFE2)) // -/w: duty cycle channel 0
-#define PWM_CH1 (*(REG16 0xFFE4)) // -/w: duty cycle channel 1
-#define PWM_CH2 (*(REG16 0xFFE6)) // -/w: duty cycle channel 2
+#define PWM_CT   (*(REG16 0xFFE0)) // -/w: control register
+#define PWM_CH10 (*(REG16 0xFFE2)) // r/w: duty cycle channel 1 and 0
+#define PWM_CH32 (*(REG16 0xFFE4)) // r/w: duty cycle channel 3 and 2
 
 // PWM controller control register
-#define PWM_CT_ENABLE 0 // r/w: WDT enable
-#define PWM_CT_FMODE  1 // r/w: 0 = slow PWM mode, 1 = fast PWM mode
+#define PWM_CT_EN     0 // -/w: PWM enable
+#define PWM_CT_PRSC0  1 // -/w: clock prescaler select bit 0
+#define PWM_CT_PRSC1  2 // -/w: clock prescaler select bit 1
+#define PWM_CT_PRSC2  3 // -/w: clock prescaler select bit 2
+#define PWM_CT_SIZE0  4 // -/w: PWM counter size bit 0
+#define PWM_CT_SIZE1  5 // -/w: PWM counter size bit 1
+#define PWM_CT_SIZE2  6 // -/w: PWM counter size bit 2
+
+// PWM clock prescaler select:
+#define PWM_PRSC_2    0 // CLK/2
+#define PWM_PRSC_4    1 // CLK/4
+#define PWM_PRSC_8    2 // CLK/8
+#define PWM_PRSC_64   3 // CLK/64
+#define PWM_PRSC_128  4 // CLK/128
+#define PWM_PRSC_1024 5 // CLK/1024
+#define PWM_PRSC_2048 6 // CLK/2048
+#define PWM_PRSC_4096 7 // CLK/4096
 
 
 // ----------------------------------------------------------------------------
@@ -291,7 +305,7 @@
 #define TWI_DATA (*(REG16 0xFFEA)) // r/w: RX (r) / TX (w) data
 
 // TWI control register
-#define TWI_CT_ENABLE   0 // r/w: TWI enable
+#define TWI_CT_EN       0 // r/w: TWI enable
 #define TWI_CT_START    1 // -/w: generate START condition
 #define TWI_CT_STOP     2 // -/w: generate STOP condition
 #define TWI_CT_BUSY     3 // r/-: TWI busy
@@ -364,7 +378,7 @@
 
 
 // ----------------------------------------------------------------------------
-// Include IO libraries
+// Include all IO library headers
 // ----------------------------------------------------------------------------
 #include "neo430_aux.h"
 #include "neo430_cpu.h"

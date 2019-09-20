@@ -19,22 +19,11 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 04.07.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 13.03.2019 #
 // #################################################################################################
 
-#ifndef neo430_crc_h
-#define neo430_crc_h
-
-// prototypes
-inline uint16_t neo430_crc16(uint16_t start_val, uint16_t polynomial, uint8_t *data, uint16_t length);
-inline uint32_t neo430_crc32(uint32_t start_val, uint32_t polynomial, uint8_t *data, uint16_t length);
-
-void neo430_crc16_set_start_value(uint16_t start_val);
-void neo430_crc32_set_start_value(uint32_t start_val);
-inline void neo430_crc16_set_polynomial(uint16_t poly);
-inline void neo430_crc32_set_polynomial(uint32_t poly);
-inline uint16_t neo430_crc16_iterate(uint8_t data);
-inline uint32_t neo430_crc32_iterate(uint8_t data);
+#include "neo430.h"
+#include "neo430_crc.h"
 
 
 /* ------------------------------------------------------------
@@ -85,7 +74,7 @@ uint32_t neo430_crc32(uint32_t start_val, uint32_t polynomial, uint8_t *data, ui
  * INFO Initialize start value for CRC16
  * PARAM 16-bit CRC shift reg start value
  * ------------------------------------------------------------ */
-inline void neo430_crc16_set_start_value(uint16_t start_val) {
+void neo430_crc16_set_start_value(uint16_t start_val) {
 
   CRC_RESX = start_val;
 }
@@ -95,7 +84,7 @@ inline void neo430_crc16_set_start_value(uint16_t start_val) {
  * INFO Initialize start value for CRC32
  * PARAM 32-bit CRC shift reg start value
  * ------------------------------------------------------------ */
-inline void neo430_crc32_set_start_value(uint32_t start_val) {
+void neo430_crc32_set_start_value(uint32_t start_val) {
 
   CRC_R32bit = start_val;
 }
@@ -105,7 +94,7 @@ inline void neo430_crc32_set_start_value(uint32_t start_val) {
  * INFO Set polynomial mask for CRC16
  * PARAM 16-bit CRC16 polynomial XOR mask
  * ------------------------------------------------------------ */
-inline void neo430_crc16_set_polynomial(uint16_t poly) {
+void neo430_crc16_set_polynomial(uint16_t poly) {
 
   CRC_POLY_LO = poly;
 }
@@ -115,7 +104,7 @@ inline void neo430_crc16_set_polynomial(uint16_t poly) {
  * INFO Set polynomial mask for CRC32
  * PARAM 32-bit CRC16 polynomial XOR mask
  * ------------------------------------------------------------ */
-inline void neo430_crc32_set_polynomial(uint32_t poly) {
+void neo430_crc32_set_polynomial(uint32_t poly) {
 
   CRC_POLY32bit = poly;
 }
@@ -126,7 +115,7 @@ inline void neo430_crc32_set_polynomial(uint32_t poly) {
  * PARAM 8-bit data input
  * RETURN Current result of CRC16 shift reg
  * ------------------------------------------------------------ */
-inline uint16_t neo430_crc16_iterate(uint8_t data) {
+uint16_t neo430_crc16_iterate(uint8_t data) {
 
   CRC_CRC16IN = (uint16_t)data;
   asm volatile ("nop");
@@ -139,12 +128,9 @@ inline uint16_t neo430_crc16_iterate(uint8_t data) {
  * PARAM 8-bit data input
  * RETURN Current result of CRC32 shift reg
  * ------------------------------------------------------------ */
-inline uint32_t neo430_crc32_iterate(uint8_t data) {
+uint32_t neo430_crc32_iterate(uint8_t data) {
 
   CRC_CRC32IN = (uint16_t)data;
   asm volatile ("nop");
   return CRC_R32bit;
 }
-
-
-#endif // neo430_crc_h

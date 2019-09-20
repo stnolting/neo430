@@ -1,5 +1,5 @@
 // #################################################################################################
-// #  < neo430_wdt.h - Watchdog helper functions >                                                 #
+// #  < neo430_pwm.h - PWM controller helper functions >                                           #
 // # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 // # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -19,56 +19,62 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 04.07.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 12.05.2019 #
 // #################################################################################################
 
-#ifndef neo430_wdt_h
-#define neo430_wdt_h
-
-// prototypes
-void neo430_wdt_enable(uint8_t prsc);
-void neo430_wdt_disable(void);
-void neo430_wdt_reset(void);
-void neo430_wdt_force_hw_reset(void);
+#include "neo430.h"
+#include "neo430_pwm.h"
 
 
 /* ------------------------------------------------------------
- * INFO Enable watchdog
- * PARAM Prescaler selection (0..7)
+ * INFO Reset and activate PWM controller
+ * PARAM prsc: Clock prescaler for PWM clock
+ * PARAM size: Actual bit width of PWM counter (1..8)
  * ------------------------------------------------------------ */
-void neo430_wdt_enable(uint8_t prsc) {
+void neo430_pwm_enable(uint8_t prsc, uint8_t size) {
 
-  WDT_CT = (WDT_PASSWORD<<8) | (1<<WDT_ENABLE) | (prsc & 0x07);
+  PWM_CT = 0; // reset
+  PWM_CT = (1<<PWM_CT_EN) | (((uint16_t)prsc)<<PWM_CT_PRSC0) | (((uint16_t)size-1)<<PWM_CT_SIZE0);
 }
 
 
 /* ------------------------------------------------------------
- * INFO Disable watchdog
+ * INFO Disable PWM controller
  * ------------------------------------------------------------ */
-void neo430_wdt_disable(void) {
+void neo430_pwm_disable(void) {
 
-  WDT_CT = (WDT_PASSWORD<<8) | (0<<WDT_ENABLE);
+  PWM_CT = 0;
 }
 
 
 /* ------------------------------------------------------------
- * INFO Reset watchdog
+ * INFO Set duty cycle of channel
+ * PARAM channel 0..3
+ * PARAM 8-bit duty cycle
  * ------------------------------------------------------------ */
-void neo430_wdt_reset(void) {
+void neo430_pwm_set(uint8_t channel, uint8_t dc) {
 
-  WDT_CT = WDT_CT | (WDT_PASSWORD<<8);
+  uint16_t data = 0;
+
+  // get current state
+  if (channel & 2) // channel 2 or 3
+    data = PWM_CH32;
+  else // channel 1 or 0
+    data = PWM_CH10;
+
+  // modify high or low part (even or odd channel)
+  if (channel & 1) { // channel 1 or 3
+    data &= 0x00ff;
+    data |= ((uint16_t)dc) << 8;
+  }
+  else { // channel 0 or 2
+    data &= 0xff00;
+    data |= ((uint16_t)dc) << 0;
+  }
+
+  // write back
+  if (channel & 2) // channel 2 or 3
+    PWM_CH32 = data;
+  else // channel 1 or 0
+    PWM_CH10 = data;
 }
-
-
-/* ------------------------------------------------------------
- * INFO Perform a hardware reset by activating the WDT and
- * performing an invalid access (wrong password)
- * ------------------------------------------------------------ */
-void neo430_wdt_force_hw_reset(void) {
-
-  WDT_CT = (WDT_PASSWORD<<8) | (1<<WDT_ENABLE);
-  WDT_CT = 0; // invalid access -> triggers reset
-}
-
-
-#endif // neo430_wdt_h

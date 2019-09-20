@@ -1,5 +1,5 @@
 // #################################################################################################
-// #  < neo430_aux.h - Handy helper functions ;) >                                                 #
+// #  < neo430_cpu.h - CPU helper functions >                                                      #
 // # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 // # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -19,51 +19,32 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                04.07.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 01.03.2019 #
 // #################################################################################################
 
-#ifndef neo430_aux_h
-#define neo430_aux_h
+#ifndef neo430_cpu_h
+#define neo430_cpu_h
 
 // prototypes
-uint8_t neo430_config_timer_period(uint32_t f_timer);
+void neo430_eint(void);
+void neo430_dint(void);
+uint16_t neo430_get_sp(void);
+uint16_t neo430_get_sreg(void);
+void neo430_set_sreg(uint16_t d);
+void neo430_sleep(void);
+void neo430_clear_irq_buffer(void);
+void neo430_cpu_delay(uint16_t t);
+void neo430_cpu_delay_ms(uint16_t ms);
+void neo430_soft_reset(void);
+void neo430_jump_address(uint16_t addr);
+void neo430_call_address(uint16_t addr);
+uint16_t neo430_bswap(uint16_t a);
+uint16_t neo430_combine_bytes(uint8_t hi, uint8_t lo);
+uint16_t neo430_dadd(uint16_t a, uint16_t b);
+void neo430_memset(uint8_t *dst, uint8_t data, uint16_t num);
+uint8_t neo430_memcmp(uint8_t *dst, uint8_t *src, uint16_t num);
+void neo430_memcpy(uint8_t *dst, uint8_t *src, uint16_t num);
+uint16_t neo430_bit_rev16(uint16_t x);
+uint32_t neo430_xorshift32(void);
 
-
-/* ------------------------------------------------------------
- * INFO Configure Timer period
- * PARAM Timer frequency in Hz (1Hz ... F_CPU/2)
- * RETURN 0 if successful, -1 if error
- * ------------------------------------------------------------ */
-uint8_t neo430_config_timer_period(uint32_t f_timer) {
-
-  uint32_t clock = CLOCKSPEED_32bit;
-  uint32_t ticks = (clock / (f_timer*2)) >> 1; // divide by lowest prescaler (=2)
-
-  uint8_t prsc = 0;
-
-  if (ticks == 0)
-    return -1; // frequency too high!
-
-  // find prescaler
-  while(prsc < 8) {
-    if (ticks <= 0x0000ffff)
-      break;
-    else {
-      if ((prsc == 2) || (prsc == 4))
-        ticks >>= 3;
-      else
-        ticks >>= 1;
-      prsc++;
-    }
-  }
-
-  TMR_THRES = (uint16_t)ticks;
-  TMR_CT &= ~(7<<TMR_CT_PRSC0);
-  TMR_CT |= (prsc<<TMR_CT_PRSC0);
-  TMR_CNT = 0;
-
-  return 0;
-}
-
-
-#endif // neo430_aux_h
+#endif // neo430_cpu_h
