@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 29.09.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 28.04.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -84,14 +84,12 @@ begin
   begin
     if rising_edge(clk_i) then
       if (wren = '1') then
-        case addr is
-          when gpio_out_addr_c =>
-            dout <= data_i;
-          when gpio_irqmask_addr_c =>
-            irq_mask <= data_i;
-          when others =>
-            NULL;
-        end case;
+        if (addr = gpio_out_addr_c) then
+          dout <= data_i;
+        end if;
+        if (addr = gpio_irqmask_addr_c) then
+          irq_mask <= data_i;
+        end if;
       end if;
     end if;
   end process wr_access;

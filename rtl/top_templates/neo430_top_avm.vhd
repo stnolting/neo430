@@ -62,7 +62,7 @@ entity neo430_top_avm is
     gpio_o          : out std_logic_vector(15 downto 0); -- parallel output
     gpio_i          : in  std_logic_vector(15 downto 0); -- parallel input
     -- pwm channels --
-    pwm_o           : out std_logic_vector(02 downto 0); -- pwm channels
+    pwm_o           : out std_logic_vector(03 downto 0); -- pwm channels
     -- UART --
     uart_txd_o      : out std_logic; -- UART send data
     uart_rxd_i      : in  std_logic; -- UART receive data
@@ -120,7 +120,7 @@ architecture neo430_top_avm_rtl of neo430_top_avm is
   signal rst_i_int      : std_ulogic;
   signal gpio_o_int     : std_ulogic_vector(15 downto 0);
   signal gpio_i_int     : std_ulogic_vector(15 downto 0);
-  signal pwm_o_int      : std_ulogic_vector(02 downto 0);
+  signal pwm_o_int      : std_ulogic_vector(03 downto 0);
   signal uart_txd_o_int : std_ulogic;
   signal uart_rxd_i_int : std_ulogic;
   signal spi_sclk_o_int : std_ulogic;

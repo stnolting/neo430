@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 29.09.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 28.04.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -93,31 +93,34 @@ begin
   begin
     if rising_edge(clk_i) then
       if (wr_en = '1') then -- valid word write
-        case addr is
-          when wb32_rd_adr_lo_addr_c =>
-            wb_addr(15 downto 0) <= data_i;
-            wb_we_o <= '0';
-          when wb32_rd_adr_hi_addr_c =>
-            wb_addr(31 downto 16) <= data_i;
-            wb_we_o <= '0';
-          when wb32_wr_adr_lo_addr_c =>
-            wb_addr(15 downto 0) <= data_i;
-            wb_we_o <= '1';
-          when wb32_wr_adr_hi_addr_c =>
-            wb_addr(31 downto 16) <= data_i;
-            wb_we_o <= '1';
-          when wb32_data_lo_addr_c =>
-            wb_wdata(15 downto 0) <= data_i;
-          when wb32_data_hi_addr_c =>
-            wb_wdata(31 downto 16) <= data_i;
-          when wb32_ctrl_addr_c =>
-            byte_en(0) <= data_i(ctrl_byte_en0_c);
-            byte_en(1) <= data_i(ctrl_byte_en1_c);
-            byte_en(2) <= data_i(ctrl_byte_en2_c);
-            byte_en(3) <= data_i(ctrl_byte_en3_c);
-          when others =>
-            NULL;
-        end case;
+        if (addr = wb32_rd_adr_lo_addr_c) then
+          wb_addr(15 downto 0) <= data_i;
+          wb_we_o <= '0';
+        end if;
+        if (addr = wb32_rd_adr_hi_addr_c) then
+          wb_addr(31 downto 16) <= data_i;
+          wb_we_o <= '0';
+        end if;
+        if (addr = wb32_wr_adr_lo_addr_c) then
+          wb_addr(15 downto 0) <= data_i;
+          wb_we_o <= '1';
+        end if;
+        if (addr = wb32_wr_adr_hi_addr_c) then
+          wb_addr(31 downto 16) <= data_i;
+          wb_we_o <= '1';
+        end if;
+        if (addr = wb32_data_lo_addr_c) then
+          wb_wdata(15 downto 0) <= data_i;
+        end if;
+        if (addr = wb32_data_hi_addr_c) then
+          wb_wdata(31 downto 16) <= data_i;
+        end if;
+        if (addr = wb32_ctrl_addr_c) then
+          byte_en(0) <= data_i(ctrl_byte_en0_c);
+          byte_en(1) <= data_i(ctrl_byte_en1_c);
+          byte_en(2) <= data_i(ctrl_byte_en2_c);
+          byte_en(3) <= data_i(ctrl_byte_en3_c);
+        end if;
       end if;
     end if;
   end process wr_access;
@@ -167,15 +170,13 @@ begin
     if rising_edge(clk_i) then
       data_o <= (others => '0');
       if (rden_i = '1') and (acc_en = '1') then
-        case addr is
-          when wb32_data_lo_addr_c =>
-            data_o <= wb_rdata(15 downto 00);
-          when wb32_data_hi_addr_c =>
-            data_o <= wb_rdata(31 downto 16);
-          when others =>
---        when wb32_ctrl_addr_c =>
-            data_o(ctrl_pending_c) <= pending;
-        end case;
+        if (addr = wb32_data_lo_addr_c) then
+          data_o <= wb_rdata(15 downto 00);
+        elsif (addr = wb32_data_hi_addr_c) then
+          data_o <= wb_rdata(31 downto 16);
+        else -- when wb32_ctrl_addr_c =>
+          data_o(ctrl_pending_c) <= pending;
+        end if;
       end if;
     end if;
   end process rd_access;

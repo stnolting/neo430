@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 29.04.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -30,12 +30,13 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0200"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0300"; -- no touchy!
 
-  -- Danger Zone! ---------------------------------------------------------------------------
+  -- Advanced Hardware Configuration --------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant low_power_mode_c : boolean := false; -- reduces switching activity, but will also decrease f_max and might increase area
-  constant awesome_mode_c   : boolean := true; -- of course!
+  constant use_dsp_mul_c    : boolean := false; -- use DSP blocks for MULDIV's multiplication (default=false)
+  constant low_power_mode_c : boolean := false; -- reduces switching activity, but will also decrease f_max and might increase area (default=false)
+  constant awesome_mode_c   : boolean := true; -- of course! (default=true)
 
   -- Internal Functions ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -169,11 +170,11 @@ package neo430_package is
   constant pwm_size_c : natural := 8; -- bytes
 
   constant pwm_ctrl_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(pwm_base_c) + x"0000");
-  constant pwm_ch0_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(pwm_base_c) + x"0002");
-  constant pwm_ch1_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(pwm_base_c) + x"0004");
-  constant pwm_ch2_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(pwm_base_c) + x"0006");
+  constant pwm_ch10_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(pwm_base_c) + x"0002");
+  constant pwm_ch32_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(pwm_base_c) + x"0004");
+--constant pwm_???_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(pwm_base_c) + x"0006");
 
-  -- IO: Two Wire Serial Interface --
+  -- IO: Two Wire Serial Interface (TWI) --
   constant twi_base_c : std_ulogic_vector(15 downto 0) := x"FFE8";
   constant twi_size_c : natural := 4; -- bytes
 
@@ -187,7 +188,7 @@ package neo430_package is
 --constant ???_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0000");
 --constant ???_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0002");
 
-  -- IO: System Configuration --
+  -- IO: System Configuration (SYSCONFIG) --
   constant sysconfig_base_c : std_ulogic_vector(15 downto 0) := x"FFF0";
   constant sysconfig_size_c : natural := 16; -- bytes
 
@@ -332,7 +333,7 @@ package neo430_package is
       gpio_o     : out std_ulogic_vector(15 downto 0); -- parallel output
       gpio_i     : in  std_ulogic_vector(15 downto 0); -- parallel input
       -- pwm channels --
-      pwm_o      : out std_ulogic_vector(02 downto 0); -- pwm channels
+      pwm_o      : out std_ulogic_vector(03 downto 0); -- pwm channels
       -- serial com --
       uart_txd_o : out std_ulogic; -- UART send data
       uart_rxd_i : in  std_ulogic; -- UART receive data
@@ -700,7 +701,7 @@ package neo430_package is
       clkgen_en_o : out std_ulogic; -- enable clock generator
       clkgen_i    : in  std_ulogic_vector(07 downto 0);
       -- pwm output channels --
-      pwm_o       : out std_ulogic_vector(02 downto 0)
+      pwm_o       : out std_ulogic_vector(03 downto 0)
     );
   end component;
 

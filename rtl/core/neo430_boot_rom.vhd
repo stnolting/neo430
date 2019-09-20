@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 29.09.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 28.04.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -64,7 +64,7 @@ architecture neo430_boot_rom_rtl of neo430_boot_rom is
   signal addr   : natural range 0 to boot_size_c/2-1;
 
   -- bootloader image --
-  signal boot_img : boot_img_t := init_boot_rom(bootloader_init_image);
+  constant boot_img : boot_img_t := init_boot_rom(bootloader_init_image);
 
 begin
 

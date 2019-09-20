@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 09.08.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 29.04.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -60,6 +60,11 @@ architecture neo430_dmem_rtl of neo430_dmem is
   attribute ramstyle : string;
   attribute ramstyle of dmem_file_l : signal is "no_rw_check";
   attribute ramstyle of dmem_file_h : signal is "no_rw_check";
+
+  -- RAM attribute to inhibit bypass-logic - Lattice ICE40up only! --
+  attribute syn_ramstyle : string;
+  attribute syn_ramstyle of dmem_file_l : signal is "no_rw_check";
+  attribute syn_ramstyle of dmem_file_h : signal is "no_rw_check";
 
 begin
 

@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 29.09.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 28.04.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -83,17 +83,16 @@ begin
       start <= '0';
       if (wren = '1') then
         -- operands --
-        case addr is
-          when crc_crc16_in_addr_c | crc_crc32_in_addr_c => -- write data & start operation
-            idata <= data_i(7 downto 0);
-            start <= '1'; -- start operation
-          when crc_poly_lo_addr_c => -- low (part) polynomial
-            poly(15 downto 00) <= data_i;
-          when crc_poly_hi_addr_c => -- high (part) polynomial
-            poly(31 downto 16) <= data_i;
-          when others =>
-            NULL;
-        end case;
+        if (addr = crc_crc16_in_addr_c) or (addr = crc_crc32_in_addr_c) then -- write data & start operation
+          idata <= data_i(7 downto 0);
+          start <= '1'; -- start operation
+        end if;
+        if (addr = crc_poly_lo_addr_c) then -- low (part) polynomial
+          poly(15 downto 00) <= data_i;
+        end if;
+        if (addr = crc_poly_hi_addr_c) then -- high (part) polynomial
+          poly(31 downto 16) <= data_i;
+        end if;
         -- operation selection --
         if (addr = crc_crc16_in_addr_c) then
           mode <= '0'; -- crc16 mode

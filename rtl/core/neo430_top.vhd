@@ -43,7 +43,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 18.09.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -63,21 +63,21 @@ entity neo430_top is
     -- additional configuration --
     USER_CODE   : std_ulogic_vector(15 downto 0) := x"0000"; -- custom user code
     -- module configuration --
-    DADD_USE    : boolean := false;  -- implement DADD instruction? (default=true)
-    MULDIV_USE  : boolean := false;  -- implement multiplier/divider unit? (default=true)
-    WB32_USE    : boolean := false;  -- implement WB32 unit? (default=true)
-    WDT_USE     : boolean := false;  -- implement WDT? (default=true)
+    DADD_USE    : boolean := true;  -- implement DADD instruction? (default=true)
+    MULDIV_USE  : boolean := true;  -- implement multiplier/divider unit? (default=true)
+    WB32_USE    : boolean := true;  -- implement WB32 unit? (default=true)
+    WDT_USE     : boolean := true;  -- implement WDT? (default=true)
     GPIO_USE    : boolean := true;  -- implement GPIO unit? (default=true)
-    TIMER_USE   : boolean := false;  -- implement timer? (default=true)
-    UART_USE    : boolean := false;  -- implement UART? (default=true)
-    CRC_USE     : boolean := false;  -- implement CRC unit? (default=true)
+    TIMER_USE   : boolean := true;  -- implement timer? (default=true)
+    UART_USE    : boolean := true;  -- implement UART? (default=true)
+    CRC_USE     : boolean := true;  -- implement CRC unit? (default=true)
     CFU_USE     : boolean := false; -- implement custom functions unit? (default=false)
-    PWM_USE     : boolean := false;  -- implement PWM controller? (default=true)
-    TWI_USE     : boolean := false;  -- implement two wire serial interface? (default=true)
-    SPI_USE     : boolean := false;  -- implement SPI? (default=true)
+    PWM_USE     : boolean := true;  -- implement PWM controller? (default=true)
+    TWI_USE     : boolean := true;  -- implement two wire serial interface? (default=true)
+    SPI_USE     : boolean := true;  -- implement SPI? (default=true)
     -- boot configuration --
-    BOOTLD_USE  : boolean := false;  -- implement and use bootloader? (default=true)
-    IMEM_AS_ROM : boolean := true  -- implement IMEM as read-only memory? (default=false)
+    BOOTLD_USE  : boolean := true;  -- implement and use bootloader? (default=true)
+    IMEM_AS_ROM : boolean := false  -- implement IMEM as read-only memory? (default=false)
   );
   port (
     -- global control --
@@ -87,7 +87,7 @@ entity neo430_top is
     gpio_o     : out std_ulogic_vector(15 downto 0); -- parallel output
     gpio_i     : in  std_ulogic_vector(15 downto 0); -- parallel input
     -- pwm channels --
-    pwm_o      : out std_ulogic_vector(02 downto 0); -- pwm channels
+    pwm_o      : out std_ulogic_vector(03 downto 0); -- pwm channels
     -- serial com --
     uart_txd_o : out std_ulogic; -- UART send data
     uart_rxd_i : in  std_ulogic; -- UART receive data
@@ -116,8 +116,9 @@ end neo430_top;
 architecture neo430_top_rtl of neo430_top is
 
   -- generators --
+  signal rst_i_sync0  : std_ulogic;
+  signal rst_i_sync1  : std_ulogic;
   signal rst_gen      : std_ulogic_vector(03 downto 0) := (others => '0'); -- perform reset on bitstream upload
-  signal rst_gen_sync : std_ulogic_vector(01 downto 0);
   signal ext_rst      : std_ulogic;
   signal sys_rst      : std_ulogic;
   signal wdt_rst      : std_ulogic;
@@ -179,25 +180,28 @@ begin
 
   -- Reset Generator ----------------------------------------------------------
   -- -----------------------------------------------------------------------------
-  reset_generator: process(rst_i, clk_i)
+  -- make sure the external reset is free of metastability and has a minimal duration of 1 clock cycle
+  reset_generator_filter: process(clk_i)
   begin
-    if (rst_i = '0') then
-      rst_gen <= (others => '0');
-    elsif rising_edge(clk_i) then
-      rst_gen <= rst_gen(rst_gen'left-1 downto 0) & '1';
+    if rising_edge(clk_i) then
+      rst_i_sync0 <= rst_i;
+      rst_i_sync1 <= rst_i_sync0; -- no metastability, thanks
+    end if;
+  end process reset_generator_filter;
+
+  -- keep internal reset active for at least 4 clock cycles
+  reset_generator: process(rst_i_sync1, clk_i)
+  begin
+    if rising_edge(clk_i) then
+      if (rst_i_sync1 = '0') then
+        rst_gen <= (others => '0');
+      else
+        rst_gen <= rst_gen(rst_gen'left-1 downto 0) & '1';
+      end if;
     end if;
   end process reset_generator;
 
-  -- one extra sync ff to prevent weird glitches on the reset net
-  -- and another one to avoid metastability
-  reset_generator_sync_ff: process(clk_i)
-  begin
-    if rising_edge(clk_i) then
-      rst_gen_sync <= rst_gen_sync(0) & rst_gen(rst_gen'left);
-    end if;
-  end process reset_generator_sync_ff;
-
-  ext_rst <= rst_gen_sync(1);
+  ext_rst <= rst_gen(rst_gen'left); -- the beautified external reset signal
   sys_rst <= ext_rst and wdt_rst;
 
 
@@ -654,6 +658,7 @@ begin
 
   neo430_twi_inst_false:
   if (TWI_USE = false) generate
+    twi_cg_en <= '0';
     twi_rdata <= (others => '0');
     twi_irq   <= '0';
   end generate;

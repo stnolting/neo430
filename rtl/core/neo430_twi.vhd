@@ -132,7 +132,7 @@ begin
   begin
     if rising_edge(clk_i) then
       if (arbiter(2) = '0') or (arbiter = "100") then -- offline or idle
-        twi_phase_gen <= "0001"; -- make sure to start with a new phase 0,1,2,3 stepping
+        twi_phase_gen <= "0001"; -- make sure to start with a new phase, 0,1,2,3 stepping
       else
         if (twi_clk = '1') then
           twi_phase_gen <= twi_phase_gen(2 downto 0) & twi_phase_gen(3); -- shift left

@@ -1,9 +1,8 @@
 -- #################################################################################################
 -- #  << NEO430 - PWM Controller >>                                                                #
 -- # ********************************************************************************************* #
--- # Simple 3-channel PWM controller with 8 bit resolution. The PWM update frequency can either be #
--- # set to fast PWM mode (high PWM frequency) or to slow PWM mode (low PWM frequency).            #
--- # Note that all registers are read-only!                                                        #
+-- # Simple 4-channel PWM controller with 8 bit resolution for the duty cycle and selectable       #
+--- # counter width (frequency resolution) from 1 to 8 bits.                                       #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -23,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 29.09.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 12.05.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -46,26 +45,28 @@ entity neo430_pwm is
     clkgen_en_o : out std_ulogic; -- enable clock generator
     clkgen_i    : in  std_ulogic_vector(07 downto 0);
     -- pwm output channels --
-    pwm_o       : out std_ulogic_vector(02 downto 0)
+    pwm_o       : out std_ulogic_vector(03 downto 0)
   );
 end neo430_pwm;
 
 architecture neo430_pwm_rtl of neo430_pwm is
 
-  -- ADVANCED user configuration ----------------------------------------------------------
-  constant pwm_resolution_c : natural := 8; -- pwm resolution in bits (max 16, default=8)
-  -- --------------------------------------------------------------------------------------
-
   -- internal configuration --
-  constant num_pwm_channels_c : natural := 3; -- number of PWM channels - FIXED!
+  constant num_pwm_channels_c : natural := 4; -- number of PWM channels - FIXED!
+  constant pwm_resolution_c   : natural := 8; -- bit-width - FIXED!
 
   -- IO space: module base address --
   constant hi_abb_c : natural := index_size_f(io_size_c)-1; -- high address boundary bit
   constant lo_abb_c : natural := index_size_f(pwm_size_c); -- low address boundary bit
 
   -- Control register bits --
-  constant ctrl_enable_c : natural := 0; -- -/w: PWM enable
-  constant ctrl_fmode_c  : natural := 1; -- -/w: 1 = fast PWM mode, 0 = slow PWM mode
+  constant ctrl_enable_c    : natural := 0; -- -/w: PWM enable
+  constant ctrl_prsc0_bit_c : natural := 1; -- -/w: prescaler select bit 0
+  constant ctrl_prsc1_bit_c : natural := 2; -- -/w: prescaler select bit 1
+  constant ctrl_prsc2_bit_c : natural := 3; -- -/w: prescaler select bit 2
+  constant ctrl_size0_bit_c : natural := 4; -- -/w: cnt size bit 0
+  constant ctrl_size1_bit_c : natural := 5; -- -/w: cnt size bit 1
+  constant ctrl_size2_bit_c : natural := 6; -- -/w: cnt size bit 2
 
   -- access control --
   signal acc_en : std_ulogic; -- module access enable
@@ -76,7 +77,11 @@ architecture neo430_pwm_rtl of neo430_pwm is
   type pwm_ch_t is array (0 to num_pwm_channels_c-1) of std_ulogic_vector(pwm_resolution_c-1 downto 0);
   signal pwm_ch : pwm_ch_t;
   signal enable : std_ulogic;
-  signal fmode  : std_ulogic;
+  signal prsc   : std_ulogic_vector(2 downto 0);
+  signal size   : std_ulogic_vector(2 downto 0);
+
+  -- constrained pwm counter --
+  signal mask   : std_ulogic_vector(7 downto 0);
 
   -- prescaler clock generator --
   signal prsc_tick : std_ulogic;
@@ -99,22 +104,44 @@ begin
   begin
     if rising_edge(clk_i) then
       if (wren = '1') then
-        case addr is
-          when pwm_ctrl_addr_c =>
-            enable <= data_i(ctrl_enable_c);
-            fmode  <= data_i(ctrl_fmode_c);
-          when pwm_ch0_addr_c =>
-            pwm_ch(0) <= data_i(pwm_resolution_c-1 downto 0);
-          when pwm_ch1_addr_c =>
-            pwm_ch(1) <= data_i(pwm_resolution_c-1 downto 0);
-          when pwm_ch2_addr_c =>
-            pwm_ch(2) <= data_i(pwm_resolution_c-1 downto 0);
-          when others =>
-            NULL;
-        end case;
+        if (addr = pwm_ctrl_addr_c) then
+          enable <= data_i(ctrl_enable_c);
+          prsc   <= data_i(ctrl_prsc2_bit_c downto ctrl_prsc0_bit_c);
+          size   <= data_i(ctrl_size2_bit_c downto ctrl_size0_bit_c);
+        end if;
+        if (addr = pwm_ch10_addr_c) then
+          pwm_ch(0) <= data_i(0+(pwm_resolution_c-1) downto 0);
+          pwm_ch(1) <= data_i(8+(pwm_resolution_c-1) downto 8);
+        end if;
+        if (addr = pwm_ch32_addr_c) then
+          pwm_ch(2) <= data_i(0+(pwm_resolution_c-1) downto 0);
+          pwm_ch(3) <= data_i(8+(pwm_resolution_c-1) downto 8);
+        end if;
       end if;
     end if;
   end process wr_access;
+
+  -- PWM frequency select --
+  clkgen_en_o <= enable; -- enable clock generator
+  prsc_tick   <= clkgen_i(to_integer(unsigned(prsc)));
+
+
+  -- Virtual Counter Size -----------------------------------------------------
+  -- -----------------------------------------------------------------------------
+  mask_gen: process(size)
+  begin
+    case size is
+      when "000" => mask <= "00000001";
+      when "001" => mask <= "00000011";
+      when "010" => mask <= "00000111";
+      when "011" => mask <= "00001111";
+      when "100" => mask <= "00011111";
+      when "101" => mask <= "00111111";
+      when "110" => mask <= "01111111";
+      when "111" => mask <= "11111111";
+      when others => mask <= (others => '1');
+    end case;
+  end process mask_gen;
 
 
   -- PWM Core -----------------------------------------------------------------
@@ -126,10 +153,11 @@ begin
       if (enable = '0') then 
         pwm_cnt <= (others => '0');
       elsif (prsc_tick = '1') then
-        pwm_cnt <= std_ulogic_vector(unsigned(pwm_cnt) + 1);
+        pwm_cnt <= std_ulogic_vector(unsigned(pwm_cnt) + 1) and mask;
       end if;
       -- channels --
       for i in 0 to num_pwm_channels_c-1 loop
+        -- constrain counter and duty cycle value to virtual size configured by SIZE register
         if (unsigned(pwm_cnt) >= unsigned(pwm_ch(i))) or (enable = '0') then
           pwm_o(i) <= '0';
         else
@@ -139,14 +167,24 @@ begin
     end if;
   end process pwm_core;
 
-  -- PWM frequency select --
-  clkgen_en_o <= enable; -- enable clock generator
-  prsc_tick   <= clkgen_i(clk_div2048_c) when (fmode = '0') else clkgen_i(clk_div2_c);
-
 
   -- Read access --------------------------------------------------------------
   -- -----------------------------------------------------------------------------
-  data_o <= (others => '0'); -- module is write-only!
+  rd_access: process(clk_i)
+  begin
+    if rising_edge(clk_i) then
+      data_o <= (others => '0');
+      if (acc_en = '1') and (rden_i = '1') then
+        if (addr = pwm_ch10_addr_c) then
+          data_o(0+(pwm_resolution_c-1) downto 0) <= pwm_ch(0);
+          data_o(8+(pwm_resolution_c-1) downto 8) <= pwm_ch(1);
+        else -- pwm_ch32_addr_c
+          data_o(0+(pwm_resolution_c-1) downto 0) <= pwm_ch(2);
+          data_o(8+(pwm_resolution_c-1) downto 8) <= pwm_ch(3);
+        end if;
+      end if;
+    end if;
+  end process rd_access;
 
 
 end neo430_pwm_rtl;

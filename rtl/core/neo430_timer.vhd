@@ -24,7 +24,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  tephan Nolting, Hannover, Germany                                                 29.09.2018 #
+-- #  tephan Nolting, Hannover, Germany                                                 28.04.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -111,18 +111,17 @@ begin
       end if;
       -- control & threshold --
       if (wr_en = '1') then
-        case addr is
-          when timer_thres_addr_c =>
-            thres <= data_i;
-          when timer_ctrl_addr_c =>
-            ctrl(ctrl_en_bit_c)     <= data_i(ctrl_en_bit_c);
-            ctrl(ctrl_arst_bit_c)   <= data_i(ctrl_arst_bit_c);
-            ctrl(ctrl_irq_en_bit_c) <= data_i(ctrl_irq_en_bit_c);
-            ctrl(ctrl_prsc0_bit_c)  <= data_i(ctrl_prsc0_bit_c);
-            ctrl(ctrl_prsc1_bit_c)  <= data_i(ctrl_prsc1_bit_c);
-            ctrl(ctrl_prsc2_bit_c)  <= data_i(ctrl_prsc2_bit_c);
-          when others => NULL;
-        end case;
+        if (addr = timer_thres_addr_c) then
+          thres <= data_i;
+        end if;
+        if (addr = timer_ctrl_addr_c) then
+          ctrl(ctrl_en_bit_c)     <= data_i(ctrl_en_bit_c);
+          ctrl(ctrl_arst_bit_c)   <= data_i(ctrl_arst_bit_c);
+          ctrl(ctrl_irq_en_bit_c) <= data_i(ctrl_irq_en_bit_c);
+          ctrl(ctrl_prsc0_bit_c)  <= data_i(ctrl_prsc0_bit_c);
+          ctrl(ctrl_prsc1_bit_c)  <= data_i(ctrl_prsc1_bit_c);
+          ctrl(ctrl_prsc2_bit_c)  <= data_i(ctrl_prsc2_bit_c);
+        end if;
       end if;
     end if;
   end process wr_access;
@@ -150,20 +149,18 @@ begin
     if rising_edge(clk_i) then
       data_o <= (others => '0');
       if (rden_i = '1') and (acc_en = '1') then
-        case addr is
-          when timer_ctrl_addr_c =>
-            data_o(ctrl_en_bit_c)     <= ctrl(ctrl_en_bit_c);
-            data_o(ctrl_arst_bit_c)   <= ctrl(ctrl_arst_bit_c);
-            data_o(ctrl_irq_en_bit_c) <= ctrl(ctrl_irq_en_bit_c);
-            data_o(ctrl_prsc0_bit_c)  <= ctrl(ctrl_prsc0_bit_c);
-            data_o(ctrl_prsc1_bit_c)  <= ctrl(ctrl_prsc1_bit_c);
-            data_o(ctrl_prsc2_bit_c)  <= ctrl(ctrl_prsc2_bit_c);
-          when timer_cnt_addr_c =>
-            data_o <= cnt;
-          when others =>
-        --when timer_thres_addr_c =>
-            data_o <= thres;
-        end case;
+        if (addr = timer_ctrl_addr_c) then
+          data_o(ctrl_en_bit_c)     <= ctrl(ctrl_en_bit_c);
+          data_o(ctrl_arst_bit_c)   <= ctrl(ctrl_arst_bit_c);
+          data_o(ctrl_irq_en_bit_c) <= ctrl(ctrl_irq_en_bit_c);
+          data_o(ctrl_prsc0_bit_c)  <= ctrl(ctrl_prsc0_bit_c);
+          data_o(ctrl_prsc1_bit_c)  <= ctrl(ctrl_prsc1_bit_c);
+          data_o(ctrl_prsc2_bit_c)  <= ctrl(ctrl_prsc2_bit_c);
+        elsif (addr = timer_cnt_addr_c) then
+          data_o <= cnt;
+        else -- timer_thres_addr_c
+          data_o <= thres;
+        end if;
       end if;
     end if;
   end process rd_access;

@@ -1,9 +1,10 @@
 -- #################################################################################################
 -- #  << NEO430 - 16-Bit Unsigned Multiplier & Divider Unit >>                                     #
 -- # ********************************************************************************************* #
--- # NOTE: This unit uses "repeated trial subtraction" as division algorithm                       #
--- # NOTE: This unit uses "shifted add" as multiplication algorithm                                #
--- # Division: DIVIDEND / DIVIDER = QUOTIENT + REMAINDER / DIVIDER (each 16-bit)                   #
+-- # NOTE: This unit uses "repeated trial subtraction" as division algorithm.                      #
+-- # NOTE: This unit uses "shifted add" as multiplication algorithm. Set 'use_dsp_mul_c' in the    #
+-- # package file to TRUE to use DSP slices for multiplication.                                    #
+-- # Division: DIVIDEND / DIVIDER = QUOTIENT + REMAINDER (16-bit) / DIVIDER (16-bit)               #
 -- # Multiplication: FACTOR1 * FACTOR2 = PRODUCT (32-bit)                                          #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
@@ -24,7 +25,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 29.09.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 29.04.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -89,15 +90,13 @@ begin
       start <= '0';
       if (wr_en = '1') then -- only full word accesses!
         -- operands --
-        case addr is
-          when muldiv_opa_addr_c => -- dividend or factor 1
-            opa <= data_i;
-          when muldiv_opb_div_addr_c | muldiv_opb_mul_addr_c => -- divisor or factor 2
-            opb <= data_i;
-            start <= '1'; -- trigger operation
-          when others =>
-            NULL;
-        end case;
+        if (addr = muldiv_opa_addr_c) then -- dividend or factor 1
+          opa <= data_i;
+        end if;
+        if (addr = muldiv_opb_div_addr_c) or (addr = muldiv_opb_mul_addr_c) then -- divisor or factor 2
+          opb <= data_i;
+          start <= '1'; -- trigger operation
+        end if;
         -- operation: division/multiplication --
         if (addr = muldiv_opb_div_addr_c) then -- division
           operation <= '1';
@@ -137,12 +136,16 @@ begin
         end if;
       -- multiplication core --
       else
-        if (start = '1') then -- load factor 1
-          product(31 downto 16) <= (others => '0');
-          product(15 downto  0) <= opa;
-        elsif (run = '1') then
-          product(31 downto 15) <= do_add(16 downto 0);
-          product(14 downto  0) <= product(15 downto 1);
+        if (use_dsp_mul_c = false) then -- implement serial multiplication
+          if (start = '1') then -- load factor 1
+            product(31 downto 16) <= (others => '0');
+            product(15 downto  0) <= opa;
+          elsif (run = '1') then
+            product(31 downto 15) <= do_add(16 downto 0);
+            product(14 downto  0) <= product(15 downto 1);
+          end if;
+        else -- use DSP for multiplication
+          product(31 downto 0) <= std_ulogic_vector(unsigned(opa) * unsigned(opb));
         end if;
       end if;
     end if;

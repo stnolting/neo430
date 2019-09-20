@@ -48,7 +48,7 @@ entity neo430_spi is
     spi_sclk_o  : out std_ulogic; -- SPI serial clock
     spi_mosi_o  : out std_ulogic; -- SPI master out, slave in
     spi_miso_i  : in  std_ulogic; -- SPI master in, slave out
-    spi_cs_o    : out std_ulogic_vector(07 downto 0); -- SPI CS 0..5
+    spi_cs_o    : out std_ulogic_vector(07 downto 0); -- SPI CS 0..7
     -- interrupt --
     spi_irq_o   : out std_ulogic -- transmission done interrupt
   );
