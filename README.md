@@ -73,7 +73,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 - Completely different processor modules with different functionality
 - Up to 48kB instruction memory and 12kB data memory
-- Specific memory map – included NEO430 linker script and compilation script required
+- Specific memory map – provided NEO430 linker script and compilation script required
 - Custom binary executable format
 - Just 4 CPU interrupt channels
 - Single clock domain for complete processor
@@ -81,7 +81,6 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Only one power-down (sleep) mode
 - Wishbone-compatible interface to attach custom IP
 - Internal bootloader with text interface (via UART serial port)
-- *NO* built-in support of floating point types yet (i.e. float & double)
 
 
 ## Implementation Results
