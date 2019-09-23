@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 # ********************************************************************************************* #
-# Stephan Nolting, Hannover, Germany                                                 06.04.2019 #
+# Stephan Nolting, Hannover, Germany                                                 23.09.2019 #
 #################################################################################################
 
 
@@ -95,7 +95,7 @@ SIZE      = $(MSP430GCC_BIN_PATH)/msp430-elf-size
 IMAGE_GEN = $(NEO430_EXE_PATH)/image_gen
 
 # Compiler flags
-CC_OPTS = -mcpu=msp430 -pipe -Wall -Xassembler --mY -mhwmult=none -lm -fno-delete-null-pointer-checks -flto
+CC_OPTS = -mcpu=msp430 -pipe -Wall -Xassembler --mY -mhwmult=none -fno-delete-null-pointer-checks -flto
 
 # Linker flags
 LD_OPTS = -mcpu=msp430 -mrelax -minrt -nostartfiles -flto
@@ -129,7 +129,7 @@ $(OBJ): %.o : %.c crt0.elf
 
 # Link object files
 main.elf: $(OBJ)
-	@$(CC) $(LD_OPTS) $(EFFORT) -I $(NEO430_INC_PATH) -T boot_linker_script.x $(OBJ) -o $@
+	@$(CC) $(LD_OPTS) $(EFFORT) -I $(NEO430_INC_PATH) -T boot_linker_script.x $(OBJ) -o $@ -lm 
 	@echo Memory utilization:
 	@$(SIZE) main.elf
 
