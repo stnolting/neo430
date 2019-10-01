@@ -1,5 +1,5 @@
 /* ################################################################################################# */
-/* #  < NEO430 MSPGCC bootloader linker script >                                                   # */
+/* # < NEO430 MSP430GCC bootloader linker script >                                                 # */
 /* # ********************************************************************************************* # */
 /* # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        # */
 /* # Copyright by Stephan Nolting: stnolting@gmail.com                                             # */
