@@ -1,5 +1,5 @@
 #################################################################################################
-#  < NEO430 Application Compile Script - Linux / Cygwin / Windows Subsystem for Linux version > #
+#  < NEO430 Application Compile Script - Linux / Windows Powershell / Windows Linux Subsystem > #
 # ********************************************************************************************* #
 # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 # ********************************************************************************************* #
-# Stephan Nolting, Hannover, Germany                                                 06.04.2019 #
+# Stephan Nolting, Hannover, Germany                                                 24.09.2019 #
 #################################################################################################
 
 
@@ -29,11 +29,13 @@
 # Compiler effort (-Os = optimize for size)
 EFFORT = -Os
 
-# User's application sources (append all additional files here)
+# User's application sources (add additional files here)
 APP_SRC = main.c 
 
-# User's application include folders (don't forget the '-I# before each entry)
+# User's application include folders (don't forget the '-I' before each entry)
 APP_INC = -I .
+#-------------------------------------------------------------------------------
+
 
 
 #-------------------------------------------------------------------------------
@@ -99,7 +101,7 @@ SIZE      = $(MSP430GCC_BIN_PATH)/msp430-elf-size
 IMAGE_GEN = $(NEO430_EXE_PATH)/image_gen
 
 # Compiler flags
-CC_OPTS = -mcpu=msp430 -pipe -Wall -Xassembler --mY -mhwmult=none -lm -fno-delete-null-pointer-checks
+CC_OPTS = -mcpu=msp430 -pipe -Wall -Xassembler --mY -mhwmult=none -fno-delete-null-pointer-checks
 CC_OPTS += -Wl,-static -mrelax -minrt -nostartfiles -fdata-sections -ffunction-sections -Xlinker --gc-sections -flto
 
 # Linker flags
@@ -134,7 +136,7 @@ $(OBJ): %.o : %.c crt0.elf
 
 # Link object files
 main.elf: $(OBJ)
-	@$(CC) $(LD_OPTS) $(EFFORT) -I $(NEO430_INC_PATH) $(APP_INC) -T $(NEO430_COM_PATH)/neo430_linker_script.x $(OBJ) -o $@
+	@$(CC) $(LD_OPTS) $(EFFORT) -I $(NEO430_INC_PATH) $(APP_INC) -T $(NEO430_COM_PATH)/neo430_linker_script.x $(OBJ) -o $@ -lm
 	@echo Memory utilization:
 	@$(SIZE) main.elf
 

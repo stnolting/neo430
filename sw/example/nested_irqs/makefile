@@ -1,5 +1,5 @@
 #################################################################################################
-#  < NEO430 Application Compile Script - Linux / Cygwin / Windows Subsystem for Linux version > #
+#  < NEO430 Application Compile Script - Linux / Windows Powershell / Windows Linux Subsystem > #
 # ********************************************************************************************* #
 # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 # ********************************************************************************************* #
-# Stephan Nolting, Hannover, Germany                                                 23.09.2019 #
+# Stephan Nolting, Hannover, Germany                                                 24.09.2019 #
 #################################################################################################
 
 
@@ -29,11 +29,13 @@
 # Compiler effort (-Os = optimize for size)
 EFFORT = -Os
 
-# User's application sources (append all additional files here)
+# User's application sources (add additional files here)
 APP_SRC = main.c 
 
-# User's application include folders (don't forget the '-I# before each entry)
+# User's application include folders (don't forget the '-I' before each entry)
 APP_INC = -I .
+#-------------------------------------------------------------------------------
+
 
 
 #-------------------------------------------------------------------------------
