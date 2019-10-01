@@ -53,23 +53,25 @@ add wave -noupdate /neo430_tb/neo430_top_inst/neo430_dmem_inst/dmem_file
 add wave -noupdate -divider Bootloader_ROM
 add wave -noupdate /neo430_tb/neo430_top_inst/neo430_boot_rom_inst_true/neo430_boot_rom_inst/boot_img
 
-add wave -noupdate -divider IO_USART
-add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_usart_inst/baud
-add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_usart_inst/ctrl
-add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_usart_inst/spi_busy
-add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_usart_inst/spi_sclk_o
-add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_usart_inst/spi_mosi_o
-add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_usart_inst/spi_miso_i
-add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_usart_inst/spi_cs_o
-add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_usart_inst/spi_rtx_sreg
-add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_usart_inst/uart_tx_sreg
-add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_usart_inst/uart_tx_busy
-add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_usart_inst/uart_txd_o
-add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_usart_inst/uart_rx_busy
-add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_usart_inst/uart_rx_reg
-add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_usart_inst/uart_rx_avail
-add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_usart_inst/uart_rxd_i
-add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_usart_inst/usart_irq_o
+add wave -noupdate -divider IO_UART
+add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_uart_inst/baud
+add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_uart_inst/ctrl
+add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_uart_inst/uart_tx_sreg
+add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_uart_inst/uart_tx_busy
+add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_uart_inst/uart_txd_o
+add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_uart_inst/uart_rx_busy
+add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_uart_inst/uart_rx_reg
+add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_uart_inst/uart_rx_avail
+add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_uart_inst/uart_rxd_i
+add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_uart_inst/usart_irq_o
+
+add wave -noupdate -divider IO_SPI
+add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_spi_inst/spi_busy
+add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_spi_inst/spi_sclk_o
+add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_spi_inst/spi_mosi_o
+add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_spi_inst/spi_miso_i
+add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_spi_inst/spi_cs_o
+add wave -noupdate /neo430_tb/neo430_top_inst/neo430_usart_inst_true/neo430_spi_inst/spi_rtx_sreg
 
 add wave -noupdate -divider IO_Timer
 add wave -noupdate /neo430_tb/neo430_top_inst/neo430_timer_inst_true/neo430_timer_inst/tctrl

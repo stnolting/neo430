@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 29.04.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 23.09.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -30,7 +30,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0300"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0301"; -- no touchy!
 
   -- Advanced Hardware Configuration --------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -182,8 +182,8 @@ package neo430_package is
   constant twi_rtx_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(twi_base_c) + x"0002");
 
   -- IO: RESERVED --
---constant ???_base_c : std_ulogic_vector(15 downto 0) := x"FFFC";
---constant ???_size_c : natural := 2; -- bytes
+--constant ???_base_c : std_ulogic_vector(15 downto 0) := x"FFEC";
+--constant ???_size_c : natural := 4; -- bytes
 
 --constant ???_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0000");
 --constant ???_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0002");

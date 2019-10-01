@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 23.09.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -117,7 +117,8 @@ begin
   sysinfo_mem(1)(11) <= bool_to_ulogic_f(PWM_USE);     -- PWM present?
   sysinfo_mem(1)(12) <= bool_to_ulogic_f(TWI_USE);     -- TWI present?
   sysinfo_mem(1)(13) <= bool_to_ulogic_f(SPI_USE);     -- SPI present?
-  sysinfo_mem(1)(15 downto 14) <= (others => '0');     -- reserved
+  sysinfo_mem(1)(14) <= '0';                           -- reserved
+  sysinfo_mem(1)(15) <= '0';                           -- reserved
 
   -- CPUID2: User code --
   sysinfo_mem(2) <= USER_CODE;

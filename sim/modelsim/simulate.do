@@ -25,10 +25,11 @@ vcom -work neo430 -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_pwm.vhd
 vcom -work neo430 -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_reg_file.vhd
 vcom -work neo430 -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_sysconfig.vhd
 vcom -work neo430 -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_timer.vhd
-vcom -work neo430 -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_trng.vhd
-vcom -work neo430 -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_usart.vhd
+vcom -work neo430 -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_uart.vhd
+vcom -work neo430 -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_spi.vhd
 vcom -work neo430 -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_wb_interface.vhd
 vcom -work neo430 -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_wdt.vhd
+vcom -work neo430 -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_twi.vhd
 vcom -work neo430 -2002 -explicit -nocasestaticerror ${rtl_src}/neo430_top.vhd
 vcom -work neo430 -2002 -explicit -nocasestaticerror ${sim_src}/neo430_tb.vhd
 

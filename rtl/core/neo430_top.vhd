@@ -1,9 +1,9 @@
 -- #################################################################################################
 -- #  << NEO430 - Processor Top Entity >>                                                          #
 -- # ********************************************************************************************* #
--- #  This is the top entity of the NEO430 processor. Instantiate this unit in your own project    #
--- #  and define all the configuration generics according to your needs.                           #
--- #  Alternatively, you can use one of the other top entities provided in rtl\top_templates       #
+-- # This is the top entity of the NEO430 processor. Instantiate this unit in your own project and #
+-- # define all the configuration generics according to your needs. Alternatively, you can use one #
+-- # of the other top entities provided in rtl\top_templates                                       #
 -- # ********************************************************************************************* #
 -- #  The NEO430 processor:                                                                        #
 -- #  - Reset and clock generators                                                                 #
@@ -43,7 +43,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 18.09.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 23.09.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -261,9 +261,10 @@ begin
   );
 
   -- final CPU read data --
-  cpu_bus.rdata <= rom_rdata or ram_rdata or boot_rdata or muldiv_rdata or wb_rdata or
-                   uart_rdata or spi_rdata or gpio_rdata or timer_rdata or wdt_rdata or
-                   sysconfig_rdata or crc_rdata or cfu_rdata or pwm_rdata or twi_rdata;
+  cpu_bus.rdata <= rom_rdata or ram_rdata or boot_rdata or muldiv_rdata or
+                   wb_rdata or uart_rdata or spi_rdata or gpio_rdata or
+                   timer_rdata or wdt_rdata or sysconfig_rdata or crc_rdata or
+                   cfu_rdata or pwm_rdata or twi_rdata;
 
   -- sync for external IRQ --
   external_irq_sync: process(clk_i)

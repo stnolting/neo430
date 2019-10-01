@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 23.09.2019 #
 -- #################################################################################################
 
 library ieee;
