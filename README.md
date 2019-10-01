@@ -54,19 +54,19 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Very small outline and high operating frequency
 - Internal DMEN (RAM, for data) and IMEM (RAM or ROM, for code), configurable sizes
 - One external interrupt line
-- Customizable processor hardware configuration
-- Optional multiplier/divider unit (MULDIV)
-- Optional high-precision timer (TIMER)
-- Optional universal asynchronous receiver and transmitter (UART)
-- Optional serial peripheral unit (SPI)
-- Optional two wire serial interface (TWI)
-- Optional general purpose parallel IO port (GPIO), 16 inputs, 16 outputs, with pin-change interrupt
-- Optional 32-bit Wishbone bus interface adapter (WB32) - including bridges to Avalon(TM) bus and AXI4-Lite(TM)
-- Optional watchdog timer (WDT)
-- Optional cyclic redundancy check unit (CRC16/32)
-- Optional custom functions unit (CFU) for user-defined processor extensions
-- Optional 4 channel PWM controller with 1 to 8 bit resolution (PWM)
-- Optional internal bootloader (2kB ROM) with serial user console and automatic boot from external SPI EEPROM
+- Customizable processor hardware configuration:
+  - Optional multiplier/divider unit (MULDIV)
+  - Optional high-precision timer (TIMER)
+  - Optional universal asynchronous receiver and transmitter (UART)
+  - Optional serial peripheral unit (SPI)
+  - Optional two wire serial interface (TWI)
+  - Optional general purpose parallel IO port (GPIO), 16 inputs, 16 outputs, with pin-change interrupt
+  - Optional 32-bit Wishbone bus interface adapter (WB32) - including bridges to Avalon(TM) bus and AXI4-Lite(TM)
+  - Optional watchdog timer (WDT)
+  - Optional cyclic redundancy check unit (CRC16/32)
+  - Optional custom functions unit (CFU) for user-defined processor extensions
+  - Optional 4 channel PWM controller with 1 to 8 bit resolution (PWM)
+  - Optional internal bootloader (2kB ROM) with serial user console and automatic boot from external SPI EEPROM
 
 
 ## Differences to TI's Original MSP430(TM) Processors
@@ -87,7 +87,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 Mapping results generated for HW version 0x0300. The full (default) configuration includes
 all optional processor modules (excluding the CFU), an IMEM size of 4kB and a DMEM size of 2kB.
-Results generated with Xilinx Vivado 2017.3 and Intel Quartus Prime Lite 17.1
+Results were generated with Xilinx Vivado 2017.3 and Intel Quartus Prime Lite 17.1.
 
 | __Xilinx Artix-7 (XC7A35TICSG324-1L)__  | LUTs      | FFs      | BRAMs    | DSPs   | f_max*  |
 |:----------------------------------------|:---------:|:--------:|:--------:|:------:|:-------:|
@@ -143,7 +143,7 @@ If you are using the NEO430 for some kind of publication, please cite it as foll
 > S. Nolting, "The NEO430 Processor", github.com/stnolting/neo430
 
 
-## Proprietary Notice
+## Proprietary/Legal Notice
 
 "MSP430" is a trademark of Texas Instruments Corporation.
 
