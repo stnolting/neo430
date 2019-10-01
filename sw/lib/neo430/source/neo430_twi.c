@@ -1,5 +1,5 @@
 // #################################################################################################
-// #  < neo430_twi.h - Internal Two Wire Serial interface functions >                              #
+// #  < neo430_twi.c - Internal Two Wire Serial interface functions >                              #
 // # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 // # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
