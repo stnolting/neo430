@@ -1,5 +1,5 @@
 #################################################################################################
-#  < NEO430 Application Compile Script - Linux / Cygwin / Windows Subsystem for Linux version > #
+#  < NEO430 Application Compile Script - Linux / Windows Powershell / Windows Linux Subsystem > #
 # ********************************************************************************************* #
 # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 # ********************************************************************************************* #
-# Stephan Nolting, Hannover, Germany                                                 23.09.2019 #
+# Stephan Nolting, Hannover, Germany                                                 01.10.2019 #
 #################################################################################################
 
 
@@ -29,19 +29,13 @@
 # Compiler effort (-Os = optimize for size)
 EFFORT = -Os
 
-# User's application sources (append all additional files here)
+# User's application sources (add additional files here)
 APP_SRC = main.c 
 
-# User's application include folders (don't forget the '-I# before each entry)
+# User's application include folders (don't forget the '-I' before each entry)
 APP_INC = -I .
-
-
 #-------------------------------------------------------------------------------
-# Path of compiler binaries - SET THIS VIA YOUR ENV VARIABLES
-#-------------------------------------------------------------------------------
-ifndef MSP430GCC_BIN_PATH
-$(error Environment variable MSP430GCC_BIN_PATH pointing to the MSP430GCC compiler's bin folder is not set)
-endif
+
 
 
 #-------------------------------------------------------------------------------
@@ -79,7 +73,9 @@ APP_SRC += $(wildcard $(NEO430_SRC_PATH)/*.c)
 APP_BIN = main.bin
 APP_ASM = main.s
 
-all: $(APP_ASM) $(APP_BIN) neo430_application_image.vhd
+compile: $(APP_ASM) $(APP_BIN)
+install: $(APP_ASM) neo430_application_image.vhd
+all:     $(APP_ASM) $(APP_BIN) neo430_application_image.vhd
 
 # define all object files
 OBJ = $(APP_SRC:.c=.o)
@@ -89,13 +85,13 @@ OBJ = $(APP_SRC:.c=.o)
 # Tools
 #-------------------------------------------------------------------------------
 #C ompiler tools
-AS        = $(MSP430GCC_BIN_PATH)/msp430-elf-as
-CC        = $(MSP430GCC_BIN_PATH)/msp430-elf-gcc
-LD        = $(MSP430GCC_BIN_PATH)/msp430-elf-ld
-STRIP     = $(MSP430GCC_BIN_PATH)/msp430-elf-strip
-OBJDUMP   = $(MSP430GCC_BIN_PATH)/msp430-elf-objdump
-OBJCOPY   = $(MSP430GCC_BIN_PATH)/msp430-elf-objcopy
-SIZE      = $(MSP430GCC_BIN_PATH)/msp430-elf-size
+AS        = msp430-elf-as
+CC        = msp430-elf-gcc
+LD        = msp430-elf-ld
+STRIP     = msp430-elf-strip
+OBJDUMP   = msp430-elf-objdump
+OBJCOPY   = msp430-elf-objcopy
+SIZE      = msp430-elf-size
 IMAGE_GEN = $(NEO430_EXE_PATH)/image_gen
 
 # Compiler flags
@@ -168,11 +164,14 @@ neo430_application_image.vhd: image.dat $(IMAGE_GEN)
 #-------------------------------------------------------------------------------
 help:
 	@echo "NEO430 Application Compilation Script"
+	@echo "Make sure to add the absolute path of the msp430-gcc bin folder to your PATH variable."
 	@echo "Targets:"
 	@echo " help      - show this text"
-	@echo " all       - compile and generate VHDL boot image and *.bin executable for upload via bootloader"
-	@echo " clean     - clean up this project only"
-	@echo " clean_all - clean up everything"
+	@echo " compile   - compile and generate *.bin executable for upload via bootloader"
+	@echo " install   - compile, generate and install VHDL boot image"
+	@echo " all       - compile and generate *.bin executable for upload via bootloader and generate and install VHDL boot image"
+	@echo " clean     - clean up project"
+	@echo " clean_all - clean up project, core libraries and helper tools"
 
 
 #-------------------------------------------------------------------------------

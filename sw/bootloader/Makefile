@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 # ********************************************************************************************* #
-# Stephan Nolting, Hannover, Germany                                                 23.09.2019 #
+# Stephan Nolting, Hannover, Germany                                                 01.10.2019 #
 #################################################################################################
 
 
@@ -32,13 +32,6 @@ EFFORT = -Os
 # User's application sources (append all additional files here)
 APP_SRC = bootloader.c 
 
-
-#-------------------------------------------------------------------------------
-# Path of compiler binaries - SET THIS VIA YOUR ENV VARIABLES
-#-------------------------------------------------------------------------------
-ifndef MSP430GCC_BIN_PATH
-$(error Environment variable MSP430GCC_BIN_PATH pointing to the MSP430GCC compiler's bin folder is not set)
-endif
 
 
 #-------------------------------------------------------------------------------
@@ -85,13 +78,13 @@ OBJ = $(APP_SRC:.c=.o)
 # Tools
 #-------------------------------------------------------------------------------
 #C ompiler tools
-AS        = $(MSP430GCC_BIN_PATH)/msp430-elf-as
-CC        = $(MSP430GCC_BIN_PATH)/msp430-elf-gcc
-LD        = $(MSP430GCC_BIN_PATH)/msp430-elf-ld
-STRIP     = $(MSP430GCC_BIN_PATH)/msp430-elf-strip
-OBJDUMP   = $(MSP430GCC_BIN_PATH)/msp430-elf-objdump
-OBJCOPY   = $(MSP430GCC_BIN_PATH)/msp430-elf-objcopy
-SIZE      = $(MSP430GCC_BIN_PATH)/msp430-elf-size
+AS        = msp430-elf-as
+CC        = msp430-elf-gcc
+LD        = msp430-elf-ld
+STRIP     = msp430-elf-strip
+OBJDUMP   = msp430-elf-objdump
+OBJCOPY   = msp430-elf-objcopy
+SIZE      = msp430-elf-size
 IMAGE_GEN = $(NEO430_EXE_PATH)/image_gen
 
 # Compiler flags

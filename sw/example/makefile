@@ -1,5 +1,5 @@
 #################################################################################################
-#  < NEO430 Application Compile Script - Linux/Cygwin/WinBash version >                         #
+# < NEO430 Application Compile Script - Linux/Cygwin/WinBash version >                          #
 # ********************************************************************************************* #
 # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 # ********************************************************************************************* #
-# Stephan Nolting, Hannover, Germany                                                 06.04.2019 #
+# Stephan Nolting, Hannover, Germany                                                 01.01.2019 #
 #################################################################################################
 
 
@@ -32,7 +32,7 @@
 TOPTARGETS := all clean_all
 
 SUBDIRS := $(wildcard */.)
-# remove dummy folders (starting with '~')
+# ignore dummy folders (starting with '~')
 DUMMYDIRS := $(wildcard ~*/.)
 SUBDIRS := $(filter-out $(DUMMYDIRS), $(SUBDIRS))
 
@@ -49,9 +49,9 @@ $(SUBDIRS):
 help:
 	@echo "Compile / clean up ALL project folders in this directory"
 	@echo "Targets:"
-	@echo " help     - show this text"
-	@echo " all      - compile all projects"
-	@echo " clean_ll - clean up everything"
+	@echo " help      - show this text"
+	@echo " all       - compile and install all projects"
+	@echo " clean_all - clean up everything"
 
   
 #-------------------------------------------------------------------------------
