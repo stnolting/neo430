@@ -58,7 +58,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
   - Optional multiplier/divider unit (MULDIV)
   - Optional high-precision timer (TIMER)
   - Optional universal asynchronous receiver and transmitter (UART)
-  - Optional serial peripheral unit (SPI)
+  - Optional serial peripheral interface (SPI)
   - Optional two wire serial interface (TWI)
   - Optional general purpose parallel IO port (GPIO), 16 inputs, 16 outputs, with pin-change interrupt
   - Optional 32-bit Wishbone bus interface adapter (WB32) - including bridges to Avalon(TM) bus and AXI4-Lite(TM)
@@ -87,7 +87,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 Mapping results generated for HW version 0x0300. The full (default) configuration includes
 all optional processor modules (excluding the CFU), an IMEM size of 4kB and a DMEM size of 2kB.
-Results were generated with Xilinx Vivado 2017.3 and Intel Quartus Prime Lite 17.1.
+Results generated with Xilinx Vivado 2017.3, Intel Quartus Prime Lite 17.1 and Lattice Radiant 1.0 (Synplify)
 
 | __Xilinx Artix-7 (XC7A35TICSG324-1L)__  | LUTs      | FFs      | BRAMs    | DSPs   | f_max*  |
 |:----------------------------------------|:---------:|:--------:|:--------:|:------:|:-------:|
@@ -98,6 +98,11 @@ Results were generated with Xilinx Vivado 2017.3 and Intel Quartus Prime Lite 17
 |:--------------------------------------------|:---------:|:--------:|:------------:|:------:|:-------:|
 | Full (default) configuration:               | 1676 (8%) | 940 (4%) | 65792  (11%) | 0 (0%) | 116 MHz |
 | Minimal configuration (CPU + GPIO):         | 602  (3%) | 228 (1%) | 49408   (8%) | 0 (0%) | 124 MHz |
+
+| __Lattice iCE40 UltraPlus (iCE40UP5K-SG48I)__  | LUTs       | FFs        | EBRs     | DSPs   | SRAMs  | f_max* |
+|:-----------------------------------------------|:----------:|:----------:|:--------:|:------:|:------:|:------:|
+| Full (default) configuration:                  | 2843 (54%) | 1153 (22%) | 16 (53%) | 0 (0%) | 0 (0%) | 20 MHz |
+| Minimal configuration (CPU + GPIO):            | 1470 (28%) | 493   (9%) | 12 (40%) | 0 (0%) | 0 (0%) | 20 MHz |
 
 *) Constrained
 
@@ -152,6 +157,8 @@ If you are using the NEO430 for some kind of publication, please cite it as foll
 "Virtex", "Artix", "ISE" and "Vivado" are trademarks of Xilinx Inc.
 
 "Cyclone", "Quartus" and "Avalon Bus" are trademarks of Intel Corporation.
+
+"iCE40 UltraPlus" and "Lattice Radiant" are trademarks of Lattice Semiconductor Corporation.
 
 "AXI", "AXI4" and "AXI4-Lite" are trademarks of Arm Holdings plc.
 
