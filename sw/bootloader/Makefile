@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 # ********************************************************************************************* #
-# Stephan Nolting, Hannover, Germany                                                 01.10.2019 #
+# Stephan Nolting, Hannover, Germany                                                 04.10.2019 #
 #################################################################################################
 
 
@@ -88,10 +88,10 @@ SIZE      = msp430-elf-size
 IMAGE_GEN = $(NEO430_EXE_PATH)/image_gen
 
 # Compiler flags
-CC_OPTS = -mcpu=msp430 -pipe -Wall -Xassembler --mY -mhwmult=none -fno-delete-null-pointer-checks -flto
+CC_OPTS = -mcpu=msp430 -pipe -Wall -Xassembler --mY -mhwmult=none -fno-delete-null-pointer-checks
 
 # Linker flags
-LD_OPTS = -mcpu=msp430 -mrelax -minrt -nostartfiles -flto
+LD_OPTS = -mcpu=msp430 -mrelax -minrt -nostartfiles
 
 
 #-------------------------------------------------------------------------------
