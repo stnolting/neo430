@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 10.10.2019 #
 // #################################################################################################
 
 #ifndef neo430_twi_h
@@ -31,7 +31,7 @@ void    neo430_twi_disable(void);          // deactivate TWI module
 uint8_t neo430_twi_start_trans(uint8_t a); // start transmission (START) and send address and r/w bit
 uint8_t neo430_twi_trans(uint8_t d);       // send byte to active slave
 uint8_t neo430_twi_get_data(void);         // get last received data byte
-void    neo430_twi_stop_trans(void);       // stop transmission (STOP)
+void    neo430_twi_generate_stop(void);    // stop transmission (STOP)
 void    neo430_twi_generate_start(void);   // generate start condition
 
 #endif // neo430_twi_h

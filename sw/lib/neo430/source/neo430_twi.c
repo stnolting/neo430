@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 13.03.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 10.10.2019 #
 // #################################################################################################
 
 #include "neo430.h"
@@ -97,7 +97,7 @@ uint8_t neo430_twi_get_data(void) {
 /* ------------------------------------------------------------
  * INFO Generate STOP condition
  * ------------------------------------------------------------ */
-void neo430_twi_stop_trans(void) {
+void neo430_twi_generate_stop(void) {
 
   TWI_CT |= (1 << TWI_CT_STOP); // generate STOP condition
   while(TWI_CT & (1 << TWI_CT_BUSY)); // wait until idle again
