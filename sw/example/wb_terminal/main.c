@@ -22,7 +22,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 10.10.2019 #
 // #################################################################################################
 
 
@@ -224,7 +224,7 @@ void read_wb_address(void) {
   else if (wb_config == 2)
     neo430_uart_print_hex_word(neo430_wishbone32_get_data16(address));
   else if (wb_config == 4)
-    neo430_uart_print_hex_dword(neo430_wishbone32_get_data32(address));
+    neo430_uart_print_hex_dword(neo430_wishbone32_get_data32());
 
   neo430_uart_br_print("\n");
 }
@@ -331,7 +331,7 @@ void dump_wb(void) {
         address += 2;
       }
       else if (wb_config == 4) {
-        neo430_uart_print_hex_dword(neo430_wishbone32_get_data32(address));
+        neo430_uart_print_hex_dword(neo430_wishbone32_get_data32());
         address += 4;
       }
 
