@@ -24,7 +24,7 @@
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
 // # Thanks to Edward Sherriff!                                                                    #
-// # Stephan Nolting, Hannover, Germany                                                 18.01.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 04.10.2019 #
 // #################################################################################################
 
 #ifndef neo430_wishbone_h
@@ -50,7 +50,7 @@ void neo430_wishbone32_write16_start(uint32_t a, uint16_t d); // This function p
 void neo430_wishbone32_read8_start(uint32_t a);
 void neo430_wishbone32_write8_start(uint32_t a, uint8_t d); // This function performs a data alignment based on the address!
 
-uint32_t neo430_wishbone32_get_data32(uint32_t a);
+uint32_t neo430_wishbone32_get_data32(void);
 uint16_t neo430_wishbone32_get_data16(uint32_t a); // This function performs a data alignment based on the address!
 uint8_t neo430_wishbone32_get_data8(uint32_t a); // This function performs a data alignment based on the address!
 
@@ -63,7 +63,7 @@ void neo430_wishbone32_write(uint32_t a, uint32_t d);
 // prototypes non-blocking functions for 32-bit data bus width using NO ADDRESS ALIGNMENT
 void neo430_wishbone32_read_start(uint32_t a);
 void neo430_wishbone32_write_start(uint32_t a, uint32_t d);
-uint32_t neo430_wishbone32_get_data(uint32_t a);
+uint32_t neo430_wishbone32_get_data(void);
 
 // -------------
 
@@ -74,7 +74,7 @@ void neo430_wishbone16_write(uint32_t a, uint16_t d);
 // prototypes non-blocking functions for 16-bit data bus width using NO ADDRESS ALIGNMENT
 void neo430_wishbone16_read_start(uint32_t a);
 void neo430_wishbone16_write_start(uint32_t a, uint16_t d);
-uint16_t neo430_wishbone16_get_data(uint32_t a);
+uint16_t neo430_wishbone16_get_data(void);
 
 // -------------
 
@@ -85,7 +85,7 @@ void neo430_wishbone8_write(uint32_t a, uint8_t d);
 // prototypes non-blocking functions for 8-bit data bus width using NO ADDRESS ALIGNMENT
 void neo430_wishbone8_read_start(uint32_t a);
 void neo430_wishbone8_write_start(uint32_t a, uint8_t d);
-uint8_t neo430_wishbone8_get_data8(uint32_t a);
+uint8_t neo430_wishbone8_get_data8(void);
 
 // -------------
 

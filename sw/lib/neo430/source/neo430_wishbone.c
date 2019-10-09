@@ -24,7 +24,7 @@
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
 // # Thanks to Edward Sherriff!                                                                    #
-// # Stephan Nolting, Hannover, Germany                                                 13.03.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 04.10.2019 #
 // #################################################################################################
 
 #include "neo430.h"
@@ -300,10 +300,9 @@ void neo430_wishbone32_write8_start(uint32_t a, uint8_t d) {
 
 /* ------------------------------------------------------------
  * INFO Read 32-bit data after nonblocking transaction has been started
- * PARAM 32-bit device address
  * RETURN read data
  * ------------------------------------------------------------ */
-uint32_t neo430_wishbone32_get_data32(uint32_t a) {
+uint32_t neo430_wishbone32_get_data32(void) {
 
   return WB32_D_32bit;
 }
@@ -433,7 +432,7 @@ void neo430_wishbone32_write_start(uint32_t a, uint32_t d) {
  * PARAM 32-bit device address
  * RETURN 32-bit read data
  * ------------------------------------------------------------ */
-uint32_t neo430_wishbone32_get_data(uint32_t a) {
+uint32_t neo430_wishbone32_get_data(void) {
 
   return WB32_D_32bit;
 }
@@ -525,10 +524,9 @@ void neo430_wishbone16_write_start(uint32_t a, uint16_t d) {
 
 /* ------------------------------------------------------------
  * INFO Read 16-bit data after nonblocking transaction has been started
- * PARAM 32-bit device address
  * RETURN 16-bit read data
  * ------------------------------------------------------------ */
-uint16_t neo430_wishbone16_get_data(uint32_t a) {
+uint16_t neo430_wishbone16_get_data(void) {
 
   return WB32_LD;
 }
@@ -620,10 +618,9 @@ void neo430_wishbone8_write_start(uint32_t a, uint8_t d) {
 
 /* ------------------------------------------------------------
  * INFO Read 8-bit data after nonblocking transaction has been started
- * PARAM 32-bit device address
  * RETURN 8-bit read data
  * ------------------------------------------------------------ */
-uint8_t neo430_wishbone8_get_data(uint32_t a) {
+uint8_t neo430_wishbone8_get_data(void) {
 
   return (uint8_t)WB32_LD;
 }

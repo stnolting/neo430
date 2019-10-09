@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 13.03.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 04.10.2019 #
 // #################################################################################################
 
 #include "neo430.h"
@@ -67,10 +67,9 @@ void neo430_spi_cs_en(uint8_t cs) {
 
 
 /* ------------------------------------------------------------
- * INFO Disable SPI CSx (set high)
- * PARAM CS line (0..7)
+ * INFO Disable all SPI CSx (set high)
  * ------------------------------------------------------------ */
-void neo430_spi_cs_dis(uint8_t cs) {
+void neo430_spi_cs_dis(void) {
 
   SPI_CT &= ~(1 << SPI_CT_CS_SET);
 }
