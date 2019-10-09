@@ -49,6 +49,10 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Full support of the original MSP430 instruction set architecture
 - Tool chain based on free TI msp430-gcc compiler
 - Application compilation scripts for Windows Powershell / Windows Subsystem for Linux / native Linux
+- Software requirements (regardless of platform):
+  - TI msp430-gcc compiler
+  - native C compiler (GCC)
+  - GNU Make
 - Completely described in behavioral, platform-independent VHDL
 - Fully synchronous design, no latches, no gated clocks
 - Very small outline and high operating frequency
@@ -59,8 +63,8 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
   - Optional high-precision timer (TIMER)
   - Optional universal asynchronous receiver and transmitter (UART)
   - Optional serial peripheral interface (SPI)
-  - Optional two wire serial interface (TWI)
-  - Optional general purpose parallel IO port (GPIO), 16 inputs, 16 outputs, with pin-change interrupt
+  - Optional I2C-compatible two wire serial interface (TWI) supporting clock stretching
+  - Optional general purpose parallel IO port (GPIO), 16 inputs & 16 outputs, with pin-change interrupt
   - Optional 32-bit Wishbone bus interface adapter (WB32) - including bridges to Avalon(TM) bus and AXI4-Lite(TM)
   - Optional watchdog timer (WDT)
   - Optional cyclic redundancy check unit (CRC16/32)

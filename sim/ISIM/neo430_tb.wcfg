@@ -12,15 +12,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="295779200000fs"></ZoomStartTime>
-      <ZoomEndTime time="295823400001fs"></ZoomEndTime>
-      <Cursor1Time time="295822400000fs"></Cursor1Time>
+      <ZoomStartTime time="295936666667fs"></ZoomStartTime>
+      <ZoomEndTime time="301326666668fs"></ZoomEndTime>
+      <Cursor1Time time="298031667000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="167"></NameColumnWidth>
-      <ValueColumnWidth column_width="81"></ValueColumnWidth>
+      <ValueColumnWidth column_width="77"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="128" />
+   <WVObjectSize size="119" />
    <wvobject type="divider" fp_name="divider6">
       <obj_property name="label">Global</obj_property>
       <obj_property name="DisplayName">label</obj_property>
@@ -466,10 +466,6 @@
       <obj_property name="label">IO: TWI</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_twi_inst_true/neo430_twi_inst/clk_i" type="logic">
-      <obj_property name="ElementShortName">clk_i</obj_property>
-      <obj_property name="ObjectShortName">clk_i</obj_property>
-   </wvobject>
    <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_twi_inst_true/neo430_twi_inst/data_i" type="array">
       <obj_property name="ElementShortName">data_i[15:0]</obj_property>
       <obj_property name="ObjectShortName">data_i[15:0]</obj_property>
@@ -489,16 +485,6 @@
    <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_twi_inst_true/neo430_twi_inst/twi_clk" type="logic">
       <obj_property name="ElementShortName">twi_clk</obj_property>
       <obj_property name="ObjectShortName">twi_clk</obj_property>
-   </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_twi_inst_true/neo430_twi_inst/twi_phase_gen" type="array">
-      <obj_property name="ElementShortName">twi_phase_gen[3:0]</obj_property>
-      <obj_property name="ObjectShortName">twi_phase_gen[3:0]</obj_property>
-      <obj_property name="Radix">BINARYRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_twi_inst_true/neo430_twi_inst/twi_clk_phase" type="array">
-      <obj_property name="ElementShortName">twi_clk_phase[3:0]</obj_property>
-      <obj_property name="ObjectShortName">twi_clk_phase[3:0]</obj_property>
-      <obj_property name="Radix">BINARYRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_twi_inst_true/neo430_twi_inst/arbiter" type="array">
       <obj_property name="ElementShortName">arbiter[2:0]</obj_property>

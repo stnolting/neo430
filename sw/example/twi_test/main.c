@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 11.03.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 10.10.2019 #
 // #################################################################################################
 
 
@@ -90,7 +90,7 @@ int main(void) {
       neo430_twi_generate_start(); // generate START condition
     }
     else if (!strcmp(buffer, "stop")) {
-      neo430_twi_stop_trans(); // generate STOP condition
+      neo430_twi_generate_stop(); // generate STOP condition
     }
     else if (!strcmp(buffer, "scan")) {
       scan_twi();
@@ -167,7 +167,7 @@ void scan_twi(void) {
   uint8_t i, num_devices = 0;
   for (i=0; i<128; i++) {
     uint8_t twi_ack = neo430_twi_start_trans((uint8_t)(2*i+1));
-    neo430_twi_stop_trans();
+    neo430_twi_generate_stop();
 
     if (twi_ack == 0) {
       neo430_uart_br_print(" * Found device at address (shifted left by 1 bit): 0x");

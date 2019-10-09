@@ -1,8 +1,8 @@
 -- #################################################################################################
 -- #  << NEO430 - Two Wire Serial Interface (I2C) >>                                               #
 -- # ********************************************************************************************* #
--- # Supports START and STOP condition and 8 bit data + ACK/NACK transfers.                        #
--- # No multi-master support! No clock stretching support yet!                                     #
+-- # Supports START and STOP conditions, 8 bit data + ACK/NACK transfers and clock stretching.     #
+-- # No multi-master support yet!                                                                  #
 -- # Interrupt: TWI_transfer_done                                                                  #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
@@ -23,7 +23,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 05.10.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -83,6 +83,9 @@ architecture neo430_twi_rtl of neo430_twi is
   signal twi_phase_gen  : std_ulogic_vector(3 downto 0);
   signal twi_clk_phase  : std_ulogic_vector(3 downto 0);
 
+  -- twi clock stretching --
+  signal twi_clk_halt : std_ulogic;
+
   -- twi transceiver core --
   signal ctrl         : std_ulogic_vector(7 downto 0); -- unit's control register
   signal arbiter      : std_ulogic_vector(2 downto 0);
@@ -134,7 +137,7 @@ begin
       if (arbiter(2) = '0') or (arbiter = "100") then -- offline or idle
         twi_phase_gen <= "0001"; -- make sure to start with a new phase, 0,1,2,3 stepping
       else
-        if (twi_clk = '1') then
+        if (twi_clk = '1') and (twi_clk_halt = '0') then -- enabled and no clock stretching detected
           twi_phase_gen <= twi_phase_gen(2 downto 0) & twi_phase_gen(3); -- shift left
         end if;
       end if;
@@ -221,7 +224,7 @@ begin
             twi_scl_o    <= '0';
             twi_sda_o    <= twi_rtx_sreg(8); -- MSB first
           elsif (twi_clk_phase(1) = '1') then -- first half + second half of valid data strobe
-            twi_scl_o <= '1';
+            twi_scl_o    <= '1';
           elsif (twi_clk_phase(3) = '1') then
             twi_rtx_sreg <= twi_rtx_sreg(7 downto 0) & twi_sda_i_ff1; -- sample and shift left
             twi_scl_o    <= '0';
@@ -240,6 +243,22 @@ begin
       end case;
     end if;
   end process twi_rtx_unit;
+
+
+  -- Clock Stretching Detector ------------------------------------------------
+  -- -----------------------------------------------------------------------------
+  clock_stretching: process(arbiter, twi_scl_o, twi_scl_i_ff1)
+  begin
+    -- clock stretching can occur during data transmission and even during
+    -- a START or STOP condition
+    if (arbiter(2) = '1') and     -- module enabled
+       (twi_scl_o = '1') and      -- master wants to pull scl high
+       (twi_scl_i_ff1 = '0') then -- but scl is pulled low by slave
+      twi_clk_halt <= '1';
+    else
+      twi_clk_halt <= '0';
+    end if;
+  end process clock_stretching;
 
 
   -- Read access --------------------------------------------------------------
