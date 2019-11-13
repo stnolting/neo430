@@ -29,7 +29,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 19.09.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 13.11.2019 #
 // #################################################################################################
 
 // Libraries
@@ -45,7 +45,7 @@
 #define AUTOBOOT_TIMEOUT 8     // countdown (seconds) to auto boot
 #define STATUS_LED       0     // GPIO.out(0) is status LED
 
-// 25LC512 EEPROM
+// 25LC512 SPI EEPROM
 #define BOOT_EEP_CS      0    // boot EEPROM CS (SPI.CS0)
 #define EEP_IMAGE_BASE   0x00 // base address of NEO430 boot image
 #define EEP_WRITE        0x02 // initialize start of write sequence
@@ -53,9 +53,13 @@
 #define EEP_RDSR         0x05 // read status register
 #define EEP_WREN         0x06 // write enable
 
+// 24LC512 TWI EEPROM
+#define TWI_BOOT_EEP_ADDR_READ 0b10100001 // READ address of TWI boot eeprom
+
 // Image sources
 #define UART_IMAGE       0x00
-#define EEPROM_IMAGE     0x01
+#define EEPROM_IMAGE_SPI 0x01
+#define EEPROM_IMAGE_TWI 0x02
 
 // Error codes
 #define ERROR_EEPROM     0x00 // EEPROM access error
@@ -75,8 +79,9 @@ void     print_help(void);
 void     core_dump(void);
 void     store_eeprom(void);
 void     eeprom_write_word(uint16_t a, uint16_t d);
-void     eeprom_write_byte(uint16_t a, uint8_t b);
-uint8_t  eeprom_read_byte(uint16_t a);
+void     spi_eeprom_write_byte(uint16_t a, uint8_t b);
+uint8_t  spi_eeprom_read_byte(uint16_t a);
+uint8_t  twi_eeprom_read_byte(uint16_t a);
 void     get_image(uint8_t src);
 uint16_t get_image_word(uint16_t a, uint8_t src);
 void     __attribute__((__naked__)) system_error(uint8_t err_code);
@@ -122,8 +127,8 @@ int main(void) {
   neo430_uart_char_read(); // clear UART RX buffer
 
   // set SPI config:
-  // enable SPI, no IRQs, SPI clock mode 0, 1/128 SPI speed, disable all 6 SPI CS lines (set high)
-  neo430_spi_enable(SPI_PRSC_128); // this also resets the SPI module
+  // enable SPI, no IRQs, MSB first, SPI clock mode 0, 1/128 SPI speed, disable all 6 SPI CS lines (set high)
+  neo430_spi_enable(SPI_PRSC_64); // this also resets the SPI module
   neo430_spi_trans(0); // clear SPI RTX buffer
 
   // Timeout counter: init timer, irq tick @ ~1Hz (prescaler = 4096)
@@ -133,8 +138,7 @@ int main(void) {
   TMR_THRES = (CLOCKSPEED_HI << 2) -1; // "fake" ;D
   // enable timer, auto reset, enable IRQ, prsc = 1:2^16
   TMR_CT = (1<<TMR_CT_EN) | (1<<TMR_CT_ARST) | (1<<TMR_CT_IRQ) | ((16-1)<<TMR_CT_PRSC0);
-  TMR_CNT = 0;
-  TIMEOUT_CNT = 0; // timeout ticker
+  TIMEOUT_CNT = 0; // console timeout ticker
 
   neo430_clear_irq_buffer(); // clear all pending interrupts
   neo430_eint(); // enable global interrupts
@@ -143,7 +147,7 @@ int main(void) {
   // ****************************************************************
   // Show bootloader intro and system information
   // ****************************************************************
-  neo430_uart_br_print("\n\nNEO430 Bootloader V20190919\nBy Stephan Nolting\n\n"
+  neo430_uart_br_print("\n\nNEO430 Bootloader V20191113\nBy Stephan Nolting\n\n"
                        "HWV: 0x");
   neo430_uart_print_hex_word(HW_VERSION);
   neo430_uart_br_print("\nUSR: 0x");
@@ -167,7 +171,7 @@ int main(void) {
 
     // timeout? start auto boot sequence
     if (TIMEOUT_CNT == 4*AUTOBOOT_TIMEOUT) { // in 0.25 seconds
-      get_image(EEPROM_IMAGE); // try loading from EEPROM
+      get_image(EEPROM_IMAGE_SPI); // try loading from EEPROM
       neo430_uart_br_print("\n");
       start_app(); // start app if loading was successful
     }
@@ -200,7 +204,7 @@ int main(void) {
     else if (c == 'p') // program EEPROM from RAM
       store_eeprom();
     else if (c == 'e') // copy program from EEPROM to RAM
-      get_image(EEPROM_IMAGE);
+      get_image(EEPROM_IMAGE_SPI);
     else if (c == 's') // start program in RAM
       start_app();
     else // unknown command
@@ -263,18 +267,18 @@ void core_dump(void) {
 
   uint16_t *pnt = (uint16_t*)0x0000;
   uint16_t i = 0, j = 0;
-
+  
   while (1) {
     neo430_uart_br_print("\n");
     neo430_uart_print_hex_word((uint16_t)pnt); // print address
     neo430_uart_br_print(":  ");
-
+  
     // print hexadecimal data
     for (i=0; i<16; i++) {
       neo430_uart_print_hex_word(*pnt++);
       neo430_uart_putc(' ');
     }
-
+  
     // user abort or all done?
     if ((neo430_uart_char_received() != 0) || (j == 0xFFE0))
       return;
@@ -297,13 +301,13 @@ void store_eeprom(void) {
 
   neo430_spi_cs_en(BOOT_EEP_CS);
   neo430_spi_trans(EEP_WREN); // write enable
-  neo430_spi_cs_dis(BOOT_EEP_CS);
+  neo430_spi_cs_dis();
 
   // check if eeprom ready (or available at all)
   neo430_spi_cs_en(BOOT_EEP_CS);
   neo430_spi_trans(EEP_RDSR); // read status register CMD
   uint8_t b = neo430_spi_trans(0x00); // read status register data
-  neo430_spi_cs_dis(BOOT_EEP_CS);
+  neo430_spi_cs_dis();
 
   if ((b & 0x8F) != 0x02)
     system_error(ERROR_EEPROM);
@@ -344,35 +348,35 @@ void eeprom_write_word(uint16_t a, uint16_t d) {
   uint8_t lo = (uint8_t)(d);
   uint8_t hi = (uint8_t)(d >> 8);
   
-  eeprom_write_byte(a+0, hi);
-  eeprom_write_byte(a+1, lo);
+  spi_eeprom_write_byte(a+0, hi);
+  spi_eeprom_write_byte(a+1, lo);
 }
 
 
 /* ------------------------------------------------------------
- * INFO EEPROM write single byte
+ * INFO SPI EEPROM write single byte
  * PARAM a destination address (16 bit)
  * PARAM b byte to be written
  * ------------------------------------------------------------ */
-void eeprom_write_byte(uint16_t a, uint8_t b) {
+void spi_eeprom_write_byte(uint16_t a, uint8_t b) {
 
   neo430_spi_cs_en(BOOT_EEP_CS);
   neo430_spi_trans(EEP_WREN); // write enable
-  neo430_spi_cs_dis(BOOT_EEP_CS);
+  neo430_spi_cs_dis();
 
   neo430_spi_cs_en(BOOT_EEP_CS);
   neo430_spi_trans(EEP_WRITE); // byte write instruction
   neo430_spi_trans((uint8_t)(a >> 8));
   neo430_spi_trans((uint8_t)(a >> 0));
   neo430_spi_trans(b);
-  neo430_spi_cs_dis(BOOT_EEP_CS);
+  neo430_spi_cs_dis();
 
   // wait for write to finish
   while(1) {
     neo430_spi_cs_en(BOOT_EEP_CS);
     neo430_spi_trans(EEP_RDSR); // read status register CMD
     uint8_t s = neo430_spi_trans(0x00);
-    neo430_spi_cs_dis(BOOT_EEP_CS);
+    neo430_spi_cs_dis();
 
     if ((s & 0x01) == 0) { // check WIP flag
       break; // done!
@@ -382,18 +386,40 @@ void eeprom_write_byte(uint16_t a, uint8_t b) {
 
 
 /* ------------------------------------------------------------
- * INFO EEPROM read data
+ * INFO SPI EEPROM read data
  * PARAM a destination address (16 bit)
  * RETURN byte read data
  * ------------------------------------------------------------ */
-uint8_t eeprom_read_byte(uint16_t a) {
+uint8_t spi_eeprom_read_byte(uint16_t a) {
 
   neo430_spi_cs_en(BOOT_EEP_CS);
   neo430_spi_trans(EEP_READ); // byte read instruction
   neo430_spi_trans((uint8_t)(a >> 8));
   neo430_spi_trans((uint8_t)(a >> 0));
   uint8_t d = neo430_spi_trans(0);
-  neo430_spi_cs_dis(BOOT_EEP_CS);
+  neo430_spi_cs_dis();
+
+  return d;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO TWI EEPROM read data
+ * PARAM a destination address (16 bit)
+ * RETURN byte read data
+ * ------------------------------------------------------------ */
+uint8_t twi_eeprom_read_byte(uint16_t a) {
+
+  uint8_t twi_err = neo430_twi_start_trans(TWI_BOOT_EEP_ADDR_READ);
+  twi_err |= neo430_twi_trans((uint8_t)(a >> 8));
+  twi_err |= neo430_twi_trans((uint8_t)(a >> 0));
+  twi_err |= !neo430_twi_trans(0xFF); // read data
+  uint8_t d = neo430_twi_get_data();
+  neo430_twi_generate_stop();
+
+  //if (twi_err) {
+  //  
+  //}
 
   return d;
 }
@@ -401,7 +427,7 @@ uint8_t eeprom_read_byte(uint16_t a) {
 
 /* ------------------------------------------------------------
  * INFO Get IMEM image from SPI EEPROM at SPI.CS0 or from UART
- * PARAM src Image source 0: UART, 1: EEPROM
+ * PARAM src Image source 0: UART, 1: SPI_EEPROM
  * RETURN error code (0 if successful)
  * ------------------------------------------------------------ */
 void get_image(uint8_t src) {
@@ -414,7 +440,7 @@ void get_image(uint8_t src) {
   // print intro
   if (src == UART_IMAGE) // boot via UART
     neo430_uart_br_print("Awaiting BINEXE... ");
-  else //if (src == EEPROM_IMAGE)// boot from EEPROM
+  else //if (src == EEPROM_IMAGE_SPI)// boot from EEPROM
     neo430_uart_br_print("Loading... ");
 
   // check if valid image
@@ -456,9 +482,9 @@ void get_image(uint8_t src) {
 
 
 /* ------------------------------------------------------------
- * INFO Get image word from EEPROM or UART
+ * INFO Get image word from SPI_EEPROM or UART
  * PARAM a source address (16 bit)
- * PARAM src: 0: UART, 1: EEPROM
+ * PARAM src: 0: UART, 1: SPI_EEPROM
  * RETURN accessed data word
  * ------------------------------------------------------------ */
 uint16_t get_image_word(uint16_t a, uint8_t src) {
@@ -470,9 +496,13 @@ uint16_t get_image_word(uint16_t a, uint8_t src) {
     c0 = (uint8_t)neo430_uart_getc();
     c1 = (uint8_t)neo430_uart_getc();
   }
-  else { //if (src == EEPROM_IMAGE) // get image data from EEPROM
-    c0 = eeprom_read_byte(a+0);
-    c1 = eeprom_read_byte(a+1);
+  else if (src == EEPROM_IMAGE_SPI) { // get image data from SPI EEPROM
+    c0 = spi_eeprom_read_byte(a+0);
+    c1 = spi_eeprom_read_byte(a+1);
+  }
+  else { // if (src == EEPROM_IMAGE_TWI) // get image data from TWI EEPROM
+    //c0 = twi_eeprom_read_byte(a+0);
+    //c1 = twi_eeprom_read_byte(a+1);
   }
 
   //uint16_t r = (((uint16_t)c0) << 8) | (((uint16_t)c1) << 0);
@@ -489,7 +519,7 @@ uint16_t get_image_word(uint16_t a, uint8_t src) {
  * ------------------------------------------------------------ */
 void __attribute__((__naked__)) system_error(uint8_t err_code){
 
-  neo430_uart_br_print("\a\nERR_");
+  neo430_uart_br_print("\a\nERR_"); // output error code with annoying bell sound
   neo430_uart_print_hex_byte(err_code);
 
   asm volatile ("mov #0, r2"); // deactivate IRQs, no more write access to IMEM
