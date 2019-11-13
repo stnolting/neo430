@@ -140,7 +140,7 @@ image.dat: main.elf
 	@$(OBJCOPY) -I elf32-little $< -j .rodata -O binary rodata.dat
 	@$(OBJCOPY) -I elf32-little $< -j .data   -O binary data.dat
 	@cat text.dat rodata.dat data.dat > $@
-	@ rm -f text.dat rodata.dat data.dat
+	@rm -f text.dat rodata.dat data.dat
 
 # Assembly listing file (for debugging)
 $(APP_ASM): main.elf
