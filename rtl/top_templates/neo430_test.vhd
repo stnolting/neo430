@@ -23,7 +23,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 23.09.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 13.11.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -67,7 +67,6 @@ begin
     -- additional configuration --
     USER_CODE   => x"CAFE",           -- custom user code
     -- module configuration --
-    DADD_USE    => true,              -- implement DADD instruction? (default=true)
     MULDIV_USE  => true,              -- implement multiplier/divider unit? (default=true)
     WB32_USE    => true,              -- implement WB32 unit? (default=true)
     WDT_USE     => true,              -- implement WDT? (default=true)

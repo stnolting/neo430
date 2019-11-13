@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 28.05.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 13.11.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -32,9 +32,6 @@ library neo430;
 use neo430.neo430_package.all;
 
 entity neo430_control is
-  generic (
-    DADD_USE : boolean := true -- implement DADD instruction?
-  );
   port (
     -- global control --
     clk_i     : in  std_ulogic; -- global clock, rising edge
@@ -453,7 +450,7 @@ begin
       when TRANS_8 => -- operand transfer cycle 8
       -- ------------------------------------------------------------
         ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= ir(3 downto 0); -- destination
-        if (ctrl(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) = alu_dadd_c) and (DADD_USE = true) then
+        if (ctrl(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) = alu_dadd_c) and (use_dadd_cmd_c = true) then
           state_nxt <= TRANS_9;
         else
           ctrl_nxt(ctrl_rf_fup_c) <= not spec_cmd_v; -- update ALU status flags

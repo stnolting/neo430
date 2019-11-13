@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 22.06.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 13.11.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -33,9 +33,6 @@ library neo430;
 use neo430.neo430_package.all;
 
 entity neo430_alu is
-  generic (
-    DADD_USE : boolean := true -- implement DADD instruction?
-  );
   port (
     -- global control --
     clk_i  : in  std_ulogic; -- global clock, rising edge
@@ -172,7 +169,7 @@ begin
   end process dadd_pipe_reg;
 
   -- implement DADD instruction? --
-  dadd_res_in <= dadd_res_ff when (DADD_USE = true) else (others => '0');
+  dadd_res_in <= dadd_res_ff when (use_dadd_cmd_c = true) else (others => '0');
 
 
   -- ALU Core -----------------------------------------------------------------

@@ -43,7 +43,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 23.09.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 13.11.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -63,7 +63,6 @@ entity neo430_top is
     -- additional configuration --
     USER_CODE   : std_ulogic_vector(15 downto 0) := x"0000"; -- custom user code
     -- module configuration --
-    DADD_USE    : boolean := true;  -- implement DADD instruction? (default=true)
     MULDIV_USE  : boolean := true;  -- implement multiplier/divider unit? (default=true)
     WB32_USE    : boolean := true;  -- implement WB32 unit? (default=true)
     WDT_USE     : boolean := true;  -- implement WDT? (default=true)
@@ -240,7 +239,6 @@ begin
   -- -----------------------------------------------------------------------------
   neo430_cpu_inst: neo430_cpu
   generic map (
-    DADD_USE    => DADD_USE,        -- implement DADD instruction? (default=true)
     BOOTLD_USE  => BOOTLD_USE,      -- implement and use bootloader? (default=true)
     IMEM_AS_ROM => IMEM_AS_ROM      -- implement IMEM as read-only memory?
   )
@@ -676,7 +674,6 @@ begin
     -- additional configuration --
     USER_CODE   => USER_CODE,       -- custom user code
     -- module configuration --
-    DADD_USE    => DADD_USE,        -- implement DADD instruction?
     MULDIV_USE  => MULDIV_USE,      -- implement multiplier/divider unit?
     WB32_USE    => WB32_USE,        -- implement WB32 unit?
     WDT_USE     => WDT_USE,         -- implement WDT?

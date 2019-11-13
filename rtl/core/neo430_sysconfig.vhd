@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 23.09.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 13.11.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -41,7 +41,6 @@ entity neo430_sysconfig is
     -- additional configuration --
     USER_CODE   : std_ulogic_vector(15 downto 0) := x"0000"; -- custom user code
     -- module configuration --
-    DADD_USE    : boolean := true; -- implement DADD instruction?
     MULDIV_USE  : boolean := true; -- implement multiplier/divider unit?
     WB32_USE    : boolean := true; -- implement WB32 unit?
     WDT_USE     : boolean := true; -- implement WDT?
@@ -103,22 +102,22 @@ begin
   sysinfo_mem(0) <= hw_version_c; -- HW version
 
   -- CPUID1: System setup (features) --
-  sysinfo_mem(1)(00) <= bool_to_ulogic_f(MULDIV_USE);  -- MULDIV present?
-  sysinfo_mem(1)(01) <= bool_to_ulogic_f(WB32_USE);    -- WB32 present?
-  sysinfo_mem(1)(02) <= bool_to_ulogic_f(WDT_USE);     -- WDT present?
-  sysinfo_mem(1)(03) <= bool_to_ulogic_f(GPIO_USE);    -- GPIO present?
-  sysinfo_mem(1)(04) <= bool_to_ulogic_f(TIMER_USE);   -- TIMER present?
-  sysinfo_mem(1)(05) <= bool_to_ulogic_f(UART_USE);    -- UART present?
-  sysinfo_mem(1)(06) <= bool_to_ulogic_f(DADD_USE);    -- DADD instruction present?
-  sysinfo_mem(1)(07) <= bool_to_ulogic_f(BOOTLD_USE);  -- bootloader present?
-  sysinfo_mem(1)(08) <= bool_to_ulogic_f(IMEM_AS_ROM); -- IMEM implemented as true ROM?
-  sysinfo_mem(1)(09) <= bool_to_ulogic_f(CRC_USE);     -- CRC present?
-  sysinfo_mem(1)(10) <= bool_to_ulogic_f(CFU_USE);     -- CFU present?
-  sysinfo_mem(1)(11) <= bool_to_ulogic_f(PWM_USE);     -- PWM present?
-  sysinfo_mem(1)(12) <= bool_to_ulogic_f(TWI_USE);     -- TWI present?
-  sysinfo_mem(1)(13) <= bool_to_ulogic_f(SPI_USE);     -- SPI present?
-  sysinfo_mem(1)(14) <= '0';                           -- reserved
-  sysinfo_mem(1)(15) <= '0';                           -- reserved
+  sysinfo_mem(1)(00) <= bool_to_ulogic_f(MULDIV_USE);     -- MULDIV present?
+  sysinfo_mem(1)(01) <= bool_to_ulogic_f(WB32_USE);       -- WB32 present?
+  sysinfo_mem(1)(02) <= bool_to_ulogic_f(WDT_USE);        -- WDT present?
+  sysinfo_mem(1)(03) <= bool_to_ulogic_f(GPIO_USE);       -- GPIO present?
+  sysinfo_mem(1)(04) <= bool_to_ulogic_f(TIMER_USE);      -- TIMER present?
+  sysinfo_mem(1)(05) <= bool_to_ulogic_f(UART_USE);       -- UART present?
+  sysinfo_mem(1)(06) <= bool_to_ulogic_f(use_dadd_cmd_c); -- DADD instruction present?
+  sysinfo_mem(1)(07) <= bool_to_ulogic_f(BOOTLD_USE);     -- bootloader present?
+  sysinfo_mem(1)(08) <= bool_to_ulogic_f(IMEM_AS_ROM);    -- IMEM implemented as true ROM?
+  sysinfo_mem(1)(09) <= bool_to_ulogic_f(CRC_USE);        -- CRC present?
+  sysinfo_mem(1)(10) <= bool_to_ulogic_f(CFU_USE);        -- CFU present?
+  sysinfo_mem(1)(11) <= bool_to_ulogic_f(PWM_USE);        -- PWM present?
+  sysinfo_mem(1)(12) <= bool_to_ulogic_f(TWI_USE);        -- TWI present?
+  sysinfo_mem(1)(13) <= bool_to_ulogic_f(SPI_USE);        -- SPI present?
+  sysinfo_mem(1)(14) <= '0';                              -- reserved
+  sysinfo_mem(1)(15) <= '0';                              -- reserved
 
   -- CPUID2: User code --
   sysinfo_mem(2) <= USER_CODE;
