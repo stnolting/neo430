@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 10.10.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 08.11.2019 #
 // #################################################################################################
 
 
@@ -35,6 +35,9 @@ void send_twi(void);
 
 // Configuration
 #define BAUD_RATE 19200
+
+// Global variables
+uint16_t bus_claimed;
 
 
 /* ------------------------------------------------------------
@@ -64,6 +67,7 @@ int main(void) {
   // init TWI
   // SCL clock speed = f_cpu / (4 * PRSC)
   neo430_twi_enable(TWI_PRSC_2048); // second slowest
+  bus_claimed = 0; // no active bus session
 
   // Main menu
   for (;;) {
@@ -81,16 +85,25 @@ int main(void) {
                            " scan  - scan bus for devices\n"
                            " start - generate START condition\n"
                            " stop  - generate STOP condition\n"
-                           " send  - write/read single byte to/from bus\n"
+                           " send  - write & read single byte to/from bus\n"
                            " speed - select bus clock\n"
                            " reset - perform soft-reset\n"
-                           " exit  - exit program and return to bootloader\n");
+                           " exit  - exit program and return to bootloader\n\n"
+                           "Start a new transmission by generating a START condition. Next, transfer the 7-bit device address\n"
+                           "and the R/W flag. After that, transfer your data to be written or send a 0xFF if you want to read\n"
+                           "data from the bus. Finish the transmission by generating a STOP condition.\n");
     }
     else if (!strcmp(buffer, "start")) {
       neo430_twi_generate_start(); // generate START condition
+      bus_claimed = 1;
     }
     else if (!strcmp(buffer, "stop")) {
+      if (bus_claimed == 0) {
+        neo430_uart_br_print("No active I2C transmission.\n");
+        continue;
+      }
       neo430_twi_generate_stop(); // generate STOP condition
+      bus_claimed = 0;
     }
     else if (!strcmp(buffer, "scan")) {
       scan_twi();
@@ -170,7 +183,7 @@ void scan_twi(void) {
     neo430_twi_generate_stop();
 
     if (twi_ack == 0) {
-      neo430_uart_br_print(" * Found device at address (shifted left by 1 bit): 0x");
+      neo430_uart_br_print("+ Found device at address 0x");
       neo430_uart_print_hex_byte(2*i);
       neo430_uart_br_print("\n");
       num_devices++;
@@ -189,6 +202,11 @@ void scan_twi(void) {
 void send_twi(void) {
 
   char terminal_buffer[4];
+
+  if (bus_claimed == 0) {
+    neo430_uart_br_print("No active I2C transmission. Generate a START condition first.\n");
+    return;
+  }
 
   // enter data
   neo430_uart_br_print("Enter TX data (2 hex chars): ");

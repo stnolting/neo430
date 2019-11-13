@@ -107,6 +107,7 @@ begin
       clk_sel <= (others => '1'); -- slowest clock source
       rst_gen <= (others => '1'); -- do NOT fire on reset!
     elsif rising_edge(clk_i) then
+      -- control register write access --
       if (wren = '1') then -- allow write if password is correct
         enable  <= data_i(ctrl_enable_c);
         clk_sel <= data_i(ctrl_clksel2_c downto ctrl_clksel0_c);

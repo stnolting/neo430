@@ -22,7 +22,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 13.11.2019 #
 // #################################################################################################
 
 
@@ -82,9 +82,8 @@ int main(void) {
   UART_CT |= (1<<UART_CT_RX_IRQ);
 
   // configure TIMER period
-  TMR_THRES = 1; // very high sample rate ;)
-  // clear timer counter
-  TMR_CNT = 0;
+  neo430_timer_disable();
+  TMR_THRES = 1;
 
   // configure timer operation
   TMR_CT = (1<<TMR_CT_EN)   | // enable timer

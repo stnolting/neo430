@@ -10,9 +10,10 @@ A clear and concise description of what the bug is.
 **To Reproduce**
 Steps to reproduce the behavior:
 1. Processor configuration
-2. FPGA type / simulator / EDA tools
-3. Executed code, used libraries, ...
-4. Board / simulation configuration
+2. FPGA type, simulator/synthesis tools
+3. OS type/version, Make/GCC/etc. version
+4. Executed code, used libraries, ...
+5. Board / simulation configuration
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.

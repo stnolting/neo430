@@ -73,7 +73,8 @@ int main(void) {
   IRQVEC_TIMER = (uint16_t)(&timer_irq_handler);
 
   // configure timer frequency
-  if (neo430_config_timer_period(CLOCK_FREQ))
+  neo430_timer_disable();
+  if (neo430_timer_config_period(CLOCK_FREQ))
     neo430_uart_br_print("Invalid TIMER frequency!\n");
 
   TMR_CT |= (1<<TMR_CT_EN) | (1<<TMR_CT_ARST) | (1<<TMR_CT_IRQ); // enable timer, auto-reset, irq enabled

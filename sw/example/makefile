@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 # ********************************************************************************************* #
-# Stephan Nolting, Hannover, Germany                                                 01.01.2019 #
+# Stephan Nolting, Hannover, Germany                                                 13.11.2019 #
 #################################################################################################
 
 
@@ -29,7 +29,7 @@
 .SUFFIXES:
 .DEFAULT_GOAL := help
 
-TOPTARGETS := all clean_all
+TOPTARGETS := compile clean_all
 
 SUBDIRS := $(wildcard */.)
 # ignore dummy folders (starting with '~')
@@ -50,7 +50,7 @@ help:
 	@echo "Compile / clean up ALL project folders in this directory"
 	@echo "Targets:"
 	@echo " help      - show this text"
-	@echo " all       - compile and install all projects"
+	@echo " compile   - compile all projects"
 	@echo " clean_all - clean up everything"
 
   

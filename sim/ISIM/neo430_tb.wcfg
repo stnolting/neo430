@@ -12,15 +12,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="295936666667fs"></ZoomStartTime>
-      <ZoomEndTime time="301326666668fs"></ZoomEndTime>
-      <Cursor1Time time="298031667000fs"></Cursor1Time>
+      <ZoomStartTime time="335818933334fs"></ZoomStartTime>
+      <ZoomEndTime time="336035333335fs"></ZoomEndTime>
+      <Cursor1Time time="335860533000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="167"></NameColumnWidth>
-      <ValueColumnWidth column_width="77"></ValueColumnWidth>
+      <ValueColumnWidth column_width="73"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="119" />
+   <WVObjectSize size="120" />
    <wvobject type="divider" fp_name="divider6">
       <obj_property name="label">Global</obj_property>
       <obj_property name="DisplayName">label</obj_property>
@@ -243,18 +243,22 @@
       <obj_property name="label">IO: Timer</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
+   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_timer_inst_true/neo430_timer_inst/ctrl" type="array">
+      <obj_property name="ElementShortName">ctrl[5:0]</obj_property>
+      <obj_property name="ObjectShortName">ctrl[5:0]</obj_property>
+   </wvobject>
    <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_timer_inst_true/neo430_timer_inst/thres" type="array">
       <obj_property name="ElementShortName">thres[15:0]</obj_property>
       <obj_property name="ObjectShortName">thres[15:0]</obj_property>
       <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_timer_inst_true/neo430_timer_inst/irq_o" type="logic">
-      <obj_property name="ElementShortName">irq_o</obj_property>
-      <obj_property name="ObjectShortName">irq_o</obj_property>
-   </wvobject>
    <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_timer_inst_true/neo430_timer_inst/cnt" type="array">
       <obj_property name="ElementShortName">cnt[15:0]</obj_property>
       <obj_property name="ObjectShortName">cnt[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_timer_inst_true/neo430_timer_inst/irq_o" type="logic">
+      <obj_property name="ElementShortName">irq_o</obj_property>
+      <obj_property name="ObjectShortName">irq_o</obj_property>
    </wvobject>
    <wvobject type="divider" fp_name="divider22">
       <obj_property name="label">IO: GPIO</obj_property>

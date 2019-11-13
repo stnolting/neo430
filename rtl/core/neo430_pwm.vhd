@@ -2,7 +2,7 @@
 -- #  << NEO430 - PWM Controller >>                                                                #
 -- # ********************************************************************************************* #
 -- # Simple 4-channel PWM controller with 8 bit resolution for the duty cycle and selectable       #
---- # counter width (frequency resolution) from 1 to 8 bits.                                       #
+-- # counter width (frequency resolution) from 1 to 8 bits.                                        #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -131,14 +131,14 @@ begin
   mask_gen: process(size)
   begin
     case size is
-      when "000" => mask <= "00000001";
-      when "001" => mask <= "00000011";
-      when "010" => mask <= "00000111";
-      when "011" => mask <= "00001111";
-      when "100" => mask <= "00011111";
-      when "101" => mask <= "00111111";
-      when "110" => mask <= "01111111";
-      when "111" => mask <= "11111111";
+      when "000"  => mask <= "00000001";
+      when "001"  => mask <= "00000011";
+      when "010"  => mask <= "00000111";
+      when "011"  => mask <= "00001111";
+      when "100"  => mask <= "00011111";
+      when "101"  => mask <= "00111111";
+      when "110"  => mask <= "01111111";
+      when "111"  => mask <= "11111111";
       when others => mask <= (others => '1');
     end case;
   end process mask_gen;
@@ -153,12 +153,12 @@ begin
       if (enable = '0') then 
         pwm_cnt <= (others => '0');
       elsif (prsc_tick = '1') then
-        pwm_cnt <= std_ulogic_vector(unsigned(pwm_cnt) + 1) and mask;
+        pwm_cnt <= std_ulogic_vector(unsigned(pwm_cnt) + 1);
       end if;
       -- channels --
       for i in 0 to num_pwm_channels_c-1 loop
-        -- constrain counter and duty cycle value to virtual size configured by SIZE register
-        if (unsigned(pwm_cnt) >= unsigned(pwm_ch(i))) or (enable = '0') then
+        -- constrain counter to virtual size configured by SIZE register
+        if (unsigned(pwm_cnt and mask) >= unsigned(pwm_ch(i))) or (enable = '0') then
           pwm_o(i) <= '0';
         else
           pwm_o(i) <= '1';

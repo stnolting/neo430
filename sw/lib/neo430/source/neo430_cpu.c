@@ -191,7 +191,7 @@ uint16_t neo430_combine_bytes(uint8_t hi, uint8_t lo) {
 
 /* ------------------------------------------------------------
  * INFO Binary-coded decimal addition
- * WARNING Make sure the DADD unit is syntheszied!!!!
+ * WARNING MAKE SURE THE DADD UNIT IS SYNTHESIZED!!!
  * PARAM 2x 16-bit BCD operands (4 digits)
  * RETURN 16-bit BCD result (4 digits)
  * ------------------------------------------------------------ */
