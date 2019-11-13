@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 23.09.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 13.11.2019 #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -168,6 +168,7 @@
 #define SPI_CT_CS_SEL1  7 // r/w: spi CS select 1
 #define SPI_CT_CS_SEL2  8 // r/w: spi CS select 2
 #define SPI_CT_CS_SET   9 // r/w: selected CS becomes active ('0') when set
+#define SPI_CT_DIR     10 // r/w: shift direction (0: MSB first, 1: LSB first)
 
 #define SPI_CT_BUSY    15 // r/-: spi transceiver is busy
 
@@ -195,7 +196,7 @@
 // High-Precision Timer (TIMER)
 // ----------------------------------------------------------------------------
 #define TMR_CT    (*(REG16 0xFFB0)) // r/w: control register
-#define TMR_CNT   (*(REG16 0xFFB2)) // r/w: counter register
+#define TMR_CNT   (*(ROM16 0xFFB2)) // r/-: counter register
 #define TMR_THRES (*(REG16 0xFFB4)) // r/w: threshold register
 //#define reserved     (*(REG16 0xFFB6))
 
@@ -380,13 +381,13 @@
 // ----------------------------------------------------------------------------
 // Include all IO library headers
 // ----------------------------------------------------------------------------
-#include "neo430_aux.h"
 #include "neo430_cpu.h"
 #include "neo430_crc.h"
 #include "neo430_gpio.h"
 #include "neo430_muldiv.h"
 #include "neo430_pwm.h"
 #include "neo430_spi.h"
+#include "neo430_timer.h"
 #include "neo430_twi.h"
 #include "neo430_uart.h"
 #include "neo430_wdt.h"
