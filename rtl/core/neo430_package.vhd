@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 05.10.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 13.11.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -30,13 +30,14 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0301"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0303"; -- no touchy!
 
   -- Advanced Hardware Configuration --------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   constant use_dsp_mul_c    : boolean := false; -- use DSP blocks for MULDIV's multiplication (default=false)
+  constant use_dadd_cmd_c   : boolean := false; -- implement CPU's DADD instruction (default=false)
   constant low_power_mode_c : boolean := false; -- reduces switching activity, but will also decrease f_max and might increase area (default=false)
-  constant awesome_mode_c   : boolean := true; -- of course! (default=true)
+  constant awesome_mode_c   : boolean := true;  -- of course! (default=true)
 
   -- Internal Functions ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -309,7 +310,6 @@ package neo430_package is
       -- additional configuration --
       USER_CODE   : std_ulogic_vector(15 downto 0) := x"0000"; -- custom user code
       -- module configuration --
-      DADD_USE    : boolean := true; -- implement DADD instruction? (default=true)
       MULDIV_USE  : boolean := true; -- implement multiplier/divider unit? (default=true)
       WB32_USE    : boolean := true; -- implement WB32 unit? (default=true)
       WDT_USE     : boolean := true; -- implement WDT? (default=true)
@@ -361,9 +361,6 @@ package neo430_package is
   -- Component: Control ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_control
-    generic (
-      DADD_USE : boolean := true -- implement DADD instruction?
-    );
     port (
       -- global control --
       clk_i     : in  std_ulogic; -- global clock, rising edge
@@ -407,9 +404,6 @@ package neo430_package is
   -- Component: Data ALU --------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_alu
-    generic (
-      DADD_USE : boolean := true -- implement DADD instruction?
-    );
     port (
       -- global control --
       clk_i  : in  std_ulogic; -- global clock, rising edge
@@ -448,7 +442,6 @@ package neo430_package is
   -- -------------------------------------------------------------------------------------------
   component neo430_cpu
     generic (
-      DADD_USE    : boolean := true; -- implement DADD instruction?
       BOOTLD_USE  : boolean := true; -- implement and use bootloader?
       IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory?
     );
@@ -738,7 +731,6 @@ package neo430_package is
       -- additional configuration --
       USER_CODE   : std_ulogic_vector(15 downto 0) := x"0000"; -- custom user code
       -- module configuration --
-      DADD_USE    : boolean := true; -- implement DADD instruction?
       MULDIV_USE  : boolean := true; -- implement multiplier/divider unit?
       WB32_USE    : boolean := true; -- implement WB32 unit?
       WDT_USE     : boolean := true; -- implement WDT?
