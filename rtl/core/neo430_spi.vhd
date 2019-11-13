@@ -1,7 +1,7 @@
 -- #################################################################################################
 -- #  << NEO430 - Serial Peripheral Interface >>                                                   #
 -- # ********************************************************************************************* #
--- # Fixed frame: 8-bit, MSB first, 2 clock modes, 8 clock speeds, 8 dedicated CS lines.           #
+-- # Frame format: 8-bit, MSB or LSB first, 2 clock modes, 8 clock speeds, 8 dedicated CS lines.   #
 -- # Interrupt: SPI_transfer_done                                                                  #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 13.11.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -71,6 +71,7 @@ architecture neo430_spi_rtl of neo430_spi is
   constant ctrl_spi_cs_sel1_c : natural :=  7; -- r/w: spi CS select bit 0
   constant ctrl_spi_cs_sel2_c : natural :=  8; -- r/w: spi CS select bit 0
   constant ctrl_spi_cs_set_c  : natural :=  9; -- r/w: spi CS select enable
+  constant ctrl_spi_dir_c     : natural := 10; -- r/w: shift direction (0: MSB first, 1: LSB first)
   -- ...
   constant ctrl_spi_busy_c    : natural := 15; -- r/-: spi transceiver is busy
 
@@ -153,11 +154,19 @@ begin
       else -- transmission in progress
         if (spi_state1 = '0') then -- first half of transmission
           spi_sclk_o <= ctrl(ctrl_spi_cpha_c);
-          spi_mosi_o <= spi_rtx_sreg(7); -- MSB first
+          if (ctrl(ctrl_spi_dir_c) = '0') then
+            spi_mosi_o <= spi_rtx_sreg(7); -- MSB first
+          else
+            spi_mosi_o <= spi_rtx_sreg(0); -- LSB first
+          end if;
           if (spi_clk = '1') then
             spi_state1   <= '1';
             if (ctrl(ctrl_spi_cpha_c) = '0') then
-              spi_rtx_sreg <= spi_rtx_sreg(6 downto 0) & spi_miso_ff1; -- MSB first
+              if (ctrl(ctrl_spi_dir_c) = '0') then
+                spi_rtx_sreg <= spi_rtx_sreg(6 downto 0) & spi_miso_ff1; -- MSB first
+              else
+                spi_rtx_sreg <= spi_miso_ff1 & spi_rtx_sreg(7 downto 1); -- LSB first
+              end if;
             end if;
             spi_bitcnt <= std_ulogic_vector(unsigned(spi_bitcnt) - 1);
           end if;
@@ -166,7 +175,11 @@ begin
           if (spi_clk = '1') then
             spi_state1 <= '0';
             if (ctrl(ctrl_spi_cpha_c) = '1') then
-              spi_rtx_sreg <= spi_rtx_sreg(6 downto 0) & spi_miso_ff1; -- MSB first
+              if (ctrl(ctrl_spi_dir_c) = '0') then
+                spi_rtx_sreg <= spi_rtx_sreg(6 downto 0) & spi_miso_ff1; -- MSB first
+              else
+                spi_rtx_sreg <= spi_miso_ff1 & spi_rtx_sreg(7 downto 1); -- LSB first
+              end if;
             end if;
             if (spi_bitcnt = "0000") then
               spi_state0 <= '0';
@@ -208,6 +221,7 @@ begin
           data_o(ctrl_spi_cs_sel1_c) <= ctrl(ctrl_spi_cs_sel1_c);
           data_o(ctrl_spi_cs_sel2_c) <= ctrl(ctrl_spi_cs_sel2_c);
           data_o(ctrl_spi_cs_set_c)  <= ctrl(ctrl_spi_cs_set_c);
+          data_o(ctrl_spi_dir_c)     <= ctrl(ctrl_spi_dir_c);
           data_o(ctrl_spi_busy_c)    <= spi_busy;
         else -- spi_rtx_addr_c
           data_o(7 downto 0) <= spi_rtx_sreg;
