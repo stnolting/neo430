@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 13.11.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 14.11.2019 #
 // #################################################################################################
 
 #include "neo430.h"
@@ -62,7 +62,7 @@ void neo430_timer_reset(void) {
 uint8_t neo430_timer_config_period(uint32_t f_timer) {
 
   uint32_t clock = CLOCKSPEED_32bit;
-  uint32_t ticks = (clock / (f_timer*2)) >> 1; // divide by lowest prescaler (=2)
+  uint32_t ticks = (clock / f_timer) >> 1; // divide by lowest prescaler (= f/2)
 
   uint8_t prsc = 0;
 
