@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 13.11.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 14.11.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -30,7 +30,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0303"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0304"; -- no touchy!
 
   -- Advanced Hardware Configuration --------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -257,7 +257,7 @@ package neo430_package is
   -- address generator --
   constant ctrl_adr_off0_c    : natural := 21; -- address offset selection bit 0
   constant ctrl_adr_off1_c    : natural := 22; -- address offset selection bit 1
-  constant ctrl_adr_imm_en_c  : natural := 23; -- select immediate branch input
+  constant ctrl_adr_off2_c    : natural := 23; -- address offset selection bit 2
   constant ctrl_adr_mar_sel_c : natural := 24; -- select input for MAR
   constant ctrl_adr_bp_en_c   : natural := 25; -- mem addr output select, 0:MAR, 1:bypass
   constant ctrl_adr_ivec_oe_c : natural := 26; -- output IRQ if 1, else output PC

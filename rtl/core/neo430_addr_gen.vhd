@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 10.01.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 14.11.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -60,16 +60,12 @@ begin
   memory_addr_adder: process(ctrl_i, mem_i, imm_i, reg_i)
     variable offset_v : std_ulogic_vector(15 downto 0);
   begin
-    case ctrl_i(ctrl_adr_off1_c downto ctrl_adr_off0_c) is
-      when "00" =>
-        if (ctrl_i(ctrl_adr_imm_en_c) = '0') then
-          offset_v := mem_i;
-        else
-          offset_v := imm_i;
-        end if;
-      when "01"   => offset_v := x"0001"; -- +1
-      when "10"   => offset_v := x"0002"; -- +2
-      when others => offset_v := x"FFFE"; -- -2
+    case ctrl_i(ctrl_adr_off2_c downto ctrl_adr_off0_c) is
+      when "000"  => offset_v := imm_i;
+      when "001"  => offset_v := x"0001"; -- +1
+      when "010"  => offset_v := x"0002"; -- +2
+      when "011"  => offset_v := x"FFFE"; -- -2
+      when others => offset_v := mem_i;
     end case;
     addr_add <= std_ulogic_vector(unsigned(reg_i) + unsigned(offset_v));
   end process memory_addr_adder;
@@ -100,10 +96,10 @@ begin
   begin
     if (ctrl_i(ctrl_adr_bp_en_c) = '1') then
       if (ctrl_i(ctrl_adr_ivec_oe_c) = '1') then -- interrupt handler call
-        mem_addr_o <= dmem_base_c; -- IRQ vectors are located at the beginning of the DMEM
-        mem_addr_o(2 downto 1) <= irq_sel_i; -- select according WORD entry
+        mem_addr_o <= dmem_base_c; -- IRQ vectors are located at the beginning of DMEM
+        mem_addr_o(2 downto 0) <= irq_sel_i & '0'; -- select according word-aligned entry
       else -- direct output of reg file (for instruction fetch only)
-        mem_addr_o <= reg_i;
+        mem_addr_o <= reg_i(15 downto 1) & '0'; -- instructions have to be word-aligned
       end if;
     else
       mem_addr_o <= mem_addr_reg;
