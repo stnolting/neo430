@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 13.11.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 14.11.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -152,14 +152,14 @@ begin
   -- -----------------------------------------------------------------------------
   interrupt_gen: process
   begin
-    irq <= '0';
-    wait for 20 ms;
-    wait until rising_edge(clk_gen);
-    irq <= '1';
-    wait for t_clock_c;
-    wait until rising_edge(irq_ack);
-    irq <= '0';
-    wait;
+    --irq <= '0';
+    --wait for 20 ms;
+    --wait until rising_edge(clk_gen);
+    --irq <= '1';
+    --wait for t_clock_c;
+    --wait until rising_edge(irq_ack);
+    --irq <= '0';
+    --wait;
   end process interrupt_gen;
 
 
