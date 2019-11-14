@@ -21,7 +21,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 23.09.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 14.11.2019 #
 // #################################################################################################
 
 
@@ -87,46 +87,60 @@ int main(void) {
   // System features
   // --------------------------------------------
   uint16_t ft = SYS_FEATURES;
-  neo430_printf("\n\nSystem features\n");
+  neo430_printf("\nSystem features\n");
+
   // CFU
   neo430_printf("- Multiplier/Divider:    ");
   print_state(ft & (1<<SYS_MULDIV_EN));
+
   // WB32
-  neo430_printf("- Wishbone adapter:      ");
+  neo430_printf("- Wishbone Adapter:      ");
   print_state(ft & (1<<SYS_WB32_EN));
+
   // WDT
-  neo430_printf("- Watchdog timer:        ");
+  neo430_printf("- Watchdog Timer:        ");
   print_state(ft & (1<<SYS_WDT_EN));
+
   // GPIO
-  neo430_printf("- GPIO unit:             ");
+  neo430_printf("- GPIO Unit:             ");
   print_state(ft & (1<<SYS_GPIO_EN));
+
   // TIMER
-  neo430_printf("- High-precision timer:  ");
+  neo430_printf("- High-Precision Timer:  ");
   print_state(ft & (1<<SYS_TIMER_EN));
+
   // UART
   neo430_printf("- UART:                  ");
   print_state(ft & (1<<SYS_UART_EN));
+
   // SPI
   neo430_printf("- SPI:                   ");
   print_state(ft & (1<<SYS_SPI_EN));
+
   // DADD
-  neo430_printf("- DADD instruction:      ");
+  neo430_printf("- DADD Instruction:      ");
   print_state(ft & (1<<SYS_DADD_EN));
+
   // Bootloader installed
-  neo430_printf("- Internal bootloader:   ");
+  neo430_printf("- Internal Bootloader:   ");
   print_state(ft & (1<<SYS_BTLD_EN));
+
   // is IMEM true ROM?
-  neo430_printf("- IMEM as true ROM:      ");
+  neo430_printf("- IMEM as True ROM:      ");
   print_state(ft & (1<<SYS_IROM_EN));
+
   // CRC
   neo430_printf("- CRC16/CRC32:           ");
   print_state(ft & (1<<SYS_CRC_EN));
+
   // CFU
   neo430_printf("- Custom Functions Unit: ");
   print_state(ft & (1<<SYS_CFU_EN));
+
   // PWM
   neo430_printf("- PWM Controller:        ");
   print_state(ft & (1<<SYS_PWM_EN));
+
   // TWI
   neo430_printf("- Two Wire Interface:    ");
   print_state(ft & (1<<SYS_TWI_EN));

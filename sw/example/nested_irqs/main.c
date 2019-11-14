@@ -22,7 +22,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 20.04.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 14.11.2019 #
 // #################################################################################################
 
 
@@ -32,14 +32,13 @@
 
 // Configuration
 #define BAUD_RATE  19200
-#define CLOCK_FREQ 1000 // in Hz
 
 // Function prototypes
 void __attribute__((__interrupt__)) timer_irq_handler(void);
 void __attribute__((__interrupt__)) uart_irq_handler(void);
 
 // Variable
-volatile uint64_t time;
+volatile uint64_t time_ms;
 
 
 /* ------------------------------------------------------------
@@ -59,11 +58,11 @@ int main(void) {
 
 
   // reset time
-  time = 0;
+  time_ms = 0;
 
 
   // intro text
-  neo430_uart_br_print("\nClock example. Press any key to show the current time.\n");
+//neo430_uart_br_print("\nClock example. Press any key to show the current time.\n");
 
 
   // init TIMER IRQ
@@ -74,10 +73,12 @@ int main(void) {
 
   // configure timer frequency
   neo430_timer_disable();
-  if (neo430_timer_config_period(CLOCK_FREQ))
+  if (neo430_timer_config_period(1000)) // 1kHz to increment every 1ms
     neo430_uart_br_print("Invalid TIMER frequency!\n");
 
+  neo430_printf("THR: %x, CTR: %x\n", TMR_THRES, TMR_CT);
   TMR_CT |= (1<<TMR_CT_EN) | (1<<TMR_CT_ARST) | (1<<TMR_CT_IRQ); // enable timer, auto-reset, irq enabled
+  neo430_printf("THR: %x, CTR: %x\n", TMR_THRES, TMR_CT);
 
 
   // init UART RX IRQ
@@ -108,7 +109,7 @@ int main(void) {
  * ------------------------------------------------------------ */
 void __attribute__((__interrupt__)) timer_irq_handler(void) {
 
-  time++;
+  time_ms++;
 }
 
 
@@ -121,10 +122,11 @@ void __attribute__((__interrupt__)) uart_irq_handler(void) {
   neo430_eint();
 
   // show time
-  uint32_t current_time = time/CLOCK_FREQ; // in seconds
-  uint16_t hour   = (uint16_t)( (current_time/3600)%24 );
-  uint16_t minute = (uint16_t)( (current_time/60)%60 );
-  uint16_t second = (uint16_t)( (current_time%60) );
-  neo430_printf("Current runtime: %u:%u:%u\n", hour, minute, second);
+  uint32_t current_time = time_ms; // in seconds
+  uint16_t hour     = (uint16_t)( (((current_time/10000)/60)/3600)%24 );
+  uint16_t minute   = (uint16_t)( ((current_time/1000)/60)%60 );
+  uint16_t second   = (uint16_t)( (current_time/1000)%60 );
+  uint16_t m_second = (uint16_t)( (current_time%1000)%1000 );
+  neo430_printf("Current runtime: %u:%u:%u:%u\n", hour, minute, second, m_second);
 }
 

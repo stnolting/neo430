@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 08.11.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 14.11.2019 #
 // #################################################################################################
 
 
@@ -183,7 +183,7 @@ void scan_twi(void) {
     neo430_twi_generate_stop();
 
     if (twi_ack == 0) {
-      neo430_uart_br_print("+ Found device at address 0x");
+      neo430_uart_br_print("+ Found device at write-address 0x");
       neo430_uart_print_hex_byte(2*i);
       neo430_uart_br_print("\n");
       num_devices++;
