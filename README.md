@@ -79,6 +79,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Up to 48kB instruction memory and 12kB data memory
 - Specific memory map – provided NEO430 linker script and compilation script required
 - Custom binary executable format
+- No default support of CPU's DADD instruction (btu can be enabled in package)
 - Just 4 CPU interrupt channels
 - Single clock domain for complete processor
 - Different numbers of instruction execution cycles
@@ -89,26 +90,56 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 ## Implementation Results
 
-Mapping results generated for HW version 0x0300. The full (default) configuration includes
-all optional processor modules (excluding the CFU), an IMEM size of 4kB and a DMEM size of 2kB.
+Mapping results generated for HW version 0x0303. The full (default) hardware configuration includes
+all optional processor modules (excluding the CFU and DADD), an IMEM size of 4kB and a DMEM size of 2kB.
 Results generated with Xilinx Vivado 2017.3, Intel Quartus Prime Lite 17.1 and Lattice Radiant 1.0 (Synplify)
 
-| __Xilinx Artix-7 (XC7A35TICSG324-1L)__  | LUTs      | FFs      | BRAMs    | DSPs   | f_max*  |
-|:----------------------------------------|:---------:|:--------:|:--------:|:------:|:-------:|
-| Full (default) configuration:           | 1006 (5%) | 952 (2%) | 2.5 (5%) | 0 (0%) | 100 MHz |
-| Minimal configuration (CPU + GPIO):     | 879  (4%) | 287 (1%) | 1   (2%) | 0 (0%) | 100 MHz |
+| __Xilinx Artix-7 (XC7A35TICSG324-1L)__  | LUTs       | FFs        | BRAMs    | DSPs   | f_max*  |
+|:----------------------------------------|:----------:|:----------:|:--------:|:------:|:-------:|
+| Full (default) configuration:           | 941 (4.5%) | 960 (2.3%) | 2.5 (5%) | 0 (0%) | 100 MHz |
+| Minimal configuration (CPU + GPIO):     | 768 (3.6%) | 288 (0.7%) | 1   (2%) | 0 (0%) | 100 MHz |
 
-| __Intel/Altera Cyclone IV (EP4CE22F17C6)__  | LUTs      | FFs      | Memory bits  | DSPs   | f_max   |
-|:--------------------------------------------|:---------:|:--------:|:------------:|:------:|:-------:|
-| Full (default) configuration:               | 1676 (8%) | 940 (4%) | 65792  (11%) | 0 (0%) | 116 MHz |
-| Minimal configuration (CPU + GPIO):         | 602  (3%) | 228 (1%) | 49408   (8%) | 0 (0%) | 124 MHz |
+| __Intel Cyclone IV (EP4CE22F17C6)__  | LUTs      | FFs      | Memory bits  | DSPs   | f_max     |
+|:-------------------------------------|:---------:|:--------:|:------------:|:------:|:---------:|
+| Full (default) configuration:        | 1603 (7%) | 928 (4%) | 65792 (11%)  | 0 (0%) | 119.6 MHz |
+| Minimal configuration (CPU + GPIO):  | 607  (3%) | 230 (1%) | 49408  (8%)  | 0 (0%) | 119.6 MHz |
 
 | __Lattice iCE40 UltraPlus (iCE40UP5K-SG48I)__  | LUTs       | FFs        | EBRs     | DSPs   | SRAMs  | f_max* |
 |:-----------------------------------------------|:----------:|:----------:|:--------:|:------:|:------:|:------:|
-| Full (default) configuration:                  | 2843 (54%) | 1153 (22%) | 16 (53%) | 0 (0%) | 0 (0%) | 20 MHz |
-| Minimal configuration (CPU + GPIO):            | 1470 (28%) | 493   (9%) | 12 (40%) | 0 (0%) | 0 (0%) | 20 MHz |
+| Full (default) configuration:                  | 2833 (54%) | 1131 (21%) | 16 (53%) | 0 (0%) | 0 (0%) | 20 MHz |
+| Minimal configuration (CPU + GPIO):            | 1464 (28%) | 498   (9%) | 12 (40%) | 0 (0%) | 0 (0%) | 20 MHz |
 
 *) Constrained
+
+
+### Device Utilization by Entity
+
+The following table shows the required resources for each module of the NEO430 processor system. Note that the provided
+numbers only represent a coarse overview as logic elements might be merged and optimized beyond module boundaries.
+
+Mapping results generated for HW version 0x0303. The full (default) hardware configuration includes all optional
+processor modules (excluding the CFU and DADD), an IMEM size of 4kB and a DMEM size of 2kB. Results were generated
+using Intel Quartus Prime Lite 17.1.
+
+| __Intel Cyclone IV (EP4CE22F17C6)__ | LUTs | FFs | Memory Bits | DSPs |
+|:------------------------------------|:----:|:---:|:------------|:----:|
+| Bootloader Memory (Boot ROM, 2kB)   | 2    | 1   | 16384       | 0    |
+| Central Processing Unit (CPU)       | 547  | 196 | 256         | 0    |
+| Checksum Unit (CRC)                 | 111  | 94  | 0           | 0    |
+| Custom Functions Unit (CFU)         | -    | -   | -           | -    |
+| Data Memory (DMEM, 2kB)             | 5    | 1   | 16384       | 0    |
+| IO Port Unit (GPIO)                 | 53   | 45  | 0           | 0    |
+| Instruction Memory (IMEM, 4kB)      | 6    | 1   | 32768       | 0    |
+| Multiplier & Divider (MULDIV)       | 186  | 131 | 0           | 0    |
+| Pulse-Width Modulation Unit (PWM)   | 80   | 67  | 0           | 0    |
+| Serial Peripheral Interface (SPI)   | 57   | 43  | 0           | 0    |
+| System Info Memory (SYSCONFIG)      | 16   | 14  | 0           | 0    |
+| High-Precision Timer (TIMER)        | 66   | 55  | 0           | 0    |
+| Two Wire Interface (TWI)            | 82   | 41  | 0           | 0    |
+| Universal Asynchronous Rx/Tx (UART) | 129  | 89  | 0           | 0    |
+| Wishbone Interface (WB32)           | 130  | 117 | 0           | 0    |
+| Watchdog TImer (WDT)                | 51   | 34  | 0           | 0    |
+
 
 
 ## Let's Get It Started!
@@ -122,6 +153,8 @@ Results generated with Xilinx Vivado 2017.3, Intel Quartus Prime Lite 17.1 and L
  * Next, install the compiler toolchain from the TI homepage (select the "compiler only" package):
 
   http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/index_FDS.html
+
+ * Make sure GNU Make and a native C compiler (GCC) are installed (double check for the newest version)
 
  * Follow the instructions from the "Let's Get It Started" section of the NEO430 documentary:
 
@@ -158,7 +191,7 @@ If you are using the NEO430 for some kind of publication, please cite it as foll
 
 "Windows" is a trademark of Microsoft Corporation.
 
-"Virtex", "Artix", "ISE" and "Vivado" are trademarks of Xilinx Inc.
+"Virtex", "Artix" and "Vivado" are trademarks of Xilinx Inc.
 
 "Cyclone", "Quartus" and "Avalon Bus" are trademarks of Intel Corporation.
 
