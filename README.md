@@ -1,3 +1,14 @@
+## Table of Content
+
+* [Introduction](#Introduction)
+* [Processor Features](#Processor-Features)
+* [Differences to the Original MSP430 Processors](#Differences-to-the-Original-MSP430-Processors)
+* [Implementation Results](#Implementation-Results)
+* [Quick Start](#Quick-Start)
+* [Contact](#Contact)
+* [Proprietary and Legal Notice](#Proprietary-and-Legal-Notice)
+
+
 ## Introduction
 
 Welcome to the __NEO430 Processor__ project!
@@ -73,7 +84,7 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
   - Optional internal bootloader (2kB ROM) with serial user console and automatic boot from external SPI EEPROM
 
 
-## Differences to TI's Original MSP430(TM) Processors
+## Differences to the Original MSP430 Processors
 
 - Completely different processor modules with different functionality
 - Up to 48kB instruction memory and 12kB data memory
@@ -141,8 +152,7 @@ using Intel Quartus Prime Lite 17.1.
 | Watchdog TImer (WDT)                | 51   | 34  | 0           | 0    |
 
 
-
-## Let's Get It Started!
+## Quick Start
 
  * At first, make sure to get the most recent version of this project from GitHub:
  
@@ -171,7 +181,7 @@ using Intel Quartus Prime Lite 17.1.
  * Have fun! =)
 
 
-## Questions?
+## Contact
 
 If you have any questions, bug reports, ideas or if you are facing problems with the NEO430, feel free to drop me a line:
 
@@ -185,7 +195,25 @@ If you are using the NEO430 for some kind of publication, please cite it as foll
 > S. Nolting, "The NEO430 Processor", github.com/stnolting/neo430
 
 
-## Proprietary/Legal Notice
+## Proprietary and Legal Notice
+
+This is a private/hobby project released under the LGPL-3.0 license. No copyright infringement intended.
+
+This source file may be used and distributed without restriction provided that this copyright
+statement is not removed from the file and that any derivative work contains the original
+copyright notice and the associated disclaimer.
+
+This source file is free software; you can redistribute it and/or modify it under the terms of
+the GNU Lesser General Public License as published by the Free Software Foundation, either
+version 3 of the License, or (at your option) any later version.
+
+This source is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License along with this
+source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html
+
 
 "MSP430" is a trademark of Texas Instruments Corporation.
 
