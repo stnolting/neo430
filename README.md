@@ -14,44 +14,41 @@
 Welcome to the __NEO430 Processor__ project!
 
 You need a small but still powerful, customizable and microcontroller-like
-processor system for your next FPGA design? Then the NEO430 is the perfect
-choice for you!
+processor system for your next FPGA project? Then the NEO430 is the right
+choice for you.
 
-This processor is based on the Texas Instruments MSP430(TM) ISA and provides 100%
+This processor is based on the Texas Instruments MSP430(TM) ISA and provides full
 compatibility with the original instruction set. The NEO430 is not an MSP430
-clone – it is more a complete new implementation from the bottom up. The
+clone – it is more like a complete new implementation from the bottom up. The
 processor features a very small outline, already implementing standard
 features like a timer, a watchdog, UART, TWI and SPI serial interfaces, general
 purpose IO ports, an internal bootloader and of course internal memory for
-program code and data. All of the peripheral modules are optional – so if you
-do not need them, you can exclude them from implementation to reduce the size
+program code and data. All of the implemented peripheral modules are optional – so if you
+do not need them, you can exclude them from synthesis to reduce the size
 of the system. Any additional modules, which make a more customized system,
-can be connected via a Wishbone-compatible bus interface. By this, you can
-built a system, that perfectly fits your needs.
+can be connected via a Wishbone-compatible bus interface or directly implemented within the
+processor. By this, you can built a system, that perfectly fits your needs.
 
 It is up to you to use the NEO430 as stand-alone, configurable and extensible
-microcontroller, or to include it as controller within a more complex SoC
-design.
+microcontroller, or to use it as controller within a more complex SoC design.
 
 The high-level software development is based on the free TI msp430-gcc
-compiler tool chain. You can either use Windows or Linux as build
-environment for your applications – the project comes with build scripts
-for both worlds. The sw\example folder of this project features several demo
-programs from which you can start creating your own NEO430 applications.
+compiler tool chain. You can either use Windows (PowerShell or Linux Subsystem) or
+Linux as build environment for your applications – the project supports both worlds.
 
 This project is intended to work "out of the box". Just synthesize the test
 setup from this project, upload it to your FPGA board of choice (the NEO430 uses
-a vendor-independent VHDL description) and start exploring the capabilities of
-the NEO430 processor. Application program generation (and installation) works
-by executing a single "make" command. Jump to the "Let’s Get It Started"
-chapter, which provides a lot of guides and tutorials to make your first
-NEO430 setup run:
+a FPGA vendor-independent VHDL description) and start exploring the capabilities of
+the NEO430 processor. Application program generation works by executing a single "make"
+command. Jump to the "Let’s Get It Started" chapter in the NEO430 documentary, which provides
+a lot of guides and tutorials to make your first NEO430 setup run:
 https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
 
 ## Processor Features
 
-<img src="https://github.com/stnolting/neo430/blob/master/doc/figures/neo430_arch.png" width="500px"/>
+![NEO430 Overview](https://raw.githubusercontent.com/stnolting/neo430/master/doc/figures/neo430_arch.png)
+
 (optional modules are marked using dashed lines in the figure above)
 
 
@@ -102,8 +99,9 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 ## Implementation Results
 
 Mapping results generated for HW version 0x0303. The full (default) hardware configuration includes
-all optional processor modules (excluding the CFU and DADD), an IMEM size of 4kB and a DMEM size of 2kB.
-Results generated with Xilinx Vivado 2017.3, Intel Quartus Prime Lite 17.1 and Lattice Radiant 1.0 (Synplify)
+all optional processor modules (excluding the CFU and DADD instruction), an IMEM size of 4kB and a DMEM size of 2kB.
+The minimal configuration only includes the CPU and the GPIO module. Results generated with Xilinx Vivado 2017.3,
+Intel Quartus Prime Lite 17.1 and Lattice Radiant 1.0 (Synplify)
 
 | __Xilinx Artix-7 (XC7A35TICSG324-1L)__  | LUTs       | FFs        | BRAMs    | DSPs   | f_max*  |
 |:----------------------------------------|:----------:|:----------:|:--------:|:------:|:-------:|
@@ -129,7 +127,7 @@ The following table shows the required resources for each module of the NEO430 p
 numbers only represent a coarse overview as logic elements might be merged and optimized beyond module boundaries.
 
 Mapping results generated for HW version 0x0303. The full (default) hardware configuration includes all optional
-processor modules (excluding the CFU and DADD), an IMEM size of 4kB and a DMEM size of 2kB. Results were generated
+processor modules (excluding the CFU and DADD instruction), an IMEM size of 4kB and a DMEM size of 2kB. Results were generated
 using Intel Quartus Prime Lite 17.1.
 
 | __Intel Cyclone IV (EP4CE22F17C6)__ | LUTs | FFs | Memory Bits | DSPs |
@@ -160,30 +158,31 @@ using Intel Quartus Prime Lite 17.1.
     git clone https://github.com/stnolting/neo430.git
     ~~~
 
- * Next, install the compiler toolchain from the TI homepage (select the "compiler only" package):
+ * Next, install the compiler toolchain from the TI homepage (select the "compiler only" package according to your system OS):
 
-  http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/index_FDS.html
+   http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/index_FDS.html
 
- * Make sure GNU Make and a native C compiler (GCC) are installed (double check for the newest version)
+ * Make sure GNU Make and a native C compiler (GCC) are installed (double check for the newest versions)
 
  * Follow the instructions from the "Let's Get It Started" section of the NEO430 documentary:
 
-  https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
+   https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 
  * The NEO430 documentary will guide you to create a simple test setup, which serves as "hello world" FPGA demo: 
 
-<img src="https://github.com/stnolting/neo430/blob/master/doc/figures/test_setup.jpg" width="400px"/>
+![NEO430 Test Example Setup](https://raw.githubusercontent.com/stnolting/neo430/master/doc/figures/test_setup.jpg)
 
- * This project also includes some example programs, from which you can start:
+ * The NEO430 project also includes some example programs from which you can start your own application:
 
-  https://github.com/stnolting/neo430/tree/master/sw/example
+   https://github.com/stnolting/neo430/tree/master/sw/example
 
  * Have fun! =)
 
 
 ## Contact
 
-If you have any questions, bug reports, ideas or if you are facing problems with the NEO430, feel free to drop me a line:
+If you have any questions, bug reports, ideas or if you are facing problems with the NEO430, feel free to drop me a line.
+I'm always happy to hear what cool projects you are realizing with this core :smiley:
 
   stnolting@gmail.com
 
@@ -229,4 +228,7 @@ source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html
 
 
 
-<img src="https://github.com/stnolting/neo430/blob/master/doc/figures/oshw_logo.png" width="100px"/>
+![OpenHardware Logo](https://raw.githubusercontent.com/stnolting/neo430/master/doc/figures/oshw_logo.png)
+
+
+Made with :blue_heart: in Hannover, Germany.
