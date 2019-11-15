@@ -29,7 +29,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 13.11.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 15.11.2019 #
 // #################################################################################################
 
 // Libraries
@@ -147,7 +147,7 @@ int main(void) {
   // ****************************************************************
   // Show bootloader intro and system information
   // ****************************************************************
-  neo430_uart_br_print("\n\nNEO430 Bootloader V20191113\nBy Stephan Nolting\n\n"
+  neo430_uart_br_print("\n\nNEO430 Bootloader V20191115\nBy Stephan Nolting\n\n"
                        "HWV: 0x");
   neo430_uart_print_hex_word(HW_VERSION);
   neo430_uart_br_print("\nUSR: 0x");
@@ -283,7 +283,7 @@ void core_dump(void) {
     if ((neo430_uart_char_received() != 0) || (j == 0xFFE0))
       return;
   
-    j += 16;
+    j += 32;
   }
 }
 
