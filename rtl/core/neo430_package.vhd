@@ -30,7 +30,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0304"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0305"; -- no touchy!
 
   -- Advanced Hardware Configuration --------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -291,7 +291,7 @@ package neo430_package is
   constant alu_subc_c : std_ulogic_vector(3 downto 0) := "0111"; -- r <= b - a - 1 + carry
   constant alu_sub_c  : std_ulogic_vector(3 downto 0) := "1000"; -- r <= b - a
   constant alu_cmp_c  : std_ulogic_vector(3 downto 0) := "1001"; -- b - a (no write back)
-  constant alu_dadd_c : std_ulogic_vector(3 downto 0) := "1010"; -- r <= a + b (BCD!)
+  constant alu_dadd_c : std_ulogic_vector(3 downto 0) := "1010"; -- r <= a + b (BCD)
   constant alu_bit_c  : std_ulogic_vector(3 downto 0) := "1011"; -- a & b (no write back)
   constant alu_bic_c  : std_ulogic_vector(3 downto 0) := "1100"; -- r <= !a & b
   constant alu_bis_c  : std_ulogic_vector(3 downto 0) := "1101"; -- r <= a | b

@@ -122,7 +122,7 @@ begin
     end if;
   end process sreg_write;
 
-  -- construct logical SREG --
+  -- construct logical status register --
   sreg_combine: process(sreg)
   begin
     sreg_int <= (others => '0');
@@ -139,7 +139,7 @@ begin
   -- status register output --
   sreg_o <= sreg_int;
 
-  -- general purpose register file (including PC, dummy SR and dummy CG) --
+  -- general purpose register file (including PC, SP, dummy SR and dummy CG) --
   rf_write: process(clk_i)
   begin
     if rising_edge(clk_i) then
@@ -153,7 +153,7 @@ begin
   -- Register File Read Access ------------------------------------------------
   -- -----------------------------------------------------------------------------
   rf_read: process(ctrl_i, reg_file, sreg_int)
-    variable const_sel_v : std_ulogic_vector(02 downto 0);
+    variable const_sel_v : std_ulogic_vector(2 downto 0);
   begin
     if ((ctrl_i(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) = reg_sr_c) or
         (ctrl_i(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) = reg_cg_c)) then
@@ -168,10 +168,9 @@ begin
         when "101"  => data_o <= x"0001"; -- +1
         when "110"  => data_o <= x"0002"; -- +2
         when "111"  => data_o <= x"FFFF"; -- -1
-        when others => data_o <= x"0000";
+        when others => data_o <= (others => '-');
       end case;
-    else
-      -- gp register file read access --
+    else -- gp register file read access
       data_o <= reg_file(to_integer(unsigned(ctrl_i(ctrl_rf_adr3_c downto ctrl_rf_adr0_c))));
     end if;
   end process rf_read;

@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 13.11.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 15.11.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -148,7 +148,7 @@ begin
     ctrl_nxt <= (others => '0');
     ctrl_nxt(ctrl_rf_adr3_c  downto ctrl_rf_adr0_c)  <= src; -- source reg A
     ctrl_nxt(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) <= ctrl(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c); -- keep ALU function
-    ctrl_nxt(ctrl_rf_as1_c   downto ctrl_rf_as0_c)   <= sam; -- default SRC addressing mode
+    ctrl_nxt(ctrl_rf_as1_c   downto ctrl_rf_as0_c)   <= sam; -- default: SRC addressing mode
     ctrl_nxt(ctrl_adr_off2_c downto ctrl_adr_off0_c) <= "010"; -- add +2 as address offset
     ctrl_nxt(ctrl_mem_rd_c) <= mem_rd_ff; -- memory read
     ctrl_nxt(ctrl_alu_bw_c) <= ctrl(ctrl_alu_bw_c); -- keep byte/word mode
@@ -638,15 +638,17 @@ begin
   -- interrupt priority encoder --
   irq_priority: process(irq_buf)
   begin
-    if (irq_buf(0) = '1') then
-      irq_vec_nxt <= "00";
-    elsif (irq_buf(1) = '1') then
-      irq_vec_nxt <= "01";
-    elsif (irq_buf(2) = '1') then
-      irq_vec_nxt <= "10";
-    else --if (irq_buf(3) = '1') then
-      irq_vec_nxt <= "11";
-    end if;
+    -- use "case" here to prevent a MUX chain
+    case irq_buf is
+      when "0001" | "0011" | "0101" | "0111" | "1001" | "1011" | "1101" | "1111" => -- "---1"
+        irq_vec_nxt <= "00";
+      when "0010" | "0110" | "1010" | "1110" => -- "--10"
+        irq_vec_nxt <= "01";
+      when "0100" | "1100" => -- "-100"
+        irq_vec_nxt <= "10";
+      when others => -- "1000"
+        irq_vec_nxt <= "11";
+    end case;
   end process irq_priority;
 
   -- interrupt vector output --

@@ -1,7 +1,7 @@
 -- #################################################################################################
 -- #  << NEO430 - Arithmetical/Logical Unit >>                                                     #
 -- # ********************************************************************************************* #
--- # Main data processing ALU and temporary operand registers.                                     #
+-- # Main data processing ALU and operand registers.                                               #
 -- # BCD arithmetic operations need 2 cycles, all other operations only take one cycle.            #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 13.11.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 15.11.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -139,9 +139,9 @@ begin
   end process binary_arithmetic_core;
 
 
-  -- Decimal Arithmetic Core --------------------------------------------------
+  -- Binary Coded Decimal Arithmetic Core -------------------------------------
   -- -----------------------------------------------------------------------------
-  decimal_arithmetic_core: process(op_a_ff, op_b_ff, sreg_i)
+  bcd_arithmetic_core: process(op_a_ff, op_b_ff, sreg_i)
     variable dsum_ll_v, dsum_lh_v, dsum_hl_v, dsum_hh_v : std_ulogic_vector(4 downto 0);
   begin
     -- four 4-bit BCD adders --
@@ -156,7 +156,7 @@ begin
     dadd_res(11 downto 08) <= dsum_hl_v(3 downto 0);
     dadd_res(15 downto 12) <= dsum_hh_v(3 downto 0);
     dadd_res(16) <= dsum_hh_v(4);
-  end process decimal_arithmetic_core;
+  end process bcd_arithmetic_core;
 
 
   -- DADD Pipeline Register ---------------------------------------------------
@@ -169,7 +169,7 @@ begin
   end process dadd_pipe_reg;
 
   -- implement DADD instruction? --
-  dadd_res_in <= dadd_res_ff when (use_dadd_cmd_c = true) else (others => '0');
+  dadd_res_in <= dadd_res_ff when (use_dadd_cmd_c = true) else (others => '-');
 
 
   -- ALU Core -----------------------------------------------------------------
@@ -185,22 +185,12 @@ begin
 
     -- function selection --
     case ctrl_i(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) is
-      when alu_add_c => -- r <= a + b
-        alu_res <= add_res(15 downto 0);
-        flag_o(flag_c_c) <= add_res(16);
-        flag_o(flag_v_c) <= add_res(17);
-
-      when alu_addc_c => -- r <= a + b + c
-        alu_res <= add_res(15 downto 0);
-        flag_o(flag_c_c) <= add_res(16);
-        flag_o(flag_v_c) <= add_res(17);
-
-      when alu_sub_c => -- r <= b - a
-        alu_res <= add_res(15 downto 0);
-        flag_o(flag_c_c) <= add_res(16);
-        flag_o(flag_v_c) <= add_res(17);
-
-      when alu_subc_c => -- r <= b - a - 1 + c
+      when alu_add_c | alu_addc_c | alu_sub_c | alu_subc_c | alu_cmp_c =>
+        -- alu_add_c  : r <= a + b
+        -- alu_addc_c : r <= a + b + c
+        -- alu_sub_c  : r <= b - a
+        -- alu_subc_c : r <= b - a - 1 + c
+        -- alu_cmp_c  : b - a (no write back, done by ctrl arbiter)
         alu_res <= add_res(15 downto 0);
         flag_o(flag_c_c) <= add_res(16);
         flag_o(flag_v_c) <= add_res(17);
@@ -209,11 +199,6 @@ begin
         alu_res <= dadd_res_in(15 downto 0);
         flag_o(flag_c_c) <= dadd_res_in(16);
         flag_o(flag_v_c) <= '0';
-
-      when alu_cmp_c => -- b - a (no write back, done by ctrl arbiter)
-        alu_res <= add_res(15 downto 0);
-        flag_o(flag_c_c) <= add_res(16);
-        flag_o(flag_v_c) <= add_res(17);
 
       when alu_and_c => -- r <= a & b
         alu_res <= op_a_ff and op_b_ff;
@@ -247,18 +232,19 @@ begin
         flag_o(flag_c_c) <= not zero;
         flag_o(flag_v_c) <= '0';
 
-      when alu_rra_c => -- r <= a >> 1, rotate right arithmetically
-        alu_res <= op_a_ff(15) & op_a_ff(15 downto 1); -- word mode
-        if (ctrl_i(ctrl_alu_bw_c) = '1') then -- byte mode
-          alu_res(7) <= op_a_ff(7);
-        end if;
-        flag_o(flag_c_c) <= op_a_ff(0);
-        flag_o(flag_v_c) <= '0';
-
-      when alu_rrc_c => -- r <= a >> 1, rotate right through carry
-        alu_res <= sreg_i(sreg_c_c) & op_a_ff(15 downto 1); -- word mode
-        if (ctrl_i(ctrl_alu_bw_c) = '1') then -- byte mode
-          alu_res(7) <= sreg_i(sreg_c_c);
+      when alu_rra_c | alu_rrc_c =>
+        -- alu_rra_c : r <= a >> 1, rotate right arithmetically
+        -- alu_rrc_c : r <= a >> 1, rotate right through carry
+        if (ctrl_i(ctrl_alu_cmd1_c) = alu_rra_c(1)) then -- alu_rra_c
+          alu_res <= op_a_ff(15) & op_a_ff(15 downto 1); -- word mode
+          if (ctrl_i(ctrl_alu_bw_c) = '1') then -- byte mode
+            alu_res(7) <= op_a_ff(7);
+          end if;
+        else -- alu_rrc_c
+          alu_res <= sreg_i(sreg_c_c) & op_a_ff(15 downto 1); -- word mode
+          if (ctrl_i(ctrl_alu_bw_c) = '1') then -- byte mode
+            alu_res(7) <= sreg_i(sreg_c_c);
+          end if;
         end if;
         flag_o(flag_c_c) <= op_a_ff(0);
         flag_o(flag_v_c) <= '0';
@@ -278,14 +264,7 @@ begin
         flag_o(flag_n_c) <= sreg_i(sreg_n_c); -- keep
         flag_o(flag_z_c) <= sreg_i(sreg_z_c); -- keep
 
-      when alu_mov_c => -- r <= a
-        alu_res <= op_a_ff;
-        flag_o(flag_c_c) <= sreg_i(sreg_c_c); -- keep
-        flag_o(flag_v_c) <= sreg_i(sreg_v_c); -- keep
-        flag_o(flag_n_c) <= sreg_i(sreg_n_c); -- keep
-        flag_o(flag_z_c) <= sreg_i(sreg_z_c); -- keep
-
-      when others => -- undefined
+      when others => -- alu_mov_c : r <= a
         alu_res <= op_a_ff;
         flag_o(flag_c_c) <= sreg_i(sreg_c_c); -- keep
         flag_o(flag_v_c) <= sreg_i(sreg_v_c); -- keep
