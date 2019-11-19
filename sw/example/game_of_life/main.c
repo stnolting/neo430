@@ -61,7 +61,7 @@ int main(void) {
   clear_universe(0);
   clear_universe(1);
 
-  neo430_printf("\n\n### Conways's Game of Life ###\n\n");
+  neo430_printf("\n\n<<< Conways's Game of Life >>>\n\n");
   neo430_printf("This program requires a terminal resolution of at least %ux%u characters.\n", NUM_CELLS_X+2, NUM_CELLS_Y+3);
   neo430_printf("Press any key to start a random-initialized torus-style universe of %ux%u cells.\n", NUM_CELLS_X, NUM_CELLS_Y);
   neo430_printf("You can pause/restart the simulation by pressing any key.\n");
@@ -89,7 +89,7 @@ int main(void) {
     }
 
     // print generation, population count and the current universe
-    neo430_printf("\n\nGeneration %l, %u/%u living cells\n", generation, pop_count(u), NUM_CELLS_X*NUM_CELLS_Y);
+    neo430_printf("\n\nGeneration %l: %u/%u living cells\n", generation, pop_count(u), NUM_CELLS_X*NUM_CELLS_Y);
     print_universe(u);
 
     // compute next generation
@@ -209,9 +209,9 @@ uint8_t get_cell(uint8_t u, int16_t x, int16_t y){
   tmp &= 1 << (7 - (x & 7));
 
   if (tmp == 0)
-    return 0;
+    return 0; // DEAD
   else
-    return 1;
+    return 1; // ALIVE
 }
 
 

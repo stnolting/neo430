@@ -6,7 +6,7 @@
 * [Implementation Results](#Implementation-Results)
 * [Quick Start](#Quick-Start)
 * [Contact](#Contact)
-* [Proprietary and Legal Notice](#Proprietary-and-Legal-Notice)
+* [Disclaimer, Proprietary and Legal Notice](#Disclaimer-Proprietary-and-Legal-Notice)
 
 
 ## Introduction
@@ -41,8 +41,7 @@ setup from this project, upload it to your FPGA board of choice (the NEO430 uses
 a FPGA vendor-independent VHDL description) and start exploring the capabilities of
 the NEO430 processor. Application program generation works by executing a single "make"
 command. Jump to the "Let’s Get It Started" chapter in the NEO430 documentary, which provides
-a lot of guides and tutorials to make your first NEO430 setup run:
-https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
+a lot of guides and tutorials to make your first NEO430 setup run: ![NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/figures/PDF_32.png)[NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/NEO430.pdf "NEO430 Datasheet from GitHub")
 
 
 ## Processor Features
@@ -58,9 +57,9 @@ https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
 - Tool chain based on free TI msp430-gcc compiler
 - Application compilation scripts for Windows Powershell / Windows Subsystem for Linux / native Linux
 - Software requirements (regardless of platform):
-  - TI msp430-gcc compiler
-  - native C compiler (GCC)
-  - GNU Make
+  - [TI `msp430-gcc` compiler](http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/index_FDS.html "TI `msp430-gcc` compiler")
+  - native C compiler (`GCC`)
+  - `GNU Make`
 - Completely described in behavioral, platform-independent VHDL
 - Fully synchronous design, no latches, no gated clocks
 - Very small outline and high operating frequency
@@ -158,15 +157,15 @@ using Intel Quartus Prime Lite 17.1.
     git clone https://github.com/stnolting/neo430.git
     ~~~
 
- * Next, install the compiler toolchain from the TI homepage (select the "compiler only" package according to your system OS):
+ * Next, install the `MSP430-GCC` compiler toolchain from the TI homepage (select the "compiler only" package according to your system OS):
 
-   http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/index_FDS.html
+   https://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/index_FDS.html
 
- * Make sure GNU Make and a native C compiler (GCC) are installed (double check for the newest versions)
+ * Make sure `GNU Make` and a native C compiler (`GCC`) are installed (double check for the newest versions)
 
  * Follow the instructions from the "Let's Get It Started" section of the NEO430 documentary:
 
-   https://github.com/stnolting/neo430/blob/master/doc/NEO430.pdf
+   ![NEO430 Datasheet](http://raw.githubusercontent.com/stnolting/neo430/master/doc/figures/PDF_32.png)[NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/NEO430.pdf "NEO430 Datasheet from GitHub")
 
  * The NEO430 documentary will guide you to create a simple test setup, which serves as "hello world" FPGA demo: 
 
@@ -194,9 +193,11 @@ If you are using the NEO430 for some kind of publication, please cite it as foll
 > S. Nolting, "The NEO430 Processor", github.com/stnolting/neo430
 
 
-## Proprietary and Legal Notice
+## Disclaimer, Proprietary and Legal Notice
 
-This is a private/hobby project released under the LGPL-3.0 license. No copyright infringement intended.
+This is a hobby project released under the LGPL-3.0 license. No copyright infringement intended.
+
+This project is not affiliated with or endorsed by the Open Source Initiative (https://www.oshwa.org / https://opensource.org).
 
 This source file may be used and distributed without restriction provided that this copyright
 statement is not removed from the file and that any derivative work contains the original
@@ -222,13 +223,13 @@ source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html
 
 "Cyclone", "Quartus" and "Avalon Bus" are trademarks of Intel Corporation.
 
-"iCE40 UltraPlus" and "Lattice Radiant" are trademarks of Lattice Semiconductor Corporation.
+"iCE40 UltraPlus", "Lattice Radiant" and "Lattice Diamond" are trademarks of Lattice Semiconductor Corporation.
 
 "AXI", "AXI4" and "AXI4-Lite" are trademarks of Arm Holdings plc.
 
 
 
-![OpenHardware Logo](https://raw.githubusercontent.com/stnolting/neo430/master/doc/figures/oshw_logo.png)
+![Open Source Hardware Logo https://www.oshwa.org](https://raw.githubusercontent.com/stnolting/neo430/master/doc/figures/oshw_logo.png)
 
 
-Made with :blue_heart: in Hannover, Germany.
+Made with :beer: in Hannover, Germany.
