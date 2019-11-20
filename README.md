@@ -62,7 +62,7 @@ a lot of guides and tutorials to make your first NEO430 setup run: ![NEO430 Data
   - `GNU Make`
 - Completely described in behavioral, platform-independent VHDL
 - Fully synchronous design, no latches, no gated clocks
-- Very small outline and high operating frequency
+- Very low resource requirements and high operating frequency
 - Internal DMEN (RAM, for data) and IMEM (RAM or ROM, for code), configurable sizes
 - One external interrupt line
 - Customizable processor hardware configuration:
@@ -165,7 +165,7 @@ using Intel Quartus Prime Lite 17.1.
 
  * Follow the instructions from the "Let's Get It Started" section of the NEO430 documentary:
 
-   ![NEO430 Datasheet](http://raw.githubusercontent.com/stnolting/neo430/master/doc/figures/PDF_32.png)[NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/NEO430.pdf "NEO430 Datasheet from GitHub")
+   ![NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/figures/PDF_32.png)[NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/NEO430.pdf "NEO430 Datasheet from GitHub")
 
  * The NEO430 documentary will guide you to create a simple test setup, which serves as "hello world" FPGA demo: 
 
@@ -181,7 +181,7 @@ using Intel Quartus Prime Lite 17.1.
 ## Contact
 
 If you have any questions, bug reports, ideas or if you are facing problems with the NEO430, feel free to drop me a line.
-I'm always happy to hear what cool projects you are realizing with this core :smiley:
+Also, I'm always happy to hear what cool projects you are realizing with this core :smiley:
 
   stnolting@gmail.com
 

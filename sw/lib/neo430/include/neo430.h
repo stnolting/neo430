@@ -1,9 +1,9 @@
 // #################################################################################################
 // #  < neo430.h - MAIN NEO430 INCLUDE FILE >                                                      #
 // # ********************************************************************************************* #
-// #  This file is crucial for all NEO430 software projects!                                       #
-// #  You only need to include THIS file into your project code (all sub-libraries are included    #
-// #  within this library file).                                                                   #
+// # This file is crucial for all NEO430 software projects!                                        #
+// # You only need to include THIS file into your project code (all sub-libraries are included     #
+// # within this library file).                                                                    #
 // # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 // # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 13.11.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 19.11.2019 #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -54,9 +54,9 @@
 #define REG8  (volatile uint8_t*)        // memory-mapped register
 #define REG16 (volatile uint16_t*)       // memory-mapped register
 #define REG32 (volatile uint32_t*)       // memory-mapped register
-#define ROM8  (const volatile uint8_t*)  // read-only
-#define ROM16 (const volatile uint16_t*) // read-only
-#define ROM32 (const volatile uint32_t*) // read-only
+#define ROM8  (const volatile uint8_t*)  // memory-mapped read-only constant
+#define ROM16 (const volatile uint16_t*) // memory-mapped read-only constant
+#define ROM32 (const volatile uint32_t*) // memory-mapped read-only constant
 
 
 // ----------------------------------------------------------------------------
@@ -328,25 +328,28 @@
 // TWI data register flags
 #define TWI_DT_ACK     15 // r/-: ACK received
 
-
+/*
 // ----------------------------------------------------------------------------
 // Reserved
 // ----------------------------------------------------------------------------
-//#define TRNG_DATA (*(REG16 0xFFEC))
-//#define TRNG_DATA (*(REG16 0xFFEE))
+#define ???_CT   (*(REG16 0xFFEC)) // -/w: control register
+#define ???_DATA (*(ROM16 0xFFEE)) // r/-: data register
 
+// ??? control register
+#define ???_CT_EN 0 // -/w: ??? enable
+*/
 
 // ----------------------------------------------------------------------------
 // System Configuration (SYSCONFIG)
 // ----------------------------------------------------------------------------
-#define CPUID0 (*(ROM16 0xFFF0)) // r/-: HW version
-#define CPUID1 (*(ROM16 0xFFF2)) // r/-: system configuration
-#define CPUID2 (*(ROM16 0xFFF4)) // r/-: CPU identifier
+#define CPUID0 (*(ROM16 0xFFF0)) // r/-: HW version number
+#define CPUID1 (*(ROM16 0xFFF2)) // r/-: synthesized system features
+#define CPUID2 (*(ROM16 0xFFF4)) // r/-: custom user code
 #define CPUID3 (*(ROM16 0xFFF6)) // r/-: IMEM/ROM size in bytes
 #define CPUID4 (*(ROM16 0xFFF8)) // r/-: DMEM/RAM base address
 #define CPUID5 (*(ROM16 0xFFFA)) // r/-: DMEM/RAM size in bytes
-#define CPUID6 (*(ROM16 0xFFFC)) // r/-: clock speed lo
-#define CPUID7 (*(ROM16 0xFFFE)) // r/-: clock speed hi
+#define CPUID6 (*(ROM16 0xFFFC)) // r/-: clock speed (in Hz) low part
+#define CPUID7 (*(ROM16 0xFFFE)) // r/-: clock speed (in Hz) high part
 
 // Aliases
 #define HW_VERSION    CPUID0 // r/-: HW version number
@@ -359,23 +362,25 @@
 #define CLOCKSPEED_HI CPUID7 // r/-: clock speed (in Hz) high part
 
 // SysConfig - 32-bit register access
-#define CLOCKSPEED_32bit (*(REG32 (&CLOCKSPEED_LO))) // r/-: clock speed (in Hz)
+#define CLOCKSPEED_32bit (*(ROM32 (&CLOCKSPEED_LO))) // r/-: clock speed (in Hz)
 
 // SYS features
-#define SYS_MULDIV_EN 0 // MULDIV synthesized
-#define SYS_WB32_EN   1 // WB32 synthesized
-#define SYS_WDT_EN    2 // WDT synthesized
-#define SYS_GPIO_EN   3 // GPIO synthesized
-#define SYS_TIMER_EN  4 // timer synthesized
-#define SYS_UART_EN   5 // UART synthesized
-#define SYS_DADD_EN   6 // DADD instruction synthesized
-#define SYS_BTLD_EN   7 // Bootloader installed and enabled?
-#define SYS_IROM_EN   8 // Implement IMEM as true ROM?
-#define SYS_CRC_EN    9 // CRC synthesized
-#define SYS_CFU_EN   10 // CFU synthesized
-#define SYS_PWM_EN   11 // PWM controller synthesized
-#define SYS_TWI_EN   12 // TWI synthesized
-#define SYS_SPI_EN   13 // SPI synthesized
+#define SYS_MULDIV_EN 0 // r/-: MULDIV synthesized
+#define SYS_WB32_EN   1 // r/-: WB32 synthesized
+#define SYS_WDT_EN    2 // r/-: WDT synthesized
+#define SYS_GPIO_EN   3 // r/-: GPIO synthesized
+#define SYS_TIMER_EN  4 // r/-: TIMER synthesized
+#define SYS_UART_EN   5 // r/-: UART synthesized
+#define SYS_DADD_EN   6 // r/-: DADD instruction synthesized
+#define SYS_BTLD_EN   7 // r/-: Bootloader installed and enabled
+#define SYS_IROM_EN   8 // r/-: Implement IMEM as true ROM
+#define SYS_CRC_EN    9 // r/-: CRC synthesized
+#define SYS_CFU_EN   10 // r/-: CFU synthesized
+#define SYS_PWM_EN   11 // r/-: PWM controller synthesized
+#define SYS_TWI_EN   12 // r/-: TWI synthesized
+#define SYS_SPI_EN   13 // r/-: SPI synthesized
+//define reserved_EN 14 // r/-: reserved
+//define reserved_EN 15 // r/-: reserved
 
 
 // ----------------------------------------------------------------------------

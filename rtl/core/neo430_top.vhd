@@ -663,6 +663,28 @@ begin
   end generate;
 
 
+  -- Reserved -----------------------------------------------------------------
+  -- -----------------------------------------------------------------------------
+--neo430_???_inst_true:
+--if (???_USE = true) generate
+--  neo430_???_inst: neo430_???
+--  port map (
+--    -- host access --
+--    clk_i       => clk_i,         -- global clock line
+--    rden_i      => io_rd_en,      -- read enable
+--    wren_i      => io_wr_en,      -- write enable
+--    addr_i      => cpu_bus.addr,  -- address
+--    data_i      => cpu_bus.wdata, -- data in
+--    data_o      => ???_rdata      -- data out
+--  );
+--end generate;
+--
+--neo430_???_inst_false:
+--if (???_USE = false) generate
+--  ???_rdata <= (others => '0');
+--end generate;
+
+
   -- System Configuration -----------------------------------------------------
   -- -----------------------------------------------------------------------------
   neo430_sysconfig_inst: neo430_sysconfig

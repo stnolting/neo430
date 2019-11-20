@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// #  Stephan Nolting, Hannover, Germany                                               13.10.2017  #
+// # Stephan Nolting, Hannover, Germany                                                 19.11.2019 #
 // #################################################################################################
 
 #include <stdint.h>
@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
 	       " -app_img : Generate application raw executable memory image (text file, no header!)\n"
 	       " -bld_img : Generate bootloader raw executable memory image (text file, no header!)\n"
 		     "2nd: Input file (raw binary image)\n"
-		     "3rd: Output file (as selected)\n");
+		     "3rd: Output file\n");
   	return 1;
   }
 
@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
 
 
 // ------------------------------------------------------------
-// Generate BINARY executable (with header!!!)
+// Generate BINARY executable (with header!!!) for bootloader upload
 // ------------------------------------------------------------
   if (option == 1) {
     // reserve space for header
