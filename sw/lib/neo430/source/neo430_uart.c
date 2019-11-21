@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 20.04.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 21.11.2019 #
 // #################################################################################################
 
 #include "neo430.h"
@@ -335,6 +335,9 @@ void neo430_printf(char *format, ...) {
           break;
         case 'c': // char
           neo430_uart_putc((char)va_arg(a, int));
+          break;
+        case 'b': // unsigned 16-bit binary
+          neo430_uart_print_bin_word(va_arg(a, unsigned int));
           break;
         case 'i': // 16-bit integer
           n = (int32_t)va_arg(a, int);
