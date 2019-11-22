@@ -26,7 +26,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 28.04.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 22.11.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -120,16 +120,19 @@ begin
   rd_access: process(clk_i)
   begin
     if rising_edge(clk_i) then
-      data_o <= (others => '0'); -- this is crucial for the final OR-ing of all device's outputs
+      data_o <= (others => '0'); -- this is crucial for the final OR-ing of all IO device's outputs
       if (rden = '1') then -- valid read access
-        if    (addr = cfu_reg0_addr_c) then data_o <= user_reg0;
-        elsif (addr = cfu_reg1_addr_c) then data_o <= user_reg1;
-        elsif (addr = cfu_reg2_addr_c) then data_o <= user_reg2;
-        elsif (addr = cfu_reg3_addr_c) then data_o <= user_reg3;
-        elsif (addr = cfu_reg4_addr_c) then data_o <= user_reg4;
-        elsif (addr = cfu_reg5_addr_c) then data_o <= user_reg5;
-        elsif (addr = cfu_reg6_addr_c) then data_o <= user_reg6;
-        else                                data_o <= user_reg7; end if;
+        case addr is
+          when cfu_reg0_addr_c => data_o <= user_reg0;
+          when cfu_reg1_addr_c => data_o <= user_reg1;
+          when cfu_reg2_addr_c => data_o <= user_reg2;
+          when cfu_reg3_addr_c => data_o <= user_reg3;
+          when cfu_reg4_addr_c => data_o <= user_reg4;
+          when cfu_reg5_addr_c => data_o <= user_reg5;
+          when cfu_reg6_addr_c => data_o <= user_reg6;
+          when cfu_reg7_addr_c => data_o <= user_reg7;
+          when others          => data_o <= (others => '-');
+        end case;
       end if;
     end if;
   end process rd_access;
