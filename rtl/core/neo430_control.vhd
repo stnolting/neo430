@@ -148,7 +148,7 @@ begin
     ctrl_nxt <= (others => '0');
     ctrl_nxt(ctrl_rf_adr3_c  downto ctrl_rf_adr0_c)  <= src; -- source reg A
     ctrl_nxt(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) <= ctrl(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c); -- keep ALU function
-    ctrl_nxt(ctrl_rf_as1_c   downto ctrl_rf_as0_c)   <= sam; -- default: SRC addressing mode
+    ctrl_nxt(ctrl_rf_as1_c   downto ctrl_rf_as0_c)   <= sam; -- SRC addressing mode
     ctrl_nxt(ctrl_adr_off2_c downto ctrl_adr_off0_c) <= "010"; -- add +2 as address offset
     ctrl_nxt(ctrl_mem_rd_c) <= mem_rd_ff; -- memory read
     ctrl_nxt(ctrl_alu_bw_c) <= ctrl(ctrl_alu_bw_c); -- keep byte/word mode

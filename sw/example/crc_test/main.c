@@ -46,7 +46,7 @@ int main(void) {
 
   neo430_uart_br_print("\n<<< CRC16/CRC32 module test >>>\n");
 
-  // check if CRC unit was synthesized, exit if no WB is available
+  // check if CRC unit was synthesized, exit if not available
   if (!(SYS_FEATURES & (1<<SYS_CRC_EN))) {
     neo430_uart_br_print("Error! No CRC unit synthesized!");
     return 1;
