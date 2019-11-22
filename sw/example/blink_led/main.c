@@ -44,13 +44,7 @@ int main(void) {
   // intro text
   neo430_uart_br_print("\nBlinking LED demo program\n");
 
-  // check if GPIO unit was synthesized, exit if no GPIO is available
-  if (!(SYS_FEATURES & (1<<SYS_GPIO_EN))) {
-    neo430_uart_br_print("Error! No GPIO unit synthesized!");
-    return 1;
-  }
-
-  uint16_t i = 0; // init counter
+  uint16_t i = 0;
   while (1) {
     neo430_gpio_port_set(0x00FF & (i++)); // set output port and increment counter
     neo430_cpu_delay_ms(200); // wait 200ms
