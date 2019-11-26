@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 15.11.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 26.11.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -72,9 +72,10 @@ architecture neo430_control_rtl of neo430_control is
   signal sam_nxt, sam      : std_ulogic_vector(01 downto 0); -- CMD according SRC addressing mode
 
   -- irq system --
-  signal irq_start, irq_ack    : std_ulogic;
-  signal irq_ack_mask, irq_buf : std_ulogic_vector(3 downto 0);
-  signal irq_vec_nxt, irq_vec  : std_ulogic_vector(1 downto 0);
+  signal irq_start, irq_ack     : std_ulogic;
+  signal irq_ack_mask, irq_buf  : std_ulogic_vector(3 downto 0);
+  signal irq_vec_nxt, irq_vec   : std_ulogic_vector(1 downto 0);
+  signal i_flag_ff0, i_flag_ff1 : std_ulogic;
 
 begin
 
@@ -608,6 +609,11 @@ begin
   irq_buffer: process(clk_i)
   begin
     if rising_edge(clk_i) then
+      -- delay I flag 2 cycles to allow the interrupted program to execute at least one insruction even if we have
+      -- a permanent interrupt request
+      i_flag_ff0 <= sreg_i(sreg_i_c);
+      i_flag_ff1 <= i_flag_ff0;
+      -- interrupt vector and queue buffer --
       irq_vec <= irq_vec_nxt;
       for i in 0 to 3 loop
         irq_buf(i) <= (irq_buf(i) or irq_i(i)) and (not sreg_i(sreg_q_c)) and (not irq_ack_mask(i));
@@ -616,7 +622,7 @@ begin
   end process irq_buffer;
 
   -- valid start of IRQ handler --
-  irq_start <= '1' when (irq_buf /= "0000") and (sreg_i(sreg_i_c) = '1') else '0';
+  irq_start <= '1' when (irq_buf /= "0000") and (i_flag_ff1 = '1') and (sreg_i(sreg_i_c) = '1') else '0';
 
   -- acknowledge mask --
   irq_ack_mask_gen: process(irq_ack, irq_vec)
