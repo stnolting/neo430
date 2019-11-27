@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 18.01.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 27.11.2019 #
 // #################################################################################################
 
 #ifndef neo430_uart_h
@@ -48,5 +48,6 @@ void neo430_itoa(uint32_t x, const uint16_t leading_zeros);                // co
 void neo430_printf(char *format, ...);                                     // print format string
 void neo430_fp_print(int32_t num, const uint16_t fp);                      // print fixed point number
 uint32_t neo430_hexstr_to_uint(char *buffer, uint8_t length);              // convert hex string to number
+void neo430_uart_bs(uint16_t n);                                           // return terminal cursor n positions
 
 #endif // neo430_uart_h

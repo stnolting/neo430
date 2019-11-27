@@ -435,3 +435,16 @@ uint32_t neo430_hexstr_to_uint(char *buffer, uint8_t length) {
 
   return res;
 }
+
+
+/* ------------------------------------------------------------
+ * INFO Return terminal cursor n positions
+ * PARAM n positions
+ * ------------------------------------------------------------ */
+void neo430_uart_bs(uint16_t n) {
+
+  while (n--) {
+    neo430_uart_putc(0x08);
+  }
+}
+
