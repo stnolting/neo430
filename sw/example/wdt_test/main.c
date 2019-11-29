@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
+// # Stephan Nolting, Hannover, Germany                                                 27.11.2019 #
 // #################################################################################################
 
 
@@ -49,28 +49,40 @@ int main(void) {
   }
 
   neo430_uart_br_print("Cause of last processor reset: ");
-  if ((WDT_CT & (1<<WDT_CT_RCAUSE)) == 0)
+  uint16_t wdt_cause = WDT_CT;
+  if ((wdt_cause & (1<<WDT_CT_RCAUSE)) == 0) { // reset caused by WDT at all?
     neo430_uart_br_print("EXTERNAL RESET");
-  else
-    neo430_uart_br_print("WATCHDOG");
+  }
+  else {
+    if ((wdt_cause & (1<<WDT_CT_RPWFAIL)) == 0) { // WDT reset caused by wrong password access?
+      neo430_uart_br_print("WATCHDOG Timeout");
+    }
+    else {
+      neo430_uart_br_print("WATCHDOG Access Error");
+    }
+  }
+
 
   neo430_uart_br_print("\n\nWill reset WDT 64 times.\n"
                 "A system reset will be executed in the following time out.\n"
-                "Press any key to trigger manual WDT hardware reset.\n"
-                "[----------------------------------------------------------------]\n ");
+                "Press any key to trigger manual WDT hardware reset by WDT access with wrong password.\n"
+                "Restart this program after reset to check for the reset cause.\n\n"
+                "WDT resets: [................................................................]");
+  neo430_uart_bs(65); // back-space terminal cursor by 65 positions
 
-  // init watchdog: third largest period
-  neo430_wdt_enable(WDT_PRSC_1024);
+  // activate watchdog: second largest period
+  neo430_wdt_enable(WDT_PRSC_2048);
+
 
   uint8_t i;
   for (i=0; i<64; i++) {
-    neo430_uart_putc('.');
+    neo430_uart_putc('#');
     neo430_wdt_reset(); // reset watchdog
-    neo430_cpu_delay(4); // wait some time
+    neo430_cpu_delay_ms(80); // wait some time
 
     // trigger manual reset if key pressed
     if (neo430_uart_char_received()) {
-      neo430_wdt_force_hw_reset();
+      neo430_wdt_force_hw_reset(); // access wdt with wrong password
     }
   }
 
