@@ -1,5 +1,5 @@
 // #################################################################################################
-// #  < PWM controller demo program >                                                              #
+// #  < Use the PWM controller to modulate the GPIO output port >                                  #
 // # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: http://opencores.org/project,neo430        #
 // # Copyright 2015-2016, Stephan Nolting: stnolting@gmail.com                                     #
@@ -40,26 +40,32 @@ int main(void) {
   // setup UART
   neo430_uart_setup(BAUD_RATE);
 
-  neo430_uart_br_print("\n<<< PWM controller demo >>>\n");
+  neo430_uart_br_print("\n<<< PWM GPIO modulation demo >>>\n");
 
-  // check if PWM unit was synthesized, exit if no PWM controller is available
+  // check if PWM unit was synthesized, exit if not
   if (!(SYS_FEATURES & (1<<SYS_PWM_EN))) {
     neo430_uart_br_print("Error! No PWM controller synthesized!");
     return 1;
   }
 
-  // enable pwm controller
-  neo430_pwm_enable(PWM_PRSC_2, 1, 0); // max frequency, 8-bit resolution, no GPIO modulation
+  // check if GPIO unit was synthesized, exit if not
+  if (!(SYS_FEATURES & (1<<SYS_GPIO_EN))) {
+    neo430_uart_br_print("Error! No GPIO controller synthesized!");
+    return 1;
+  }
 
-  // clear all channels
+  // enable pwm controller
+  neo430_pwm_enable(PWM_PRSC_4, 1, 1); // 2nd highest frequency, 8-bit resolution, use GPIO modulation
+
+  // clear GPIO output port
+  neo430_gpio_port_set(0);
+
+  // clear pwm channel 3 (GPIO PWM channel)
   neo430_pwm_set(0, 0);
-  neo430_pwm_set(1, 0);
-  neo430_pwm_set(2, 0);
-  neo430_pwm_set(3, 0);
 
   uint8_t pwm = 0;
   uint8_t up = 1;
-  uint8_t ch = 0;
+  uint16_t cnt = 0;
 
   // animate!
   while(1) {
@@ -72,18 +78,20 @@ int main(void) {
         pwm++;
     }
     else {
-      if (pwm == 0) {
-        ch = (ch + 1) & 3;
+      if (pwm == 0)
         up = 1;
-      }
       else
         pwm--;
     }
-  
-    // output new duty cycle
-    neo430_pwm_set(ch, pwm);
 
-    neo430_cpu_delay_ms(4);
+    // output new duty cycle
+    neo430_pwm_set(3, pwm);
+
+    // output simple counter on GPIO output port
+    neo430_gpio_port_set((cnt>>4) & 0x00FF);
+    cnt++;
+
+    neo430_cpu_delay_ms(8);
   }
 
   return 0;

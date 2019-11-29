@@ -3,6 +3,7 @@
 -- # ********************************************************************************************* #
 -- # 16-bit parallel input & output unit. Any pin-change (HI->LO or LO->HI) triggers the IRQ.      #
 -- # Pins used for the pin change interrupt are selected using a 16-bit mask.                      #
+-- # The PWM controller can be used to module the GPIO controller's output.                        #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -22,7 +23,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 28.04.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 21.11.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -35,17 +36,19 @@ use neo430.neo430_package.all;
 entity neo430_gpio is
   port (
     -- host access --
-    clk_i  : in  std_ulogic; -- global clock line
-    rden_i : in  std_ulogic; -- read enable
-    wren_i : in  std_ulogic; -- write enable
-    addr_i : in  std_ulogic_vector(15 downto 0); -- address
-    data_i : in  std_ulogic_vector(15 downto 0); -- data in
-    data_o : out std_ulogic_vector(15 downto 0); -- data out
+    clk_i      : in  std_ulogic; -- global clock line
+    rden_i     : in  std_ulogic; -- read enable
+    wren_i     : in  std_ulogic; -- write enable
+    addr_i     : in  std_ulogic_vector(15 downto 0); -- address
+    data_i     : in  std_ulogic_vector(15 downto 0); -- data in
+    data_o     : out std_ulogic_vector(15 downto 0); -- data out
     -- parallel io --
-    gpio_o : out std_ulogic_vector(15 downto 0);
-    gpio_i : in  std_ulogic_vector(15 downto 0);
+    gpio_o     : out std_ulogic_vector(15 downto 0);
+    gpio_i     : in  std_ulogic_vector(15 downto 0);
+    -- GPIO PWM --
+    gpio_pwm_i : in  std_ulogic;
     -- interrupt --
-    irq_o  : out std_ulogic
+    irq_o      : out std_ulogic
   );
 end neo430_gpio;
 
@@ -62,8 +65,8 @@ architecture neo430_gpio_rtl of neo430_gpio is
   signal rden   : std_ulogic; -- read enable
 
   -- accessible regs --
-  signal dout, din : std_ulogic_vector(15 downto 0);
-  signal irq_mask  : std_ulogic_vector(15 downto 0);
+  signal dout, din : std_ulogic_vector(15 downto 0); -- r/w
+  signal irq_mask  : std_ulogic_vector(15 downto 0); -- -/w
 
   -- misc --
   signal irq_raw, sync_in, in_buf : std_ulogic_vector(15 downto 0);
@@ -94,8 +97,8 @@ begin
     end if;
   end process wr_access;
 
-  -- output --
-  gpio_o <= dout;
+  -- (PWM modulated) output --
+  gpio_o <= dout when (gpio_pwm_i = '1') else (others => '0');
 
 
   -- IRQ Generator ------------------------------------------------------------
