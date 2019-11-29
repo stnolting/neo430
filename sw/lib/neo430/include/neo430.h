@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 19.11.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 28.11.2019 #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -41,6 +41,7 @@
 #define N_FLAG 2  // r/w: negative
 #define I_FLAG 3  // r/w: global interrupt enable
 #define S_FLAG 4  // r/w: sleep
+#define P_FLAG 5  // r/w: parity (if enabled for synthesis)
 #define V_FLAG 8  // r/w: overflow
 #define Q_FLAG 14 // -/w: clear pending IRQ buffer when set
 #define R_FLAG 15 // r/w: allow write-access to IMEM
@@ -60,9 +61,11 @@
 
 
 // ----------------------------------------------------------------------------
-// Start of data memory (DMEN)
+// Start of memory sections
 // ----------------------------------------------------------------------------
-#define DMEM_ADDR_BASE 0xC000
+#define IMEM_ADDR_BASE 0x0000 // r/(w)/x: instruction memory
+#define DMEM_ADDR_BASE 0xC000 // r/w/x:   data memory
+#define BTLD_ADDR_BASE 0xF000 // r/-/x:   bootloader memory
 
 
 // ----------------------------------------------------------------------------
@@ -231,6 +234,7 @@
 #define WDT_CT_PRSC2    2 // r/w: clock prescaler select bit 2
 #define WDT_CT_EN       3 // r/w: WDT enable
 #define WDT_CT_RCAUSE   4 // r/-: reset cause (0: external, 1: watchdog timeout)
+#define WDT_CT_RPWFAIL  5 // r/-: watchdog resed caused by wrong WDT access password
 
 // Watchdog clock prescaler select:
 #define WDT_PRSC_2    0 // CLK/2
@@ -275,18 +279,17 @@
 // ----------------------------------------------------------------------------
 // Pulse Width Modulation Controller (PWM)
 // ----------------------------------------------------------------------------
-#define PWM_CT   (*(REG16 0xFFE0)) // -/w: control register
+#define PWM_CT   (*(REG16 0xFFE0)) // r/w: control register
 #define PWM_CH10 (*(REG16 0xFFE2)) // r/w: duty cycle channel 1 and 0
-#define PWM_CH32 (*(REG16 0xFFE4)) // r/w: duty cycle channel 3 and 2
+#define PWM_CH32 (*(REG16 0xFFE4)) // -/w: duty cycle channel 3 and 2
 
 // PWM controller control register
-#define PWM_CT_EN     0 // -/w: PWM enable
-#define PWM_CT_PRSC0  1 // -/w: clock prescaler select bit 0
-#define PWM_CT_PRSC1  2 // -/w: clock prescaler select bit 1
-#define PWM_CT_PRSC2  3 // -/w: clock prescaler select bit 2
-#define PWM_CT_SIZE0  4 // -/w: PWM counter size bit 0
-#define PWM_CT_SIZE1  5 // -/w: PWM counter size bit 1
-#define PWM_CT_SIZE2  6 // -/w: PWM counter size bit 2
+#define PWM_CT_EN       0 // -/w: PWM enable
+#define PWM_CT_PRSC0    1 // -/w: clock prescaler select bit 0
+#define PWM_CT_PRSC1    2 // -/w: clock prescaler select bit 1
+#define PWM_CT_PRSC2    3 // -/w: clock prescaler select bit 2
+#define PWM_CT_GPIO_PWM 4 // -/w: use channel 3 for PWM modulation of GPIO unit's output port
+#define PWM_CT_SIZE_SEL 5 // -/w: cnt size select (0 = 4-bit, 1 = 8-bit)
 
 // PWM clock prescaler select:
 #define PWM_PRSC_2    0 // CLK/2
@@ -326,18 +329,47 @@
 #define TWI_PRSC_4096 7 // CLK/4096
 
 // TWI data register flags
-#define TWI_DT_ACK     15 // r/-: ACK received
+#define TWI_DT_ACK    15 // r/-: ACK received
 
-/*
-// ----------------------------------------------------------------------------
-// Reserved
-// ----------------------------------------------------------------------------
-#define ???_CT   (*(REG16 0xFFEC)) // -/w: control register
-#define ???_DATA (*(ROM16 0xFFEE)) // r/-: data register
 
-// ??? control register
-#define ???_CT_EN 0 // -/w: ??? enable
-*/
+// ----------------------------------------------------------------------------
+// True Random Number Generator (TRNG)
+// ----------------------------------------------------------------------------
+#define TRNG_CT (*(REG16 0xFFEC)) // r/w: control register
+
+// TRNG control register
+#define TRNG_CT_RND0  0 // r/-: TRNG random data byte bit 0
+#define TRNG_CT_RND1  1 // r/-: TRNG random data byte bit 1
+#define TRNG_CT_RND2  2 // r/-: TRNG random data byte bit 2
+#define TRNG_CT_RND3  3 // r/-: TRNG random data byte bit 3
+#define TRNG_CT_RND4  4 // r/-: TRNG random data byte bit 4
+#define TRNG_CT_RND5  5 // r/-: TRNG random data byte bit 5
+#define TRNG_CT_RND6  6 // r/-: TRNG random data byte bit 6
+#define TRNG_CT_RND7  7 // r/-: TRNG random data byte bit 7
+#define TRNG_CT_EN   15 // r/w: TRNG enable
+
+
+// ----------------------------------------------------------------------------
+// External Interrupts Controller (EXIRQ)
+// ----------------------------------------------------------------------------
+#define EXIRQ_CT (*(REG16 0xFFEE)) // r/w: control register
+
+// EXIRQ control register
+#define EXIRQ_CT_SRC0     0 // r/-: IRQ source bit 0
+#define EXIRQ_CT_SRC1     1 // r/-: IRQ source bit 1
+#define EXIRQ_CT_SRC2     2 // r/-: IRQ source bit 2
+#define EXIRQ_CT_TRIG     3 // r/w: global trigger (0: high-level, 1: rising-edge)
+#define EXIRQ_CT_EN       4 // r/w: unit enable
+
+#define EXIRQ_CT_IRQ0_EN  8 // r/w: Enable IRQ channel 0
+#define EXIRQ_CT_IRQ1_EN  9 // r/w: Enable IRQ channel 1
+#define EXIRQ_CT_IRQ2_EN 10 // r/w: Enable IRQ channel 2
+#define EXIRQ_CT_IRQ3_EN 11 // r/w: Enable IRQ channel 3
+#define EXIRQ_CT_IRQ4_EN 12 // r/w: Enable IRQ channel 4
+#define EXIRQ_CT_IRQ5_EN 13 // r/w: Enable IRQ channel 5
+#define EXIRQ_CT_IRQ6_EN 14 // r/w: Enable IRQ channel 6
+#define EXIRQ_CT_IRQ7_EN 15 // r/w: Enable IRQ channel 7
+
 
 // ----------------------------------------------------------------------------
 // System Configuration (SYSCONFIG)
@@ -346,7 +378,7 @@
 #define CPUID1 (*(ROM16 0xFFF2)) // r/-: synthesized system features
 #define CPUID2 (*(ROM16 0xFFF4)) // r/-: custom user code
 #define CPUID3 (*(ROM16 0xFFF6)) // r/-: IMEM/ROM size in bytes
-#define CPUID4 (*(ROM16 0xFFF8)) // r/-: DMEM/RAM base address
+#define CPUID4 (*(ROM16 0xFFF8)) // r/-: reserved
 #define CPUID5 (*(ROM16 0xFFFA)) // r/-: DMEM/RAM size in bytes
 #define CPUID6 (*(ROM16 0xFFFC)) // r/-: clock speed (in Hz) low part
 #define CPUID7 (*(ROM16 0xFFFE)) // r/-: clock speed (in Hz) high part
@@ -356,7 +388,7 @@
 #define SYS_FEATURES  CPUID1 // r/-: synthesized system features
 #define USER_CODE     CPUID2 // r/-: custom user code
 #define IMEM_SIZE     CPUID3 // r/-: IMEM/ROM size in bytes
-#define DMEM_BASE     CPUID4 // r/-: DMEM/RAM base address
+//#define             CPUID4 // r/-: reserved
 #define DMEM_SIZE     CPUID5 // r/-: DMEM/RAM size in bytes
 #define CLOCKSPEED_LO CPUID6 // r/-: clock speed (in Hz) low part
 #define CLOCKSPEED_HI CPUID7 // r/-: clock speed (in Hz) high part
@@ -379,8 +411,8 @@
 #define SYS_PWM_EN   11 // r/-: PWM controller synthesized
 #define SYS_TWI_EN   12 // r/-: TWI synthesized
 #define SYS_SPI_EN   13 // r/-: SPI synthesized
-//define reserved_EN 14 // r/-: reserved
-//define reserved_EN 15 // r/-: reserved
+#define SYS_TRNG_EN  14 // r/-: TRNG synthesized
+#define SYS_EXIRQ_EN 15 // r/-: EXIRQ synthesized
 
 
 // ----------------------------------------------------------------------------
@@ -388,11 +420,13 @@
 // ----------------------------------------------------------------------------
 #include "neo430_cpu.h"
 #include "neo430_crc.h"
+#include "neo430_exirq.h"
 #include "neo430_gpio.h"
 #include "neo430_muldiv.h"
 #include "neo430_pwm.h"
 #include "neo430_spi.h"
 #include "neo430_timer.h"
+#include "neo430_trng.h"
 #include "neo430_twi.h"
 #include "neo430_uart.h"
 #include "neo430_wdt.h"

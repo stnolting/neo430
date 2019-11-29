@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 14.11.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 28.11.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -60,7 +60,7 @@ architecture neo430_tb_rtl of neo430_tb is
 
   -- generators --
   signal clk_gen, rst_gen : std_ulogic := '0';
-  signal irq, irq_ack     : std_ulogic;
+  signal irq, irq_ack     : std_ulogic_vector(7 downto 0);
 
   -- local signals --
   signal uart_txd : std_ulogic;
@@ -107,6 +107,8 @@ begin
     PWM_USE     => true,              -- implement PWM controller? (default=true)
     TWI_USE     => true,              -- implement two wire serial interface? (default=true)
     SPI_USE     => true,              -- implement SPI? (default=true)
+    TRNG_USE    => false,             -- implement TRNG? (default=false) - CANNOT BE SIMULATED!
+    EXIRQ_USE   => true,              -- implement EXIRQ? (default=true)
     -- boot configuration --
     BOOTLD_USE  => false,             -- implement and use bootloader? (default=true)
     IMEM_AS_ROM => false              -- implement IMEM as read-only memory? (default=false)
@@ -138,9 +140,9 @@ begin
     wb_stb_o   => open,               -- strobe
     wb_cyc_o   => open,               -- valid cycle
     wb_ack_i   => '0',                -- transfer acknowledge
-    -- external interrupt --
-    irq_i      => irq,                -- external interrupt request line
-    irq_ack_o  => irq_ack             -- external interrupt request acknowledge
+    -- external interrupts --
+    ext_irq_i  => irq,                -- external interrupt request lines
+    ext_ack_o  => irq_ack             -- external interrupt request acknowledges
   );
 
   -- twi pull-ups --
@@ -152,14 +154,12 @@ begin
   -- -----------------------------------------------------------------------------
   interrupt_gen: process
   begin
-    --irq <= '0';
-    --wait for 20 ms;
-    --wait until rising_edge(clk_gen);
-    --irq <= '1';
-    --wait for t_clock_c;
-    --wait until rising_edge(irq_ack);
-    --irq <= '0';
-    --wait;
+    irq <= (others => '0');
+    wait for 20 ms;
+    wait until rising_edge(clk_gen);
+    irq <= "00000111";
+    wait for t_clock_c;
+    wait;
   end process interrupt_gen;
 
 

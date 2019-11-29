@@ -23,7 +23,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 13.11.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 28.11.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -78,6 +78,8 @@ begin
     PWM_USE     => true,              -- implement PWM controller? (default=true)
     TWI_USE     => true,              -- implement two wire serial interface? (default=true)
     SPI_USE     => true,              -- implement SPI? (default=true)
+    TRNG_USE    => false,             -- implement TRNG? (default=false)
+    EXIRQ_USE   => true,              -- implement EXIRQ? (default=true)
     -- boot configuration --
     BOOTLD_USE  => true,              -- implement and use bootloader? (default=true)
     IMEM_AS_ROM => false              -- implement IMEM as read-only memory? (default=false)
@@ -109,9 +111,9 @@ begin
     wb_stb_o   => open,               -- strobe
     wb_cyc_o   => open,               -- valid cycle
     wb_ack_i   => '0',                -- transfer acknowledge
-    -- external interrupt --
-    irq_i      => '0',                -- external interrupt request line
-    irq_ack_o  => open                -- external interrupt request acknowledge
+    -- external interrupts --
+    ext_irq_i  => "00000000",         -- external interrupt request lines
+    ext_ack_o  => open                -- external interrupt request acknowledges
   );
 
   -- constrain output signals --

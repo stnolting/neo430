@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 13.11.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 28.11.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -52,6 +52,8 @@ entity neo430_sysconfig is
     PWM_USE     : boolean := true; -- implement PWM controller?
     TWI_USE     : boolean := true; -- implement TWI?
     SPI_USE     : boolean := true; -- implement SPI?
+    TRNG_USE    : boolean := true; -- implement TRNG?
+    EXIRQ_USE   : boolean := true; -- implement EXIRQ? (default=true)
     -- boot configuration --
     BOOTLD_USE  : boolean := true; -- implement and use bootloader?
     IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory?
@@ -116,8 +118,8 @@ begin
   sysinfo_mem(1)(11) <= bool_to_ulogic_f(PWM_USE);        -- PWM present?
   sysinfo_mem(1)(12) <= bool_to_ulogic_f(TWI_USE);        -- TWI present?
   sysinfo_mem(1)(13) <= bool_to_ulogic_f(SPI_USE);        -- SPI present?
-  sysinfo_mem(1)(14) <= '0';                              -- reserved
-  sysinfo_mem(1)(15) <= '0';                              -- reserved
+  sysinfo_mem(1)(14) <= bool_to_ulogic_f(TRNG_USE);       -- TRNG present?
+  sysinfo_mem(1)(15) <= bool_to_ulogic_f(EXIRQ_USE);      -- EXIRQ present?
 
   -- CPUID2: User code --
   sysinfo_mem(2) <= USER_CODE;
@@ -125,8 +127,8 @@ begin
   -- CPUID3: IMEM (ROM/RAM) size --
   sysinfo_mem(3) <= std_ulogic_vector(to_unsigned(IMEM_SIZE, 16)); -- size in bytes
 
-  -- CPUID4: DMEM (RAM) base address --
-  sysinfo_mem(4) <= dmem_base_c;
+  -- CPUID4: reserved --
+  sysinfo_mem(4) <= (others => '0');
 
   -- CPUID5: DMEM (RAM) size --
   sysinfo_mem(5) <= std_ulogic_vector(to_unsigned(DMEM_SIZE, 16)); -- size in bytes

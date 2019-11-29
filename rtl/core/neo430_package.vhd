@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 14.11.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 27.11.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -30,13 +30,14 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0305"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0320"; -- no touchy!
 
   -- Advanced Hardware Configuration --------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant use_dsp_mul_c    : boolean := false; -- use DSP blocks for MULDIV's multiplication (default=false)
+  constant use_dsp_mul_c    : boolean := false; -- use DSP blocks for MULDIV's multiplication core (default=false)
   constant use_dadd_cmd_c   : boolean := false; -- implement CPU's DADD instruction (default=false)
-  constant low_power_mode_c : boolean := false; -- reduces switching activity, but will also decrease f_max and might increase area (default=false)
+  constant use_xalu_c       : boolean := false; -- implement extended ALU function (default=false)
+  constant low_power_mode_c : boolean := false; -- can reduce switching activity, but will also decrease f_max and might increase area (default=false)
   constant awesome_mode_c   : boolean := true;  -- of course! (default=true)
 
   -- Internal Functions ---------------------------------------------------------------------
@@ -57,7 +58,7 @@ package neo430_package is
   function and_all_f(a : std_ulogic_vector) return std_ulogic;
   function xor_all_f(a : std_ulogic_vector) return std_ulogic;
 
-  -- Address Space Layout -------------------------------------------------------------------
+  -- Address Space Layout (make sure this is always sync with neo430.h) ---------------------
   -- -------------------------------------------------------------------------------------------
 
   -- Main Memory: IMEM(ROM/RAM) --
@@ -182,12 +183,17 @@ package neo430_package is
   constant twi_ctrl_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(twi_base_c) + x"0000");
   constant twi_rtx_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(twi_base_c) + x"0002");
 
-  -- IO: RESERVED --
---constant ???_base_c : std_ulogic_vector(15 downto 0) := x"FFEC";
---constant ???_size_c : natural := 4; -- bytes
+  -- IO: True Random Number Generator (TRNG) --
+  constant trng_base_c : std_ulogic_vector(15 downto 0) := x"FFEC";
+  constant trng_size_c : natural := 2; -- bytes
 
---constant ???_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0000");
---constant ???_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(???_base_c) + x"0002");
+  constant trng_ctrl_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(trng_base_c) + x"0000");
+
+  -- IO: External Interrupts Controller (EXIRQ) --
+  constant exirq_base_c : std_ulogic_vector(15 downto 0) := x"FFEE";
+  constant exirq_size_c : natural := 2; -- bytes
+
+  constant exirq_ctrl_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(exirq_base_c) + x"0000");
 
   -- IO: System Configuration (SYSCONFIG) --
   constant sysconfig_base_c : std_ulogic_vector(15 downto 0) := x"FFF0";
@@ -218,6 +224,7 @@ package neo430_package is
   constant sreg_n_c : natural := 2;  -- r/w: negative flag
   constant sreg_i_c : natural := 3;  -- r/w: global interrupt enable
   constant sreg_s_c : natural := 4;  -- r/w: CPU sleep flag
+  constant sreg_p_c : natural := 5;  -- r/w: parity flag
   constant sreg_v_c : natural := 8;  -- r/w: overflow flag
   constant sreg_q_c : natural := 14; -- -/w: clear pending IRQ buffer when set
   constant sreg_r_c : natural := 15; -- r/w: enable write access to IMEM (ROM) when set
@@ -228,6 +235,7 @@ package neo430_package is
   constant flag_z_c : natural := 1; -- zero flag
   constant flag_n_c : natural := 2; -- negative flag
   constant flag_v_c : natural := 3; -- overflow flag
+  constant flag_p_c : natural := 4; -- parity flag
 
   -- Main Control Bus -----------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -299,7 +307,7 @@ package neo430_package is
   constant alu_and_c  : std_ulogic_vector(3 downto 0) := "1111"; -- r <= a & b
 
 
-  -- The Core of the Problem: Processor Top Entity ------------------------------------------
+  -- The Core of the Problem: NEO430 Processor Top Entity -----------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_top
     generic (
@@ -318,9 +326,11 @@ package neo430_package is
       UART_USE    : boolean := true; -- implement UART? (default=true)
       CRC_USE     : boolean := true; -- implement CRC unit? (default=true)
       CFU_USE     : boolean := false; -- implement custom functions unit? (default=false)
-      PWM_USE     : boolean := true; -- implement PWM controller? (default = true)
+      PWM_USE     : boolean := true; -- implement PWM controller? (default=true)
       TWI_USE     : boolean := true; -- implement two wire serial interface? (default=true)
       SPI_USE     : boolean := true; -- implement SPI? (default=true)
+      TRNG_USE    : boolean := false; -- implement TRNG? (default=false)
+      EXIRQ_USE   : boolean := true; -- implement EXIRQ? (default=true)
       -- boot configuration --
       BOOTLD_USE  : boolean := true; -- implement and use bootloader? (default=true)
       IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory? (default=false)
@@ -352,13 +362,13 @@ package neo430_package is
       wb_stb_o   : out std_ulogic; -- strobe
       wb_cyc_o   : out std_ulogic; -- valid cycle
       wb_ack_i   : in  std_ulogic; -- transfer acknowledge
-      -- interrupts --
-      irq_i      : in  std_ulogic; -- external interrupt request line
-      irq_ack_o  : out std_ulogic  -- external interrupt request acknowledge
+      -- external interrupts --
+      ext_irq_i  : in  std_ulogic_vector(07 downto 0); -- external interrupt request lines
+      ext_ack_o  : out std_ulogic_vector(07 downto 0)  -- external interrupt request acknowledges
     );
   end component;
 
-  -- Component: Control ---------------------------------------------------------------------
+  -- Component: CPU Control -----------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_control
     port (
@@ -392,7 +402,7 @@ package neo430_package is
       -- data input --
       alu_i  : in  std_ulogic_vector(15 downto 0); -- data from alu
       addr_i : in  std_ulogic_vector(15 downto 0); -- data from addr unit
-      flag_i : in  std_ulogic_vector(03 downto 0); -- new ALU flags
+      flag_i : in  std_ulogic_vector(04 downto 0); -- new ALU flags
       -- control --
       ctrl_i : in  std_ulogic_vector(ctrl_width_c-1 downto 0);
       -- data output --
@@ -415,7 +425,7 @@ package neo430_package is
       ctrl_i : in  std_ulogic_vector(ctrl_width_c-1 downto 0);
       -- results --
       data_o : out std_ulogic_vector(15 downto 0); -- result
-      flag_o : out std_ulogic_vector(03 downto 0)  -- new ALU flags
+      flag_o : out std_ulogic_vector(04 downto 0)  -- new ALU flags
     );
   end component;
 
@@ -462,7 +472,7 @@ package neo430_package is
     );
   end component;
 
-  -- Component: Instruction Memory (ROM) ----------------------------------------------------
+  -- Component: Instruction Memory RAM (IMEM) -----------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_imem
     generic (
@@ -481,7 +491,7 @@ package neo430_package is
     );
   end component;
 
-  -- Component: Data Memory (RAM) -----------------------------------------------------------
+  -- Component: Data Memory RAM (DMEM) ------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_dmem
     generic (
@@ -508,7 +518,7 @@ package neo430_package is
     );
   end component;
 
-  -- Component: Multiplier/Divider ----------------------------------------------------------
+  -- Component: Multiplier/Divider (MULDIV) -------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_muldiv
     port (
@@ -522,7 +532,7 @@ package neo430_package is
     );
   end component;
 
-  -- Component: 32bit Wishbone Interface ----------------------------------------------------
+  -- Component: 32bit Wishbone Interface (WB32) ---------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_wb_interface
     port (
@@ -545,7 +555,7 @@ package neo430_package is
     );
   end component;
 
-  -- Component: UART ------------------------------------------------------------------------
+  -- Component: Universal Asynchornous Receiver/Transmitter (UART) --------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_uart
     port (
@@ -567,7 +577,7 @@ package neo430_package is
     );
   end component;
 
-  -- Component: SPI -------------------------------------------------------------------------
+  -- Component: Serial Peripheral Interface (SPI) -------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_spi
     port (
@@ -591,26 +601,28 @@ package neo430_package is
     );
   end component;
 
-  -- Component: GPIO ------------------------------------------------------------------------
+  -- Component: General Purpose Input/Ouput Controller (GPIO) -------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_gpio
     port (
       -- host access --
-      clk_i  : in  std_ulogic; -- global clock line
-      rden_i : in  std_ulogic; -- read enable
-      wren_i : in  std_ulogic; -- write enable
-      addr_i : in  std_ulogic_vector(15 downto 0); -- address
-      data_i : in  std_ulogic_vector(15 downto 0); -- data in
-      data_o : out std_ulogic_vector(15 downto 0); -- data out
+      clk_i      : in  std_ulogic; -- global clock line
+      rden_i     : in  std_ulogic; -- read enable
+      wren_i     : in  std_ulogic; -- write enable
+      addr_i     : in  std_ulogic_vector(15 downto 0); -- address
+      data_i     : in  std_ulogic_vector(15 downto 0); -- data in
+      data_o     : out std_ulogic_vector(15 downto 0); -- data out
       -- parallel io --
-      gpio_o : out std_ulogic_vector(15 downto 0);
-      gpio_i : in  std_ulogic_vector(15 downto 0);
+      gpio_o     : out std_ulogic_vector(15 downto 0);
+      gpio_i     : in  std_ulogic_vector(15 downto 0);
+      -- GPIO PWM --
+      gpio_pwm_i : in  std_ulogic;
       -- interrupt --
-      irq_o  : out std_ulogic
+      irq_o      : out std_ulogic
     );
   end component;
 
-  -- Component: High-Precision Timer --------------------------------------------------------
+  -- Component: High-Precision Timer (TIMER) ------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_timer
     port (
@@ -629,7 +641,7 @@ package neo430_package is
     );
   end component;
 
-  -- Component: Watchdog Timer --------------------------------------------------------------
+  -- Component: Watchdog Timer (WDT) --------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_wdt
     port (
@@ -649,7 +661,7 @@ package neo430_package is
     );
   end component;
 
-  -- Component: CRC Module ------------------------------------------------------------------
+  -- Component: Cyclic Redundancy Check Unit (CRC)-------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_crc
     port (
@@ -663,7 +675,7 @@ package neo430_package is
     );
   end component;
 
-  -- Component: Custom Functions Unit -------------------------------------------------------
+  -- Component: Custom Functions Unit (CFU) -------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_cfu
     port (
@@ -679,7 +691,7 @@ package neo430_package is
     );
   end component;
 
-  -- Component: PWM Controller --------------------------------------------------------------
+  -- Component: PWM Controller (PWM) --------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_pwm
     port (
@@ -693,12 +705,14 @@ package neo430_package is
       -- clock generator --
       clkgen_en_o : out std_ulogic; -- enable clock generator
       clkgen_i    : in  std_ulogic_vector(07 downto 0);
+      -- GPIO output PWM --
+      gpio_pwm_o  : out std_ulogic;
       -- pwm output channels --
       pwm_o       : out std_ulogic_vector(03 downto 0)
     );
   end component;
 
-  -- Component: Serial Two Wire Interfcae ---------------------------------------------------
+  -- Component: Serial Two Wire Interfcae (TWI) ---------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_twi
     port (
@@ -720,7 +734,40 @@ package neo430_package is
     );
   end component;
 
-  -- Component: System Configuration --------------------------------------------------------
+  -- Component: True Random Number Generator (TRNG) -----------------------------------------
+  -- -------------------------------------------------------------------------------------------
+  component neo430_trng
+    port (
+      -- host access --
+      clk_i  : in  std_ulogic; -- global clock line
+      rden_i : in  std_ulogic; -- read enable
+      wren_i : in  std_ulogic; -- write enable
+      addr_i : in  std_ulogic_vector(15 downto 0); -- address
+      data_i : in  std_ulogic_vector(15 downto 0); -- data in
+      data_o : out std_ulogic_vector(15 downto 0)  -- data out
+    );
+  end component;
+
+  -- Component: External Interrupts Controller (EXIRQ) --------------------------------------
+  -- -------------------------------------------------------------------------------------------
+  component neo430_exirq
+    port (
+      -- host access --
+      clk_i     : in  std_ulogic; -- global clock line
+      rden_i    : in  std_ulogic; -- read enable
+      wren_i    : in  std_ulogic; -- write enable
+      addr_i    : in  std_ulogic_vector(15 downto 0); -- address
+      data_i    : in  std_ulogic_vector(15 downto 0); -- data in
+      data_o    : out std_ulogic_vector(15 downto 0); -- data out
+      -- cpu interrupt --
+      cpu_irq_o : out std_ulogic;
+      -- external interrupt lines --
+      ext_irq_i : in  std_ulogic_vector(7 downto 0); -- IRQ
+      ext_ack_o : out std_ulogic_vector(7 downto 0)  -- acknowledge
+    );
+  end component;
+
+  -- Component: System Configuration (SYSCONFIG) --------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_sysconfig
     generic (
@@ -742,6 +789,8 @@ package neo430_package is
       PWM_USE     : boolean := true; -- implement PWM controller?
       TWI_USE     : boolean := true; -- implement TWI?
       SPI_USE     : boolean := true; -- implement SPI?
+      TRNG_USE    : boolean := true; -- implement TRNG?
+      EXIRQ_USE   : boolean := true; -- implement EXIRQ? (default=true)
       -- boot configuration --
       BOOTLD_USE  : boolean := true; -- implement and use bootloader?
       IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory?
@@ -772,7 +821,7 @@ package body neo430_package is
     return 0;
   end function index_size_f;
 
-  -- Function: Test is value (encoded with a certain bit width) is a power of 2 -------------
+  -- Function: Test if value (encoded with a certain bit width) is a power of 2 -------------
   -- -------------------------------------------------------------------------------------------
   function is_power_of_two_f(num : natural; bit_width : natural) return boolean is
   begin

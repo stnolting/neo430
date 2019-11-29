@@ -21,7 +21,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 14.11.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 28.11.2019 #
 // #################################################################################################
 
 
@@ -61,10 +61,10 @@ int main(void) {
   neo430_printf("Clock speed:      %n Hz\n", clock);
 
   // ROM/IMEM
-  neo430_printf("IMEM/ROM:         %u bytes @ 0x0000\n", IMEM_SIZE);
+  neo430_printf("IMEM/ROM:         %u bytes @ 0x%x\n", IMEM_SIZE, IMEM_ADDR_BASE);
 
   // RAM/DMEM
-  neo430_printf("DMEM/RAM:         %u bytes @ 0x%x\n", DMEM_SIZE, DMEM_BASE);
+  neo430_printf("DMEM/RAM:         %u bytes @ 0x%x\n", DMEM_SIZE, DMEM_ADDR_BASE);
 
   // UART baud rate
   uint16_t baud = UART_CT & 0x00FF;
@@ -145,6 +145,14 @@ int main(void) {
   neo430_printf("- Two Wire Interface:    ");
   print_state(ft & (1<<SYS_TWI_EN));
 
+  // TRNG
+  neo430_printf("- True Random Generator: ");
+  print_state(ft & (1<<SYS_TRNG_EN));
+
+  // EXIRQ
+  neo430_printf("- External IRQs Ctrl.:   ");
+  print_state(ft & (1<<SYS_EXIRQ_EN));
+
 
   // Exit
   // --------------------------------------------
@@ -166,7 +174,7 @@ int main(void) {
 void print_state(uint16_t d) {
 
   if (d)
-    neo430_printf("enabled\n");
+    neo430_printf("synthesized\n");
   else
-    neo430_printf("DISABLED\n");
+    neo430_printf("-\n");
 }
