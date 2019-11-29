@@ -1,5 +1,5 @@
 // #################################################################################################
-// #  < neo430_wishbone.h - Internal Wishbone interface control functions >                        #
+// #  < neo430_wishbone.c - Internal Wishbone interface control functions >                        #
 // # ********************************************************************************************* #
 // # Use the normal Wishbone functions for BLOCKING access (until ACK is asserted).                #
 // # Use non-blocking functions (*_start, wishbone_busy, wishbone_get_data*) to prevent dead locks #

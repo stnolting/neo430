@@ -1,5 +1,5 @@
 // #################################################################################################
-// #  < neo430_usart.h - Internal UARt driver functions >                                          #
+// #  < neo430_usart.c - Internal UARt driver functions >                                          #
 // # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 // # Copyright by Stephan Nolting: stnolting@gmail.com                                             #

@@ -1,5 +1,5 @@
 // #################################################################################################
-// #  < neo430_muldiv.h - Multiplier/Divider function >                                            #
+// #  < neo430_muldiv.c - Multiplier/Divider function >                                            #
 // # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 // # Copyright by Stephan Nolting: stnolting@gmail.com                                             #

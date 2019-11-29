@@ -19,14 +19,14 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 12.05.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 22.11.2019 #
 // #################################################################################################
 
 #ifndef neo430_pwm_h
 #define neo430_pwm_h
 
 // prototypes
-void neo430_pwm_enable(uint8_t prsc, uint8_t size);
+void neo430_pwm_enable(const uint16_t prsc, const uint16_t size, const uint16_t gpio_pwm);
 void neo430_pwm_disable(void);
 void neo430_pwm_set(uint8_t channel, uint8_t dc);
 

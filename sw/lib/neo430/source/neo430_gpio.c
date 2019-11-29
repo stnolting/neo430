@@ -1,5 +1,5 @@
 // #################################################################################################
-// #  < neo430_gpio.h - PIO controller helper functions >                                          #
+// #  < neo430_gpio.c - PIO controller helper functions >                                          #
 // # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 // # Copyright by Stephan Nolting: stnolting@gmail.com                                             #

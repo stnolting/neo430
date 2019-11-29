@@ -1,5 +1,5 @@
 // #################################################################################################
-// #  < neo430_crc.h - CRC module helper functions >                                               #
+// #  < neo430_crc.c - CRC module helper functions >                                               #
 // # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 // # Copyright by Stephan Nolting: stnolting@gmail.com                                             #

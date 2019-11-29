@@ -1,5 +1,5 @@
 // #################################################################################################
-// #  < neo430_timer.h - Timer helper functions >                                                  #
+// #  < neo430_timer.c - Timer helper functions >                                                  #
 // # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 // # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
