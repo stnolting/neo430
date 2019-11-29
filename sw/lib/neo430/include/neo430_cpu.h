@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 01.03.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 21.11.2019 #
 // #################################################################################################
 
 #ifndef neo430_cpu_h
@@ -31,6 +31,7 @@ void neo430_dint(void);
 uint16_t neo430_get_sp(void);
 uint16_t neo430_get_sreg(void);
 void neo430_set_sreg(uint16_t d);
+uint16_t neo430_get_parity(uint16_t d);
 void neo430_sleep(void);
 void neo430_clear_irq_buffer(void);
 void neo430_cpu_delay(uint16_t t);

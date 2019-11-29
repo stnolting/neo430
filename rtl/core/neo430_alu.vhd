@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 15.11.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 21.11.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -44,7 +44,7 @@ entity neo430_alu is
     ctrl_i : in  std_ulogic_vector(ctrl_width_c-1 downto 0);
     -- results --
     data_o : out std_ulogic_vector(15 downto 0); -- result
-    flag_o : out std_ulogic_vector(03 downto 0)  -- new ALU flags
+    flag_o : out std_ulogic_vector(04 downto 0)  -- new ALU flags
   );
 end neo430_alu;
 
@@ -55,11 +55,11 @@ architecture neo430_alu_rtl of neo430_alu is
   signal add_res          : std_ulogic_vector(17 downto 0); -- adder/subtractor kernel result
   signal dadd_res         : std_ulogic_vector(16 downto 0); -- decimal adder kernel result
   signal dadd_res_ff      : std_ulogic_vector(16 downto 0); -- decimal adder kernel result buffered
-  signal dadd_res_in      : std_ulogic_vector(16 downto 0); -- decimal adder kernel result buffered
   signal alu_res          : std_ulogic_vector(15 downto 0); -- alu result
   signal data_res         : std_ulogic_vector(15 downto 0); -- final alu result
   signal zero             : std_ulogic; -- zero detector
-  signal negative         : std_ulogic; -- sign detectors
+  signal negative         : std_ulogic; -- sign detector
+  signal parity           : std_ulogic; -- parity detector
 
 begin
 
@@ -73,12 +73,15 @@ begin
   operand_register: process(clk_i)
   begin
     if rising_edge(clk_i) then
+      -- operand registers --
       if (ctrl_i(ctrl_alu_opa_wr_c) = '1') then
         op_a_ff <= op_data;
       end if;
       if (ctrl_i(ctrl_alu_opb_wr_c) = '1') then
         op_b_ff <= op_data;
       end if;
+      -- DADD pipeline register --
+      dadd_res_ff <= dadd_res;
     end if;
   end process operand_register;
 
@@ -159,22 +162,9 @@ begin
   end process bcd_arithmetic_core;
 
 
-  -- DADD Pipeline Register ---------------------------------------------------
-  -- -----------------------------------------------------------------------------
-  dadd_pipe_reg: process(clk_i)
-  begin
-    if rising_edge(clk_i) then
-      dadd_res_ff <= dadd_res;
-    end if;
-  end process dadd_pipe_reg;
-
-  -- implement DADD instruction? --
-  dadd_res_in <= dadd_res_ff when (use_dadd_cmd_c = true) else (others => '-');
-
-
   -- ALU Core -----------------------------------------------------------------
   -- -----------------------------------------------------------------------------
-  alu_core: process(ctrl_i, op_a_ff, op_b_ff, sreg_i, negative, zero, add_res, dadd_res_in)
+  alu_core: process(ctrl_i, op_a_ff, op_b_ff, sreg_i, negative, zero, parity, add_res, dadd_res_ff)
   begin
     -- defaults --
     alu_res <= op_a_ff;
@@ -182,6 +172,7 @@ begin
     flag_o(flag_v_c) <= sreg_i(sreg_v_c); -- keep
     flag_o(flag_n_c) <= negative; -- update
     flag_o(flag_z_c) <= zero; -- update
+    flag_o(flag_p_c) <= parity; -- update
 
     -- function selection --
     case ctrl_i(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) is
@@ -196,9 +187,15 @@ begin
         flag_o(flag_v_c) <= add_res(17);
 
       when alu_dadd_c => -- r <= a + b + c (decimal)
-        alu_res <= dadd_res_in(15 downto 0);
-        flag_o(flag_c_c) <= dadd_res_in(16);
-        flag_o(flag_v_c) <= '0';
+        if (use_dadd_cmd_c = true) then -- implement DADD instruction at all?
+          alu_res <= dadd_res_ff(15 downto 0);
+          flag_o(flag_c_c) <= dadd_res_ff(16);
+          flag_o(flag_v_c) <= '0';
+        else -- output is undefined when DADD instruction is disabled
+          alu_res <= (others => '-');
+          flag_o(flag_c_c) <= '-';
+          flag_o(flag_v_c) <= '-';
+        end if;
 
       when alu_and_c => -- r <= a & b
         alu_res <= op_a_ff and op_b_ff;
@@ -283,6 +280,9 @@ begin
 
   -- zero flag --
   zero <= not or_all_f(data_res);
+
+  -- parity flag --
+  parity <= (not xor_all_f(data_res)) when (use_xalu_c = true) else '-'; -- if implemented
 
   -- negative flag --
   negative <= data_res(7) when (ctrl_i(ctrl_alu_bw_c) = '1') else data_res(15);

@@ -1,5 +1,5 @@
 // #################################################################################################
-// #  < neo430_cpu.h - CPU helper functions >                                                      #
+// #  < neo430_cpu.c - CPU helper functions >                                                      #
 // # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 // # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 13.03.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 26.11.2019 #
 // #################################################################################################
 
 #include "neo430.h"
@@ -80,6 +80,24 @@ void neo430_set_sreg(uint16_t d){
 
   register uint16_t r = d;
   asm volatile ("mov %0, r2" : : "r" (r));
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Get parity of value
+ * WARNING MAKE SURE THIS OPTION IS SYNTHESIZED (package switch "use_ext_alu_c")!!!
+ * PARAM d input value
+ * RETURN Resulting parity (1=even number of 1s, 0=odd number of 1s)
+ * ------------------------------------------------------------ */
+uint16_t neo430_get_parity(uint16_t d){
+
+  register uint16_t r = d;
+  asm volatile ("mov %0, %0" : "=r" (r) : "r" (r)); // just get value through alu
+
+  if (neo430_get_sreg() & (1<<P_FLAG)) // get parity flag from SR
+    return 1;
+  else
+    return 0;
 }
 
 
@@ -191,7 +209,7 @@ uint16_t neo430_combine_bytes(uint8_t hi, uint8_t lo) {
 
 /* ------------------------------------------------------------
  * INFO Binary-coded decimal addition
- * WARNING MAKE SURE THE DADD UNIT IS SYNTHESIZED!!!
+ * WARNING MAKE SURE THE DADD UNIT IS SYNTHESIZED (package switch "use_dadd_cmd_c")!!!
  * PARAM 2x 16-bit BCD operands (4 digits)
  * RETURN 16-bit BCD result (4 digits)
  * ------------------------------------------------------------ */
