@@ -8,8 +8,8 @@ package neo430_application_image is
 
   type application_init_image_t is array (0 to 65535) of std_ulogic_vector(15 downto 0);
   constant application_init_image : application_init_image_t := (
-    000000 => x"4218",
-    000001 => x"fff8",
+    000000 => x"4038",
+    000001 => x"c000",
     000002 => x"4211",
     000003 => x"fffa",
     000004 => x"4302",

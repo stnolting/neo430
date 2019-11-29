@@ -19,18 +19,19 @@
 ; # You should have received a copy of the GNU Lesser General Public License along with this      #
 ; # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 ; # ********************************************************************************************* #
-; # Stephan Nolting, Hannover, Germany                                                 06.04.2019 #
+; # Stephan Nolting, Hannover, Germany                                                 27.11.2019 #
 ; #################################################################################################
 
   .file	"crt0.asm"
   .section .text
   .p2align 1,0
 
+
 __crt0_begin:
 ; -----------------------------------------------------------
 ; Get required system info
 ; -----------------------------------------------------------
-    mov  &0xFFF8, r8 ; = DMEM (RAM) base address
+    mov  #0xC000, r8 ; = DMEM (RAM) base address
     mov  &0xFFFA, r1 ; = DMEM (RAM) size in byte
 
 
