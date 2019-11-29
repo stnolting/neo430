@@ -5,13 +5,15 @@
 * [Differences to the Original MSP430 Processors](#Differences-to-the-Original-MSP430-Processors)
 * [Implementation Results](#Implementation-Results)
 * [Quick Start](#Quick-Start)
+* [Change Log](#Change-Log)
 * [Contact](#Contact)
 * [Disclaimer, Proprietary and Legal Notice](#Disclaimer-Proprietary-and-Legal-Notice)
 
 
+
 ## Introduction
 
-Welcome to the __NEO430 Processor__ project!
+Welcome to __[The NEO430 Processor](https://github.com/stnolting/neo430)__ project!
 
 You need a small but still powerful, customizable and microcontroller-like
 processor system for your next FPGA project? Then the NEO430 is the right
@@ -41,7 +43,8 @@ setup from this project, upload it to your FPGA board of choice (the NEO430 uses
 a FPGA vendor-independent VHDL description) and start exploring the capabilities of
 the NEO430 processor. Application program generation works by executing a single "make"
 command. Jump to the "Let’s Get It Started" chapter in the NEO430 documentary, which provides
-a lot of guides and tutorials to make your first NEO430 setup run: ![NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/figures/PDF_32.png)[NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/NEO430.pdf "NEO430 Datasheet from GitHub")
+a lot of guides and tutorials to make your first NEO430 setup run: [![NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/figures/PDF_32.png) NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/NEO430.pdf "NEO430 Datasheet from GitHub")
+
 
 
 ## Processor Features
@@ -52,70 +55,78 @@ a lot of guides and tutorials to make your first NEO430 setup run: ![NEO430 Data
 
 
 - 16-bit open source soft-core microcontroller-like processor system
+- Full support of the original [MSP430 instruction set architecture](https://raw.githubusercontent.com/stnolting/neo430/master/doc/instruction_set.pdf)
 - Code-efficient CISC-like instruction capabilities
-- Full support of the original MSP430 instruction set architecture
-- Tool chain based on free TI msp430-gcc compiler
-- Application compilation scripts for Windows Powershell / Windows Subsystem for Linux / native Linux
+- Tool chain based on free [TI msp430-gcc compiler](http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/index_FDS.html "TI `msp430-gcc` compiler")
+- Application compilation scripts ([makefiles](https://github.com/stnolting/neo430/blob/master/sw/example/blink_led/Makefile)) for Windows Powershell / Windows Subsystem for Linux / native Linux
 - Software requirements (regardless of platform):
-  - [TI `msp430-gcc` compiler](http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/index_FDS.html "TI `msp430-gcc` compiler")
-  - native C compiler (`GCC`)
+  - TI `msp430-gcc` compiler
+  - native `GCC` compiler
   - `GNU Make`
-- Completely described in behavioral, platform-independent VHDL
+- Completely described in behavioral, platform-independent VHDL (no macros, primitives, attributes, etc. used)
 - Fully synchronous design, no latches, no gated clocks
 - Very low resource requirements and high operating frequency
-- Internal DMEN (RAM, for data) and IMEM (RAM or ROM, for code), configurable sizes
+- Internal [DMEM](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_dmem.vhd) (RAM, for data) and [IMEM](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_imem.vhd) (RAM or ROM, for code), configurable sizes
 - One external interrupt line
 - Customizable processor hardware configuration:
-  - Optional multiplier/divider unit (MULDIV)
-  - Optional high-precision timer (TIMER)
-  - Optional universal asynchronous receiver and transmitter (UART)
-  - Optional serial peripheral interface (SPI)
-  - Optional I2C-compatible two wire serial interface (TWI) supporting clock stretching
-  - Optional general purpose parallel IO port (GPIO), 16 inputs & 16 outputs, with pin-change interrupt
-  - Optional 32-bit Wishbone bus interface adapter (WB32) - including bridges to Avalon(TM) bus and AXI4-Lite(TM)
-  - Optional watchdog timer (WDT)
-  - Optional cyclic redundancy check unit (CRC16/32)
-  - Optional custom functions unit (CFU) for user-defined processor extensions
-  - Optional 4 channel PWM controller with 1 to 8 bit resolution (PWM)
-  - Optional internal bootloader (2kB ROM) with serial user console and automatic boot from external SPI EEPROM
+  - Optional multiplier/divider unit ([MULDIV](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_muldiv.vhd))
+  - Optional high-precision timer ([TIMER](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_timer.vhd))
+  - Optional universal asynchronous receiver and transmitter ([UART](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_uart.vhd))
+  - Optional serial peripheral interface ([SPI](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_spi.vhd))
+  - Optional I2C-compatible two wire serial interface ([TWI](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_twi.vhd)) supporting clock stretching
+  - Optional general purpose parallel IO port ([GPIO](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_gpio.vhd)), 16 inputs & 16 outputs, with pin-change interrupt and PWM option
+  - Optional 32-bit Wishbone bus interface adapter ([WB32](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_wb_interface.vhd)) - including bridges to [Avalon (TM](https://github.com/stnolting/neo430/blob/master/rtl/top_templates/neo430_top_avm.vhd)) bus and [AXI4-Lite (TM](https://github.com/stnolting/neo430/blob/master/rtl/top_templates/neo430_top_axi4lite.vhd))
+  - Optional watchdog timer ([WDT](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_wdt.vhd))
+  - Optional cyclic redundancy check unit ([CRC16/32](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_crc.vhd))
+  - Optional custom functions unit ([CFU](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_cfu.vhd)) for user-defined processor extensions
+  - Optional 4 channel PWM controller with 1 to 8 bit resolution ([PWM](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_pwm.vhd))
+  - Optional Galois Ring Oscillator (GARO) based true random number generator ([TRNG](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_trng.vhd))
+  - Optional external interrupts controller with 8 independent channels ([EXIRQ](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_exirq.vhd))
+  - Optional internal [bootloader](https://github.com/stnolting/neo430/blob/master/sw/bootloader/bootloader.c) (2kB ROM) with serial user console and automatic boot from external SPI EEPROM
+
 
 
 ## Differences to the Original MSP430 Processors
 
 - Completely different processor modules with different functionality
 - Up to 48kB instruction memory and 12kB data memory
-- Specific memory map – provided NEO430 linker script and compilation script required
+- NEO430 tool chain (makefiles, boot-code and linker script) required for application compilation
 - Custom binary executable format
-- No default support of CPU's DADD instruction (btu can be enabled in package)
+- No hardware debugging interface
+- No analog components
+- No support of TI's Code Composer Studio
+- No default support of CPU's DADD instruction (but can be enabled in package)
 - Just 4 CPU interrupt channels
 - Single clock domain for complete processor
 - Different numbers of instruction execution cycles
 - Only one power-down (sleep) mode
 - Wishbone-compatible interface to attach custom IP
 - Internal bootloader with text interface (via UART serial port)
+- Extended ALU functions (if enabled)
+
 
 
 ## Implementation Results
 
-Mapping results generated for HW version 0x0303. The full (default) hardware configuration includes
-all optional processor modules (excluding the CFU and DADD instruction), an IMEM size of 4kB and a DMEM size of 2kB.
-The minimal configuration only includes the CPU and the GPIO module. Results generated with Xilinx Vivado 2017.3,
-Intel Quartus Prime Lite 17.1 and Lattice Radiant 1.0 (Synplify)
+Mapping results generated for HW version 0x0320. The full (default) hardware configuration includes
+all optional processor modules (excluding the CFU, the TRNG and the DADD instruction), an IMEM size of 4kB and a DMEM
+size of 2kB. The minimal configuration only includes the CPU and the GPIO module. Results generated with Xilinx Vivado 2017.3,
+Intel Quartus Prime Lite 17.1 and Lattice Radiant 1.1 (Synplify)
 
-| __Xilinx Artix-7 (XC7A35TICSG324-1L)__  | LUTs       | FFs        | BRAMs    | DSPs   | f_max*  |
-|:----------------------------------------|:----------:|:----------:|:--------:|:------:|:-------:|
-| Full (default) configuration:           | 941 (4.5%) | 960 (2.3%) | 2.5 (5%) | 0 (0%) | 100 MHz |
-| Minimal configuration (CPU + GPIO):     | 768 (3.6%) | 288 (0.7%) | 1   (2%) | 0 (0%) | 100 MHz |
+| __Xilinx Artix-7 (XC7A35TICSG324-1L)__  | LUTs       | FFs         | BRAMs    | DSPs   | f_max*  |
+|:----------------------------------------|:----------:|:-----------:|:--------:|:------:|:-------:|
+| Full (default) configuration:           | 983 (4.7%) | 1014 (2.5%) | 2.5 (5%) | 0 (0%) | 100 MHz |
+| Minimal configuration (CPU + GPIO):     | 685 (3.3%) | 290 (0.7%)  | 1 (2%)   | 0 (0%) | 100 MHz |
 
-| __Intel Cyclone IV (EP4CE22F17C6)__  | LUTs      | FFs      | Memory bits  | DSPs   | f_max     |
-|:-------------------------------------|:---------:|:--------:|:------------:|:------:|:---------:|
-| Full (default) configuration:        | 1603 (7%) | 928 (4%) | 65792 (11%)  | 0 (0%) | 119.6 MHz |
-| Minimal configuration (CPU + GPIO):  | 607  (3%) | 230 (1%) | 49408  (8%)  | 0 (0%) | 119.6 MHz |
+| __Intel Cyclone IV (EP4CE22F17C6)__  | LUTs      | FFs      | Memory bits | DSPs   | f_max   |
+|:-------------------------------------|:---------:|:--------:|:-----------:|:------:|:-------:|
+| Full (default) configuration:        | 1648 (7%) | 990 (4%) | 65800 (11%) | 0 (0%) | 122 MHz |
+| Minimal configuration (CPU + GPIO):  | 596 (3%)  | 233 (1%) | 49408 (8%)  | 0 (0%) | 126 MHz |
 
 | __Lattice iCE40 UltraPlus (iCE40UP5K-SG48I)__  | LUTs       | FFs        | EBRs     | DSPs   | SRAMs  | f_max* |
 |:-----------------------------------------------|:----------:|:----------:|:--------:|:------:|:------:|:------:|
-| Full (default) configuration:                  | 2833 (54%) | 1131 (21%) | 16 (53%) | 0 (0%) | 0 (0%) | 20 MHz |
-| Minimal configuration (CPU + GPIO):            | 1464 (28%) | 498   (9%) | 12 (40%) | 0 (0%) | 0 (0%) | 20 MHz |
+| Full (default) configuration:                  | 2600 (49%) | 1152 (21%) | 16 (53%) | 0 (0%) | 0 (0%) | 20 MHz |
+| Minimal configuration (CPU + GPIO):            | 1365 (25%) | 493 (9%)   | 12 (40%) | 0 (0%) | 0 (0%) | 20 MHz |
 
 *) Constrained
 
@@ -125,57 +136,67 @@ Intel Quartus Prime Lite 17.1 and Lattice Radiant 1.0 (Synplify)
 The following table shows the required resources for each module of the NEO430 processor system. Note that the provided
 numbers only represent a coarse overview as logic elements might be merged and optimized beyond module boundaries.
 
-Mapping results generated for HW version 0x0303. The full (default) hardware configuration includes all optional
-processor modules (excluding the CFU and DADD instruction), an IMEM size of 4kB and a DMEM size of 2kB. Results were generated
-using Intel Quartus Prime Lite 17.1.
+Mapping results generated for HW version 0x0320. The full (default) hardware configuration includes all optional
+processor modules (excluding the CFU and DADD instruction but including the TRNG), an IMEM size of 4kB and a DMEM size of
+2kB. Results were generated using Intel Quartus Prime Lite 17.1.
 
-| __Intel Cyclone IV (EP4CE22F17C6)__ | LUTs | FFs | Memory Bits | DSPs |
-|:------------------------------------|:----:|:---:|:------------|:----:|
-| Bootloader Memory (Boot ROM, 2kB)   | 2    | 1   | 16384       | 0    |
-| Central Processing Unit (CPU)       | 547  | 196 | 256         | 0    |
-| Checksum Unit (CRC)                 | 111  | 94  | 0           | 0    |
-| Custom Functions Unit (CFU)         | -    | -   | -           | -    |
-| Data Memory (DMEM, 2kB)             | 5    | 1   | 16384       | 0    |
-| IO Port Unit (GPIO)                 | 53   | 45  | 0           | 0    |
-| Instruction Memory (IMEM, 4kB)      | 6    | 1   | 32768       | 0    |
-| Multiplier & Divider (MULDIV)       | 186  | 131 | 0           | 0    |
-| Pulse-Width Modulation Unit (PWM)   | 80   | 67  | 0           | 0    |
-| Serial Peripheral Interface (SPI)   | 57   | 43  | 0           | 0    |
-| System Info Memory (SYSCONFIG)      | 16   | 14  | 0           | 0    |
-| High-Precision Timer (TIMER)        | 66   | 55  | 0           | 0    |
-| Two Wire Interface (TWI)            | 82   | 41  | 0           | 0    |
-| Universal Asynchronous Rx/Tx (UART) | 129  | 89  | 0           | 0    |
-| Wishbone Interface (WB32)           | 130  | 117 | 0           | 0    |
-| Watchdog TImer (WDT)                | 51   | 34  | 0           | 0    |
+| __Intel Cyclone IV (EP4CE22F17C6)__    | LUTs | FFs | Memory Bits | DSPs |
+|:---------------------------------------|:----:|:---:|:------------|:----:|
+| Bootloader Memory (Boot ROM, 2kB)      | 2    | 1   | 16384       | 0    |
+| Central Processing Unit (CPU)          | 506  | 171 | 256         | 0    |
+| Checksum Unit (CRC)                    | 110  | 94  | 0           | 0    |
+| Custom Functions Unit (CFU)            | -    | -   | -           | -    |
+| Data Memory (DMEM, 2kB)                | 6    | 1   | 16384       | 0    |
+| IO Port Unit (GPIO)                    | 49   | 45  | 0           | 0    |
+| Instruction Memory (IMEM, 4kB)         | 4    | 1   | 32768       | 0    |
+| Multiplier & Divider (MULDIV)          | 184  | 131 | 0           | 0    |
+| Pulse-Width Modulation Unit (PWM)      | 80   | 66  | 0           | 0    |
+| Serial Peripheral Interface (SPI)      | 57   | 43  | 0           | 0    |
+| System Info Memory (SYSCONFIG)         | 15   | 13  | 0           | 0    |
+| High-Precision Timer (TIMER)           | 70   | 55  | 0           | 0    |
+| True Random Number Generator (TRNG)    | 44   | 36  | 0           | 0    |
+| Two Wire Interface (TWI)               | 80   | 41  | 0           | 0    |
+| Universal Asynchronous Rx/Tx (UART)    | 129  | 89  | 0           | 0    |
+| Wishbone Interface (WB32)              | 128  | 117 | 0           | 0    |
+| External Interrupts Controller (EXIRQ) | 73   | 60  | 0           | 0    |
+| Watchdog TImer (WDT)                   | 49   | 36  | 0           | 0    |
+
 
 
 ## Quick Start
 
- * At first, make sure to get the most recent version of this project from GitHub:
+ * At first, get the most recent version the NEO430 Processor project from GitHub:
  
-    ~~~
-    git clone https://github.com/stnolting/neo430.git
-    ~~~
+   * Clone the NEO430 repository using `git` from the command line (suggested, as this allows easy project updates via `git pull`):
+ 
+     ~~~
+     git clone https://github.com/stnolting/neo430.git
+     ~~~
 
- * Next, install the `MSP430-GCC` compiler toolchain from the TI homepage (select the "compiler only" package according to your system OS):
+   * Or download the current version of this project as ZIP file: [neo430-master.zip](https://github.com/stnolting/neo430/archive/master.zip)
+
+ * Next, install the free `MSP430-GCC` compiler toolchain from the TI homepage (select the "compiler only" package according to your system OS):
 
    https://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/index_FDS.html
 
- * Make sure `GNU Make` and a native C compiler (`GCC`) are installed (double check for the newest versions)
+ * Make sure `GNU Make` and a native `GCC` compiler are installed (double check for the newest versions)
 
- * Follow the instructions from the "Let's Get It Started" section of the NEO430 documentary:
+ * Follow the instructions from the "Let's Get It Started" section of the NEO430 documentary: [![NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/figures/PDF_32.png) NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/NEO430.pdf "NEO430 Datasheet from GitHub")
 
-   ![NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/figures/PDF_32.png)[NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/NEO430.pdf "NEO430 Datasheet from GitHub")
-
- * The NEO430 documentary will guide you to create a simple test setup, which serves as "hello world" FPGA demo: 
+ * This documentary will guide you to create a simple test setup, which serves as ["hello word" FPGA demo](https://github.com/stnolting/neo430/blob/master/rtl/top_templates/neo430_test.vhd): 
 
 ![NEO430 Test Example Setup](https://raw.githubusercontent.com/stnolting/neo430/master/doc/figures/test_setup.jpg)
 
- * The NEO430 project also includes some example programs from which you can start your own application:
-
-   https://github.com/stnolting/neo430/tree/master/sw/example
+ * The NEO430 project also includes some example programs from which you can start your own application: [SW example projects](https://github.com/stnolting/neo430/tree/master/sw/example)
 
  * Have fun! =)
+
+
+
+## Change Log
+
+The official change log of this project can be found at the end of the [![NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/figures/PDF_32.png) NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/NEO430.pdf "NEO430 Datasheet from GitHub").
+
 
 
 ## Contact
@@ -186,11 +207,13 @@ Also, I'm always happy to hear what cool projects you are realizing with this co
   stnolting@gmail.com
 
 
+
 ## Citation
 
 If you are using the NEO430 for some kind of publication, please cite it as follows:
 
 > S. Nolting, "The NEO430 Processor", github.com/stnolting/neo430
+
 
 
 ## Disclaimer, Proprietary and Legal Notice
@@ -215,7 +238,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html
 
 
-"MSP430" is a trademark of Texas Instruments Corporation.
+"MSP430" and "Code Composer Studio" are trademarks of Texas Instruments Corporation.
 
 "Windows" is a trademark of Microsoft Corporation.
 
