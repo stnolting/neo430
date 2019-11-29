@@ -29,7 +29,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 15.11.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 29.11.2019 #
 // #################################################################################################
 
 // Libraries
@@ -67,7 +67,6 @@
 #define ERROR_EXECUTABLE 0x02 // invalid executable format
 #define ERROR_SIZE       0x04 // executable is too big
 #define ERROR_CHECKSUM   0x08 // checksum error
-#define ERROR_EEPWR      0xFF // EEPROM write error
 
 // Scratch registers - abuse unused IRQ vectors for this ;)
 #define TIMEOUT_CNT IRQVEC_GPIO
@@ -105,6 +104,9 @@ int main(void) {
   // clear status register and disable interrupts, clear interrupt buffer, enable write access to IMEM
   asm volatile ("mov %0, r2" : : "i" ((1<<R_FLAG) | (1<<Q_FLAG)));
 
+  // disable TRNG
+  TRNG_CT = 0;
+
   // disable Wishbone interface
   WB32_CT = 0;
 
@@ -113,6 +115,9 @@ int main(void) {
 
   // disable TWI
   TWI_CT = 0;
+
+  // disable EXIRQ
+  EXIRQ_CT = 0;
 
   // init timer interrupt vector
   IRQVEC_TIMER = (uint16_t)(&timer_irq_handler); // timer match
@@ -147,7 +152,9 @@ int main(void) {
   // ****************************************************************
   // Show bootloader intro and system information
   // ****************************************************************
-  neo430_uart_br_print("\n\nNEO430 Bootloader V20191115\nBy Stephan Nolting\n\n"
+  neo430_uart_br_print("\n\n<< NEO430 Bootloader >>\n"
+                       "\n"
+                       "BLV: "__DATE__"\n"
                        "HWV: 0x");
   neo430_uart_print_hex_word(HW_VERSION);
   neo430_uart_br_print("\nUSR: 0x");
@@ -207,6 +214,8 @@ int main(void) {
       get_image(EEPROM_IMAGE_SPI);
     else if (c == 's') // start program in RAM
       start_app();
+    else if (c == 'c')
+      neo430_uart_br_print("By Stephan Nolting");
     else // unknown command
       neo430_uart_br_print("Bad CMD!");
   }
@@ -496,14 +505,14 @@ uint16_t get_image_word(uint16_t a, uint8_t src) {
     c0 = (uint8_t)neo430_uart_getc();
     c1 = (uint8_t)neo430_uart_getc();
   }
-  else if (src == EEPROM_IMAGE_SPI) { // get image data from SPI EEPROM
+  else {// if (src == EEPROM_IMAGE_SPI) { // get image data from SPI EEPROM
     c0 = spi_eeprom_read_byte(a+0);
     c1 = spi_eeprom_read_byte(a+1);
   }
-  else { // if (src == EEPROM_IMAGE_TWI) // get image data from TWI EEPROM
-    //c0 = twi_eeprom_read_byte(a+0);
-    //c1 = twi_eeprom_read_byte(a+1);
-  }
+//else { // if (src == EEPROM_IMAGE_TWI) // get image data from TWI EEPROM
+//  //c0 = twi_eeprom_read_byte(a+0);
+//  //c1 = twi_eeprom_read_byte(a+1);
+//}
 
   //uint16_t r = (((uint16_t)c0) << 8) | (((uint16_t)c1) << 0);
   uint16_t r = neo430_combine_bytes(c0, c1);
