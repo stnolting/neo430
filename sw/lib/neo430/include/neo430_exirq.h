@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 29.11.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 05.12.2019 #
 // #################################################################################################
 
 #ifndef neo430_exirq_h
@@ -28,7 +28,6 @@
 // data types
 struct neo430_exirq_config_t {
   uint16_t address[8];
-  uint8_t  trigger;
   uint8_t  enable;
 };
 
@@ -39,6 +38,7 @@ static uint16_t neo430_exirq_vectors[8] __attribute__((unused)); // do not ouput
 void   neo430_exirq_enable(void);                                // activate EXIRQ controller
 void   neo430_exirq_disable(void);                               // deactivate EXIRQ controller
 void   neo430_exirq_config(struct neo430_exirq_config_t config); // configure EXIRQ controller
+void   neo430_exirq_sw_irq(uint8_t id);                          // trigger interrupt by software
 void __attribute__((__interrupt__)) exirq_irq_handler(void);     // EXIRQ IRQ handler
 
 #endif // neo430_exirq_h

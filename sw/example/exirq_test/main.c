@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 29.11.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 06.11.2019 #
 // #################################################################################################
 
 
@@ -34,6 +34,8 @@ void ext_irq_ch0_handler(void);
 void ext_irq_ch1_handler(void);
 void ext_irq_ch2_handler(void);
 void ext_irq_ch3_handler(void);
+
+void ext_irq_ch7_handler(void);
 
 
 /* ------------------------------------------------------------
@@ -53,11 +55,14 @@ int main(void) {
     return 1;
   }
 
+  neo430_uart_br_print("\nTrigger the external interrupt pin (set high) or perform a manual\n"
+                       "triggering (sw interrupt) by pressing key 0 to 7.\n");
+
   // clear output port
   neo430_gpio_port_set(0);
 
 
-  // use this struct for configuring the EXIRQ controller
+  // use this predefined struct for configuring the EXIRQ controller
   struct neo430_exirq_config_t exirq_config;
 
   // initialise handler addresses
@@ -68,22 +73,28 @@ int main(void) {
   exirq_config.address[4] = 0; // set unused vectors to zero
   exirq_config.address[5] = 0;
   exirq_config.address[6] = 0;
-  exirq_config.address[7] = 0;
+  exirq_config.address[7] = (uint16_t)(&ext_irq_ch7_handler);
 
-  // enable used IRQ channels
-  exirq_config.enable = 0b00001111;
+  // only enable the actually used IRQ channels
+  exirq_config.enable = 0b10001111;
 
-  // use rising edge as trigger for all channels
-  exirq_config.trigger = 1;
-
-  // send configuration and activate EXIRQ controller
+  // program configuration and activate EXIRQ controller
   neo430_exirq_config(exirq_config);
   neo430_exirq_enable();
 
-  // enable global interrupts and go to sleep
+  // enable global interrupts
   neo430_eint();
+
+  // trigger EXIRQ channel 0 IRQ by software just for fun
+  neo430_exirq_sw_irq(0);
+
+  // wait for key input
   while(1) {
-    neo430_sleep();
+    char c = neo430_uart_getc();
+    if ((c >= '0') && (c <= '7')) {
+      c = c - '0';
+      neo430_exirq_sw_irq((uint8_t)c); // trigger according IRQ by software
+    }
   }
 
   return 0;
@@ -92,7 +103,7 @@ int main(void) {
 
 // handler functions for the external interrupt channels:
 // - must not have parameters nor a return value
-// - must not use the interrupt attribute, as they are normal functions, called by an actual interrupt handler
+// - should not use the interrupt attribute, as they can be normal functions called by the actual interrupt handler
 
 void ext_irq_ch0_handler(void) {
 
@@ -115,5 +126,11 @@ void ext_irq_ch2_handler(void) {
 void ext_irq_ch3_handler(void) {
 
   neo430_gpio_pin_toggle(3);
+}
+
+
+void ext_irq_ch7_handler(void) {
+
+  neo430_gpio_pin_toggle(7);
 }
 

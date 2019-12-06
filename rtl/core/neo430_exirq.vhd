@@ -2,16 +2,16 @@
 -- #  << NEO430 - External Interrupts Controller >>                                                #
 -- # ********************************************************************************************* #
 -- # This unit provides 8 maskable external interrupt lines with according ACK lines. The IRQ      #
--- # can be globally set to trigger either on a high-level or on a rising edge. Each line has a    #
--- # unique enable bit. The acknowledge output is set high for one clock cycle to confirm the      #
--- # interrupt has been sampled and has also been cpatured by the handler function.                #
--- # All external interrupt requests are forwarded to a single CPU interrupt. The according        #
+-- # trigger on a high level (use external edge detectors if required). Each line has a unique     #
+-- # enable bit. The acknowledge output is set high for one clock cycle to confirm the             #
+-- # interrupt has been sampled and has also been cpatured by the according handler function.      #
+-- # All external interrupt requests are forwarded to a *single CPU interrupt*. The according IRQ  #
 -- # has to check the SRC bits in the unit's control register to determine the actual source and   #
 -- # start the according handler function.                                                         #
 -- # If several IRQs occur at the same time, the one with highest priority is executed while the   #
 -- # others are kept in a buffer. The buffer is reset when the global enable flag of the unit is   #
--- # cleared.                                                                                      #
--- # ext_irq_i(0) has highest priority while ext_irq_i(7) has the lowest priority.                 #
+-- # cleared. ext_irq_i(0) has highest priority while ext_irq_i(7) has the lowest priority.        #
+-- # Each enabled interrupt channel can also be triggered by software using the sw_irq_x bits.     #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -31,7 +31,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 29.11.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 06.12.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -61,20 +61,22 @@ end neo430_exirq;
 architecture neo430_exirq_rtl of neo430_exirq is
 
   -- control register bits --
-  constant ctrl_src0_c    : natural :=  0; -- r/-: IRQ source bit 0
-  constant ctrl_src1_c    : natural :=  1; -- r/-: IRQ source bit 1
-  constant ctrl_src2_c    : natural :=  2; -- r/-: IRQ source bit 2
-  constant ctrl_trig_c    : natural :=  3; -- r/w: global trigger (0: high-level, 1: rising-edge)
-  constant ctrl_en_c      : natural :=  4; -- r/w: unit enable
-  -- ...
-  constant ctrl_en_irq0_c : natural :=  8; -- r/w: IRQ 0 enable
-  constant ctrl_en_irq1_c : natural :=  9; -- r/w: IRQ 1 enable
-  constant ctrl_en_irq2_c : natural := 10; -- r/w: IRQ 2 enable
-  constant ctrl_en_irq3_c : natural := 11; -- r/w: IRQ 3 enable
-  constant ctrl_en_irq4_c : natural := 12; -- r/w: IRQ 4 enable
-  constant ctrl_en_irq5_c : natural := 13; -- r/w: IRQ 5 enable
-  constant ctrl_en_irq6_c : natural := 14; -- r/w: IRQ 6 enable
-  constant ctrl_en_irq7_c : natural := 15; -- r/w: IRQ 7 enable
+  constant ctrl_src0_c        : natural :=  0; -- r/-: IRQ source bit 0
+  constant ctrl_src1_c        : natural :=  1; -- r/-: IRQ source bit 1
+  constant ctrl_src2_c        : natural :=  2; -- r/-: IRQ source bit 2
+  constant ctrl_en_c          : natural :=  3; -- r/w: unit enable
+  constant ctrl_sw_irq_c      : natural :=  4; -- -/w: enable SW IRQ trigger, auto-clears
+  constant ctrl_sw_irq_sel0_c : natural :=  5; -- -/w: SW IRQ select bit 0
+  constant ctrl_sw_irq_sel1_c : natural :=  6; -- -/w: SW IRQ select bit 1
+  constant ctrl_sw_irq_sel2_c : natural :=  7; -- -/w: SW IRQ select bit 2
+  constant ctrl_en_irq0_c     : natural :=  8; -- r/w: IRQ channel 0 enable
+  constant ctrl_en_irq1_c     : natural :=  9; -- r/w: IRQ channel 1 enable
+  constant ctrl_en_irq2_c     : natural := 10; -- r/w: IRQ channel 2 enable
+  constant ctrl_en_irq3_c     : natural := 11; -- r/w: IRQ channel 3 enable
+  constant ctrl_en_irq4_c     : natural := 12; -- r/w: IRQ channel 4 enable
+  constant ctrl_en_irq5_c     : natural := 13; -- r/w: IRQ channel 5 enable
+  constant ctrl_en_irq6_c     : natural := 14; -- r/w: IRQ channel 6 enable
+  constant ctrl_en_irq7_c     : natural := 15; -- r/w: IRQ channel 7 enable
 
   -- IO space: module base address --
   constant hi_abb_c : natural := index_size_f(io_size_c)-1; -- high address boundary bit
@@ -87,11 +89,12 @@ architecture neo430_exirq_rtl of neo430_exirq is
 
   -- r/w accessible registers --
   signal irq_enable  : std_ulogic_vector(7 downto 0);
-  signal irq_trigger : std_ulogic;
   signal enable      : std_ulogic;
+  signal sw_trig     : std_ulogic;
+  signal sw_trig_src : std_ulogic_vector(2 downto 0);
 
   -- irq input / ack output system --
-  signal irq_sync0, irq_sync1, irq_sync2, irq_raw, irq_valid, ack_mask : std_ulogic_vector(7 downto 0);
+  signal irq_sync, irq_raw, sw_irq, irq_valid, ack_mask : std_ulogic_vector(7 downto 0);
 
   -- controller core --
   signal irq_buf              : std_ulogic_vector(7 downto 0);
@@ -112,33 +115,47 @@ begin
   wr_access: process(clk_i)
   begin
     if rising_edge(clk_i) then
+      sw_trig <= '0';
       if (wren = '1') then
-        irq_trigger <= data_i(ctrl_trig_c);
-        enable      <= data_i(ctrl_en_c);
-        irq_enable  <= data_i(ctrl_en_irq7_c downto ctrl_en_irq0_c);
+        enable     <= data_i(ctrl_en_c);
+        irq_enable <= data_i(ctrl_en_irq7_c downto ctrl_en_irq0_c);
+        -- software irq trigger --
+        sw_trig     <= data_i(ctrl_sw_irq_c);
+        sw_trig_src <= data_i(ctrl_sw_irq_sel2_c downto ctrl_sw_irq_sel0_c);
       end if;
     end if;
   end process wr_access;
 
 
-  -- Get external interrupt request --------------------------------------------
+  -- Get external/software interrupt request ----------------------------------
   -- -----------------------------------------------------------------------------
-  exirq_sync: process(clk_i)
+  ext_irq_source_sync: process(clk_i)
   begin
     if rising_edge(clk_i) then
-      -- no metastability! --
-      irq_sync0 <= ext_irq_i;
-      irq_sync1 <= irq_sync0;
-      -- sample again for edge detection --
-      irq_sync2 <= irq_sync1;
+      irq_sync <= ext_irq_i;
+      irq_raw  <= irq_sync; -- sync to avoid metastability
     end if;
-  end process exirq_sync;
+  end process ext_irq_source_sync;
 
-  -- rising-edge or high-level detector --
-  irq_raw <= (irq_sync1 and (not irq_sync2)) when (irq_trigger = '1') else irq_sync1;
+  sw_irq_source: process(sw_trig, sw_trig_src)
+    variable sw_irq_v : std_ulogic_vector(3 downto 0);
+  begin
+    sw_irq_v := sw_trig & sw_trig_src;
+    case sw_irq_v is
+      when "1000" => sw_irq <= "00000001";
+      when "1001" => sw_irq <= "00000010";
+      when "1010" => sw_irq <= "00000100";
+      when "1011" => sw_irq <= "00001000";
+      when "1100" => sw_irq <= "00010000";
+      when "1101" => sw_irq <= "00100000";
+      when "1110" => sw_irq <= "01000000";
+      when "1111" => sw_irq <= "10000000";
+      when others => sw_irq <= "00000000";
+    end case;
+  end process sw_irq_source;
 
   -- only pass enabled interrupt sources --
-  irq_valid <= irq_raw and irq_enable;
+  irq_valid <= (irq_raw or sw_irq) and irq_enable;
 
 
   -- IRQ controller core ------------------------------------------------------
@@ -191,18 +208,20 @@ begin
 
   -- ACK priority decoder -----------------------------------------------------
   -- -----------------------------------------------------------------------------
-  ack_priority_dec: process(irq_src_reg)
+  ack_priority_dec: process(state, irq_src_reg)
+    variable irq_src_v : std_ulogic_vector(3 downto 0);
   begin
-    case irq_src_reg is
-      when "000"  => ack_mask <= "00000001";
-      when "001"  => ack_mask <= "00000010";
-      when "010"  => ack_mask <= "00000100";
-      when "011"  => ack_mask <= "00001000";
-      when "100"  => ack_mask <= "00010000";
-      when "101"  => ack_mask <= "00100000";
-      when "110"  => ack_mask <= "01000000";
-      when "111"  => ack_mask <= "10000000";
-      when others => ack_mask <= "--------";
+    irq_src_v := state & irq_src_reg;
+    case irq_src_v is
+      when "1000" => ack_mask <= "00000001";
+      when "1001" => ack_mask <= "00000010";
+      when "1010" => ack_mask <= "00000100";
+      when "1011" => ack_mask <= "00001000";
+      when "1100" => ack_mask <= "00010000";
+      when "1101" => ack_mask <= "00100000";
+      when "1110" => ack_mask <= "01000000";
+      when "1111" => ack_mask <= "10000000";
+      when others => ack_mask <= "00000000";
     end case;
   end process ack_priority_dec;
 
@@ -216,7 +235,6 @@ begin
       if (rden = '1') then
         data_o(ctrl_src2_c downto ctrl_src0_c) <= irq_src_reg;
         data_o(ctrl_en_irq7_c downto ctrl_en_irq0_c) <= irq_enable;
-        data_o(ctrl_trig_c) <= irq_trigger;
         data_o(ctrl_en_c) <= enable;
       end if;
     end if;

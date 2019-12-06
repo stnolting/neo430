@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 28.11.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 06.12.2019 #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -355,20 +355,22 @@
 #define EXIRQ_CT (*(REG16 0xFFEE)) // r/w: control register
 
 // EXIRQ control register
-#define EXIRQ_CT_SRC0     0 // r/-: IRQ source bit 0
-#define EXIRQ_CT_SRC1     1 // r/-: IRQ source bit 1
-#define EXIRQ_CT_SRC2     2 // r/-: IRQ source bit 2
-#define EXIRQ_CT_TRIG     3 // r/w: global trigger (0: high-level, 1: rising-edge)
-#define EXIRQ_CT_EN       4 // r/w: unit enable
-
-#define EXIRQ_CT_IRQ0_EN  8 // r/w: Enable IRQ channel 0
-#define EXIRQ_CT_IRQ1_EN  9 // r/w: Enable IRQ channel 1
-#define EXIRQ_CT_IRQ2_EN 10 // r/w: Enable IRQ channel 2
-#define EXIRQ_CT_IRQ3_EN 11 // r/w: Enable IRQ channel 3
-#define EXIRQ_CT_IRQ4_EN 12 // r/w: Enable IRQ channel 4
-#define EXIRQ_CT_IRQ5_EN 13 // r/w: Enable IRQ channel 5
-#define EXIRQ_CT_IRQ6_EN 14 // r/w: Enable IRQ channel 6
-#define EXIRQ_CT_IRQ7_EN 15 // r/w: Enable IRQ channel 7
+#define EXIRQ_CT_SRC0         0 // r/-: IRQ source bit 0
+#define EXIRQ_CT_SRC1         1 // r/-: IRQ source bit 1
+#define EXIRQ_CT_SRC2         2 // r/-: IRQ source bit 2
+#define EXIRQ_CT_EN           3 // r/w: unit enable
+#define EXIRQ_CT_SW_IRQ       4 // -/w: enable SW IRQ trigger, auto-clears
+#define EXIRQ_CT_SW_IRQ_SEL0  5 // -/w: SW IRQ select bit 0, read as zero
+#define EXIRQ_CT_SW_IRQ_SEL1  6 // -/w: SW IRQ select bit 1, read as zero
+#define EXIRQ_CT_SW_IRQ_SEL2  7 // -/w: SW IRQ select bit 2, read as zero
+#define EXIRQ_CT_IRQ0_EN      8 // r/w: Enable IRQ channel 0
+#define EXIRQ_CT_IRQ1_EN      9 // r/w: Enable IRQ channel 1
+#define EXIRQ_CT_IRQ2_EN     10 // r/w: Enable IRQ channel 2
+#define EXIRQ_CT_IRQ3_EN     11 // r/w: Enable IRQ channel 3
+#define EXIRQ_CT_IRQ4_EN     12 // r/w: Enable IRQ channel 4
+#define EXIRQ_CT_IRQ5_EN     13 // r/w: Enable IRQ channel 5
+#define EXIRQ_CT_IRQ6_EN     14 // r/w: Enable IRQ channel 6
+#define EXIRQ_CT_IRQ7_EN     15 // r/w: Enable IRQ channel 7
 
 
 // ----------------------------------------------------------------------------

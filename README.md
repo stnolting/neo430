@@ -81,7 +81,7 @@ a lot of guides and tutorials to make your first NEO430 setup run: [![NEO430 Dat
   - Optional custom functions unit ([CFU](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_cfu.vhd)) for user-defined processor extensions
   - Optional 4 channel PWM controller with 1 to 8 bit resolution ([PWM](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_pwm.vhd))
   - Optional Galois Ring Oscillator (GARO) based true random number generator ([TRNG](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_trng.vhd))
-  - Optional external interrupts controller with 8 independent channels ([EXIRQ](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_exirq.vhd))
+  - Optional external interrupts controller with 8 independent channels ([EXIRQ](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_exirq.vhd)), can also be used for software-triggered interrupts (traps, breakpoints, etc.)
   - Optional internal [bootloader](https://github.com/stnolting/neo430/blob/master/sw/bootloader/bootloader.c) (2kB ROM) with serial user console and automatic boot from external SPI EEPROM
 
 
@@ -158,7 +158,7 @@ processor modules (excluding the CFU and DADD instruction but including the TRNG
 | Two Wire Interface (TWI)               | 80   | 41  | 0           | 0    |
 | Universal Asynchronous Rx/Tx (UART)    | 129  | 89  | 0           | 0    |
 | Wishbone Interface (WB32)              | 128  | 117 | 0           | 0    |
-| External Interrupts Controller (EXIRQ) | 73   | 60  | 0           | 0    |
+| External Interrupts Controller (EXIRQ) | 72   | 54  | 0           | 0    |
 | Watchdog TImer (WDT)                   | 49   | 36  | 0           | 0    |
 
 

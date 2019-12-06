@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 28.11.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 05.12.2019 #
 // #################################################################################################
 
 #include "neo430.h"
@@ -63,23 +63,35 @@ void neo430_exirq_config(struct neo430_exirq_config_t config) {
   neo430_exirq_vectors[6] = config.address[6];
   neo430_exirq_vectors[7] = config.address[7];
 
-  // set correct CPU external IRQ interrupt handler address
+  // set correct CPU external interrupts request handler address
   IRQVEC_EXT = (uint16_t)(&exirq_irq_handler);
 
-  // configure channel enables and global trigger
-  uint16_t trig = (uint16_t)config.trigger;
-  uint16_t ena  = (uint16_t)config.enable;
+  // configure channel enables
+  uint16_t enable = (uint16_t)config.enable;
+  EXIRQ_CT = (enable<<EXIRQ_CT_IRQ0_EN);
+}
 
-  EXIRQ_CT = (ena<<EXIRQ_CT_IRQ0_EN) | (trig<<EXIRQ_CT_TRIG) ;
+
+/* ------------------------------------------------------------
+ * INFO Trigger IRQ channel by software
+ * PARAM id (0..7) indicating which (ENABLED!) channel shall be triggered
+ * ------------------------------------------------------------ */
+void neo430_exirq_sw_irq(uint8_t id) {
+
+  uint16_t irq_sel = (uint16_t)(id & 7);
+
+  // apply sw irq enable bit and according irq select
+  EXIRQ_CT |= (1<<EXIRQ_CT_SW_IRQ) | (irq_sel<<EXIRQ_CT_SW_IRQ_SEL0);
 }
 
 
 /* ------------------------------------------------------------
  * INFO Actual external interrupts controller IRQ handler
+ * INFO This function is automatically installed
  * ------------------------------------------------------------ */
 void __attribute__((__interrupt__)) exirq_irq_handler(void) {
 
-  uint16_t src = EXIRQ_CT & ((8-1)<<EXIRQ_CT_SRC0);
-  neo430_call_address(neo430_exirq_vectors[src]);
+  uint16_t src = EXIRQ_CT & (7<<EXIRQ_CT_SRC0); // get IRQ source
+  neo430_call_address(neo430_exirq_vectors[src]); // call according handler
 }
 

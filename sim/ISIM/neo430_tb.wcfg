@@ -12,15 +12,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="19996391666667fs"></ZoomStartTime>
-      <ZoomEndTime time="20018191666668fs"></ZoomEndTime>
-      <Cursor1Time time="20000025000000fs"></Cursor1Time>
+      <ZoomStartTime time="1434752233333fs"></ZoomStartTime>
+      <ZoomEndTime time="1434861633334fs"></ZoomEndTime>
+      <Cursor1Time time="1430885000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="167"></NameColumnWidth>
-      <ValueColumnWidth column_width="65"></ValueColumnWidth>
+      <ValueColumnWidth column_width="61"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="132" />
+   <WVObjectSize size="135" />
    <wvobject type="divider" fp_name="divider6">
       <obj_property name="label">Global</obj_property>
       <obj_property name="DisplayName">label</obj_property>
@@ -267,7 +267,6 @@
    <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_gpio_inst_true/neo430_gpio_inst/gpio_o" type="array">
       <obj_property name="ElementShortName">gpio_o[15:0]</obj_property>
       <obj_property name="ObjectShortName">gpio_o[15:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_gpio_inst_true/neo430_gpio_inst/gpio_i" type="array">
       <obj_property name="ElementShortName">gpio_i[15:0]</obj_property>
@@ -532,10 +531,6 @@
       <obj_property name="ElementShortName">enable</obj_property>
       <obj_property name="ObjectShortName">enable</obj_property>
    </wvobject>
-   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_exirq_inst_true/neo430_exirq_inst/irq_trigger" type="logic">
-      <obj_property name="ElementShortName">irq_trigger</obj_property>
-      <obj_property name="ObjectShortName">irq_trigger</obj_property>
-   </wvobject>
    <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_exirq_inst_true/neo430_exirq_inst/state" type="logic">
       <obj_property name="ElementShortName">state</obj_property>
       <obj_property name="ObjectShortName">state</obj_property>
@@ -548,6 +543,10 @@
       <obj_property name="ElementShortName">irq_enable[7:0]</obj_property>
       <obj_property name="ObjectShortName">irq_enable[7:0]</obj_property>
    </wvobject>
+   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_exirq_inst_true/neo430_exirq_inst/ack_mask" type="array">
+      <obj_property name="ElementShortName">ack_mask[7:0]</obj_property>
+      <obj_property name="ObjectShortName">ack_mask[7:0]</obj_property>
+   </wvobject>
    <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_exirq_inst_true/neo430_exirq_inst/irq_valid" type="array">
       <obj_property name="ElementShortName">irq_valid[7:0]</obj_property>
       <obj_property name="ObjectShortName">irq_valid[7:0]</obj_property>
@@ -559,6 +558,18 @@
    <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_exirq_inst_true/neo430_exirq_inst/irq_src_reg" type="array">
       <obj_property name="ElementShortName">irq_src_reg[2:0]</obj_property>
       <obj_property name="ObjectShortName">irq_src_reg[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_exirq_inst_true/neo430_exirq_inst/sw_trig" type="logic">
+      <obj_property name="ElementShortName">sw_trig</obj_property>
+      <obj_property name="ObjectShortName">sw_trig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_exirq_inst_true/neo430_exirq_inst/sw_trig_src" type="array">
+      <obj_property name="ElementShortName">sw_trig_src[2:0]</obj_property>
+      <obj_property name="ObjectShortName">sw_trig_src[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_exirq_inst_true/neo430_exirq_inst/sw_irq" type="array">
+      <obj_property name="ElementShortName">sw_irq[7:0]</obj_property>
+      <obj_property name="ObjectShortName">sw_irq[7:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/neo430_tb/neo430_top_inst/neo430_exirq_inst_true/neo430_exirq_inst/cpu_irq_o" type="logic">
       <obj_property name="ElementShortName">cpu_irq_o</obj_property>
