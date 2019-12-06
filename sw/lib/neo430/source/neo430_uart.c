@@ -193,7 +193,7 @@ void neo430_uart_print_hex_char(char c) {
   if (d < 10)
     d += '0';
   else
-    d += 'A'-10;
+    d += 'a'-10;
   neo430_uart_putc(d);
 }
 
