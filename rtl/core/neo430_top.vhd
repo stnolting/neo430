@@ -46,7 +46,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 29.11.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 09.12.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -234,18 +234,18 @@ begin
     end if;
   end process clock_generator_buf;
 
-  -- clock enable select - edge detectors --
-  clk_gen(clk_div2_c)    <= clk_div_ff(0)  and (not clk_div(0));  -- CLK/2
-  clk_gen(clk_div4_c)    <= clk_div_ff(1)  and (not clk_div(1));  -- CLK/4
-  clk_gen(clk_div8_c)    <= clk_div_ff(2)  and (not clk_div(2));  -- CLK/8
-  clk_gen(clk_div64_c)   <= clk_div_ff(5)  and (not clk_div(5));  -- CLK/64
-  clk_gen(clk_div128_c)  <= clk_div_ff(6)  and (not clk_div(6));  -- CLK/128
-  clk_gen(clk_div1024_c) <= clk_div_ff(9)  and (not clk_div(9));  -- CLK/1024
-  clk_gen(clk_div2048_c) <= clk_div_ff(10) and (not clk_div(10)); -- CLK/2048
-  clk_gen(clk_div4096_c) <= clk_div_ff(11) and (not clk_div(11)); -- CLK/4096
+  -- clock enable select - rising edge detectors --
+  clk_gen(clk_div2_c)    <= clk_div(0)  and (not clk_div_ff(0));  -- CLK/2
+  clk_gen(clk_div4_c)    <= clk_div(1)  and (not clk_div_ff(1));  -- CLK/4
+  clk_gen(clk_div8_c)    <= clk_div(2)  and (not clk_div_ff(2));  -- CLK/8
+  clk_gen(clk_div64_c)   <= clk_div(5)  and (not clk_div_ff(5));  -- CLK/64
+  clk_gen(clk_div128_c)  <= clk_div(6)  and (not clk_div_ff(6));  -- CLK/128
+  clk_gen(clk_div1024_c) <= clk_div(9)  and (not clk_div_ff(9));  -- CLK/1024
+  clk_gen(clk_div2048_c) <= clk_div(10) and (not clk_div_ff(10)); -- CLK/2048
+  clk_gen(clk_div4096_c) <= clk_div(11) and (not clk_div_ff(11)); -- CLK/4096
 
 
-  -- CPU ----------------------------------------------------------------------
+  -- The core of the problem: The CPU -----------------------------------------
   -- -----------------------------------------------------------------------------
   neo430_cpu_inst: neo430_cpu
   generic map (
@@ -274,11 +274,11 @@ begin
                    timer_rdata or wdt_rdata or sysconfig_rdata or crc_rdata or
                    cfu_rdata or pwm_rdata or twi_rdata or trng_rdata or exirq_rdata;
 
-  -- interrupt priority assignment --
-  irq(0) <= timer_irq; -- timer match (highest priority)
+  -- interrupts: priority assignment --
+  irq(0) <= timer_irq;                      -- timer match (highest priority)
   irq(1) <= uart_irq or spi_irq or twi_irq; -- serial IRQ
-  irq(2) <= gpio_irq;  -- GPIO input pin change
-  irq(3) <= ext_irq; -- external interrupt request (lowest priority)
+  irq(2) <= gpio_irq;                       -- GPIO input pin change
+  irq(3) <= ext_irq;                        -- external interrupt request (lowest priority)
 
 
   -- Main Memory (ROM/IMEM & RAM/DMEM) ----------------------------------------
@@ -336,7 +336,7 @@ begin
   -- -----------------------------------------------------------------------------
   io_acc   <= '1' when (cpu_bus.addr(15 downto index_size_f(io_size_c)) = io_base_c(15 downto index_size_f(io_size_c))) else '0';
   io_rd_en <= cpu_bus.rd_en and io_acc;
-  io_wr_en <= (cpu_bus.wr_en(0) or cpu_bus.wr_en(1)) and io_acc;
+  io_wr_en <= (cpu_bus.wr_en(0) or cpu_bus.wr_en(1)) and io_acc; -- use all accesses as full-word accesses
 
 
   -- Multiplier/Divider Unit (MULDIV) -----------------------------------------
@@ -558,7 +558,7 @@ begin
   end generate;
 
 
-  -- CRC Module (CRC) ---------------------------------------------------------
+  -- Checksum Module (CRC) ----------------------------------------------------
   -- -----------------------------------------------------------------------------
   neo430_crc_inst_true:
   if (CRC_USE = true) generate
@@ -752,7 +752,7 @@ begin
     TWI_USE     => TWI_USE,         -- implement TWI?
     SPI_USE     => SPI_USE,         -- implement SPI?
     TRNG_USE    => TRNG_USE,        -- implement TRNG?
-    EXIRQ_USE   => EXIRQ_USE,       -- implement EXIRQ? (default=true)
+    EXIRQ_USE   => EXIRQ_USE,       -- implement EXIRQ?
     -- boot configuration --
     BOOTLD_USE  => BOOTLD_USE,      -- implement and use bootloader?
     IMEM_AS_ROM => IMEM_AS_ROM      -- implement IMEM as read-only memory?
