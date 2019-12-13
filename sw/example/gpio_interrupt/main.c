@@ -2,7 +2,6 @@
 // #  < GPIO interrupt example program >                                                           #
 // # ********************************************************************************************* #
 // # Prints a message whenever a GPIO input pin goes HIGH. Uses the PIO pin-change interrupt.      #
-// # Also outputs a counter on GPIO.OUT[7:0], driven by the timer interrupt.                       #
 // # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 // # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -22,7 +21,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 06.04.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 10.12.2019 #
 // #################################################################################################
 
 
@@ -48,13 +47,9 @@ int main(void) {
   // intro text
   neo430_uart_br_print("\nGPIO pin change interrupt demo program\n\n");
 
-  // check if GPIO & TIMER units present
+  // check if GPIO present
   if (!(SYS_FEATURES & (1<<SYS_GPIO_EN))) {
     neo430_uart_br_print("Error! No GPIO unit synthesized!");
-    return 1;
-  }
-  if (!(SYS_FEATURES & (1<<SYS_TIMER_EN))) {
-    neo430_uart_br_print("Error! No TIMER unit synthesized!");
     return 1;
   }
 

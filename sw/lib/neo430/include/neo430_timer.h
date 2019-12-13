@@ -19,16 +19,18 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 13.11.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 10.12.2019 #
 // #################################################################################################
 
 #ifndef neo430_timer_h
 #define neo430_timer_h
 
 // prototypes
-void    neo430_timer_enable(void);
-void    neo430_timer_disable(void);
-void    neo430_timer_reset(void);
-uint8_t neo430_timer_config_period(uint32_t f_timer);
+void    neo430_timer_enable(void);                    // enable timer unit
+void    neo430_timer_disable(void);                   // disable timer unit
+void    neo430_timer_reset(void);                     // reset timer
+void    neo430_timer_start(void);                     // start timer
+void    neo430_timer_stop(void);                      // stop timer
+uint8_t neo430_timer_config_period(uint32_t f_timer); // configure (irq) frequency
 
 #endif // neo430_timer_h

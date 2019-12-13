@@ -29,7 +29,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 29.11.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 10.12.2019 #
 // #################################################################################################
 
 // Libraries
@@ -141,8 +141,8 @@ int main(void) {
   TMR_CT = 0; // reset timer
   //uint32_t clock = CLOCKSPEED_32bit >> 14; // divide by 4096
   TMR_THRES = (CLOCKSPEED_HI << 2) -1; // "fake" ;D
-  // enable timer, auto reset, enable IRQ, prsc = 1:2^16
-  TMR_CT = (1<<TMR_CT_EN) | (1<<TMR_CT_ARST) | (1<<TMR_CT_IRQ) | ((16-1)<<TMR_CT_PRSC0);
+  // enable timer, auto reset, enable IRQ, prsc = 1:2^16, start timer
+  TMR_CT = (1<<TMR_CT_EN) | (1<<TMR_CT_ARST) | (1<<TMR_CT_IRQ) | ((16-1)<<TMR_CT_PRSC0) | (1<<TMR_CT_RUN);
   TIMEOUT_CNT = 0; // console timeout ticker
 
   neo430_clear_irq_buffer(); // clear all pending interrupts

@@ -69,7 +69,7 @@ int main(void) {
   if (neo430_timer_config_period(BLINK_FREQ))
     neo430_uart_br_print("Invalid TIMER frequency!\n");
 
-  TMR_CT |= (1<<TMR_CT_EN) | (1<<TMR_CT_ARST) | (1<<TMR_CT_IRQ); // enable timer, auto-reset, irq enabled
+  TMR_CT |= (1<<TMR_CT_EN) | (1<<TMR_CT_ARST) | (1<<TMR_CT_IRQ) | (1<<TMR_CT_RUN); // enable timer, auto-reset, irq enabled, timer start
 
   // enable global IRQs
   neo430_eint();

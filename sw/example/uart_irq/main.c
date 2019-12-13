@@ -22,7 +22,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 13.11.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 10.12.2019 #
 // #################################################################################################
 
 
@@ -89,6 +89,7 @@ int main(void) {
   TMR_CT = (1<<TMR_CT_EN)   | // enable timer
            (1<<TMR_CT_ARST) | // auto reset on threshold match
            (1<<TMR_CT_IRQ)  | // enable IRQ
+           (1<<TMR_CT_RUN)  | // make timer run
            (TMR_PRSC_4096<<TMR_CT_PRSC0);
 
 

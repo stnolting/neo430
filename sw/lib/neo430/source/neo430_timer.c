@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 14.11.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 10.12.2019 #
 // #################################################################################################
 
 #include "neo430.h"
@@ -51,6 +51,24 @@ void neo430_timer_reset(void) {
 
   neo430_timer_disable();
   neo430_timer_enable();
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Start Timer
+ * ------------------------------------------------------------ */
+void neo430_timer_start(void) {
+
+  TMR_CT |= (1<<TMR_CT_RUN);
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Stop Timer
+ * ------------------------------------------------------------ */
+void neo430_timer_stop(void) {
+
+  TMR_CT &= ~(1<<TMR_CT_RUN);
 }
 
 

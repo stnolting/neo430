@@ -24,7 +24,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  tephan Nolting, Hannover, Germany                                                 28.04.2019 #
+-- #  tephan Nolting, Hannover, Germany                                                 10.12.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -61,9 +61,10 @@ architecture neo430_timer_rtl of neo430_timer is
   constant ctrl_en_bit_c     : natural := 0; -- r/w: timer enable
   constant ctrl_arst_bit_c   : natural := 1; -- r/w: auto reset on match
   constant ctrl_irq_en_bit_c : natural := 2; -- r/w: interrupt enable
-  constant ctrl_prsc0_bit_c  : natural := 3; -- r/w: prescaler select bit 0
-  constant ctrl_prsc1_bit_c  : natural := 4; -- r/w: prescaler select bit 1
-  constant ctrl_prsc2_bit_c  : natural := 5; -- r/w: prescaler select bit 2
+  constant ctrl_run_c        : natural := 3; -- r/w: start/stop timer
+  constant ctrl_prsc0_bit_c  : natural := 4; -- r/w: prescaler select bit 0
+  constant ctrl_prsc1_bit_c  : natural := 5; -- r/w: prescaler select bit 1
+  constant ctrl_prsc2_bit_c  : natural := 6; -- r/w: prescaler select bit 2
 
   -- access control --
   signal acc_en : std_ulogic; -- module access enable
@@ -73,7 +74,7 @@ architecture neo430_timer_rtl of neo430_timer is
   -- timer regs --
   signal cnt   : std_ulogic_vector(15 downto 0); -- r/-: counter register
   signal thres : std_ulogic_vector(15 downto 0); -- r/w: threshold register 
-  signal ctrl  : std_ulogic_vector(05 downto 0); -- r/w: control register 
+  signal ctrl  : std_ulogic_vector(06 downto 0); -- r/w: control register 
 
   -- prescaler clock generator --
   signal prsc_tick : std_ulogic;
@@ -105,6 +106,7 @@ begin
           ctrl(ctrl_en_bit_c)     <= data_i(ctrl_en_bit_c);
           ctrl(ctrl_arst_bit_c)   <= data_i(ctrl_arst_bit_c);
           ctrl(ctrl_irq_en_bit_c) <= data_i(ctrl_irq_en_bit_c);
+          ctrl(ctrl_run_c)        <= data_i(ctrl_run_c);
           ctrl(ctrl_prsc0_bit_c)  <= data_i(ctrl_prsc0_bit_c);
           ctrl(ctrl_prsc1_bit_c)  <= data_i(ctrl_prsc1_bit_c);
           ctrl(ctrl_prsc2_bit_c)  <= data_i(ctrl_prsc2_bit_c);
@@ -130,10 +132,12 @@ begin
       -- counter update --
       if (ctrl(ctrl_en_bit_c) = '0') then -- timer disabled
         cnt <= (others => '0');
-      elsif (match = '1') and (ctrl(ctrl_arst_bit_c) = '1') then -- threshold match and auto reset?
-        cnt <= (others => '0');
-      elsif (match = '0') and (prsc_tick = '1') then -- count++
-        cnt <= std_ulogic_vector(unsigned(cnt) + 1);
+      elsif (ctrl(ctrl_run_c) = '1') then -- timer enabled, but is it started?
+        if (match = '1') and (ctrl(ctrl_arst_bit_c) = '1') then -- threshold match and auto reset?
+          cnt <= (others => '0');
+        elsif (match = '0') and (prsc_tick = '1') then -- count++
+          cnt <= std_ulogic_vector(unsigned(cnt) + 1);
+        end if;
       end if;
     end if;
   end process counter_update;
@@ -159,6 +163,7 @@ begin
           data_o(ctrl_en_bit_c)     <= ctrl(ctrl_en_bit_c);
           data_o(ctrl_arst_bit_c)   <= ctrl(ctrl_arst_bit_c);
           data_o(ctrl_irq_en_bit_c) <= ctrl(ctrl_irq_en_bit_c);
+          data_o(ctrl_run_c)        <= ctrl(ctrl_run_c);
           data_o(ctrl_prsc0_bit_c)  <= ctrl(ctrl_prsc0_bit_c);
           data_o(ctrl_prsc1_bit_c)  <= ctrl(ctrl_prsc1_bit_c);
           data_o(ctrl_prsc2_bit_c)  <= ctrl(ctrl_prsc2_bit_c);

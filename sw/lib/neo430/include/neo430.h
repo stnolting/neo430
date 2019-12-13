@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 06.12.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 10.12.2019 #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -207,9 +207,10 @@
 #define TMR_CT_EN    0 // r/w: timer enable
 #define TMR_CT_ARST  1 // r/w: auto reset on match
 #define TMR_CT_IRQ   2 // r/w: interrupt enable
-#define TMR_CT_PRSC0 3 // r/w: clock prescaler select bit 0
-#define TMR_CT_PRSC1 4 // r/w: clock prescaler select bit 1
-#define TMR_CT_PRSC2 5 // r/w: clock prescaler select bit 2
+#define TMR_CT_RUN   3 // r/w: start/stop timer
+#define TMR_CT_PRSC0 4 // r/w: clock prescaler select bit 0
+#define TMR_CT_PRSC1 5 // r/w: clock prescaler select bit 1
+#define TMR_CT_PRSC2 6 // r/w: clock prescaler select bit 2
 
 // Timer clock prescaler select:
 #define TMR_PRSC_2    0 // CLK/2

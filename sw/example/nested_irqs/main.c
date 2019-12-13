@@ -22,7 +22,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 14.11.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 10.12.2019 #
 // #################################################################################################
 
 
@@ -77,7 +77,7 @@ int main(void) {
     neo430_uart_br_print("Invalid TIMER frequency!\n");
 
   neo430_printf("THR: %x, CTR: %x\n", TMR_THRES, TMR_CT);
-  TMR_CT |= (1<<TMR_CT_EN) | (1<<TMR_CT_ARST) | (1<<TMR_CT_IRQ); // enable timer, auto-reset, irq enabled
+  TMR_CT |= (1<<TMR_CT_EN) | (1<<TMR_CT_ARST) | (1<<TMR_CT_IRQ) | (1<<TMR_CT_RUN); // enable timer, auto-reset, irq enabled, start timer
   neo430_printf("THR: %x, CTR: %x\n", TMR_THRES, TMR_CT);
 
 
