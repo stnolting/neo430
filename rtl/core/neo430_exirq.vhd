@@ -180,11 +180,11 @@ begin
         irq_src_reg <= irq_src; -- capture source
         if (irq_fire = '1') then
           cpu_irq_o <= '1'; -- trigger CPU
-          state     <= '1'; -- goto active IRQ state
+          state     <= '1'; -- go to active IRQ state
         end if;
 
       else -- active IRQ
-        if (rden = '1') then -- ACK on when reading IRQ source
+        if (rden = '1') then -- ACK when reading IRQ source
           ext_ack_o <= ack_mask;
           state     <= '0';
         end if;
