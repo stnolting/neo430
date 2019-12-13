@@ -4,6 +4,7 @@
 * [Processor Features](#Processor-Features)
 * [Differences to the Original MSP430 Processors](#Differences-to-the-Original-MSP430-Processors)
 * [Implementation Results](#Implementation-Results)
+* [Performance](#Performance)
 * [Quick Start](#Quick-Start)
 * [Change Log](#Change-Log)
 * [Contact](#Contact)
@@ -15,35 +16,29 @@
 
 Welcome to __[The NEO430 Processor](https://github.com/stnolting/neo430)__ project!
 
-You need a small but still powerful, customizable and microcontroller-like
-processor system for your next FPGA project? Then the NEO430 is the right
-choice for you.
+You need a small but still powerful, customizable and microcontroller-like processor system for your next FPGA project?
+Then the NEO430 is the right choice for you.
 
-This processor is based on the Texas Instruments MSP430(TM) ISA and provides full
-compatibility with the original instruction set. The NEO430 is not an MSP430
-clone – it is more like a complete new implementation from the bottom up. The
-processor features a very small outline, already implementing standard
-features like a timer, a watchdog, UART, TWI and SPI serial interfaces, general
-purpose IO ports, an internal bootloader and of course internal memory for
-program code and data. All of the implemented peripheral modules are optional – so if you
-do not need them, you can exclude them from synthesis to reduce the size
-of the system. Any additional modules, which make a more customized system,
-can be connected via a Wishbone-compatible bus interface or directly implemented within the
-processor. By this, you can built a system, that perfectly fits your needs.
+This processor is based on the Texas Instruments MSP430(TM) ISA and provides full compatibility with the original
+instruction set. The NEO430 is not an MSP430 clone – it is more like a complete new implementation from the bottom up. The
+processor features a very small outline, already implementing standard features like a timer, a watchdog, UART, TWI and SPI
+serial interfaces, general purpose IO ports, an internal bootloader and of course internal memory for program code and data.
+All of the implemented peripheral modules are optional – so if you do not need them, you can exclude them from synthesis to
+reduce the size of the system. Any additional modules, which make a more customized system, can be connected via a
+Wishbone-compatible bus interface or directly implemented within the processor. By this, you can built a system,
+that perfectly fits your needs.
 
-It is up to you to use the NEO430 as stand-alone, configurable and extensible
-microcontroller, or to use it as controller within a more complex SoC design.
+It is up to you to use the NEO430 as stand-alone, configurable and extensible microcontroller, or to use it as controller
+within a more complex SoC design.
 
-The high-level software development is based on the free TI msp430-gcc
-compiler tool chain. You can either use Windows (PowerShell or Linux Subsystem) or
-Linux as build environment for your applications – the project supports both worlds.
+The high-level software development is based on the free TI msp430-gcc compiler tool chain. You can either use Windows
+(PowerShell or Linux Subsystem) or Linux as build environment for your applications – the project supports both worlds.
 
-This project is intended to work "out of the box". Just synthesize the test
-setup from this project, upload it to your FPGA board of choice (the NEO430 uses
-a FPGA vendor-independent VHDL description) and start exploring the capabilities of
-the NEO430 processor. Application program generation works by executing a single "make"
-command. Jump to the "Let’s Get It Started" chapter in the NEO430 documentary, which provides
-a lot of guides and tutorials to make your first NEO430 setup run: [![NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/figures/PDF_32.png) NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/NEO430.pdf "NEO430 Datasheet from GitHub")
+This project is intended to work "out of the box". Just synthesize the test setup from this project, upload it to your
+FPGA board of choice (the NEO430 uses a FPGA vendor-independent VHDL description) and start exploring the capabilities of
+the NEO430 processor. Application program generation works by executing a single "make" command. Jump to the
+"Let’s Get It Started" chapter in the NEO430 documentary, which provides a lot of guides and tutorials to make your first
+NEO430 setup run: [![NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/figures/PDF_32.png) NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/NEO430.pdf "NEO430 Datasheet from GitHub")
 
 
 
@@ -67,7 +62,6 @@ a lot of guides and tutorials to make your first NEO430 setup run: [![NEO430 Dat
 - Fully synchronous design, no latches, no gated clocks
 - Very low resource requirements and high operating frequency
 - Internal [DMEM](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_dmem.vhd) (RAM, for data) and [IMEM](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_imem.vhd) (RAM or ROM, for code), configurable sizes
-- One external interrupt line
 - Customizable processor hardware configuration:
   - Optional multiplier/divider unit ([MULDIV](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_muldiv.vhd))
   - Optional high-precision timer ([TIMER](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_timer.vhd))
@@ -163,11 +157,58 @@ processor modules (excluding the CFU and DADD instruction but including the TRNG
 
 
 
+## Performance
+
+In contrast to most mainstream processors the NEO430 processor does not implement a pipelined instruction execution. Instead,
+a **multi-cycle instruction execution scheme** is used: Each single instruction is executed in a series of micro instructions
+requiring several clock cycles to complete. The main benefit of this execution style is the highly reduced logic overhead as no
+complex pipeline hazard detection and resolving logic is required making the NEO430 even sammler - at the cost of a reduced IPC
+(instructions per cycle). Also, the MSP430 ISA is not really compatible to the classic (e.g., DLX/MIPS) pipeline scheme due to
+its complex operand and adressing modes (e.g., ALU operations executing directly on memory data). However, this concept allows
+the processor to use very **dense and powerfull CISC-like operations**.
+
+Furthermore, the multi-cycle architecture features a **very short crtitical path** when compared to other (even 32-bit)
+processors. Thus, the NEO430 can operate at very high frequencies even on low-cost (e.g., +120MHz on an Intel Cyclone 4)
+and low-power FPGAs (e.g., +20MHz on a Lattice iCE40 UltraPlus).
+
+Depending on the format of the instruction, the actual execution can take 3 to 11 clock cycles. If all possible instruction
+types and formates are executed in an eually distributed manner (worse case), the average CPI (clock cycles per instruction)
+evaluates to ~8 cycles/instruction resulting in **0.125 instructions per Hertz** of the operating frequency. However, this mix
+is quite unrealistic, so the real average CPI will be somewhere below 8 cycles/instruction.
+
+
+### Coremark Benchmark
+
+The [coremark CPU benchmark](https://www.eembc.org/coremark/) was executed on the NEO430 and is available in the
+project's [sw/example/coremark](https://github.com/stnolting/neo430/blob/master/sw/example/coremark) folder This benchmark
+tests the capabilities of the CPU itself rather than the functions provided by the whole system / SoC.
+
+~~~
+Hardware: 100 MHz, 16kB IMEM, 8kB DMEM, HW verison 0x0322, no peripherals used (except for the TIMER and the UART)
+Software: Optimization level -Os, msp430-gcc 8.3.0 for Linux, MEM_METHOD is MEM_STACK, 2000 coremark iterations
+~~~
+
+| __Coremark Score__ | __Relative Score__    |
+|:------------------:|:---------------------:|
+| 6.38               | 0.064 Coremarks/MHz   |
+
+Even though a score of 6.38 can outnumber certain architectures and configurations (see the score table on the coremark
+homepage), the relative score of 0.064 coremarks per second might pretty low. But you have to keep in mind that benchmark
+was executed using only the resources of the CPU itself. The CPU consists of only ~500 Intel Cyclone IV LUTs and does not
+contain any sophisticated ALU operations like multiplication or barrel shifting. Also, all instructions are executed in a
+multi-cycle scheme requiring several clock cycles to complete. When explicitly using the NEO430 MULDIV unit for performing
+the matrix-operations benchmark scenario (among other operations, it is based on matrix-scalar, matrix-vector and
+matrix-matrix multiplications) the **coremark score is increased to 12.56**. By using additional HW accelerators from the
+NEO430 ecosystem (like the CRC unit) or by using the MULDIV unit also for address and index computations the perfromance
+and thus, the coremark score can be further increased
+
+
+
 ## Quick Start
 
  * At first, get the most recent version the NEO430 Processor project from GitHub:
  
-   * Clone the NEO430 repository using `git` from the command line (suggested, as this allows easy project updates via `git pull`):
+   * Clone the NEO430 repository using `git` from the command line (suggested for easy project updates via `git pull`):
  
      ~~~
      git clone https://github.com/stnolting/neo430.git
