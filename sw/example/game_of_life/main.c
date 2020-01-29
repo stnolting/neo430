@@ -31,6 +31,7 @@
 #define NUM_CELLS_X 160 // must be a multiple of 8
 #define NUM_CELLS_Y 40
 #define BAUD_RATE   19200
+#define UNI_DELAY   500 // delay between iterations in ms
 
 // Global variables
 uint8_t universe[2][NUM_CELLS_X/8][NUM_CELLS_Y];
@@ -112,7 +113,7 @@ int main(void) {
     generation++;
 
     // wait 500ms
-    neo430_cpu_delay_ms(500);
+    neo430_cpu_delay_ms(UNI_DELAY);
   }
 
   return 0;

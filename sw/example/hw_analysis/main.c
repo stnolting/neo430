@@ -67,21 +67,7 @@ int main(void) {
   neo430_printf("DMEM/RAM:         %u bytes @ 0x%x\n", DMEM_SIZE, DMEM_ADDR_BASE);
 
   // UART baud rate
-  uint16_t baud = UART_CT & 0x00FF;
-  uint16_t prsc;
-  switch ((UART_CT >> 8) & 0x0007) {
-    case 0:  prsc = 2; break;
-    case 1:  prsc = 4; break;
-    case 2:  prsc = 8; break;
-    case 3:  prsc = 64; break;
-    case 4:  prsc = 128; break;
-    case 5:  prsc = 1024; break;
-    case 6:  prsc = 2048; break;
-    case 7:  prsc = 4096; break;
-    default: prsc = 0; break;
-  }
-  uint32_t baud_value = clock / (uint32_t)(prsc * baud);
-  neo430_printf("UART Baud rate:   %n\n", baud_value);
+  neo430_printf("UART Baud rate:   %n\n", neo430_uart_get_baudrate());
 
 
   // System features
