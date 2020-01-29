@@ -46,7 +46,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 09.12.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 10.01.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -98,7 +98,7 @@ entity neo430_top is
     spi_sclk_o : out std_ulogic; -- serial clock line
     spi_mosi_o : out std_ulogic; -- serial data line out
     spi_miso_i : in  std_ulogic; -- serial data line in
-    spi_cs_o   : out std_ulogic_vector(07 downto 0); -- SPI CS 0..7
+    spi_cs_o   : out std_ulogic_vector(05 downto 0); -- SPI CS
     twi_sda_io : inout std_logic; -- twi serial data line
     twi_scl_io : inout std_logic; -- twi serial clock line
     -- 32-bit wishbone interface --
