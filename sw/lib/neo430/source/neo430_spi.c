@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 04.10.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 10.01.2020 #
 // #################################################################################################
 
 #include "neo430.h"
@@ -27,7 +27,7 @@
 
 
 /* ------------------------------------------------------------
- * INFO Reset, activate, configure and enable SPI module
+ * INFO Reset, configure speed and enable SPI module
  * INFO SPI SCK speed: f_main/(2*PRSC), prsc = see below (control reg)
  * SPI clock prescaler select:
  *  0: CLK/2
@@ -56,22 +56,21 @@ void neo430_spi_disable(void) {
 
 
 /* ------------------------------------------------------------
- * INFO Enable SPI CSx (set low)
- * PARAM CS line (0..7)
+ * INFO Enable SPI CSx (set low), can be used to set several CS lines
+ * PARAM CS line (0..5)
  * ------------------------------------------------------------ */
 void neo430_spi_cs_en(uint8_t cs) {
 
-  SPI_CT &= ~(15 << SPI_CT_CS_SEL0); // clear CS selection AND CS_set
-  SPI_CT |= (1 << SPI_CT_CS_SET) | (cs << SPI_CT_CS_SEL0);
+  SPI_CT |= 1 << (cs+SPI_CT_CS_SEL0);
 }
 
 
 /* ------------------------------------------------------------
- * INFO Disable all SPI CSx (set high)
+ * INFO Disable ALL SPI CS lines (set high)
  * ------------------------------------------------------------ */
 void neo430_spi_cs_dis(void) {
 
-  SPI_CT &= ~(1 << SPI_CT_CS_SET);
+  SPI_CT &= ~(0b111111 << SPI_CT_CS_SEL0); // clear all 6 CS lines
 }
 
 
@@ -80,10 +79,10 @@ void neo430_spi_cs_dis(void) {
  * PARAM d byte to be send
  * RETURN received byte
  * ------------------------------------------------------------ */
-uint8_t neo430_spi_trans(uint8_t d) {
+uint16_t neo430_spi_trans(uint16_t d) {
 
-  SPI_RTX = (uint16_t)d; // trigger transfer
+  SPI_RTX = d; // trigger transfer
   while((SPI_CT & (1<<SPI_CT_BUSY)) != 0); // wait for current transfer to finish
 
-  return (uint8_t)SPI_RTX;
+  return SPI_RTX;
 }

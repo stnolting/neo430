@@ -1,7 +1,7 @@
 -- #################################################################################################
 -- #  << NEO430 - Serial Peripheral Interface >>                                                   #
 -- # ********************************************************************************************* #
--- # Frame format: 8-bit, MSB or LSB first, 2 clock modes, 8 clock speeds, 8 dedicated CS lines.   #
+-- # Frame format: 8-bit or 16-bit, MSB or LSB first, 2 clock modes, 8 clock speeds, 6 CS lines.   #
 -- # Interrupt: SPI_transfer_done                                                                  #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 13.11.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 10.01.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -48,7 +48,7 @@ entity neo430_spi is
     spi_sclk_o  : out std_ulogic; -- SPI serial clock
     spi_mosi_o  : out std_ulogic; -- SPI master out, slave in
     spi_miso_i  : in  std_ulogic; -- SPI master in, slave out
-    spi_cs_o    : out std_ulogic_vector(07 downto 0); -- SPI CS 0..7
+    spi_cs_o    : out std_ulogic_vector(05 downto 0); -- SPI CS
     -- interrupt --
     spi_irq_o   : out std_ulogic -- transmission done interrupt
   );
@@ -61,18 +61,21 @@ architecture neo430_spi_rtl of neo430_spi is
   constant lo_abb_c : natural := index_size_f(spi_size_c); -- low address boundary bit
 
   -- control reg bits --
-  constant ctrl_spi_en_c      : natural :=  0; -- r/w: spi enable
-  constant ctrl_spi_cpha_c    : natural :=  1; -- r/w: spi clock phase
-  constant ctrl_spi_irq_en_c  : natural :=  2; -- r/w: spi transmission done interrupt enable
-  constant ctrl_spi_prsc0_c   : natural :=  3; -- r/w: spi prescaler select bit 0
-  constant ctrl_spi_prsc1_c   : natural :=  4; -- r/w: spi prescaler select bit 1
-  constant ctrl_spi_prsc2_c   : natural :=  5; -- r/w: spi prescaler select bit 2
-  constant ctrl_spi_cs_sel0_c : natural :=  6; -- r/w: spi CS select bit 0
-  constant ctrl_spi_cs_sel1_c : natural :=  7; -- r/w: spi CS select bit 0
-  constant ctrl_spi_cs_sel2_c : natural :=  8; -- r/w: spi CS select bit 0
-  constant ctrl_spi_cs_set_c  : natural :=  9; -- r/w: spi CS select enable
-  constant ctrl_spi_dir_c     : natural := 10; -- r/w: shift direction (0: MSB first, 1: LSB first)
-  -- ...
+  constant ctrl_spi_cs_sel0_c : natural :=  0; -- r/w: spi CS 0
+  constant ctrl_spi_cs_sel1_c : natural :=  1; -- r/w: spi CS 1
+  constant ctrl_spi_cs_sel2_c : natural :=  2; -- r/w: spi CS 2
+  constant ctrl_spi_cs_sel3_c : natural :=  3; -- r/w: spi CS 3
+  constant ctrl_spi_cs_sel4_c : natural :=  4; -- r/w: spi CS 4
+  constant ctrl_spi_cs_sel5_c : natural :=  5; -- r/w: spi CS 5
+  constant ctrl_spi_en_c      : natural :=  6; -- r/w: spi enable
+  constant ctrl_spi_cpha_c    : natural :=  7; -- r/w: spi clock phase
+  constant ctrl_spi_irq_en_c  : natural :=  8; -- r/w: spi transmission done interrupt enable
+  constant ctrl_spi_prsc0_c   : natural :=  9; -- r/w: spi prescaler select bit 0
+  constant ctrl_spi_prsc1_c   : natural := 10; -- r/w: spi prescaler select bit 1
+  constant ctrl_spi_prsc2_c   : natural := 11; -- r/w: spi prescaler select bit 2
+  constant ctrl_spi_dir_c     : natural := 12; -- r/w: shift direction (0: MSB first, 1: LSB first)
+  constant ctrl_spi_size_c    : natural := 13; -- r/w: data size(0: 8-bit, 1: 16-bit)
+  --       reserved           : natural := 14;
   constant ctrl_spi_busy_c    : natural := 15; -- r/-: spi transceiver is busy
 
   -- access control --
@@ -91,8 +94,9 @@ architecture neo430_spi_rtl of neo430_spi is
   signal spi_busy     : std_ulogic;
   signal spi_state0   : std_ulogic;
   signal spi_state1   : std_ulogic;
-  signal spi_rtx_sreg : std_ulogic_vector(07 downto 0);
-  signal spi_bitcnt   : std_ulogic_vector(03 downto 0);
+  signal spi_rtx_sreg : std_ulogic_vector(15 downto 0);
+  signal spi_rx_data  : std_ulogic_vector(15 downto 0);
+  signal spi_bitcnt   : std_ulogic_vector(04 downto 0);
   signal spi_miso_ff0 : std_ulogic;
   signal spi_miso_ff1 : std_ulogic;
 
@@ -140,48 +144,59 @@ begin
       -- arbiter --
       spi_irq_o <= '0';
       if (spi_state0 = '0') or (ctrl(ctrl_spi_en_c) = '0') then -- idle or disabled
-        spi_bitcnt <= "1000"; -- 8 bit transfer size
+        if (ctrl(ctrl_spi_size_c) = '0') then -- 8 bit mode
+          spi_bitcnt <= "01000";
+        else -- 16 bit mode
+          spi_bitcnt <= "10000";
+        end if;
         spi_state1 <= '0';
         spi_mosi_o <= '0';
         spi_sclk_o <= '0';
         if (ctrl(ctrl_spi_en_c) = '0') then -- disabled
           spi_busy <= '0';
         elsif (wr_en = '1') and (addr = spi_rtx_addr_c) then
-          spi_rtx_sreg <= data_i(7 downto 0);
-          spi_busy     <= '1';
+          if (ctrl(ctrl_spi_size_c) = '0') then -- 8 bit mode
+            spi_rtx_sreg <= data_i(7 downto 0) & "00000000";
+          else -- 16 bit mode
+            spi_rtx_sreg <= data_i(15 downto 0);
+          end if;
+          spi_busy <= '1';
         end if;
         spi_state0 <= spi_busy and spi_clk; -- start with next new clock pulse
+
       else -- transmission in progress
         if (spi_state1 = '0') then -- first half of transmission
+
           spi_sclk_o <= ctrl(ctrl_spi_cpha_c);
           if (ctrl(ctrl_spi_dir_c) = '0') then
-            spi_mosi_o <= spi_rtx_sreg(7); -- MSB first
+            spi_mosi_o <= spi_rtx_sreg(15); -- MSB first
           else
             spi_mosi_o <= spi_rtx_sreg(0); -- LSB first
           end if;
           if (spi_clk = '1') then
-            spi_state1   <= '1';
+            spi_state1 <= '1';
             if (ctrl(ctrl_spi_cpha_c) = '0') then
               if (ctrl(ctrl_spi_dir_c) = '0') then
-                spi_rtx_sreg <= spi_rtx_sreg(6 downto 0) & spi_miso_ff1; -- MSB first
+                spi_rtx_sreg <= spi_rtx_sreg(14 downto 0) & spi_miso_ff1; -- MSB first
               else
-                spi_rtx_sreg <= spi_miso_ff1 & spi_rtx_sreg(7 downto 1); -- LSB first
+                spi_rtx_sreg <= spi_miso_ff1 & spi_rtx_sreg(15 downto 1); -- LSB first
               end if;
             end if;
             spi_bitcnt <= std_ulogic_vector(unsigned(spi_bitcnt) - 1);
           end if;
         else -- second half of transmission
+
           spi_sclk_o <= not ctrl(ctrl_spi_cpha_c);
           if (spi_clk = '1') then
             spi_state1 <= '0';
             if (ctrl(ctrl_spi_cpha_c) = '1') then
               if (ctrl(ctrl_spi_dir_c) = '0') then
-                spi_rtx_sreg <= spi_rtx_sreg(6 downto 0) & spi_miso_ff1; -- MSB first
+                spi_rtx_sreg <= spi_rtx_sreg(14 downto 0) & spi_miso_ff1; -- MSB first
               else
-                spi_rtx_sreg <= spi_miso_ff1 & spi_rtx_sreg(7 downto 1); -- LSB first
+                spi_rtx_sreg <= spi_miso_ff1 & spi_rtx_sreg(15 downto 1); -- LSB first
               end if;
             end if;
-            if (spi_bitcnt = "0000") then
+            if (spi_bitcnt = "00000") then
               spi_state0 <= '0';
               spi_busy   <= '0';
               spi_irq_o  <= ctrl(ctrl_spi_irq_en_c);
@@ -192,15 +207,16 @@ begin
     end if;
   end process spi_rtx_unit;
 
+  -- SPI receiver output --
+  spi_rx_data <= (x"00" & spi_rtx_sreg(7 downto 0)) when (ctrl(ctrl_spi_size_c) = '0') else spi_rtx_sreg(15 downto 0);
+
   -- direct user-defined CS --  
-  spi_cs_o(0) <= '0' when (ctrl(ctrl_spi_cs_set_c) = '1') and (ctrl(ctrl_spi_cs_sel2_c downto ctrl_spi_cs_sel0_c) = "000") else '1';
-  spi_cs_o(1) <= '0' when (ctrl(ctrl_spi_cs_set_c) = '1') and (ctrl(ctrl_spi_cs_sel2_c downto ctrl_spi_cs_sel0_c) = "001") else '1';
-  spi_cs_o(2) <= '0' when (ctrl(ctrl_spi_cs_set_c) = '1') and (ctrl(ctrl_spi_cs_sel2_c downto ctrl_spi_cs_sel0_c) = "010") else '1';
-  spi_cs_o(3) <= '0' when (ctrl(ctrl_spi_cs_set_c) = '1') and (ctrl(ctrl_spi_cs_sel2_c downto ctrl_spi_cs_sel0_c) = "011") else '1';
-  spi_cs_o(4) <= '0' when (ctrl(ctrl_spi_cs_set_c) = '1') and (ctrl(ctrl_spi_cs_sel2_c downto ctrl_spi_cs_sel0_c) = "100") else '1';
-  spi_cs_o(5) <= '0' when (ctrl(ctrl_spi_cs_set_c) = '1') and (ctrl(ctrl_spi_cs_sel2_c downto ctrl_spi_cs_sel0_c) = "101") else '1';
-  spi_cs_o(6) <= '0' when (ctrl(ctrl_spi_cs_set_c) = '1') and (ctrl(ctrl_spi_cs_sel2_c downto ctrl_spi_cs_sel0_c) = "110") else '1';
-  spi_cs_o(7) <= '0' when (ctrl(ctrl_spi_cs_set_c) = '1') and (ctrl(ctrl_spi_cs_sel2_c downto ctrl_spi_cs_sel0_c) = "111") else '1';
+  spi_cs_o(0) <= '0' when (ctrl(ctrl_spi_cs_sel0_c) = '1') else '1';
+  spi_cs_o(1) <= '0' when (ctrl(ctrl_spi_cs_sel1_c) = '1') else '1';
+  spi_cs_o(2) <= '0' when (ctrl(ctrl_spi_cs_sel2_c) = '1') else '1';
+  spi_cs_o(3) <= '0' when (ctrl(ctrl_spi_cs_sel3_c) = '1') else '1';
+  spi_cs_o(4) <= '0' when (ctrl(ctrl_spi_cs_sel4_c) = '1') else '1';
+  spi_cs_o(5) <= '0' when (ctrl(ctrl_spi_cs_sel5_c) = '1') else '1';
 
 
   -- Read access --------------------------------------------------------------
@@ -217,14 +233,17 @@ begin
           data_o(ctrl_spi_prsc0_c)   <= ctrl(ctrl_spi_prsc0_c);
           data_o(ctrl_spi_prsc1_c)   <= ctrl(ctrl_spi_prsc1_c);
           data_o(ctrl_spi_prsc2_c)   <= ctrl(ctrl_spi_prsc2_c);
+          data_o(ctrl_spi_dir_c)     <= ctrl(ctrl_spi_dir_c);
+          data_o(ctrl_spi_size_c)    <= ctrl(ctrl_spi_size_c);
           data_o(ctrl_spi_cs_sel0_c) <= ctrl(ctrl_spi_cs_sel0_c);
           data_o(ctrl_spi_cs_sel1_c) <= ctrl(ctrl_spi_cs_sel1_c);
           data_o(ctrl_spi_cs_sel2_c) <= ctrl(ctrl_spi_cs_sel2_c);
-          data_o(ctrl_spi_cs_set_c)  <= ctrl(ctrl_spi_cs_set_c);
-          data_o(ctrl_spi_dir_c)     <= ctrl(ctrl_spi_dir_c);
+          data_o(ctrl_spi_cs_sel3_c) <= ctrl(ctrl_spi_cs_sel3_c);
+          data_o(ctrl_spi_cs_sel4_c) <= ctrl(ctrl_spi_cs_sel4_c);
+          data_o(ctrl_spi_cs_sel5_c) <= ctrl(ctrl_spi_cs_sel5_c);
           data_o(ctrl_spi_busy_c)    <= spi_busy;
         else -- spi_rtx_addr_c
-          data_o(7 downto 0) <= spi_rtx_sreg;
+          data_o(15 downto 0) <= spi_rx_data;
         end if;
       end if;
     end if;

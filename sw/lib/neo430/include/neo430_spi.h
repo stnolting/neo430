@@ -19,17 +19,17 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 04.10.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 10.02.2020 #
 // #################################################################################################
 
 #ifndef neo430_spi_h
 #define neo430_spi_h
 
 // prototypes
-void    neo430_spi_enable(uint8_t prsc);   // configure and activate SPI module
-void    neo430_spi_disable(void);          // deactivate SPI module
-void    neo430_spi_cs_en(uint8_t cs);      // activate slave
-void    neo430_spi_cs_dis(void);           // deactivate all slaves
-uint8_t neo430_spi_trans(uint8_t d);       // RTX transfer
+void     neo430_spi_enable(uint8_t prsc);   // configure speed and activate SPI module
+void     neo430_spi_disable(void);          // deactivate SPI module
+void     neo430_spi_cs_en(uint8_t cs);      // select slave
+void     neo430_spi_cs_dis(void);           // deselect all slaves
+uint16_t neo430_spi_trans(uint16_t d);      // RTX transfer
 
 #endif // neo430_spi_h
