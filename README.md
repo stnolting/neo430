@@ -66,15 +66,15 @@ NEO430 setup run: [![NEO430 Datasheet](https://raw.githubusercontent.com/stnolti
   - Optional multiplier/divider unit ([MULDIV](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_muldiv.vhd))
   - Optional high-precision timer ([TIMER](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_timer.vhd))
   - Optional universal asynchronous receiver and transmitter ([UART](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_uart.vhd))
-  - Optional serial peripheral interface ([SPI](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_spi.vhd))
+  - Optional serial peripheral interface ([SPI](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_spi.vhd)), 8 or 16 bit tansfer data size, 6 dedicated CS lines
   - Optional I2C-compatible two wire serial interface ([TWI](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_twi.vhd)) supporting clock stretching
   - Optional general purpose parallel IO port ([GPIO](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_gpio.vhd)), 16 inputs & 16 outputs, with pin-change interrupt and PWM option
   - Optional 32-bit Wishbone bus interface adapter ([WB32](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_wb_interface.vhd)) - including bridges to [Avalon (TM](https://github.com/stnolting/neo430/blob/master/rtl/top_templates/neo430_top_avm.vhd)) bus and [AXI4-Lite (TM](https://github.com/stnolting/neo430/blob/master/rtl/top_templates/neo430_top_axi4lite.vhd))
   - Optional watchdog timer ([WDT](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_wdt.vhd))
   - Optional cyclic redundancy check unit ([CRC16/32](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_crc.vhd))
   - Optional custom functions unit ([CFU](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_cfu.vhd)) for user-defined processor extensions
-  - Optional 4 channel PWM controller with 1 to 8 bit resolution ([PWM](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_pwm.vhd))
-  - Optional Galois Ring Oscillator (GARO) based true random number generator ([TRNG](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_trng.vhd))
+  - Optional 4 channel PWM controller with 4 or 8 bit resolution ([PWM](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_pwm.vhd))
+  - Optional Galois Ring Oscillator (GARO) based true random number generator ([TRNG](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_trng.vhd)) with de-biasing and internal post-processing
   - Optional external interrupts controller with 8 independent channels ([EXIRQ](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_exirq.vhd)), can also be used for software-triggered interrupts (traps, breakpoints, etc.)
   - Optional internal [bootloader](https://github.com/stnolting/neo430/blob/master/sw/bootloader/bootloader.c) (2kB ROM) with serial user console and automatic boot from external SPI EEPROM
 
@@ -199,7 +199,7 @@ contain any sophisticated ALU operations like multiplication or barrel shifting.
 multi-cycle scheme requiring several clock cycles to complete. When explicitly using the NEO430 MULDIV unit for performing
 the matrix-operations benchmark scenario (among other operations, it is based on matrix-scalar, matrix-vector and
 matrix-matrix multiplications) the **coremark score is increased to 12.56**. By using additional HW accelerators from the
-NEO430 ecosystem (like the CRC unit) or by using the MULDIV unit also for address and index computations the perfromance
+NEO430 ecosystem (like the CRC unit) or by using the MULDIV unit also for address and index computations the performance
 and thus, the coremark score can be further increased
 
 
