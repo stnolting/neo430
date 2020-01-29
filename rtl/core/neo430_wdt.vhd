@@ -25,7 +25,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 27.11.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 15.01.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -102,23 +102,25 @@ begin
 
   -- Write Access, Reset Generator --------------------------------------------
   -- -----------------------------------------------------------------------------
-  wdt_core: process(rst_i, rst_sync(1), clk_i)
+  wdt_core: process(clk_i)
   begin
-    if (rst_i = '0') or (rst_sync(1) = '0') then -- external or internal reset
-      enable  <= '0'; -- disable WDT
-      clk_sel <= (others => '1'); -- slowest clock rst_source
-      rst_gen <= (others => '1'); -- do NOT fire on reset!
-    elsif rising_edge(clk_i) then
-      -- control register write access --
-      if (wren = '1') then -- allow write if password is correct
-        enable  <= data_i(ctrl_enable_c);
-        clk_sel <= data_i(ctrl_clksel2_c downto ctrl_clksel0_c);
-      end if;
-      -- reset generator - enabled and (overflow or unauthorized access)? --
-      if (enable = '1') and ((cnt(cnt'left) = '1') or (fail_ff = '1')) then
-        rst_gen <= (others => '0');
+    if rising_edge(clk_i) then
+      if (rst_i = '0') or (rst_sync(1) = '0') then -- external or internal reset
+        enable  <= '0'; -- disable WDT
+        clk_sel <= (others => '1'); -- slowest clock rst_source
+        rst_gen <= (others => '1'); -- do NOT fire on reset!
       else
-        rst_gen <= rst_gen(rst_gen'left-1 downto 0) & '1';
+        -- control register write access --
+        if (wren = '1') then -- allow write if password is correct
+          enable  <= data_i(ctrl_enable_c);
+          clk_sel <= data_i(ctrl_clksel2_c downto ctrl_clksel0_c);
+        end if;
+        -- reset generator - enabled and (overflow or unauthorized access)? --
+        if (enable = '1') and ((cnt(cnt'left) = '1') or (fail_ff = '1')) then
+          rst_gen <= (others => '0');
+        else
+          rst_gen <= rst_gen(rst_gen'left-1 downto 0) & '1';
+        end if;
       end if;
     end if;
   end process wdt_core;
