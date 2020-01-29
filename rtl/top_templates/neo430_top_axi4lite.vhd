@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 28.11.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 10.01.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -68,7 +68,7 @@ entity neo430_top_axi4lite is
     spi_sclk_o    : out std_logic; -- serial clock line
     spi_mosi_o    : out std_logic; -- serial data line out
     spi_miso_i    : in  std_logic; -- serial data line in
-    spi_cs_o      : out std_logic_vector(07 downto 0); -- SPI CS 0..7
+    spi_cs_o      : out std_logic_vector(05 downto 0); -- SPI CS
     twi_sda_io    : inout std_logic; -- twi serial data line
     twi_scl_io    : inout std_logic; -- twi serial clock line
     -- external interrupts --
@@ -129,7 +129,7 @@ architecture neo430_top_axi4lite_rtl of neo430_top_axi4lite is
   signal spi_sclk_o_int : std_ulogic;
   signal spi_mosi_o_int : std_ulogic;
   signal spi_miso_i_int : std_ulogic;
-  signal spi_cs_o_int   : std_ulogic_vector(07 downto 0);
+  signal spi_cs_o_int   : std_ulogic_vector(05 downto 0);
   signal irq_i_int      : std_ulogic_vector(07 downto 0);
   signal irq_ack_o_int  : std_ulogic_vector(07 downto 0);
   constant usrcode_c    : std_ulogic_vector(15 downto 0) := std_ulogic_vector(USER_CODE);
@@ -187,7 +187,7 @@ begin
     spi_sclk_o  => spi_sclk_o_int,    -- serial clock line
     spi_mosi_o  => spi_mosi_o_int,    -- serial data line out
     spi_miso_i  => spi_miso_i_int,    -- serial data line in
-    spi_cs_o    => spi_cs_o_int,      -- SPI CS 0..7
+    spi_cs_o    => spi_cs_o_int,      -- SPI CS
     twi_sda_io  => twi_sda_io,        -- twi serial data line
     twi_scl_io  => twi_scl_io,        -- twi serial clock line
     -- 32-bit wishbone interface --

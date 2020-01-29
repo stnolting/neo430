@@ -23,7 +23,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 28.11.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 10.01.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -99,7 +99,7 @@ begin
     spi_sclk_o => open,               -- serial clock line
     spi_mosi_o => open,               -- serial data line out
     spi_miso_i => '0',                -- serial data line in
-    spi_cs_o   => open,               -- SPI CS 0..7
+    spi_cs_o   => open,               -- SPI CS
     twi_sda_io => twi_sda,            -- twi serial data line
     twi_scl_io => twi_scl,            -- twi serial clock line
     -- 32-bit wishbone interface --
