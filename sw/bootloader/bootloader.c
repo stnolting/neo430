@@ -29,16 +29,12 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 10.12.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 17.01.2020 #
 // #################################################################################################
 
 // Libraries
 #include <stdint.h>
 #include <neo430.h>
-
-// Macros
-#define xstr(a) str(a)
-#define str(a) #a
 
 // Configuration
 #define BAUD_RATE        19200 // default UART baud rate
@@ -71,8 +67,14 @@
 // Scratch registers - abuse unused IRQ vectors for this ;)
 #define TIMEOUT_CNT IRQVEC_GPIO
 
+// Macros
+#define xstr(a) str(a)
+#define str(a) #a
+#define BOOT_EEP_EN {SPI_CT |= 1 << (BOOT_EEP_CS+SPI_CT_CS_SEL0);}
+
 // Function prototypes
 void     __attribute__((__interrupt__)) timer_irq_handler(void);
+void     __attribute__((__interrupt__)) dummy_irq_handler(void);
 void     __attribute__((__naked__)) start_app(void);
 void     print_help(void);
 void     core_dump(void);
@@ -119,8 +121,9 @@ int main(void) {
   // disable EXIRQ
   EXIRQ_CT = 0;
 
-  // init timer interrupt vector
+  // init interrupt vectors
   IRQVEC_TIMER = (uint16_t)(&timer_irq_handler); // timer match
+  IRQVEC_EXT   = (uint16_t)(&dummy_irq_handler); // dummy handler in case an external IRQ occurs
 
   // init GPIO
   GPIO_IRQMASK = 0; // no pin change interrupt please, thanks
@@ -132,7 +135,7 @@ int main(void) {
   neo430_uart_char_read(); // clear UART RX buffer
 
   // set SPI config:
-  // enable SPI, no IRQs, MSB first, SPI clock mode 0, 1/128 SPI speed, disable all 6 SPI CS lines (set high)
+  // enable SPI, no IRQs, MSB first, 8-bit mode, SPI clock mode 0, set SPI speed, disable all 6 SPI CS lines (set high)
   neo430_spi_enable(SPI_PRSC_64); // this also resets the SPI module
   neo430_spi_trans(0); // clear SPI RTX buffer
 
@@ -215,7 +218,7 @@ int main(void) {
     else if (c == 's') // start program in RAM
       start_app();
     else if (c == 'c')
-      neo430_uart_br_print("By Stephan Nolting");
+      neo430_uart_br_print("By Stephan Nolting\nMade in Hannover, Germany");
     else // unknown command
       neo430_uart_br_print("Bad CMD!");
   }
@@ -229,6 +232,15 @@ void __attribute__((__interrupt__)) timer_irq_handler(void) {
 
   TIMEOUT_CNT++; // increment system ticker
   neo430_gpio_port_toggle(1<<STATUS_LED); // toggle status LED
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Dummy IRQ handler
+ * ------------------------------------------------------------ */
+void __attribute__((__interrupt__)) dummy_irq_handler(void) {
+
+  asm volatile ("nop");
 }
 
 
@@ -308,17 +320,17 @@ void store_eeprom(void) {
 
   neo430_uart_br_print("\nWriting... ");
 
-  neo430_spi_cs_en(BOOT_EEP_CS);
+  BOOT_EEP_EN;
   neo430_spi_trans(EEP_WREN); // write enable
   neo430_spi_cs_dis();
 
   // check if eeprom ready (or available at all)
-  neo430_spi_cs_en(BOOT_EEP_CS);
+  BOOT_EEP_EN;
   neo430_spi_trans(EEP_RDSR); // read status register CMD
-  uint8_t b = neo430_spi_trans(0x00); // read status register data
+  uint16_t b = neo430_spi_trans(0); // read status register data
   neo430_spi_cs_dis();
 
-  if ((b & 0x8F) != 0x02)
+  if ((b & 0x008F) != 0x0002)
     system_error(ERROR_EEPROM);
 
   // write EXE signature
@@ -369,25 +381,25 @@ void eeprom_write_word(uint16_t a, uint16_t d) {
  * ------------------------------------------------------------ */
 void spi_eeprom_write_byte(uint16_t a, uint8_t b) {
 
-  neo430_spi_cs_en(BOOT_EEP_CS);
+  BOOT_EEP_EN;
   neo430_spi_trans(EEP_WREN); // write enable
   neo430_spi_cs_dis();
 
-  neo430_spi_cs_en(BOOT_EEP_CS);
+  BOOT_EEP_EN;
   neo430_spi_trans(EEP_WRITE); // byte write instruction
-  neo430_spi_trans((uint8_t)(a >> 8));
-  neo430_spi_trans((uint8_t)(a >> 0));
-  neo430_spi_trans(b);
+  neo430_spi_trans(neo430_bswap(a)); // was ">> 8"
+  neo430_spi_trans(a >> 0);
+  neo430_spi_trans((uint16_t)b);
   neo430_spi_cs_dis();
 
   // wait for write to finish
   while(1) {
-    neo430_spi_cs_en(BOOT_EEP_CS);
+    BOOT_EEP_EN;
     neo430_spi_trans(EEP_RDSR); // read status register CMD
-    uint8_t s = neo430_spi_trans(0x00);
+    uint16_t s = neo430_spi_trans(0);
     neo430_spi_cs_dis();
 
-    if ((s & 0x01) == 0) { // check WIP flag
+    if ((s & 0x0001) == 0) { // check WIP flag
       break; // done!
     }
   }
@@ -401,11 +413,11 @@ void spi_eeprom_write_byte(uint16_t a, uint8_t b) {
  * ------------------------------------------------------------ */
 uint8_t spi_eeprom_read_byte(uint16_t a) {
 
-  neo430_spi_cs_en(BOOT_EEP_CS);
+  BOOT_EEP_EN;
   neo430_spi_trans(EEP_READ); // byte read instruction
-  neo430_spi_trans((uint8_t)(a >> 8));
-  neo430_spi_trans((uint8_t)(a >> 0));
-  uint8_t d = neo430_spi_trans(0);
+  neo430_spi_trans(neo430_bswap(a)); // was ">> 8"
+  neo430_spi_trans(a >> 0);
+  uint8_t d = (uint8_t)neo430_spi_trans(0);
   neo430_spi_cs_dis();
 
   return d;
@@ -419,18 +431,7 @@ uint8_t spi_eeprom_read_byte(uint16_t a) {
  * ------------------------------------------------------------ */
 uint8_t twi_eeprom_read_byte(uint16_t a) {
 
-  uint8_t twi_err = neo430_twi_start_trans(TWI_BOOT_EEP_ADDR_READ);
-  twi_err |= neo430_twi_trans((uint8_t)(a >> 8));
-  twi_err |= neo430_twi_trans((uint8_t)(a >> 0));
-  twi_err |= !neo430_twi_trans(0xFF); // read data
-  uint8_t d = neo430_twi_get_data();
-  neo430_twi_generate_stop();
-
-  //if (twi_err) {
-  //  
-  //}
-
-  return d;
+  return 0;
 }
 
 
