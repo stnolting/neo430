@@ -19,15 +19,15 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 21.11.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 09.01.2020 #
 // #################################################################################################
 
 #ifndef neo430_trng_h
 #define neo430_trng_h
 
 // prototypes
-void    neo430_trng_enable(void);
-void    neo430_trng_disable(void);
-uint8_t neo430_trng_get(void);
+void     neo430_trng_enable(uint16_t tap_mask);  // set TRNG's tap mask and enable TRNG
+void     neo430_trng_disable(void);              // disable TRNG
+uint16_t neo430_trng_get(uint8_t *data);         // read new random byte from TRNG and check if valid
 
 #endif // neo430_trng_h

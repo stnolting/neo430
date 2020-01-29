@@ -7,13 +7,17 @@
 -- # these latches are used as additional delay element. By using unique enable signals for each   #
 -- # latch, the synthesis tool cannot "optimize" one of the inverters out of the design. Further-  #
 -- # more, the latches prevent the synthesis tool from detecting combinatorial loops.              #
+-- # The output of the GARO is de-biased by a simple von Neuman random extractor and is further    #
+-- # post-processed by an 8-bit LFSR for improved whitening.                                       #
 -- #                                                                                               #
 -- # Sources:                                                                                      #
--- #  - GARO: "Enhancing the Randomness of a Combined True Random Number Generator Based on the    #
--- #    Ring Oscillator Sampling Method" by Mieczyslaw Jessa and Lukasz Matuszewski                #
+-- #  - GARO: "Experimental Assessment of FIRO- and GARO-based Noise Sources for Digital TRNG      #
+-- #    Designs on FPGAs" by Martin Schramm, Reiner Dojen and Michael Heigly, 2017                 #
 -- #  - Latches for platform independence: "Extended Abstract: The Butterfly PUF Protecting IP     #
 -- #    on every FPGA" by Sandeep S. Kumar, Jorge Guajardo, Roel Maesyz, Geert-Jan Schrijen and    #
 -- #    Pim Tuyls, Philips Research Europe, 2008                                                   #
+-- #  - Von Neumann De-Biasing: "Iterating Von Neumann’s Post-Processing under Hardware            #
+-- #    Constraints" by Vladimir Rozic, Bohan Yang, Wim Dehaene and Ingrid Verbauwhede, 2016       #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -33,7 +37,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 27.11.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 10.01.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -57,15 +61,17 @@ end neo430_trng;
 
 architecture neo430_trng_rtl of neo430_trng is
 
-  -- user configuration --------------------------------------------------------------------------------
-  constant num_oscs_c  : natural := 5; -- number of oscillators (default=5)
-  constant garo_taps_c : std_ulogic_vector(num_oscs_c-2 downto 0) := "0101"; -- GARO xor feedback select
-  constant use_lfsr_c  : boolean := true; -- use LFSR for post-processing (default=true)
-  constant lfsr_taps_c : std_ulogic_vector(7 downto 0) := "10111000"; -- LFSR feedback taps
-  -- ---------------------------------------------------------------------------------------------------
+  -- advanced configuration ------------------------------------------------------------------------------------
+  constant num_inv_c   : natural := 14; -- length of GARO inverter chain (default=14, max=14)
+  constant lfsr_taps_c : std_ulogic_vector(11 downto 0) := "100000101001"; -- Fibonacci LFSR feedback taps
+  -- -------------------------------------------------------------------------------------------------------
 
   -- control register bits --
-  constant ctrl_rnd_en_c : natural := 15; -- -/w: TRNG enable
+  constant ctrl_taps_00_c   : natural :=  0; -- -/w: TAP 0 enable
+  -- ...
+  constant ctrl_taps_13_c   : natural := 13; -- -/w: TAP 13 enable
+  constant ctrl_rnd_en_c    : natural := 14; -- r/w: TRNG enable
+  constant ctrl_rnd_valid_c : natural := 15; -- r/-: Output byte valid
 
   -- IO space: module base address --
   constant hi_abb_c : natural := index_size_f(io_size_c)-1; -- high address boundary bit
@@ -77,14 +83,21 @@ architecture neo430_trng_rtl of neo430_trng is
   signal rden   : std_ulogic; -- read enable
 
   -- random number generator --
-  signal rnd_inv         : std_ulogic_vector(num_oscs_c-1 downto 0); -- inverter chain
-  signal rnd_enable_sreg : std_ulogic_vector(num_oscs_c-1 downto 0); -- enable shift register
+  signal rnd_inv         : std_ulogic_vector(num_inv_c-1 downto 0); -- inverter chain
+  signal rnd_enable_sreg : std_ulogic_vector(num_inv_c-1 downto 0); -- enable shift register
   signal rnd_enable      : std_ulogic;
-  signal rnd_sync0       : std_ulogic;
-  signal rnd_sync1       : std_ulogic;
-  signal rnd_sreg        : std_ulogic_vector(7 downto 0); -- sample shift reg
-  signal rnd_cnt         : std_ulogic_vector(2 downto 0);
-  signal rnd_data        : std_ulogic_vector(7 downto 0); -- random data register (read-only)
+  signal tap_config      : std_ulogic_vector(13 downto 0);
+  signal rnd_sync        : std_ulogic_vector(2 downto 0); -- metastability filter & de-biasing
+  signal ready_ff        : std_ulogic; -- new random data available
+  signal rnd_sreg        : std_ulogic_vector(11 downto 0); -- sample shift reg
+  signal rnd_cnt         : std_ulogic_vector(3 downto 0);
+  signal new_sample      : std_ulogic; -- new output byte ready
+  signal rnd_data        : std_ulogic_vector(11 downto 0); -- random data register (read-only)
+
+  -- Randomness extractor (von Neumann De-Biasing) --
+  signal db_state  : std_ulogic;
+  signal db_enable : std_ulogic; -- valid data from de-biasing
+  signal db_data   : std_ulogic; -- actual data from de-biasing
 
 begin
 
@@ -100,34 +113,33 @@ begin
   wr_access: process(clk_i)
   begin
     if rising_edge(clk_i) then
-      -- write access --
       if (wren = '1') then
         rnd_enable <= data_i(ctrl_rnd_en_c);
+        tap_config(13 downto 0) <= data_i(ctrl_taps_13_c downto ctrl_taps_00_c);
       end if;
-      -- using individual enable signals for each inverter - derived from a shift register - to prevent the synthesis tool
-      -- from removing all but one inverter (since they implement "logical identical functions")
-      -- this also allows to make the trng platform independent
-      rnd_enable_sreg <= rnd_enable_sreg(num_oscs_c-2 downto 0) & rnd_enable; -- activate right most inverter first
     end if;
   end process wr_access;
 
 
   -- True Random Generator ----------------------------------------------------
   -- -----------------------------------------------------------------------------
-  entropy_source: process(rnd_enable_sreg, rnd_enable, rnd_inv)
+  entropy_source: process(rnd_enable_sreg, rnd_enable, rnd_inv, tap_config)
   begin
-    for i in 0 to num_oscs_c-1 loop
+    for i in 0 to num_inv_c-1 loop
       if (rnd_enable = '0') then -- start with a defined state (latch reset)
         rnd_inv(i) <= '0';
-      -- use latches to decouple the inverters
-      -- by this, the synthesis tool does not complain about combinatorial loops
-      elsif (rnd_enable_sreg(i) = '1') then -- uniquely enable latches to prevent synthesis from removing chain elements
+      -- uniquely enable latches to prevent synthesis from removing chain elements
+      elsif (rnd_enable_sreg(i) = '1') then -- latch enable
         -- here we have the inverter chain --
-        if (i = num_oscs_c-1) then -- left most inverter?
-          rnd_inv(i) <= not rnd_inv(0); -- direct input of right most inverter (= output signal)
+        if (i = num_inv_c-1) then -- left most inverter?
+          if (tap_config(i) = '1') then
+            rnd_inv(i) <= not rnd_inv(0); -- direct input of right most inverter (= output signal)
+          else
+            rnd_inv(i) <= '0';
+          end if;
         else
-          if (garo_taps_c(i) = '1') then
-            rnd_inv(i) <= (not rnd_inv(i+1)) xor rnd_inv(0); -- use final output as feedback
+          if (tap_config(i) = '1') then
+            rnd_inv(i) <= not (rnd_inv(i+1) xor rnd_inv(0)); -- use final output as feedback
           else
             rnd_inv(i) <= not rnd_inv(i+1); -- normal chain: use previous inverter's output as input
           end if;
@@ -136,33 +148,71 @@ begin
     end loop; -- i
   end process entropy_source;
 
-
-  -- Random Data Shift Register -----------------------------------------------
-  -- -----------------------------------------------------------------------------
-  data_sreg: process(clk_i)
+  -- unique enable signals for each inverter latch --
+  inv_enable: process(clk_i)
   begin
     if rising_edge(clk_i) then
-      -- synchronize output of oscillator chain --
-      rnd_sync0 <= rnd_inv(0);
-      rnd_sync1 <= rnd_sync0; -- no more metastability
-      -- sample random data --
+      -- using individual enable signals for each inverter - derived from a shift register - to prevent the synthesis tool
+      -- from removing all but one inverter (since they implement "logical identical functions")
+      -- this also allows to make the trng platform independent
+      rnd_enable_sreg <= rnd_enable_sreg(num_inv_c-2 downto 0) & rnd_enable; -- activate right most inverter first
+    end if;
+  end process inv_enable;
+
+
+  -- Processing Core ----------------------------------------------------------
+  -- -----------------------------------------------------------------------------
+  processing_core: process(clk_i)
+  begin
+    if rising_edge(clk_i) then
+      -- synchronize output of GARO --
+      rnd_sync <= rnd_sync(1 downto 0) & rnd_inv(0); -- no more metastability
+
+      -- von Neumann De-Biasing state --
+      db_state <= (not db_state) and rnd_enable; -- just toggle -> process in every second cycle
+
+      -- sample random data & post-processing --
       if (rnd_enable = '0') then
         rnd_cnt  <= (others => '0');
         rnd_sreg <= (others => '0');
-      else
-        rnd_cnt <= std_ulogic_vector(unsigned(rnd_cnt) + 1);
-        if (use_lfsr_c = true) then -- use LFSR for post-processing
-          rnd_sreg <= rnd_sreg(6 downto 0) & (xor_all_f(rnd_sreg and lfsr_taps_c) xor rnd_sync1);
-        else -- no post-processing
-          rnd_sreg <= rnd_sreg(6 downto 0) & rnd_sync1;
+      elsif (db_enable = '1') then -- valid de-biased output?
+        if (rnd_cnt = "1010") then
+          rnd_cnt <= (others => '0');
+        else
+          rnd_cnt <= std_ulogic_vector(unsigned(rnd_cnt) + 1);
         end if;
+        rnd_sreg <= rnd_sreg(10 downto 0) & (xor_all_f(rnd_sreg and lfsr_taps_c) xor db_data); -- LFSR post-processing
       end if;
-      -- sample final output byte --
-      if (rnd_cnt = "000") and (rnd_enable = '1') then
+
+      -- data output register --
+      if (new_sample = '1') then
         rnd_data <= rnd_sreg;
       end if;
+
+      -- data ready flag --
+      if (rnd_enable = '0') or (rden = '1') then -- clear when deactivated or on data read
+        ready_ff <= '0';
+      elsif (new_sample = '1') then
+        ready_ff <= '1';
+      end if;
     end if;
-  end process data_sreg;
+  end process processing_core;
+
+  -- John von Neumann De-Biasing --
+  debiasing: process(db_state, rnd_sync)
+    variable tmp_v : std_ulogic_vector(2 downto 0);
+  begin
+    -- check groups of two non-overlapping bits from the input stream
+    tmp_v := db_state & rnd_sync(2 downto 1);
+    case tmp_v is
+      when "101"  => db_enable <= '1'; db_data <= '1'; -- rising edge  -> '1'
+      when "110"  => db_enable <= '1'; db_data <= '0'; -- falling edge -> '0'
+      when others => db_enable <= '0'; db_data <= '-'; -- invalid
+    end case;
+  end process debiasing;
+
+  -- new valid byte available? --
+  new_sample <= '1' when (rnd_cnt = "1010") and (rnd_enable = '1') and (db_enable = '1') else '0';
 
 
   -- Read access --------------------------------------------------------------
@@ -172,8 +222,9 @@ begin
     if rising_edge(clk_i) then
       data_o <= (others => '0');
       if (rden = '1') then
-        data_o(7 downto 0)    <= rnd_data;
-        data_o(ctrl_rnd_en_c) <= rnd_enable;
+        data_o(11 downto 0)      <= rnd_data;
+        data_o(ctrl_rnd_en_c)    <= rnd_enable;
+        data_o(ctrl_rnd_valid_c) <= ready_ff;
       end if;
     end if;
   end process rd_access;
