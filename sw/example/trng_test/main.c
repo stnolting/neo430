@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 27.11.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 09.01.2020 #
 // #################################################################################################
 
 
@@ -28,8 +28,9 @@
 #include <neo430.h>
 
 // Configuration
-#define BAUD_RATE 19200
-#define NUM_SAMPLES 2000000000
+#define BAUD_RATE     19200
+#define NUM_SAMPLES   2000000000
+#define TRNG_TAP_MASK 0b01010001000000
 
 // Global variables
 uint32_t rnd_hist[256];
@@ -52,8 +53,28 @@ int main(void) {
     return 1;
   }
 
-  // start TRNG
-  neo430_trng_enable();
+  // reset & start TRNG
+  uint8_t rnd_data = 0;
+  uint16_t rnd_status = 0;
+  neo430_trng_enable(TRNG_TAP_MASK);
+
+  // make sure TRNG is running
+  int k;
+  for(k=0; k<1024; k++){
+    rnd_status = neo430_trng_get(&rnd_data);
+    if (rnd_status) {
+      neo430_trng_disable();
+      neo430_cpu_delay(100);
+      neo430_trng_enable(TRNG_TAP_MASK); // reset TRNG
+    }
+    else {
+      break;
+    }
+    if (k == 1000) {
+      neo430_printf("\nTRNG calibration error!\n");
+      return 0;
+    }
+  }
 
   while(1) {
 
@@ -72,7 +93,12 @@ int main(void) {
     if (cmd == 'a') {
       uint32_t num_samples = 0;
       while(1) {
-        neo430_printf("%u ", (uint16_t)neo430_trng_get());
+        rnd_status = neo430_trng_get(&rnd_data);
+        if (rnd_status) {
+          neo430_printf("\nTRNG error!\n");
+          break;
+        }
+        neo430_printf("%u ", (uint16_t)rnd_data);
         num_samples++;
         if (neo430_uart_char_received()) { // abort when key pressed
           neo430_printf("\nNumber of samples: %n\n", num_samples);
@@ -93,7 +119,12 @@ int main(void) {
       neo430_printf("Sampling data (%n samples). This may take some time...\n", (uint32_t)NUM_SAMPLES);
       uint32_t j;
       for (j=0; j<NUM_SAMPLES; j++) {
-        uint8_t rnd_data = neo430_trng_get();
+        rnd_status = neo430_trng_get(&rnd_data);
+        if (rnd_status
+        ) {
+          neo430_printf("\nTRNG error!\n");
+          break;
+        }
         rnd_hist[rnd_data]++;
       }
 
