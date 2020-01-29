@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 26.11.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 16.12.2019 #
 // #################################################################################################
 
 #include "neo430.h"
@@ -284,6 +284,62 @@ uint16_t neo430_bit_rev16(uint16_t x) {
     asm volatile ("rlc %[c], %[d]" : [d] "=r" (y) : "[d]" (y), [c] "r" (y));
   }
   return y;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO rotate word right by one position
+ * PARAM input operand to be rotated
+ * RETURN rotated result
+ * ------------------------------------------------------------ */
+uint16_t neo430_rotate_right_w(uint16_t x) {
+
+  uint16_t tmp = x;
+  asm volatile ("rrc.w %[b]" : [b] "=r" (tmp) : "[b]" (tmp)); // get carry flag
+  asm volatile ("rrc.w %[b]" : [b] "=r" (x) : "[b]" (x)); // rotate input with according carry input
+  return x;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO rotate word left by one position
+ * PARAM input operand to be rotated
+ * RETURN rotated result
+ * ------------------------------------------------------------ */
+uint16_t neo430_rotate_left_w(uint16_t x) {
+
+  uint16_t tmp = x;
+  asm volatile ("rlc.w %[b]" : [b] "=r" (tmp) : "[b]" (tmp)); // get carry flag
+  asm volatile ("rlc.w %[b]" : [b] "=r" (x) : "[b]" (x)); // rotate input with according carry input
+  return x;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO rotate byte right by one position
+ * PARAM input operand to be rotated
+ * RETURN rotated result
+ * ------------------------------------------------------------ */
+uint8_t neo430_rotate_right_b(uint8_t x) {
+
+  uint8_t tmp = x;
+  asm volatile ("rrc.b %[b]" : [b] "=r" (tmp) : "[b]" (tmp)); // get carry flag
+  asm volatile ("rrc.b %[b]" : [b] "=r" (x) : "[b]" (x)); // rotate input with according carry input
+  return x;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO rotate byte left by one position
+ * PARAM input operand to be rotated
+ * RETURN rotated result
+ * ------------------------------------------------------------ */
+uint8_t neo430_rotate_left_b(uint8_t x) {
+
+  uint8_t tmp = x;
+  asm volatile ("rlc.b %[b]" : [b] "=r" (tmp) : "[b]" (tmp)); // get carry flag
+  asm volatile ("rlc.b %[b]" : [b] "=r" (x) : "[b]" (x)); // rotate input with according carry input
+  return x;
 }
 
 
