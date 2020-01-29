@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 27.11.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 17.01.2020 #
 // #################################################################################################
 
 #ifndef neo430_uart_h
@@ -30,6 +30,8 @@
 
 // prototypes
 void neo430_uart_setup(uint32_t baudrate);                                 // activate and configure UART
+void neo430_uart_disable(void);                                            // deactivate uart
+uint32_t neo430_uart_get_baudrate(void);                                   // compute actual baudrate using UART's current configuration
 void neo430_uart_putc(char c);                                             // send single char
 char neo430_uart_getc(void);                                               // wait and read single char
 uint16_t neo430_uart_char_received(void);                                  // test if a char has been received
@@ -44,7 +46,7 @@ void neo430_uart_print_hex_dword(uint32_t dw);                             // pr
 void neo430_uart_print_bin_byte(uint8_t b);                                // print byte in binary form
 void neo430_uart_print_bin_word(uint16_t w);                               // print word in binary form
 void neo430_uart_print_bin_dword(uint32_t dw);                             // print double word in binary form
-void neo430_itoa(uint32_t x, const uint16_t leading_zeros);                // convert double word to decimal number
+void neo430_itoa(uint32_t x, const uint16_t leading_zeros, char *res);     // convert double word to decimal number
 void neo430_printf(char *format, ...);                                     // print format string
 void neo430_fp_print(int32_t num, const uint16_t fp);                      // print fixed point number
 uint32_t neo430_hexstr_to_uint(char *buffer, uint8_t length);              // convert hex string to number

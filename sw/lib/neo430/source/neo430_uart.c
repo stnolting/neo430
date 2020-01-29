@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 21.11.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 17.01.2020 #
 // #################################################################################################
 
 #include "neo430.h"
@@ -62,6 +62,15 @@ void neo430_uart_setup(uint32_t baudrate){
 
   UART_CT = 0;
   UART_CT = (1<<UART_CT_EN) | ((uint16_t)p << UART_CT_PRSC0) | (i << UART_CT_BAUD0);
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Disable UART
+ * ------------------------------------------------------------ */
+void neo430_uart_disable(void){
+
+  UART_CT = 0;
 }
 
 
@@ -274,15 +283,16 @@ void neo430_uart_print_bin_dword(uint32_t dw) {
  * INFO Slow custom version of itoa
  * PARAM 32-bit value to be printed as decimal number
  * PARAM show leading zeros when set
+ * PARAM pointer to array (11 elements!!!) to store conversion result string
  * ------------------------------------------------------------ */
-void neo430_itoa(uint32_t x, const uint16_t leading_zeros) {
+void neo430_itoa(uint32_t x, const uint16_t leading_zeros, char *res) {
 
   static const char numbers[10] = "0123456789";
-  char buffer1[11], buffer2[11];
+  char buffer1[11];
   uint16_t i, j;
 
   buffer1[10] = '\0';
-  buffer2[10] = '\0';
+  res[10] = '\0';
 
   // convert
   for (i=0; i<10; i++) {
@@ -302,12 +312,10 @@ void neo430_itoa(uint32_t x, const uint16_t leading_zeros) {
   j = 0;
   do {
     if (buffer1[i] != '\0')
-      buffer2[j++] = buffer1[i];
+      res[j++] = buffer1[i];
   } while (i--);
 
-  buffer2[j] = '\0'; // terminate result string
-
-  neo430_uart_br_print(buffer2);
+  res[j] = '\0'; // terminate result string
 }
 
 
@@ -320,7 +328,7 @@ void neo430_itoa(uint32_t x, const uint16_t leading_zeros) {
  * ------------------------------------------------------------ */
 void neo430_printf(char *format, ...) {
 
-  char c;
+  char c, string_buf[11];
   int32_t n;
 
   va_list a;
@@ -345,10 +353,12 @@ void neo430_printf(char *format, ...) {
             n = -n;
             neo430_uart_putc('-');
           }
-          neo430_itoa((uint32_t)n, 0);
+          neo430_itoa((uint32_t)n, 0, string_buf);
+          neo430_uart_br_print(string_buf);
           break;
         case 'u': // 16-bit unsigned
-          neo430_itoa((uint32_t)va_arg(a, unsigned int), 0);
+          neo430_itoa((uint32_t)va_arg(a, unsigned int), 0, string_buf);
+          neo430_uart_br_print(string_buf);
           break;
         case 'l': // 32-bit long
           n = (int32_t)va_arg(a, int32_t);
@@ -356,10 +366,12 @@ void neo430_printf(char *format, ...) {
             n = -n;
             neo430_uart_putc('-');
           }
-          neo430_itoa((uint32_t)n, 0);
+          neo430_itoa((uint32_t)n, 0, string_buf);
+          neo430_uart_br_print(string_buf);
           break;
         case 'n': // 32-bit unsigned long
-          neo430_itoa(va_arg(a, uint32_t), 0);
+          neo430_itoa(va_arg(a, uint32_t), 0, string_buf);
+          neo430_uart_br_print(string_buf);
           break;
         case 'x': // 16-bit hexadecimal
           neo430_uart_print_hex_word(va_arg(a, unsigned int));
@@ -389,6 +401,8 @@ void neo430_printf(char *format, ...) {
  * ------------------------------------------------------------ */
 void neo430_fp_print(int32_t num, const uint16_t fp) {
 
+  char string_buf[11];
+
   // print integer part
   int32_t num_int = num;
 
@@ -396,14 +410,16 @@ void neo430_fp_print(int32_t num, const uint16_t fp) {
     num_int = -num_int;
     neo430_uart_putc('-');
   }
-  neo430_itoa((uint32_t)num_int >> fp, 0);
+  neo430_itoa((uint32_t)num_int >> fp, 0, string_buf);
+  neo430_uart_br_print(string_buf);
 
   neo430_uart_putc('.');
 
   // print fractional part (3 digits)
   uint32_t frac_part = (uint32_t)(num_int & ((1<<fp)-1));
   frac_part = (frac_part * 1000) / (1<<fp);
-  neo430_itoa(frac_part, 2);
+  neo430_itoa(frac_part, 2, string_buf);
+  neo430_uart_br_print(string_buf);
 }
 
 

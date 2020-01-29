@@ -55,7 +55,7 @@ uint8_t neo430_twi_start_trans(uint8_t a) {
 
   neo430_twi_generate_start(); // generate START condition
 
-  TWI_DATA = (uint16_t)a; // send data
+  TWI_DATA = (uint16_t)a; // send address
   while(TWI_CT & (1 << TWI_CT_BUSY)); // wait until idle again
 
   // check for ACK/NACK
@@ -85,7 +85,7 @@ uint8_t neo430_twi_trans(uint8_t d) {
 
 
 /* ------------------------------------------------------------
- * INFO Get receive data from previous transmission
+ * INFO Get rx data from previous transmission
  * RETURN Last received data byte
  * ------------------------------------------------------------ */
 uint8_t neo430_twi_get_data(void) {
