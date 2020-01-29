@@ -30,7 +30,7 @@
  * INFO Reset and activate PWM controller
  * PARAM prsc: Clock prescaler for PWM clock
  * PARAM size: 1=use 8-bit counter, 0=use 4-bit counter
- * PARAM gpio_pwm: Use channel 3 for GPIO.output modulation when '1'
+ * PARAM gpio_pwm: Use channel 3 for GPIO.output modulation when 1
  * ------------------------------------------------------------ */
 void neo430_pwm_enable(const uint16_t prsc, const uint16_t size, const uint16_t gpio_pwm) {
 
