@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 10.12.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 29.01.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -30,7 +30,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0322"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0330"; -- no touchy!
 
   -- Advanced Hardware Configuration --------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -350,7 +350,7 @@ package neo430_package is
       spi_sclk_o : out std_ulogic; -- serial clock line
       spi_mosi_o : out std_ulogic; -- serial data line out
       spi_miso_i : in  std_ulogic; -- serial data line in
-      spi_cs_o   : out std_ulogic_vector(07 downto 0); -- SPI CS 0..7
+      spi_cs_o   : out std_ulogic_vector(05 downto 0); -- SPI CS
       twi_sda_io : inout std_logic; -- twi serial data line
       twi_scl_io : inout std_logic; -- twi serial clock line
       -- 32-bit wishbone interface --
@@ -595,7 +595,7 @@ package neo430_package is
       spi_sclk_o  : out std_ulogic; -- SPI serial clock
       spi_mosi_o  : out std_ulogic; -- SPI master out, slave in
       spi_miso_i  : in  std_ulogic; -- SPI master in, slave out
-      spi_cs_o    : out std_ulogic_vector(07 downto 0); -- SPI CS 0..7
+      spi_cs_o    : out std_ulogic_vector(05 downto 0); -- SPI CS
       -- interrupt --
       spi_irq_o   : out std_ulogic -- transmission done interrupt
     );
@@ -1011,6 +1011,5 @@ package body neo430_package is
     end loop; -- i
     return tmp_v;
   end function xor_all_f;
-
 
 end neo430_package;
