@@ -24,7 +24,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  tephan Nolting, Hannover, Germany                                                 10.12.2019 #
+-- #  tephan Nolting, Hannover, Germany                                                 16.01.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -146,7 +146,7 @@ begin
   match <= '1' when (cnt = thres) else '0';
 
   -- interrupt line --
-  irq_fire <= match and ctrl(ctrl_en_bit_c) and ctrl(ctrl_irq_en_bit_c);
+  irq_fire <= match and ctrl(ctrl_en_bit_c) and ctrl(ctrl_irq_en_bit_c) and ctrl(ctrl_run_c);
 
   -- edge detector --
   irq_o <= irq_fire and (not irq_fire_ff);
