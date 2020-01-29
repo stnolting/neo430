@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 10.12.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 10.01.2020 #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -134,7 +134,7 @@
 #define UART_CT_PRSC0     8 // r/w: baud presclaer bit 0
 #define UART_CT_PRSC1     9 // r/w: baud presclaer bit 1
 #define UART_CT_PRSC2    10 // r/w: baud presclaer bit 2
-
+#define UART_CT_RXOR     11 // r/-: RX data overrun
 #define UART_CT_EN       12 // r/w: UART enable
 #define UART_CT_RX_IRQ   13 // r/w: Rx done interrupt enable
 #define UART_CT_TX_IRQ   14 // r/w: Tx done interrupt enable
@@ -161,18 +161,21 @@
 #define SPI_RTX (*(REG16 0xFFA6)) // r/w: receive/transmit register
 
 // SPI control register
-#define SPI_CT_EN       0 // r/w: spi enable
-#define SPI_CT_CPHA     1 // r/w: spi clock phase (idle polarity = '0')
-#define SPI_CT_IRQ      2 // r/w: spi transmission done interrupt enable
-#define SPI_CT_PRSC0    3 // r/w: spi clock prescaler select bit 0
-#define SPI_CT_PRSC1    4 // r/w: spi clock prescaler select bit 1
-#define SPI_CT_PRSC2    5 // r/w: spi clock prescaler select bit 2
-#define SPI_CT_CS_SEL0  6 // r/w: spi CS select 0
-#define SPI_CT_CS_SEL1  7 // r/w: spi CS select 1
-#define SPI_CT_CS_SEL2  8 // r/w: spi CS select 2
-#define SPI_CT_CS_SET   9 // r/w: selected CS becomes active ('0') when set
-#define SPI_CT_DIR     10 // r/w: shift direction (0: MSB first, 1: LSB first)
-
+#define SPI_CT_CS_SEL0  0 // r/w: spi CS 0
+#define SPI_CT_CS_SEL1  1 // r/w: spi CS 1
+#define SPI_CT_CS_SEL2  2 // r/w: spi CS 2
+#define SPI_CT_CS_SEL3  3 // r/w: spi CS 3
+#define SPI_CT_CS_SEL4  4 // r/w: spi CS 4
+#define SPI_CT_CS_SEL5  5 // r/w: spi CS 5
+#define SPI_CT_EN       6 // r/w: spi enable
+#define SPI_CT_CPHA     7 // r/w: spi clock phase (idle polarity = '0')
+#define SPI_CT_IRQ      8 // r/w: spi transmission done interrupt enable
+#define SPI_CT_PRSC0    9 // r/w: spi clock prescaler select bit 0
+#define SPI_CT_PRSC1   10 // r/w: spi clock prescaler select bit 1
+#define SPI_CT_PRSC2   11 // r/w: spi clock prescaler select bit 2
+#define SPI_CT_DIR     12 // r/w: shift direction (0: MSB first, 1: LSB first)
+#define SPI_CT_SIZE    13 // r/w: 0 = 8-bit, 1 = 16-bit
+// ...
 #define SPI_CT_BUSY    15 // r/-: spi transceiver is busy
 
 // clock prescalers 
@@ -339,15 +342,37 @@
 #define TRNG_CT (*(REG16 0xFFEC)) // r/w: control register
 
 // TRNG control register
-#define TRNG_CT_RND0  0 // r/-: TRNG random data byte bit 0
-#define TRNG_CT_RND1  1 // r/-: TRNG random data byte bit 1
-#define TRNG_CT_RND2  2 // r/-: TRNG random data byte bit 2
-#define TRNG_CT_RND3  3 // r/-: TRNG random data byte bit 3
-#define TRNG_CT_RND4  4 // r/-: TRNG random data byte bit 4
-#define TRNG_CT_RND5  5 // r/-: TRNG random data byte bit 5
-#define TRNG_CT_RND6  6 // r/-: TRNG random data byte bit 6
-#define TRNG_CT_RND7  7 // r/-: TRNG random data byte bit 7
-#define TRNG_CT_EN   15 // r/w: TRNG enable
+#define TRNG_CT_DATA0     0 // r/-: TRNG random data byte bit 0
+#define TRNG_CT_DATA1     1 // r/-: TRNG random data byte bit 1
+#define TRNG_CT_DATA2     2 // r/-: TRNG random data byte bit 2
+#define TRNG_CT_DATA3     3 // r/-: TRNG random data byte bit 3
+#define TRNG_CT_DATA4     4 // r/-: TRNG random data byte bit 4
+#define TRNG_CT_DATA5     5 // r/-: TRNG random data byte bit 5
+#define TRNG_CT_DATA6     6 // r/-: TRNG random data byte bit 6
+#define TRNG_CT_DATA7     7 // r/-: TRNG random data byte bit 7
+#define TRNG_CT_DATA8     8 // r/-: TRNG random data byte bit 8
+#define TRNG_CT_DATA9     9 // r/-: TRNG random data byte bit 9
+#define TRNG_CT_DATA10   10 // r/-: TRNG random data byte bit 10
+#define TRNG_CT_DATA11   11 // r/-: TRNG random data byte bit 11
+// --
+#define TRNG_CT_TAP00_EN  0 // -/w: Activate tap 0 switch
+#define TRNG_CT_TAP01_EN  1 // -/w: Activate tap 1 switch
+#define TRNG_CT_TAP02_EN  2 // -/w: Activate tap 2 switch
+#define TRNG_CT_TAP03_EN  3 // -/w: Activate tap 3 switch
+#define TRNG_CT_TAP04_EN  4 // -/w: Activate tap 4 switch
+#define TRNG_CT_TAP05_EN  5 // -/w: Activate tap 5 switch
+#define TRNG_CT_TAP06_EN  6 // -/w: Activate tap 6 switch
+#define TRNG_CT_TAP07_EN  7 // -/w: Activate tap 7 switch
+#define TRNG_CT_TAP08_EN  8 // -/w: Activate tap 8 switch
+#define TRNG_CT_TAP09_EN  9 // -/w: Activate tap 9 switch
+#define TRNG_CT_TAP10_EN 10 // -/w: Activate tap 10 switch
+#define TRNG_CT_TAP11_EN 11 // -/w: Activate tap 11 switch
+#define TRNG_CT_TAP12_EN 12 // -/w: Activate tap 12 switch
+#define TRNG_CT_TAP13_EN 13 // -/w: Activate tap 13 switch
+// --
+#define TRNG_CT_EN       14 // r/w: TRNG enable
+#define TRNG_CT_VALID    15 // r/-: TRNG output byte is valid
+
 
 
 // ----------------------------------------------------------------------------
