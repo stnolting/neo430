@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 28.11.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 10.01.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -124,7 +124,7 @@ begin
     pwm_o       => open,              -- pwm channels
     -- serial com --
     uart_txd_o => uart_txd,           -- UART send data
-    uart_rxd_i => '0',                -- UART receive data
+    uart_rxd_i => uart_txd,           -- UART receive data
     spi_sclk_o => open,               -- serial clock line
     spi_mosi_o => spi_data,           -- serial data line out
     spi_miso_i => spi_data,           -- serial data line in
