@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 17.11.2018 #
+-- # Stephan Nolting, Hannover, Germany                                                 18.12.2019 #
 -- #################################################################################################
 
 library ieee;
@@ -73,7 +73,7 @@ architecture neo430_uart_rtl of neo430_uart is
   constant ctrl_uart_prsc0_c   : natural :=  8; -- r/w: UART baud prsc bit 0
   constant ctrl_uart_prsc1_c   : natural :=  9; -- r/w: UART baud prsc bit 1
   constant ctrl_uart_prsc2_c   : natural := 10; -- r/w: UART baud prsc bit 2
-  -- ...
+  constant ctrl_uart_rxovr_c   : natural := 11; -- r/-: UART RX overrun
   constant ctrl_uart_en_c      : natural := 12; -- r/w: UART enable
   constant ctrl_uart_rx_irq_c  : natural := 13; -- r/w: UART rx done interrupt enable
   constant ctrl_uart_tx_irq_c  : natural := 14; -- r/w: UART tx done interrupt enable
@@ -94,19 +94,19 @@ architecture neo430_uart_rtl of neo430_uart is
   -- uart tx unit --
   signal uart_tx_busy     : std_ulogic;
   signal uart_tx_done     : std_ulogic;
-  signal uart_tx_bitcnt   : std_ulogic_vector(03 downto 0);
-  signal uart_tx_sreg     : std_ulogic_vector(09 downto 0);
-  signal uart_tx_baud_cnt : std_ulogic_vector(07 downto 0);
+  signal uart_tx_bitcnt   : std_ulogic_vector(3 downto 0);
+  signal uart_tx_sreg     : std_ulogic_vector(9 downto 0);
+  signal uart_tx_baud_cnt : std_ulogic_vector(7 downto 0);
 
   -- uart rx unit --
-  signal uart_rx_sync     : std_ulogic_vector(04 downto 0);
-  signal uart_rx_avail    : std_ulogic;
+  signal uart_rx_sync     : std_ulogic_vector(4 downto 0);
+  signal uart_rx_avail    : std_ulogic_vector(1 downto 0);
   signal uart_rx_busy     : std_ulogic;
   signal uart_rx_busy_ff  : std_ulogic;
-  signal uart_rx_bitcnt   : std_ulogic_vector(03 downto 0);
-  signal uart_rx_sreg     : std_ulogic_vector(08 downto 0);
-  signal uart_rx_reg      : std_ulogic_vector(07 downto 0);
-  signal uart_rx_baud_cnt : std_ulogic_vector(07 downto 0);
+  signal uart_rx_bitcnt   : std_ulogic_vector(3 downto 0);
+  signal uart_rx_sreg     : std_ulogic_vector(8 downto 0);
+  signal uart_rx_reg      : std_ulogic_vector(7 downto 0);
+  signal uart_rx_baud_cnt : std_ulogic_vector(7 downto 0);
 
 begin
 
@@ -207,10 +207,10 @@ begin
 
       -- RX available flag --
       uart_rx_busy_ff <= uart_rx_busy;
-      if (ctrl(ctrl_uart_en_c) = '0') or ((uart_rx_avail = '1') and (rd_en = '1') and (addr = uart_rtx_addr_c)) then
-        uart_rx_avail <= '0';
+      if (ctrl(ctrl_uart_en_c) = '0') or (((uart_rx_avail(0) = '1') or (uart_rx_avail(1) = '1')) and (rd_en = '1') and (addr = uart_rtx_addr_c)) then
+        uart_rx_avail <= "00";
       elsif (uart_rx_busy_ff = '1') and (uart_rx_busy = '0') then
-        uart_rx_avail <= '1';
+        uart_rx_avail <= uart_rx_avail(0) & '1';
       end if;
     end if;
   end process uart_rx_unit;
@@ -244,9 +244,10 @@ begin
           data_o(ctrl_uart_en_c)      <= ctrl(ctrl_uart_en_c);
           data_o(ctrl_uart_rx_irq_c)  <= ctrl(ctrl_uart_rx_irq_c);
           data_o(ctrl_uart_tx_irq_c)  <= ctrl(ctrl_uart_tx_irq_c);
+          data_o(ctrl_uart_rxovr_c)   <= uart_rx_avail(0) and uart_rx_avail(1);
           data_o(ctrl_uart_tx_busy_c) <= uart_tx_busy;
         else -- uart_rtx_addr_c
-          data_o(data_rx_avail_c) <= uart_rx_avail;
+          data_o(data_rx_avail_c) <= uart_rx_avail(0);
           data_o(07 downto 0) <= uart_rx_reg;
         end if;
       end if;
