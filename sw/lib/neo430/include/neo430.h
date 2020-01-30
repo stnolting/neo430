@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 10.01.2020 #
+// # Stephan Nolting, Hannover, Germany                                                 30.01.2020 #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -321,6 +321,7 @@
 #define TWI_CT_PRSC1    5 // r/w: clock prescaler select bit 1
 #define TWI_CT_PRSC2    6 // r/w: clock prescaler select bit 2
 #define TWI_CT_IRQ_EN   7 // r/w: transmission done interrupt enable
+#define TWI_CT_MACK     8 // r/w: send ack by master after transmission
 
 // TWI clock prescaler select:
 #define TWI_PRSC_2    0 // CLK/2

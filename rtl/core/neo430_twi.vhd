@@ -2,7 +2,7 @@
 -- #  << NEO430 - Two Wire Serial Interface Master (I2C) >>                                        #
 -- # ********************************************************************************************* #
 -- # Supports START and STOP conditions, 8 bit data + ACK/NACK transfers and clock stretching.     #
--- # No multi-master support and no slave mode support yet!                                        #
+-- # Supports ACKs by the master. No multi-master support and no slave mode support yet!           #
 -- # Interrupt: TWI_transfer_done                                                                  #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
@@ -23,7 +23,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 09.11.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 30.01.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -60,17 +60,18 @@ architecture neo430_twi_rtl of neo430_twi is
   constant lo_abb_c : natural := index_size_f(twi_size_c); -- low address boundary bit
 
   -- control reg bits --
-  constant ctrl_twi_en_c        : natural := 0; -- r/w: TWI enable
-  constant ctrl_twi_start_c     : natural := 1; -- -/w: Generate START condition
-  constant ctrl_twi_stop_c      : natural := 2; -- -/w: Generate STOP condition
-  constant ctrl_twi_busy_c      : natural := 3; -- r/-: Set if TWI unit is busy
-  constant ctrl_twi_prsc0_c     : natural := 4; -- r/w: CLK prsc bit 0
-  constant ctrl_twi_prsc1_c     : natural := 5; -- r/w: CLK prsc bit 1
-  constant ctrl_twi_prsc2_c     : natural := 6; -- r/w: CLK prsc bit 2
-  constant ctrl_twi_irq_en_c    : natural := 7; -- r/w: transmission done interrupt
+  constant ctrl_twi_en_c     : natural := 0; -- r/w: TWI enable
+  constant ctrl_twi_start_c  : natural := 1; -- -/w: Generate START condition
+  constant ctrl_twi_stop_c   : natural := 2; -- -/w: Generate STOP condition
+  constant ctrl_twi_busy_c   : natural := 3; -- r/-: Set if TWI unit is busy
+  constant ctrl_twi_prsc0_c  : natural := 4; -- r/w: CLK prsc bit 0
+  constant ctrl_twi_prsc1_c  : natural := 5; -- r/w: CLK prsc bit 1
+  constant ctrl_twi_prsc2_c  : natural := 6; -- r/w: CLK prsc bit 2
+  constant ctrl_twi_irq_en_c : natural := 7; -- r/w: transmission done interrupt
+  constant ctrl_twi_mack_c   : natural := 8; -- r/w: generate ACK by master for transmission
 
   -- data register flags --
-  constant data_twi_ack_c   : natural := 15; -- r/-: Set if ACK received
+  constant data_twi_ack_c    : natural := 15; -- r/-: Set if ACK received
 
   -- access control --
   signal acc_en : std_ulogic; -- module access enable
@@ -87,7 +88,7 @@ architecture neo430_twi_rtl of neo430_twi is
   signal twi_clk_halt : std_ulogic;
 
   -- twi transceiver core --
-  signal ctrl         : std_ulogic_vector(7 downto 0); -- unit's control register
+  signal ctrl         : std_ulogic_vector(8 downto 0); -- unit's control register
   signal arbiter      : std_ulogic_vector(2 downto 0);
   signal twi_bitcnt   : std_ulogic_vector(3 downto 0);
   signal twi_rtx_sreg : std_ulogic_vector(8 downto 0); -- main rx/tx shift reg
@@ -115,7 +116,7 @@ begin
     if rising_edge(clk_i) then
       if (wr_en = '1') then
         if (addr = twi_ctrl_addr_c) then
-          ctrl <= data_i(7 downto 0);
+          ctrl <= data_i(ctrl'left downto 0);
         end if;
       end if;
     end if;
@@ -177,7 +178,9 @@ begin
                 arbiter(1 downto 0) <= "10";
               end if;
             elsif (addr = twi_rtx_addr_c) then -- start a data transmission
-              twi_rtx_sreg <= data_i(7 downto 0) & '1'; -- one bit extra for stop condition
+              -- one bit extra for ack, issued by master if ctrl_twi_mack_c is set,
+              -- sampled from slave if ctrl_twi_mack_c is cleared
+              twi_rtx_sreg <= data_i(7 downto 0) & (not ctrl(ctrl_twi_mack_c));
               arbiter(1 downto 0) <= "11";
             end if;
           end if;
@@ -266,6 +269,7 @@ begin
           data_o(ctrl_twi_prsc2_c)  <= ctrl(ctrl_twi_prsc2_c);
           data_o(ctrl_twi_irq_en_c) <= ctrl(ctrl_twi_irq_en_c);
           data_o(ctrl_twi_busy_c)   <= arbiter(1) or arbiter(0);
+          data_o(ctrl_twi_mack_c)   <= ctrl(ctrl_twi_mack_c);
         else -- twi_rtx_addr_c =>
           data_o(7 downto 0)        <= twi_rtx_sreg(8 downto 1);
           data_o(data_twi_ack_c)    <= not twi_rtx_sreg(0);

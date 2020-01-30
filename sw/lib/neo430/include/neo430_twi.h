@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 10.10.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 30.01.2020 #
 // #################################################################################################
 
 #ifndef neo430_twi_h
@@ -28,6 +28,8 @@
 // prototypes
 void    neo430_twi_enable(uint8_t prsc);   // configure and activate TWI module
 void    neo430_twi_disable(void);          // deactivate TWI module
+void    neo430_twi_mack_enable(void);      // activate ACK sending by master after transmission
+void    neo430_twi_mack_disable(void);     // deactivate ACK sending by master after transmission (normal mode)
 uint8_t neo430_twi_start_trans(uint8_t a); // start transmission (START) and send address and r/w bit
 uint8_t neo430_twi_trans(uint8_t d);       // send byte to active slave
 uint8_t neo430_twi_get_data(void);         // get last received data byte

@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 10.10.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 30.01.2020 #
 // #################################################################################################
 
 #include "neo430.h"
@@ -47,9 +47,28 @@ void neo430_twi_disable(void) {
 
 
 /* ------------------------------------------------------------
+ * INFO Activate sending ACK by master after transmission
+ * ------------------------------------------------------------ */
+void neo430_twi_mack_enable(void) {
+
+  TWI_CT |= (1 << TWI_CT_MACK);
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Deactivate sending ACK by master after transmission (normal mode)
+ * ACK is sampled from slave
+ * ------------------------------------------------------------ */
+void neo430_twi_mack_disable(void) {
+
+  TWI_CT &= ~(1 << TWI_CT_MACK);
+}
+
+
+/* ------------------------------------------------------------
  * INFO Generate START condition and send first byte (address & R/W)
  * PARAM 8-bit including 7-bit address and read/write bit
- * RETURN 0 if ACK received, 0xff if no valid ACK was received
+ * RETURN 0 if ACK received, 1 if no valid ACK was received
  * ------------------------------------------------------------ */
 uint8_t neo430_twi_start_trans(uint8_t a) {
 
@@ -60,16 +79,16 @@ uint8_t neo430_twi_start_trans(uint8_t a) {
 
   // check for ACK/NACK
   if (TWI_DATA & (1 << TWI_DT_ACK))
-    return 0x00; // ACK received
+    return 0; // ACK received
   else
-    return 0xff; // NACK received
+    return 1; // NACK received
 }
 
 
 /* ------------------------------------------------------------
  * INFO Send data and also sample input data
  * PARAM Data byte to be sent
- * RETURN 0 if ACK received, 0xff if no valid ACK was received
+ * RETURN 0 if ACK received, 1 if no valid ACK was received
  * ------------------------------------------------------------ */
 uint8_t neo430_twi_trans(uint8_t d) {
 
@@ -78,9 +97,9 @@ uint8_t neo430_twi_trans(uint8_t d) {
 
   // check for ACK/NACK
   if (TWI_DATA & (1 << TWI_DT_ACK))
-    return 0x00; // ACK received
+    return 0; // ACK received
   else
-    return 0xff; // NACK received
+    return 1; // NACK received
 }
 
 
