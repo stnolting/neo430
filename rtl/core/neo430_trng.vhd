@@ -37,7 +37,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 10.01.2020 #
+-- # Stephan Nolting, Hannover, Germany                                                 04.02.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -67,9 +67,15 @@ architecture neo430_trng_rtl of neo430_trng is
   -- -------------------------------------------------------------------------------------------------------
 
   -- control register bits --
+  -- < write-only bits > --
   constant ctrl_taps_00_c   : natural :=  0; -- -/w: TAP 0 enable
   -- ...
   constant ctrl_taps_13_c   : natural := 13; -- -/w: TAP 13 enable
+  -- < read-only bits > --
+  constant ctrl_data_00_c   : natural :=  0; -- r/-: Random data bit 0
+  -- ...
+  constant ctrl_data_11_c   : natural := 11; -- r/-: Random data bit 11
+  -- < remaining bits > --
   constant ctrl_rnd_en_c    : natural := 14; -- r/w: TRNG enable
   constant ctrl_rnd_valid_c : natural := 15; -- r/-: Output byte valid
 
@@ -222,7 +228,7 @@ begin
     if rising_edge(clk_i) then
       data_o <= (others => '0');
       if (rden = '1') then
-        data_o(11 downto 0)      <= rnd_data;
+        data_o(ctrl_data_11_c downto ctrl_data_00_c) <= rnd_data;
         data_o(ctrl_rnd_en_c)    <= rnd_enable;
         data_o(ctrl_rnd_valid_c) <= ready_ff;
       end if;
