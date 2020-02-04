@@ -29,7 +29,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 17.01.2020 #
+// # Stephan Nolting, Hannover, Germany                                                 04.02.2020 #
 // #################################################################################################
 
 // Libraries
@@ -454,12 +454,12 @@ void get_image(uint8_t src) {
     neo430_uart_br_print("Loading... ");
 
   // check if valid image
-  if (get_image_word(0x0000, src) != 0xCAFE) {
+  if (get_image_word(0x0000, src) != 0xCAFE) { // signature
     system_error(ERROR_EXECUTABLE);
   }
 
-  // image size & check
-  uint16_t size  = get_image_word(0x0002, src);
+  // image size and checksum
+  uint16_t size = get_image_word(0x0002, src);
   uint16_t check = get_image_word(0x0004, src);
   uint16_t end = IMEM_SIZE;
   if (size > end)
@@ -467,27 +467,26 @@ void get_image(uint8_t src) {
 
   // transfer program data
   uint16_t *pnt = (uint16_t*)0x0000;
-  uint16_t addr = 0x0006;
-  uint16_t checksum = 0;
+  uint16_t checksum = 0x0000;
   uint16_t d = 0, i = 0;
   while (i < size/2) { // in words
-    d = get_image_word(addr, src);
+    d = get_image_word(2*i+0x0006, src);
     checksum ^= d;
-    *pnt++ = d;
-    i++;
-    addr += 2;
+    pnt[i++] = d;
   }
 
   // clear rest of IMEM
-  while(i < end/2) // in words
+  while(i < end/2) { // in words
     pnt[i++] = 0x0000;
+  }
 
   // error during transfer?
   if (checksum == check) {
     neo430_uart_br_print("OK");
   }
-  else
+  else {
     system_error(ERROR_CHECKSUM);
+  }
 }
 
 
