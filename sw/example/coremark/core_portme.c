@@ -69,7 +69,7 @@ Modified for neo430 by Stephan Nolting
 	or zeroing some system parameters - e.g. setting the cpu clocks cycles to 0.
 */
 void start_time(void) {
-  neo430_timer_start();
+  neo430_timer_run();
 	//GETMYTIME(&start_time_val );      
 }
 /* Function : stop_time

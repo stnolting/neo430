@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 09.01.2020 #
+// # Stephan Nolting, Hannover, Germany                                                 06.02.2020 #
 // #################################################################################################
 
 
@@ -30,7 +30,7 @@
 // Configuration
 #define BAUD_RATE     19200
 #define NUM_SAMPLES   2000000000
-#define TRNG_TAP_MASK 0b01010001000000
+#define TRNG_TAP_MASK 0b01010001000000 // highly experimental!
 
 // Global variables
 uint32_t rnd_hist[256];

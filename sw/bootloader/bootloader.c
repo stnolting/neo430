@@ -135,7 +135,7 @@ int main(void) {
   neo430_uart_char_read(); // clear UART RX buffer
 
   // set SPI config:
-  // enable SPI, no IRQs, MSB first, 8-bit mode, SPI clock mode 0, set SPI speed, disable all 6 SPI CS lines (set high)
+  // enable SPI, no IRQ, MSB first, 8-bit mode, SPI clock mode 0, set SPI speed, disable all SPI CS lines (set high)
   neo430_spi_enable(SPI_PRSC_64); // this also resets the SPI module
   neo430_spi_trans(0); // clear SPI RTX buffer
 
