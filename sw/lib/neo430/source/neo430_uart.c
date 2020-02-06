@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 17.01.2020 #
+// # Stephan Nolting, Hannover, Germany                                                 06.02.2020 #
 // #################################################################################################
 
 #include "neo430.h"
@@ -71,6 +71,35 @@ void neo430_uart_setup(uint32_t baudrate){
 void neo430_uart_disable(void){
 
   UART_CT = 0;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Get current UARt baud rate
+ * ------------------------------------------------------------ */
+uint32_t neo430_uart_get_baudrate(void) {
+
+  // Clock speed
+  uint32_t clock = CLOCKSPEED_32bit;
+
+  // prescaler
+  uint16_t prsc;
+  switch ((UART_CT >> 8) & 0x0007) {
+    case 0:  prsc = 2; break;
+    case 1:  prsc = 4; break;
+    case 2:  prsc = 8; break;
+    case 3:  prsc = 64; break;
+    case 4:  prsc = 128; break;
+    case 5:  prsc = 1024; break;
+    case 6:  prsc = 2048; break;
+    case 7:  prsc = 4096; break;
+    default: prsc = 0; break;
+  }
+
+  uint16_t baud = UART_CT & 0x00FF;
+  uint32_t baud_value = clock / (uint32_t)(prsc * baud);
+
+  return baud_value;
 }
 
 
