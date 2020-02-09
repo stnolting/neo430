@@ -46,7 +46,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 10.01.2020 #
+-- # Stephan Nolting, Hannover, Germany                                                 06.02.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -135,6 +135,7 @@ architecture neo430_top_rtl of neo430_top is
   signal wdt_cg_en    : std_ulogic;
   signal pwm_cg_en    : std_ulogic;
   signal twi_cg_en    : std_ulogic;
+  signal cfu_cg_en    : std_ulogic;
 
   type cpu_bus_t is record
     rd_en : std_ulogic;
@@ -221,7 +222,7 @@ begin
     if (sys_rst = '0') then
       clk_div <= (others => '0');
     elsif rising_edge(clk_i) then
-      if ((timer_cg_en or uart_cg_en or spi_cg_en or wdt_cg_en or pwm_cg_en or twi_cg_en) = '1') then -- anybody needing clocks?
+      if ((timer_cg_en or uart_cg_en or spi_cg_en or wdt_cg_en or pwm_cg_en or twi_cg_en or cfu_cg_en) = '1') then -- anybody needing clocks?
         clk_div <= std_ulogic_vector(unsigned(clk_div) + 1);
       end if;
     end if;
@@ -587,18 +588,22 @@ begin
     neo430_cfu_inst: neo430_cfu
     port map(
       -- host access --
-      clk_i  => clk_i,              -- global clock line
-      rden_i => io_rd_en,           -- read enable
-      wren_i => io_wr_en,           -- write enable
-      addr_i => cpu_bus.addr,       -- address
-      data_i => cpu_bus.wdata,      -- data in
-      data_o => cfu_rdata           -- data out
+      clk_i       => clk_i,         -- global clock line
+      rden_i      => io_rd_en,      -- read enable
+      wren_i      => io_wr_en,      -- write enable
+      addr_i      => cpu_bus.addr,  -- address
+      data_i      => cpu_bus.wdata, -- data in
+      data_o      => cfu_rdata,     -- data out
+      -- clock generator --
+      clkgen_en_o => cfu_cg_en,     -- enable clock generator
+      clkgen_i    => clk_gen
       -- add custom IOs below --
     );
   end generate;
 
   neo430_cfu_inst_false:
   if (CFU_USE = false) generate
+    cfu_cg_en <= '0';
     cfu_rdata <= (others => '0');
   end generate;
 

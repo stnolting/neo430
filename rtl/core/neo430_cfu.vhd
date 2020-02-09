@@ -26,7 +26,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 22.11.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 06.02.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -39,12 +39,15 @@ use neo430.neo430_package.all;
 entity neo430_cfu is
   port (
     -- host access --
-    clk_i  : in  std_ulogic; -- global clock line
-    rden_i : in  std_ulogic; -- read enable
-    wren_i : in  std_ulogic; -- write enable
-    addr_i : in  std_ulogic_vector(15 downto 0); -- address
-    data_i : in  std_ulogic_vector(15 downto 0); -- data in
-    data_o : out std_ulogic_vector(15 downto 0)  -- data out
+    clk_i       : in  std_ulogic; -- global clock line
+    rden_i      : in  std_ulogic; -- read enable
+    wren_i      : in  std_ulogic; -- write enable
+    addr_i      : in  std_ulogic_vector(15 downto 0); -- address
+    data_i      : in  std_ulogic_vector(15 downto 0); -- data in
+    data_o      : out std_ulogic_vector(15 downto 0); -- data out
+    -- clock generator --
+    clkgen_en_o : out std_ulogic; -- enable clock generator
+    clkgen_i    : in  std_ulogic_vector(07 downto 0)
     -- custom IOs --
 --  ...
   );
@@ -63,14 +66,14 @@ architecture neo430_cfu_rtl of neo430_cfu is
   signal rden   : std_ulogic; -- read enable
 
   -- accessible regs (8x16-bit) --
-  signal user_reg0 : std_ulogic_vector(15 downto 0);
-  signal user_reg1 : std_ulogic_vector(15 downto 0);
-  signal user_reg2 : std_ulogic_vector(15 downto 0);
-  signal user_reg3 : std_ulogic_vector(15 downto 0);
-  signal user_reg4 : std_ulogic_vector(15 downto 0);
-  signal user_reg5 : std_ulogic_vector(15 downto 0);
-  signal user_reg6 : std_ulogic_vector(15 downto 0);
-  signal user_reg7 : std_ulogic_vector(15 downto 0);
+  signal cfu_ctrl_reg : std_ulogic_vector(15 downto 0);
+  signal user_reg1    : std_ulogic_vector(15 downto 0);
+  signal user_reg2    : std_ulogic_vector(15 downto 0);
+  signal user_reg3    : std_ulogic_vector(15 downto 0);
+  signal user_reg4    : std_ulogic_vector(15 downto 0);
+  signal user_reg5    : std_ulogic_vector(15 downto 0);
+  signal user_reg6    : std_ulogic_vector(15 downto 0);
+  signal user_reg7    : std_ulogic_vector(15 downto 0);
 
 begin
 
@@ -84,23 +87,57 @@ begin
   rden   <= acc_en and rden_i;
 
 
+  -- Clock System -------------------------------------------------------------
+  -- -----------------------------------------------------------------------------
+  -- The top unit implements a clock generator providing 8 "derived clocks"
+  -- Actually, these signals must not be used as direct clock signals, but as clock enable signals.
+  -- If wou want to drive a system at MAIN_CLK/8 use the following construct:
+
+  -- if rising_edge(clk_i) then -- Always use the main clock for all clock processes!
+  --   if (clkgen_i(clk_div8_c) = '1') then -- the div8 "clock" is actually a clock enable
+  --     ...
+  --   end if;
+  -- end if;
+
+  -- The following clock divider rates are available:
+  -- clkgen_i(clk_div2_c)    -> MAIN_CLK/2
+  -- clkgen_i(clk_div4_c)    -> MAIN_CLK/4
+  -- clkgen_i(clk_div8_c)    -> MAIN_CLK/8
+  -- clkgen_i(clk_div64_c)   -> MAIN_CLK/64
+  -- clkgen_i(clk_div128_c)  -> MAIN_CLK/128
+  -- clkgen_i(clk_div1024_c) -> MAIN_CLK/1024
+  -- clkgen_i(clk_div2048_c) -> MAIN_CLK/2048
+  -- clkgen_i(clk_div4096_c) -> MAIN_CLK/4096
+
+  -- this signal enabled the generator driving the clkgen_i
+  -- set this signal to '0' when you do not need the clkgen_i signal or when your CFU is disabled
+  -- to reduce dynamic power consumption
+  clkgen_en_o <= '0';
+
+
   -- Write access -------------------------------------------------------------
   -- -----------------------------------------------------------------------------
   -- Here we are writing to the interface registers of the module. This unit can only be accessed
   -- in full 16-bit word mode!
+  -- Please note, that all register of every unit are cleared during the processor boot sequence.
+  -- Make cfu_reg0_addr_c the CFU's control register. This register is cleared first during booting.
+  -- If the control register is cleared no actions should be taken when writing to other CFU registers.
   wr_access: process(clk_i)
   begin
     if rising_edge(clk_i) then
       -- write access to user registers --
       if (wren = '1') then -- valid write access
-        if (addr = cfu_reg0_addr_c) then user_reg0 <= data_i; end if;
-        if (addr = cfu_reg1_addr_c) then user_reg1 <= data_i; end if;
-        if (addr = cfu_reg2_addr_c) then user_reg2 <= data_i; end if;
-        if (addr = cfu_reg3_addr_c) then user_reg3 <= data_i; end if;
-        if (addr = cfu_reg4_addr_c) then user_reg4 <= data_i; end if;
-        if (addr = cfu_reg5_addr_c) then user_reg5 <= data_i; end if;
-        if (addr = cfu_reg6_addr_c) then user_reg6 <= data_i; end if;
-        if (addr = cfu_reg7_addr_c) then user_reg7 <= data_i; end if;
+        case addr is
+          when cfu_reg0_addr_c => cfu_ctrl_reg <= data_i;
+          when cfu_reg1_addr_c => user_reg1    <= data_i;
+          when cfu_reg2_addr_c => user_reg2    <= data_i;
+          when cfu_reg3_addr_c => user_reg3    <= data_i;
+          when cfu_reg4_addr_c => user_reg4    <= data_i;
+          when cfu_reg5_addr_c => user_reg5    <= data_i;
+          when cfu_reg6_addr_c => user_reg6    <= data_i;
+          when cfu_reg7_addr_c => user_reg7    <= data_i;
+          when others          => NULL;
+        end case;
       end if;
     end if;
   end process wr_access;
@@ -123,7 +160,7 @@ begin
       data_o <= (others => '0'); -- this is crucial for the final OR-ing of all IO device's outputs
       if (rden = '1') then -- valid read access
         case addr is
-          when cfu_reg0_addr_c => data_o <= user_reg0;
+          when cfu_reg0_addr_c => data_o <= cfu_ctrl_reg;
           when cfu_reg1_addr_c => data_o <= user_reg1;
           when cfu_reg2_addr_c => data_o <= user_reg2;
           when cfu_reg3_addr_c => data_o <= user_reg3;
