@@ -56,7 +56,7 @@ void neo430_spi_disable(void) {
 
 
 /* ------------------------------------------------------------
- * INFO Enable SPI CSx (set low), can be used to set several CS lines
+ * INFO Enable SPI CSx (set low)
  * PARAM CS line (0..5)
  * ------------------------------------------------------------ */
 void neo430_spi_cs_en(uint8_t cs) {
