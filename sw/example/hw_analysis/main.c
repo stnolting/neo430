@@ -21,7 +21,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 28.11.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 12.02.2020 #
 // #################################################################################################
 
 
@@ -103,9 +103,9 @@ int main(void) {
   neo430_printf("- SPI:                   ");
   print_state(ft & (1<<SYS_SPI_EN));
 
-  // DADD
-  neo430_printf("- DADD Instruction:      ");
-  print_state(ft & (1<<SYS_DADD_EN));
+  // XALIU
+  neo430_printf("- Extended ALU Ops.:     ");
+  print_state(ft & (1<<SYS_XALU_EN));
 
   // Bootloader installed
   neo430_printf("- Internal Bootloader:   ");

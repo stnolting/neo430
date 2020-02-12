@@ -19,22 +19,25 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 # ********************************************************************************************* #
-# Stephan Nolting, Hannover, Germany                                                 04.10.2019 #
+# Stephan Nolting, Hannover, Germany                                                 12.02.2020 #
 #################################################################################################
 
 
-#-------------------------------------------------------------------------------
+#*******************************************************************************
 # USER CONFIGURATION
-#-------------------------------------------------------------------------------
+#*******************************************************************************
 # Compiler effort (-Os = optimize for size)
-EFFORT = -Os
+EFFORT = -O3
 
 # User's application sources (add additional files here)
-APP_SRC = ee_printf.c core_list_join.c core_main.c core_matrix.c core_state.c core_util.c core_portme.c
+APP_SRC = core_main.c core_list_join.c core_matrix.c core_portme.c core_state.c core_util.c ee_printf.c
 
 # User's application include folders (don't forget the '-I' before each entry)
 APP_INC = -I .
-#-------------------------------------------------------------------------------
+
+# Relative or absolute path to the NEO430 home folder
+NEO430_HOME = ../..
+#*******************************************************************************
 
 
 
@@ -42,15 +45,15 @@ APP_INC = -I .
 # NEO430 framework
 #-------------------------------------------------------------------------------
 # Path to NEO430 linker script and startup file
-NEO430_COM_PATH=../../common
+NEO430_COM_PATH=$(NEO430_HOME)/common
 # Path to main NEO430 library include files
-NEO430_INC_PATH=../../lib/neo430/include
+NEO430_INC_PATH=$(NEO430_HOME)/lib/neo430/include
 # Path to main NEO430 library source files
-NEO430_SRC_PATH=../../lib/neo430/source
+NEO430_SRC_PATH=$(NEO430_HOME)/lib/neo430/source
 # Path to NEO430 executable generator
-NEO430_EXE_PATH=../../tools/image_gen
+NEO430_EXE_PATH=$(NEO430_HOME)/tools/image_gen
 # Path to NEO430 core rtl folder
-NEO430_RTL_PATH=../../../rtl/core
+NEO430_RTL_PATH=$(NEO430_HOME)/../rtl/core
 
 
 #-------------------------------------------------------------------------------
@@ -145,7 +148,7 @@ image.dat: main.elf
 # Assembly listing file (for debugging)
 $(APP_ASM): main.elf
 	@$(OBJDUMP) -D -S -z  $< > $@
-	@if grep -qR "dadd" $@; then echo "NEO430: WARNING! 'DADD' instruction might be used! Make sure it is synthesized!"; fi
+	@if grep -qR "dadd" $@; then echo "NEO430: WARNING! 'DADD' instruction might be used!"; fi
 
 # Generate NEO430 executable image for bootloader update
 $(APP_BIN): image.dat $(IMAGE_GEN)
@@ -164,7 +167,7 @@ neo430_application_image.vhd: image.dat $(IMAGE_GEN)
 #-------------------------------------------------------------------------------
 help:
 	@echo "NEO430 Application Compilation Script"
-	@echo "Make sure to add the absolute path of the msp430-gcc bin folder to your PATH variable."
+	@echo "Make sure to add the msp430-gcc bin folder to your system's PATH variable."
 	@echo "Targets:"
 	@echo " help      - show this text"
 	@echo " compile   - compile and generate *.bin executable for upload via bootloader"
