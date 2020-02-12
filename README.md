@@ -19,8 +19,8 @@ Welcome to __[The NEO430 Processor](https://github.com/stnolting/neo430)__ proje
 You need a small but still powerful, customizable and microcontroller-like processor system for your next FPGA project?
 Then the NEO430 is the right choice for you.
 
-This processor is based on the Texas Instruments MSP430(TM) ISA and provides full compatibility with the original
-instruction set. The NEO430 is not an MSP430 clone – it is more like a complete new implementation from the bottom up. The
+This processor is based on the Texas Instruments MSP430(TM) ISA and provides compatibility with the original
+instruction set (see differences below). The NEO430 is not an exact MSP430 clone – it is more like a complete new implementation from the bottom up. The
 processor features a very small outline, already implementing standard features like a timer, a watchdog, UART, TWI and SPI
 serial interfaces, general purpose IO ports, an internal bootloader and of course internal memory for program code and data.
 All of the implemented peripheral modules are optional – so if you do not need them, you can exclude them from synthesis to
@@ -89,7 +89,7 @@ NEO430 setup run: [![NEO430 Datasheet](https://raw.githubusercontent.com/stnolti
 - No hardware debugging interface
 - No analog components
 - No support of TI's Code Composer Studio
-- No default support of CPU's DADD instruction (but can be enabled in package)
+- No support of CPU's DADD instruction
 - Just 4 CPU interrupt channels
 - Single clock domain for complete processor
 - Different numbers of instruction execution cycles
@@ -103,7 +103,7 @@ NEO430 setup run: [![NEO430 Datasheet](https://raw.githubusercontent.com/stnolti
 ## Implementation Results
 
 Mapping results generated for HW version 0x0320. The full (default) hardware configuration includes
-all optional processor modules (excluding the CFU, the TRNG and the DADD instruction), an IMEM size of 4kB and a DMEM
+all optional processor modules (excluding the CFU and the TRNG), an IMEM size of 4kB and a DMEM
 size of 2kB. The minimal configuration only includes the CPU and the GPIO module. Results generated with Xilinx Vivado 2017.3,
 Intel Quartus Prime Lite 17.1 and Lattice Radiant 1.1 (Synplify)
 
@@ -131,7 +131,7 @@ The following table shows the required resources for each module of the NEO430 p
 numbers only represent a coarse overview as logic elements might be merged and optimized beyond module boundaries.
 
 Mapping results generated for HW version 0x0320. The full (default) hardware configuration includes all optional
-processor modules (excluding the CFU and DADD instruction but including the TRNG), an IMEM size of 4kB and a DMEM size of
+processor modules (excluding the CFU but including the TRNG), an IMEM size of 4kB and a DMEM size of
 2kB. Results were generated using Intel Quartus Prime Lite 17.1.
 
 | __Intel Cyclone IV (EP4CE22F17C6)__    | LUTs | FFs | Memory Bits | DSPs |

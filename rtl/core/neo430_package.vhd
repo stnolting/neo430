@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 08.02.2020 #
+-- # Stephan Nolting, Hannover, Germany                                                 12.02.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -30,12 +30,11 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0340"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0341"; -- no touchy!
 
   -- Advanced Hardware Configuration --------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
   constant use_dsp_mul_c    : boolean := false; -- use DSP blocks for MULDIV's multiplication core (default=false)
-  constant use_dadd_cmd_c   : boolean := false; -- implement CPU's DADD instruction (default=false)
   constant use_xalu_c       : boolean := false; -- implement extended ALU function (default=false)
   constant low_power_mode_c : boolean := false; -- can reduce switching activity, but will also decrease f_max and might increase area (default=false)
   constant awesome_mode_c   : boolean := true;  -- of course! (default=true)
@@ -53,7 +52,6 @@ package neo430_package is
   function bin_to_gray_f(input : std_ulogic_vector) return std_ulogic_vector;
   function gray_to_bin_f(input : std_ulogic_vector) return std_ulogic_vector;
   function int_to_hexchar_f(input : integer) return character;
-  function bcd_add4_f(a : std_ulogic_vector; b : std_ulogic_vector; c : std_ulogic) return std_ulogic_vector;
   function or_all_f(a : std_ulogic_vector) return std_ulogic;
   function and_all_f(a : std_ulogic_vector) return std_ulogic;
   function xor_all_f(a : std_ulogic_vector) return std_ulogic;
@@ -299,7 +297,7 @@ package neo430_package is
   constant alu_subc_c : std_ulogic_vector(3 downto 0) := "0111"; -- r <= b - a - 1 + carry
   constant alu_sub_c  : std_ulogic_vector(3 downto 0) := "1000"; -- r <= b - a
   constant alu_cmp_c  : std_ulogic_vector(3 downto 0) := "1001"; -- b - a (no write back)
-  constant alu_dadd_c : std_ulogic_vector(3 downto 0) := "1010"; -- r <= a + b (BCD)
+  constant alu_dadd_c : std_ulogic_vector(3 downto 0) := "1010"; -- r <= a + b (BCD) [NOT SUPPORTED!]
   constant alu_bit_c  : std_ulogic_vector(3 downto 0) := "1011"; -- a & b (no write back)
   constant alu_bic_c  : std_ulogic_vector(3 downto 0) := "1100"; -- r <= !a & b
   constant alu_bis_c  : std_ulogic_vector(3 downto 0) := "1101"; -- r <= a | b
@@ -960,24 +958,6 @@ package body neo430_package is
     end case;
     return output_v;
   end function int_to_hexchar_f;
-
-  -- Function: 4-bit BCD addition with carry ------------------------------------------------
-  -- -------------------------------------------------------------------------------------------
-  function bcd_add4_f(a : std_ulogic_vector; b : std_ulogic_vector; c : std_ulogic) return std_ulogic_vector is
-    variable tmp_v : unsigned(4 downto 0);
-    variable res_v : unsigned(3 downto 0);
-    variable cry_v : std_ulogic;
-  begin
-    tmp_v := ('0' & unsigned(a)) + ('0' & unsigned(b)) + ("0000" & c); 
-    if (tmp_v > 9) then
-      res_v := resize((tmp_v + "00110"), 4);
-      cry_v := '1';
-    else
-      res_v := tmp_v(3 downto 0);
-      cry_v := '0';
-    end if;
-    return std_ulogic_vector(cry_v & res_v);
-  end function bcd_add4_f;
 
   -- Function: OR all bits ------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------

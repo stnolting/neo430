@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 16.12.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 12.02.2020 #
 // #################################################################################################
 
 #include "neo430.h"
@@ -204,21 +204,6 @@ uint16_t neo430_combine_bytes(uint8_t hi, uint8_t lo) {
 
   register uint16_t r = neo430_bswap((uint16_t)hi);
   return r | (uint16_t)lo;
-}
-
-
-/* ------------------------------------------------------------
- * INFO Binary-coded decimal addition
- * WARNING MAKE SURE THE DADD UNIT IS SYNTHESIZED (package switch "use_dadd_cmd_c")!!!
- * PARAM 2x 16-bit BCD operands (4 digits)
- * RETURN 16-bit BCD result (4 digits)
- * ------------------------------------------------------------ */
-uint16_t neo430_dadd(uint16_t a, uint16_t b) {
-
-  register uint16_t z = a;
-  asm volatile ("clrc");
-  asm volatile ("dadd %[b], %[z]" : [z] "=r" (z) : "[z]" (z), [b] "r" (b));
-  return z;
 }
 
 

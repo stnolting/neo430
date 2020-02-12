@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 16.12.2019 #
+// # Stephan Nolting, Hannover, Germany                                                 12.02.2020 #
 // #################################################################################################
 
 #ifndef neo430_cpu_h
@@ -41,7 +41,6 @@ void     neo430_jump_address(uint16_t addr);                      // jump to cer
 void     neo430_call_address(uint16_t addr);                      // call certain address
 uint16_t neo430_bswap(uint16_t a);                                // swap bytes in word
 uint16_t neo430_combine_bytes(uint8_t hi, uint8_t lo);            // combine two bytes into a single word
-uint16_t neo430_dadd(uint16_t a, uint16_t b);                     // BCD addition (HAS TO BE ENABLED FOR SYNTHESIS!)
 void     neo430_memset(uint8_t *dst, uint8_t data, uint16_t num); // set num bytes in memory
 uint8_t  neo430_memcmp(uint8_t *dst, uint8_t *src, uint16_t num); // compare num bytes in memory
 void     neo430_memcpy(uint8_t *dst, uint8_t *src, uint16_t num); // copy num bytes from memory to memory

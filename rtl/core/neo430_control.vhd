@@ -21,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 26.11.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 12.02.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -60,7 +60,7 @@ architecture neo430_control_rtl of neo430_control is
 
   -- state machine --
   type state_t is (RESET, IFETCH_0, IFETCH_1, DECODE,
-    TRANS_0, TRANS_1, TRANS_2, TRANS_3, TRANS_4, TRANS_5, TRANS_6, TRANS_7,
+    TRANS_0, TRANS_1, TRANS_2, TRANS_3, TRANS_4, TRANS_5, TRANS_6,
     PUSHCALL_0, PUSHCALL_1, PUSHCALL_2,
     RETI_0, RETI_1, RETI_2, RETI_3, RETI_4,
     IRQ_0, IRQ_1, IRQ_2, IRQ_3, IRQ_4, IRQ_5);
@@ -350,7 +350,7 @@ begin
             state_nxt <= TRANS_2;
         end case;
 
-      when TRANS_2 => -- operand transfer cycle 3
+      when TRANS_2 => -- operand transfer cycle 2
       -- ------------------------------------------------------------
         case am is -- addressing mode
           when "0000" | "0001" | "1000" | "1001" =>
@@ -390,7 +390,7 @@ begin
             state_nxt <= TRANS_3;
         end case;
 
-      when TRANS_3 => -- operand transfer cycle 4
+      when TRANS_3 => -- operand transfer cycle 3
       -- ------------------------------------------------------------
         case am is -- addressing mode
           when "1001" | "1011" | "1101" | "1111" =>
@@ -412,7 +412,7 @@ begin
             state_nxt <= TRANS_4; -- NOP / DONT CARE
         end case;
 
-      when TRANS_4 => -- operand transfer cycle 6
+      when TRANS_4 => -- operand transfer cycle 4
       -- ------------------------------------------------------------
         case am is -- addressing mode
           when "0010" | "0011" | "1010" =>
@@ -438,7 +438,7 @@ begin
             state_nxt <= TRANS_5; -- NOP / DONT CARE
         end case;
 
-      when TRANS_5 => -- operand transfer cycle 7
+      when TRANS_5 => -- operand transfer cycle 5
       -- ------------------------------------------------------------
         ctrl_nxt(ctrl_alu_in_sel_c) <= '1'; -- get data from memory
         ctrl_nxt(ctrl_alu_opb_wr_c) <= '1'; -- write to OpA
@@ -448,22 +448,7 @@ begin
           state_nxt <= TRANS_6; -- single/dual ALU operation
         end if;
 
-      when TRANS_6 => -- operand transfer cycle 8
-      -- ------------------------------------------------------------
-        ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= ir(3 downto 0); -- destination
-        if (ctrl(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) = alu_dadd_c) and (use_dadd_cmd_c = true) then
-          state_nxt <= TRANS_7;
-        else
-          ctrl_nxt(ctrl_rf_fup_c) <= not spec_cmd_v; -- update ALU status flags
-          if (am(0) = '0') then -- DST: register direct
-            ctrl_nxt(ctrl_rf_wb_en_c) <= valid_wb_v; -- valid RF write back (not for CMP/BIT!)
-          else -- DST: indexed
-            ctrl_nxt(ctrl_mem_wr_c) <= valid_wb_v; -- valid MEM write back (not for CMP/BIT!)
-          end if;
-          state_nxt <= IFETCH_0; -- done!
-        end if;
-
-      when TRANS_7 => -- operand transfer cycle 9
+      when TRANS_6 => -- operand transfer cycle 6
       -- ------------------------------------------------------------
         ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= ir(3 downto 0); -- destination
         ctrl_nxt(ctrl_rf_fup_c) <= not spec_cmd_v; -- update ALU status flags

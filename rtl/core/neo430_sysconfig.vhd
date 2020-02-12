@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 28.11.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 12.02.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -110,7 +110,7 @@ begin
   sysinfo_mem(1)(03) <= bool_to_ulogic_f(GPIO_USE);       -- GPIO present?
   sysinfo_mem(1)(04) <= bool_to_ulogic_f(TIMER_USE);      -- TIMER present?
   sysinfo_mem(1)(05) <= bool_to_ulogic_f(UART_USE);       -- UART present?
-  sysinfo_mem(1)(06) <= bool_to_ulogic_f(use_dadd_cmd_c); -- DADD instruction present?
+  sysinfo_mem(1)(06) <= bool_to_ulogic_f(use_xalu_c);     -- extended ALU functions present?
   sysinfo_mem(1)(07) <= bool_to_ulogic_f(BOOTLD_USE);     -- bootloader present?
   sysinfo_mem(1)(08) <= bool_to_ulogic_f(IMEM_AS_ROM);    -- IMEM implemented as true ROM?
   sysinfo_mem(1)(09) <= bool_to_ulogic_f(CRC_USE);        -- CRC present?

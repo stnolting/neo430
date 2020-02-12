@@ -23,7 +23,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 30.01.2020 #
+// # Stephan Nolting, Hannover, Germany                                                 12.02.2020 #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -432,7 +432,7 @@
 #define SYS_GPIO_EN   3 // r/-: GPIO synthesized
 #define SYS_TIMER_EN  4 // r/-: TIMER synthesized
 #define SYS_UART_EN   5 // r/-: UART synthesized
-#define SYS_DADD_EN   6 // r/-: DADD instruction synthesized
+#define SYS_XALU_EN   6 // r/-: Extended ALU operations synthesized
 #define SYS_BTLD_EN   7 // r/-: Bootloader installed and enabled
 #define SYS_IROM_EN   8 // r/-: Implement IMEM as true ROM
 #define SYS_CRC_EN    9 // r/-: CRC synthesized

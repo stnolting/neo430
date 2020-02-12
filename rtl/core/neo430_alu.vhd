@@ -1,8 +1,7 @@
 -- #################################################################################################
 -- #  << NEO430 - Arithmetical/Logical Unit >>                                                     #
 -- # ********************************************************************************************* #
--- # Main data processing ALU and operand registers.                                               #
--- # BCD arithmetic operations need 2 cycles, all other operations only take one cycle.            #
+-- # Main data processing ALU and operand registers. DADD instruction is not supported!            #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 -- # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -22,7 +21,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 21.11.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 12.02.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -50,16 +49,15 @@ end neo430_alu;
 
 architecture neo430_alu_rtl of neo430_alu is
 
-  signal op_data          : std_ulogic_vector(15 downto 0); -- operand data
-  signal op_a_ff, op_b_ff : std_ulogic_vector(15 downto 0); -- operand register
-  signal add_res          : std_ulogic_vector(17 downto 0); -- adder/subtractor kernel result
-  signal dadd_res         : std_ulogic_vector(16 downto 0); -- decimal adder kernel result
-  signal dadd_res_ff      : std_ulogic_vector(16 downto 0); -- decimal adder kernel result buffered
-  signal alu_res          : std_ulogic_vector(15 downto 0); -- alu result
-  signal data_res         : std_ulogic_vector(15 downto 0); -- final alu result
-  signal zero             : std_ulogic; -- zero detector
-  signal negative         : std_ulogic; -- sign detector
-  signal parity           : std_ulogic; -- parity detector
+  signal op_data  : std_ulogic_vector(15 downto 0); -- operand data
+  signal op_a_ff  : std_ulogic_vector(15 downto 0); -- operand register A
+  signal op_b_ff  : std_ulogic_vector(15 downto 0); -- operand register B
+  signal add_res  : std_ulogic_vector(17 downto 0); -- adder/subtractor kernel result
+  signal alu_res  : std_ulogic_vector(15 downto 0); -- alu result
+  signal data_res : std_ulogic_vector(15 downto 0); -- final alu result
+  signal zero     : std_ulogic; -- zero detector
+  signal negative : std_ulogic; -- sign detector
+  signal parity   : std_ulogic; -- parity detector
 
 begin
 
@@ -80,8 +78,6 @@ begin
       if (ctrl_i(ctrl_alu_opb_wr_c) = '1') then
         op_b_ff <= op_data;
       end if;
-      -- DADD pipeline register --
-      dadd_res_ff <= dadd_res;
     end if;
   end process operand_register;
 
@@ -142,29 +138,9 @@ begin
   end process binary_arithmetic_core;
 
 
-  -- Binary Coded Decimal Arithmetic Core -------------------------------------
-  -- -----------------------------------------------------------------------------
-  bcd_arithmetic_core: process(op_a_ff, op_b_ff, sreg_i)
-    variable dsum_ll_v, dsum_lh_v, dsum_hl_v, dsum_hh_v : std_ulogic_vector(4 downto 0);
-  begin
-    -- four 4-bit BCD adders --
-    dsum_ll_v := bcd_add4_f(op_a_ff(03 downto 00), op_b_ff(03 downto 00), sreg_i(sreg_c_c));
-    dsum_lh_v := bcd_add4_f(op_a_ff(07 downto 04), op_b_ff(07 downto 04), dsum_ll_v(4));
-    dsum_hl_v := bcd_add4_f(op_a_ff(11 downto 08), op_b_ff(11 downto 08), dsum_lh_v(4));
-    dsum_hh_v := bcd_add4_f(op_a_ff(15 downto 12), op_b_ff(15 downto 12), dsum_hl_v(4));
-
-    -- output --
-    dadd_res(03 downto 00) <= dsum_ll_v(3 downto 0);
-    dadd_res(07 downto 04) <= dsum_lh_v(3 downto 0);
-    dadd_res(11 downto 08) <= dsum_hl_v(3 downto 0);
-    dadd_res(15 downto 12) <= dsum_hh_v(3 downto 0);
-    dadd_res(16) <= dsum_hh_v(4);
-  end process bcd_arithmetic_core;
-
-
   -- ALU Core -----------------------------------------------------------------
   -- -----------------------------------------------------------------------------
-  alu_core: process(ctrl_i, op_a_ff, op_b_ff, sreg_i, negative, zero, parity, add_res, dadd_res_ff)
+  alu_core: process(ctrl_i, op_a_ff, op_b_ff, sreg_i, negative, zero, parity, add_res)
   begin
     -- defaults --
     alu_res <= op_a_ff;
@@ -185,17 +161,6 @@ begin
         alu_res <= add_res(15 downto 0);
         flag_o(flag_c_c) <= add_res(16);
         flag_o(flag_v_c) <= add_res(17);
-
-      when alu_dadd_c => -- r <= a + b + c (decimal)
-        if (use_dadd_cmd_c = true) then -- implement DADD instruction at all?
-          alu_res <= dadd_res_ff(15 downto 0);
-          flag_o(flag_c_c) <= dadd_res_ff(16);
-          flag_o(flag_v_c) <= '0';
-        else -- output is undefined when DADD instruction is disabled
-          alu_res <= (others => '-');
-          flag_o(flag_c_c) <= '-';
-          flag_o(flag_v_c) <= '-';
-        end if;
 
       when alu_and_c => -- r <= a & b
         alu_res <= op_a_ff and op_b_ff;
@@ -261,14 +226,30 @@ begin
         flag_o(flag_n_c) <= sreg_i(sreg_n_c); -- keep
         flag_o(flag_z_c) <= sreg_i(sreg_z_c); -- keep
 
-      when others => -- alu_mov_c : r <= a
+      when alu_mov_c => -- r <= a
         alu_res <= op_a_ff;
         flag_o(flag_c_c) <= sreg_i(sreg_c_c); -- keep
         flag_o(flag_v_c) <= sreg_i(sreg_v_c); -- keep
         flag_o(flag_n_c) <= sreg_i(sreg_n_c); -- keep
         flag_o(flag_z_c) <= sreg_i(sreg_z_c); -- keep
+
+      when others => -- undefined
+        alu_res <= (others => '-');
+        flag_o(flag_c_c) <= '-';
+        flag_o(flag_v_c) <= '-';
+
     end case;
   end process alu_core;
+
+  -- are we really using the DADD instruction? --
+  alu_core_sanity_check: process(clk_i)
+  begin
+    if rising_edge(clk_i) then
+      if (ctrl_i(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) = alu_dadd_c) then
+        assert false report "DADD instruction not supported!" severity error;
+      end if;
+    end if;
+  end process alu_core_sanity_check;
 
 
   -- Post processing logic ----------------------------------------------------
