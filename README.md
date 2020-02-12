@@ -89,7 +89,7 @@ NEO430 setup run: [![NEO430 Datasheet](https://raw.githubusercontent.com/stnolti
 - No hardware debugging interface
 - No analog components
 - No support of TI's Code Composer Studio
-- No support of CPU's DADD instruction
+- No support of CPU's DADD instruction (which is never used by the compiler...)
 - Just 4 CPU interrupt channels
 - Single clock domain for complete processor
 - Different numbers of instruction execution cycles
