@@ -1,8 +1,8 @@
 [![GitHub release](https://img.shields.io/github/v/release/stnolting/neo430?include_prereleases)](https://GitHub.com/stnolting/neo430/releases/)
-![size](https://img.shields.io/github/repo-size/stnolting/neo430)
-![last commit](https://img.shields.io/github/last-commit/stnolting/neo430)
-![issues](https://img.shields.io/github/issues/stnolting/neo430)
-![license](https://img.shields.io/github/license/stnolting/neo430)
+[![size](https://img.shields.io/github/repo-size/stnolting/neo430)](https://github.com/stnolting/neo430/archive/master.zip)
+[![last commit](https://img.shields.io/github/last-commit/stnolting/neo430)](https://github.com/stnolting/neo430/commits/master)
+[![issues](https://img.shields.io/github/issues/stnolting/neo430)](https://github.com/stnolting/neo430/issues)
+[![license](https://img.shields.io/github/license/stnolting/neo430)](https://github.com/stnolting/neo430/blob/master/LICENSE)
 
 ## Table of Content
 
