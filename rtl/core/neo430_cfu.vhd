@@ -26,7 +26,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 06.02.2020 #
+-- # Stephan Nolting, Hannover, Germany                                                 13.02.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -127,17 +127,31 @@ begin
     if rising_edge(clk_i) then
       -- write access to user registers --
       if (wren = '1') then -- valid write access
-        case addr is
-          when cfu_reg0_addr_c => cfu_ctrl_reg <= data_i;
-          when cfu_reg1_addr_c => user_reg1    <= data_i;
-          when cfu_reg2_addr_c => user_reg2    <= data_i;
-          when cfu_reg3_addr_c => user_reg3    <= data_i;
-          when cfu_reg4_addr_c => user_reg4    <= data_i;
-          when cfu_reg5_addr_c => user_reg5    <= data_i;
-          when cfu_reg6_addr_c => user_reg6    <= data_i;
-          when cfu_reg7_addr_c => user_reg7    <= data_i;
-          when others          => NULL;
-        end case;
+        -- use full-parallel IFs instead of a CASE to prevent some EDA tools from complaining (GHDL)
+        if (addr = cfu_reg0_addr_c) then
+          cfu_ctrl_reg <= data_i;
+        end if;
+        if (addr = cfu_reg1_addr_c) then
+          user_reg1 <= data_i;
+        end if;
+        if (addr = cfu_reg2_addr_c) then
+          user_reg2 <= data_i;
+        end if;
+        if (addr = cfu_reg3_addr_c) then
+          user_reg3 <= data_i;
+        end if;
+        if (addr = cfu_reg4_addr_c) then
+          user_reg4 <= data_i;
+        end if;
+        if (addr = cfu_reg5_addr_c) then
+          user_reg5 <= data_i;
+        end if;
+        if (addr = cfu_reg6_addr_c) then
+          user_reg6 <= data_i;
+        end if;
+        if (addr = cfu_reg7_addr_c) then
+          user_reg7 <= data_i;
+        end if;
       end if;
     end if;
   end process wr_access;
@@ -159,17 +173,26 @@ begin
     if rising_edge(clk_i) then
       data_o <= (others => '0'); -- this is crucial for the final OR-ing of all IO device's outputs
       if (rden = '1') then -- valid read access
-        case addr is
-          when cfu_reg0_addr_c => data_o <= cfu_ctrl_reg;
-          when cfu_reg1_addr_c => data_o <= user_reg1;
-          when cfu_reg2_addr_c => data_o <= user_reg2;
-          when cfu_reg3_addr_c => data_o <= user_reg3;
-          when cfu_reg4_addr_c => data_o <= user_reg4;
-          when cfu_reg5_addr_c => data_o <= user_reg5;
-          when cfu_reg6_addr_c => data_o <= user_reg6;
-          when cfu_reg7_addr_c => data_o <= user_reg7;
-          when others          => data_o <= (others => '-');
-        end case;
+        -- use IFs instead of a CASE to prevent some EDA tools from complaining (GHDL)
+        if (addr = cfu_reg0_addr_c) then
+          data_o <= cfu_ctrl_reg;
+        elsif (addr = cfu_reg1_addr_c) then
+          data_o <= user_reg1;
+        elsif (addr = cfu_reg2_addr_c) then
+          data_o <= user_reg2;
+        elsif (addr = cfu_reg3_addr_c) then
+          data_o <= user_reg3;
+        elsif (addr = cfu_reg4_addr_c) then
+          data_o <= user_reg4;
+        elsif (addr = cfu_reg5_addr_c) then
+          data_o <= user_reg5;
+        elsif (addr = cfu_reg6_addr_c) then
+          data_o <= user_reg6;
+        elsif (addr = cfu_reg7_addr_c) then
+          data_o <= user_reg7;
+        else
+          data_o <= (others => '0');
+        end if;
       end if;
     end if;
   end process rd_access;
