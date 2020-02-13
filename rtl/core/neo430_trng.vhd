@@ -16,7 +16,7 @@
 -- #  - Latches for platform independence: "Extended Abstract: The Butterfly PUF Protecting IP     #
 -- #    on every FPGA" by Sandeep S. Kumar, Jorge Guajardo, Roel Maesyz, Geert-Jan Schrijen and    #
 -- #    Pim Tuyls, Philips Research Europe, 2008                                                   #
--- #  - Von Neumann De-Biasing: "Iterating Von Neumann’s Post-Processing under Hardware            #
+-- #  - Von Neumann De-Biasing: "Iterating Von Neumann's Post-Processing under Hardware            #
 -- #    Constraints" by Vladimir Rozic, Bohan Yang, Wim Dehaene and Ingrid Verbauwhede, 2016       #
 -- # ********************************************************************************************* #
 -- # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
