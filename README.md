@@ -1,3 +1,8 @@
+[![GitHub release](https://img.shields.io/github/v/release/stnolting/stnolting/neo430?include_prereleases)](https://GitHub.com/stnolting/stnolting/neo430/releases/)
+![size](https://img.shields.io/github/repo-size/stnolting/neo430)
+![last commit](https://img.shields.io/github/last-commit/stnolting/neo430)
+![issues](https://img.shields.io/github/issues/stnolting/neo430)
+
 ## Table of Content
 
 * [Introduction](#Introduction)
