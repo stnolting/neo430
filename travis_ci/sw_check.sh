@@ -9,5 +9,3 @@ ls -al $srcdir_bootloader
 # Try to compile all example projects
 make -C $srcdir_examples compile
 make -C $srcdir_bootloader all
-
-
