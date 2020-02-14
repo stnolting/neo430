@@ -14,12 +14,12 @@ script:
     # Run SW check (check if all example projects + bootloader are compiling)
   - >
     docker run -t -v `pwd`:/mnt/data cdelledonne/msp430-gcc
-    /bin/bash -c  "chmod u+x /mnt/data/travis/sw_check.sh; /mnt/data/travis/sw_check.sh"
+    /bin/bash -c  "chmod u+x /mnt/data/travis_ci/sw_check.sh; /mnt/data/travis_ci/sw_check.sh"
 
     # Run HW check (check if all sources are error-free)
   - >
     docker run -t -v `pwd`:/mnt/data ghdl/ghdl:buster-gcc-8.3.0
-    /bin/bash -c  "chmod u+x /mnt/data/travis/hw_check.sh; /mnt/data/travis/hw_check.sh"
+    /bin/bash -c  "chmod u+x /mnt/data/travis_ci/hw_check.sh; /mnt/data/travis_ci/hw_check.sh"
 
 notifications:
   email:
