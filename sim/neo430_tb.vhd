@@ -22,7 +22,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 10.01.2020 #
+-- # Stephan Nolting, Hannover, Germany                                                 14.02.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -47,7 +47,7 @@ architecture neo430_tb_rtl of neo430_tb is
   -- -------------------------------------------------------------------------------------------
 
   -- textio --
-  file file_uart_tx_out : text;
+  file file_uart_tx_out : text open write_mode is "neo430.uart_tx.txt";
 
   -- internal configuration --
   constant baud_val_c : real    := f_clock_c / baud_rate_c;
@@ -172,8 +172,6 @@ begin
     variable i, j     : integer;
     variable line_tmp : line;
   begin
-    -- textio --
-    file_open(file_uart_tx_out, "neo430.uart_tx.txt", write_mode);
 
     -- "UART" --
     if rising_edge(clk_gen) then
