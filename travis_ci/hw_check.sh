@@ -36,7 +36,7 @@ ghdl -a --work=neo430 $srcdir_core/neo430_uart.vhd
 ghdl -a --work=neo430 $srcdir_core/neo430_wb_interface.vhd
 ghdl -a --work=neo430 $srcdir_core/neo430_wdt.vhd
 
-ghdl -a --work=neo430 $srcdir_core/*.vhd $srcdir_top_templates/*.vhd $srcdir_sim/*.vhd
+ghdl -a --work=neo430 $srcdir_top_templates/*.vhd $srcdir_sim/*.vhd
 
 # Elaborate top entity
 ghdl -e --work=neo430 neo430_top
