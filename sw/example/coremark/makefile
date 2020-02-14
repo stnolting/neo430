@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 # ********************************************************************************************* #
-# Stephan Nolting, Hannover, Germany                                                 12.02.2020 #
+# Stephan Nolting, Hannover, Germany                                                 14.02.2020 #
 #################################################################################################
 
 
@@ -27,7 +27,7 @@
 # USER CONFIGURATION
 #*******************************************************************************
 # Compiler effort (-Os = optimize for size)
-EFFORT = -O3
+EFFORT = -Os
 
 # User's application sources (add additional files here)
 APP_SRC = core_main.c core_list_join.c core_matrix.c core_portme.c core_state.c core_util.c ee_printf.c
@@ -100,6 +100,8 @@ IMAGE_GEN = $(NEO430_EXE_PATH)/image_gen
 # Compiler flags
 CC_OPTS = -mcpu=msp430 -pipe -Wall -Xassembler --mY -mhwmult=none -fno-delete-null-pointer-checks
 CC_OPTS += -Wl,-static -mrelax -minrt -nostartfiles -fdata-sections -ffunction-sections -Xlinker --gc-sections
+# Add user flags if available
+CC_OPTS += ${CC_USER_FLAGS}
 
 # Linker flags
 LD_OPTS = -mcpu=msp430 -Wl,--gc-sections -mrelax -minrt -nostartfiles

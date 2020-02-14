@@ -92,6 +92,14 @@ MAIN_RETURN_TYPE main(void) {
 #else
 MAIN_RETURN_TYPE main(int argc, char *argv[]) {
 #endif
+
+// -----------------------------------------------
+#ifndef RUN_COREMARK
+  #pragma message ("COREMARK HAS NOT BEEN COMPILED! Use >>make clean compile CC_USER_FLAGS+=-DRUN_COREMARK<< to compile it.")
+  while(1) {}
+#endif
+// -----------------------------------------------
+
 	ee_u16 i,j=0,num_algorithms=0;
 	ee_s16 known_id=-1,total_errors=0;
 	ee_u16 seedcrc=0;
