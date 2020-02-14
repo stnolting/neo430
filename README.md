@@ -1,3 +1,6 @@
+# The NEO430 Processor
+
+[![Build Status](https://travis-ci.com/stnolting/neo430.svg?branch=master)](https://travis-ci.com/stnolting/neo430)
 [![GitHub release](https://img.shields.io/github/v/release/stnolting/neo430?include_prereleases)](https://GitHub.com/stnolting/neo430/releases/)
 [![size](https://img.shields.io/github/repo-size/stnolting/neo430)](https://github.com/stnolting/neo430/archive/master.zip)
 [![last commit](https://img.shields.io/github/last-commit/stnolting/neo430)](https://github.com/stnolting/neo430/commits/master)
@@ -145,22 +148,23 @@ processor modules (excluding the CFU but including the TRNG), an IMEM size of 4k
 | Bootloader Memory (Boot ROM, 2kB)      | 2    | 1   | 16384       | 0    |
 | Central Processing Unit (CPU)          | 506  | 171 | 256         | 0    |
 | Checksum Unit (CRC)                    | 110  | 94  | 0           | 0    |
-| Custom Functions Unit (CFU)            | -    | -   | -           | -    |
+| Custom Functions Unit (CFU)*           | -    | -   | -           | -    |
 | Data Memory (DMEM, 2kB)                | 6    | 1   | 16384       | 0    |
-| IO Port Unit (GPIO)                    | 49   | 45  | 0           | 0    |
+| External Interrupts Controller (EXIRQ) | 72   | 54  | 0           | 0    |
+| High-Precision Timer (TIMER)           | 70   | 55  | 0           | 0    |
 | Instruction Memory (IMEM, 4kB)         | 4    | 1   | 32768       | 0    |
+| IO Port Unit (GPIO)                    | 49   | 45  | 0           | 0    |
 | Multiplier & Divider (MULDIV)          | 184  | 131 | 0           | 0    |
 | Pulse-Width Modulation Unit (PWM)      | 80   | 66  | 0           | 0    |
 | Serial Peripheral Interface (SPI)      | 57   | 43  | 0           | 0    |
 | System Info Memory (SYSCONFIG)         | 15   | 13  | 0           | 0    |
-| High-Precision Timer (TIMER)           | 70   | 55  | 0           | 0    |
 | True Random Number Generator (TRNG)    | 44   | 36  | 0           | 0    |
 | Two Wire Interface (TWI)               | 80   | 41  | 0           | 0    |
 | Universal Asynchronous Rx/Tx (UART)    | 129  | 89  | 0           | 0    |
-| Wishbone Interface (WB32)              | 128  | 117 | 0           | 0    |
-| External Interrupts Controller (EXIRQ) | 72   | 54  | 0           | 0    |
 | Watchdog TImer (WDT)                   | 49   | 36  | 0           | 0    |
+| Wishbone Interface (WB32)              | 128  | 117 | 0           | 0    |
 
+*) Hardware requirements defined by user application
 
 
 ## Performance
