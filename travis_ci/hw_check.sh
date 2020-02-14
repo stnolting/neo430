@@ -47,4 +47,3 @@ ghdl -e --work=neo430 neo430_top
 # Run simulation
 ghdl -e --work=neo430 neo430_tb
 ghdl -r --work=neo430 neo430_tb --stop-time=20ms
-cat $homedir//neo430.uart_tx.txt
