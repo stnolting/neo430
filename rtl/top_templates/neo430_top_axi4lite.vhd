@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 10.01.2020 #
+-- # Stephan Nolting, Hannover, Germany                                                 14.02.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -73,7 +73,7 @@ entity neo430_top_axi4lite is
     twi_scl_io    : inout std_logic; -- twi serial clock line
     -- external interrupts --
     ext_irq_i     : in  std_logic_vector(07 downto 0); -- external interrupt request lines
-    ext_ack_o     : out std_logic_vector(07 downto 0)  -- external interrupt request acknowledges
+    ext_ack_o     : out std_logic_vector(07 downto 0); -- external interrupt request acknowledges
     -- AXI Lite-Compatible Master Interface --
     -- Clock and Reset
     m_axi_aclk    : in std_logic;
@@ -200,8 +200,8 @@ begin
     wb_cyc_o    => wb_core.cyc,       -- valid cycle
     wb_ack_i    => wb_core.ack,       -- transfer acknowledge
     -- interrupts --
-    irq_i       => irq_i_int,         -- external interrupt request line
-    irq_ack_o   => irq_ack_o_int      -- external interrupt request acknowledge
+    ext_irq_i   => irq_i_int,          -- external interrupt request line
+    ext_ack_o   => irq_ack_o_int       -- external interrupt request acknowledge
   );
 
 
@@ -210,7 +210,7 @@ begin
   gpio_i_int     <= std_ulogic_vector(gpio_i);
   uart_rxd_i_int <= std_ulogic(uart_rxd_i);
   spi_miso_i_int <= std_ulogic(spi_miso_i);
-  irq_i_int      <= std_ulogic_vector(irq_i);
+  irq_i_int      <= std_ulogic_vector(ext_irq_i);
 
   gpio_o         <= std_logic_vector(gpio_o_int);
   pwm_o          <= std_logic_vector(pwm_o_int);
@@ -218,7 +218,7 @@ begin
   spi_sclk_o     <= std_logic(spi_sclk_o_int);
   spi_mosi_o     <= std_logic(spi_mosi_o_int);
   spi_cs_o       <= std_logic_vector(spi_cs_o_int);
-  irq_ack_o      <= std_logic_vector(irq_ack_o_int);
+  ext_ack_o      <= std_logic_vector(irq_ack_o_int);
 
 
   -- Wishbone-to-AXI4-Lite-compatible Bridge ----------------------------------

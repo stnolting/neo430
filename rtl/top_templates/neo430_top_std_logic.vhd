@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 10.01.2020 #
+-- # Stephan Nolting, Hannover, Germany                                                14.02.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -83,8 +83,8 @@ entity neo430_top_std_logic is
     wb_cyc_o    : out std_logic; -- valid cycle
     wb_ack_i    : in  std_logic; -- transfer acknowledge
     -- external interrupts --
-    ext_irq_i  : in  std_logic_vector(07 downto 0); -- external interrupt request lines
-    ext_ack_o  : out std_logic_vector(07 downto 0)  -- external interrupt request acknowledges
+    ext_irq_i   : in  std_logic_vector(07 downto 0); -- external interrupt request lines
+    ext_ack_o   : out std_logic_vector(07 downto 0)  -- external interrupt request acknowledges
   );
 end neo430_top_std_logic;
 
@@ -172,8 +172,8 @@ begin
     wb_cyc_o   => wb_cyc_o_int,       -- valid cycle
     wb_ack_i   => wb_ack_i_int,       -- transfer acknowledge
     -- interrupts --
-    irq_i      => irq_i_int,          -- external interrupt request line
-    irq_ack_o  => irq_ack_o_int       -- external interrupt request acknowledge
+    ext_irq_i  => irq_i_int,          -- external interrupt request line
+    ext_ack_o  => irq_ack_o_int       -- external interrupt request acknowledge
   );
 
 
@@ -186,7 +186,7 @@ begin
   spi_miso_i_int <= std_ulogic(spi_miso_i);
   wb_dat_i_int   <= std_ulogic_vector(wb_dat_i);
   wb_ack_i_int   <= std_ulogic(wb_ack_i);
-  irq_i_int      <= std_logic_vector(irq_i);
+  irq_i_int      <= std_ulogic_vector(ext_irq_i);
 
   gpio_o         <= std_logic_vector(gpio_o_int);
   pwm_o          <= std_logic_vector(pwm_o_int);
@@ -200,7 +200,7 @@ begin
   wb_sel_o       <= std_logic_vector(wb_sel_o_int);
   wb_stb_o       <= std_logic(wb_stb_o_int);
   wb_cyc_o       <= std_logic(wb_cyc_o_int);
-  irq_ack_o      <= std_logic_vector(irq_ack_o_int);
+  ext_ack_o      <= std_logic_vector(irq_ack_o_int);
 
 
 end neo430_top_std_logic_rtl;
