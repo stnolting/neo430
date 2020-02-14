@@ -252,8 +252,9 @@ The official change log of this project can be found at the end of the [![NEO430
 
 ## Contact
 
-If you have any questions, bug reports, ideas or if you are facing problems with the NEO430, feel free to drop me a line.
-Also, I'm always happy to hear what cool projects you are realizing with this core :smiley:
+If you have any questions, bug reports, ideas or if you are facing problems with the NEO430, open a
+[new issue](https://github.com/stnolting/neo430/issues) or directly drop me a line. Also, I'm always happy to
+hear what cool projects people are realizing with this core :smiley:
 
   stnolting@gmail.com
 

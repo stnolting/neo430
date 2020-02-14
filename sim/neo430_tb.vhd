@@ -46,6 +46,9 @@ architecture neo430_tb_rtl of neo430_tb is
   constant baud_rate_c : real := 19200.0; -- standard UART baudrate
   -- -------------------------------------------------------------------------------------------
 
+  -- textio --
+  file file_uart_tx_out : text;
+
   -- internal configuration --
   constant baud_val_c : real    := f_clock_c / baud_rate_c;
   constant f_clk_c    : natural := natural(f_clock_c);
@@ -167,9 +170,12 @@ begin
   -- -----------------------------------------------------------------------------
   uart_rx_unit: process(clk_gen)
     variable i, j     : integer;
-    file uart_rx_file : text open write_mode is "uart_rx_dump.txt";
     variable line_tmp : line;
   begin
+    -- textio --
+    file_open(file_uart_tx_out, "neo430.uart_tx.txt", write_mode);
+
+    -- "UART" --
     if rising_edge(clk_gen) then
       -- synchronizer --
       uart_rx_sync <= uart_rx_sync(3 downto 0) & uart_txd;
@@ -204,7 +210,7 @@ begin
             end if;
 
             if (i = 10) then -- Linux line break
-              writeline(uart_rx_file, line_tmp);
+              writeline(file_uart_tx_out, line_tmp);
             elsif (i /= 13) then -- Remove additional carriage return
               write(line_tmp, ascii_lut(j));
             end if;
