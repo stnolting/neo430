@@ -1,7 +1,10 @@
+# Project home foler
+homedir=/mnt/data
+
 # The directories of the hw source files
-srcdir_core=/mnt/data/rtl/core
-srcdir_top_templates=/mnt/data/rtl/top_templates
-srcdir_sim=/mnt/data/sim
+srcdir_core=$homedir/rtl/core
+srcdir_top_templates=$homedir/rtl/top_templates
+srcdir_sim=$homedir//sim
 
 # List files
 ls -al $srcdir_core
@@ -40,3 +43,8 @@ ghdl -a --work=neo430 $srcdir_top_templates/*.vhd $srcdir_sim/*.vhd
 
 # Elaborate top entity
 ghdl -e --work=neo430 neo430_top
+
+# Run simulation
+ghdl -e --work=neo430 neo430_tb
+ghdl -r --work=neo430 neo430_tb --stop-time=20ms
+cat $homedir//neo430.uart_tx.txt
