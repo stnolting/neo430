@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Abort if any command returns != 0
+set -e
+
 # The directories of the sw source files
 srcdir_examples=/mnt/data/sw/example
 srcdir_bootloader=/mnt/data/sw/bootloader

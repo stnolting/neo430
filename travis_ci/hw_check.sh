@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Abort if any command returns != 0
+set -e
+
 # Project home foler
 homedir=/mnt/data
 
@@ -46,14 +49,15 @@ ghdl -a --work=neo430 $srcdir_top_templates/*.vhd $srcdir_sim/*.vhd
 # Elaborate top entity
 ghdl -e --work=neo430 neo430_top
 
-# Prepare UARt log file and run simulation
-touch neo430.uart_tx.txt
-chmod 777 neo430.uart_tx.txt
+# Prepare UART tx output log file and run simulation
+touch $homedir/neo430.uart_tx.txt
+chmod 777 $homedir/neo430.uart_tx.txt
 ghdl -e --work=neo430 neo430_tb
 ghdl -r --work=neo430 neo430_tb --stop-time=20ms --ieee-asserts=disable-at-0 --assert-level=error
 
 # Check output
-echo "Checking UART output. Return code from grep:"
-grep -q "Blinking LED demo program FAIL" neo430.uart_tx.txt
-echo $?
-echo "done"
+uart_res_reference="Blinking LED demo program FAIL_TEST"
+echo "Checking UART output. Should be" $uart_res_reference
+echo "UART output is:"
+cat $homedir/neo430.uart_tx.txt
+grep -q "$uart_res_reference" $homedir/neo430.uart_tx.txt
