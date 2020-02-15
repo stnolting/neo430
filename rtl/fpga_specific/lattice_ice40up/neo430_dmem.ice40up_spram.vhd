@@ -87,27 +87,6 @@ begin
 
   -- Memory Access ------------------------------------------------------------
   -- -----------------------------------------------------------------------------
---dmem_file_access: process(clk_i)
---begin
---  -- check max size --
---  if (DMEM_SIZE > 12*1024) then
---    assert false report "D-mem size out of range! Max 12kB!" severity error;
---  end if;
---  if rising_edge(clk_i) then
---    rden <= rden_i and acc_en;
---    if (acc_en = '1') then -- reduce switching activity when not accessed
---      if (wren_i(0) = '1') then -- write low byte
---        dmem_file_l(addr) <= data_i(07 downto 0);
---      end if;
---      rdata(07 downto 0) <= dmem_file_l(addr);
---      if (wren_i(1) = '1') then -- write high byte
---        dmem_file_h(addr) <= data_i(15 downto 8);
---      end if;
---      rdata(15 downto 8) <= dmem_file_h(addr);
---    end if;
---  end if;
---end process dmem_file_access;
-
   dmem_spram_inst : SP256K
   port map (
     AD       => spram_addr,  -- I

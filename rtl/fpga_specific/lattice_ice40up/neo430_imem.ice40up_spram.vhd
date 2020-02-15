@@ -124,44 +124,6 @@ begin
 
   -- Memory Access ------------------------------------------------------------
   -- -----------------------------------------------------------------------------
---imem_file_access: process(clk_i)
---begin
---  -- check max size --
---  if (IMEM_SIZE > 48*1024) then
---    assert false report "I-mem size out of range! Max 48kB!" severity error;
---  end if;
---  -- actual memory access --
---  if rising_edge(clk_i) then
---    rden <= rden_i and acc_en;
---    if (acc_en = '1') then -- reduce switching activity when not accessed
---      if (IMEM_AS_ROM = true) then -- implement IMEM as true ROM
---        rdata(07 downto 0) <= imem_file_rom_l(addr);
---        rdata(15 downto 8) <= imem_file_rom_h(addr);
---
---      elsif (BOOTLD_USE = true) then -- implement IMEM as non-initialized RAM
---        if (wren_i(0) = '1') and (upen_i = '1') then
---          imem_file_ram_l(addr) <= data_i(07 downto 0);
---        end if;
---        rdata(07 downto 0) <= imem_file_ram_l(addr);
---        if (wren_i(1) = '1') and (upen_i = '1') then
---          imem_file_ram_h(addr) <= data_i(15 downto 8);
---        end if;
---        rdata(15 downto 8) <= imem_file_ram_h(addr);
---
---      else -- implement IMEM as PRE-INITIALIZED RAM
---        if (wren_i(0) = '1') and (upen_i = '1') then
---          imem_file_init_ram_l(addr) <= data_i(07 downto 0);
---        end if;
---        rdata(07 downto 0) <= imem_file_init_ram_l(addr);
---        if (wren_i(1) = '1') and (upen_i = '1') then
---          imem_file_init_ram_h(addr) <= data_i(15 downto 8);
---        end if;
---        rdata(15 downto 8) <= imem_file_init_ram_h(addr);
---      end if;
---    end if;
---  end if;
---end process imem_file_access;
-
   imem_spram_lo_inst : SP256K
   port map (
     AD       => spram_addr,  -- I

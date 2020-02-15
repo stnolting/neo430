@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 12.02.2020 #
+-- # Stephan Nolting, Hannover, Germany                                                 15.02.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -60,14 +60,17 @@ package neo430_package is
   -- -------------------------------------------------------------------------------------------
 
   -- Main Memory: IMEM(ROM/RAM) --
-  constant imem_base_c : std_ulogic_vector(15 downto 0) := x"0000"; -- base address, fixed!
+  constant imem_base_c     : std_ulogic_vector(15 downto 0) := x"0000"; -- base address, fixed!
+  constant imem_max_size_c : natural := 48*1024; -- bytes, fixed!
 
   -- Main Memory: DMEM(RAM) --
-  constant dmem_base_c : std_ulogic_vector(15 downto 0) := x"C000"; -- base address, fixed!
+  constant dmem_base_c     : std_ulogic_vector(15 downto 0) := x"C000"; -- base address, fixed!
+  constant dmem_max_size_c : natural := 12*1024; -- bytes, fixed!
 
   -- Boot ROM --
-  constant boot_base_c : std_ulogic_vector(15 downto 0) := x"F000"; -- bootloader base address, fixed!
-  constant boot_size_c : natural := 2048; -- bytes, max 2048 bytes!
+  constant boot_base_c     : std_ulogic_vector(15 downto 0) := x"F000"; -- bootloader base address, fixed!
+  constant boot_size_c     : natural := 2048; -- bytes, max 2048 bytes!
+  constant boot_max_size_c : natural := 2048; -- bytes, fixed!
 
   -- IO: Peripheral Devices ("IO") Area --
   -- Each device must use 2 bytes or a multiple of 2 bytes as address space!

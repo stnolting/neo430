@@ -19,7 +19,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 29.04.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 15.02.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -79,7 +79,7 @@ begin
   dmem_file_access: process(clk_i)
   begin
     -- check max size --
-    if (DMEM_SIZE > 12*1024) then
+    if (DMEM_SIZE > dmem_max_size_c) then
       assert false report "D-mem size out of range! Max 12kB!" severity error;
     end if;
     if rising_edge(clk_i) then

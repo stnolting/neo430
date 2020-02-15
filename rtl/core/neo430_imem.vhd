@@ -24,7 +24,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 29.04.2019 #
+-- # Stephan Nolting, Hannover, Germany                                                 15.02.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -116,7 +116,7 @@ begin
   imem_file_access: process(clk_i)
   begin
     -- check max size --
-    if (IMEM_SIZE > 48*1024) then
+    if (IMEM_SIZE > imem_max_size_c) then
       assert false report "I-mem size out of range! Max 48kB!" severity error;
     end if;
     -- actual memory access --

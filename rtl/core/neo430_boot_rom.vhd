@@ -79,7 +79,7 @@ begin
   mem_file_access: process(clk_i)
   begin
     -- check max size --
-    if (boot_size_c > 2*1024) then
+    if (boot_size_c > boot_max_size_c) then
       assert false report "Boot ROM size out of range! Max 2kB!" severity error;
     end if;
     if rising_edge(clk_i) then
