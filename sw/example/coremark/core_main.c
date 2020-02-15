@@ -95,7 +95,7 @@ MAIN_RETURN_TYPE main(int argc, char *argv[]) {
 
 // -----------------------------------------------
 #ifndef RUN_COREMARK
-  #pragma message ("COREMARK HAS NOT BEEN COMPILED! Use >>make clean compile CC_USER_FLAGS+=-DRUN_COREMARK<< to compile it.")
+  #pragma warning ("COREMARK HAS NOT BEEN COMPILED! Use >>make clean compile CC_USER_FLAGS+=-DRUN_COREMARK<< to compile it.")
   while(1) {}
 #endif
 // -----------------------------------------------
