@@ -1,10 +1,12 @@
+#!/bin/bash
+
 # Project home foler
 homedir=/mnt/data
 
 # The directories of the hw source files
 srcdir_core=$homedir/rtl/core
 srcdir_top_templates=$homedir/rtl/top_templates
-srcdir_sim=$homedir//sim
+srcdir_sim=$homedir/sim
 
 # List files
 ls -al $srcdir_core
@@ -44,6 +46,14 @@ ghdl -a --work=neo430 $srcdir_top_templates/*.vhd $srcdir_sim/*.vhd
 # Elaborate top entity
 ghdl -e --work=neo430 neo430_top
 
-# Run simulation
+# Prepare UARt log file and run simulation
+touch neo430.uart_tx.txt
+chmod 777 neo430.uart_tx.txt
 ghdl -e --work=neo430 neo430_tb
-ghdl -r --work=neo430 neo430_tb --stop-time=20ms
+ghdl -r --work=neo430 neo430_tb --stop-time=20ms --ieee-asserts=disable-at-0 --assert-level=error
+
+# Check output
+echo "Checking UART output. Return code from grep:"
+grep -q "Blinking LED demo program FAIL" neo430.uart_tx.txt
+echo $?
+echo "done"

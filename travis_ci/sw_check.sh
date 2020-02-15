@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # The directories of the sw source files
 srcdir_examples=/mnt/data/sw/example
 srcdir_bootloader=/mnt/data/sw/bootloader
