@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU Lesser General Public License along with this      #
 # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 # ********************************************************************************************* #
-# Stephan Nolting, Hannover, Germany                                                 14.02.2020 #
+# Stephan Nolting, Hannover, Germany                                                 15.02.2020 #
 #################################################################################################
 
 
@@ -30,13 +30,13 @@
 EFFORT = -Os
 
 # User's application sources (add additional files here)
-APP_SRC = core_main.c core_list_join.c core_matrix.c core_portme.c core_state.c core_util.c ee_printf.c
+APP_SRC = core_list_join.c core_main.c core_matrix.c core_portme.c core_state.c core_util.c ee_printf.c
 
 # User's application include folders (don't forget the '-I' before each entry)
 APP_INC = -I .
 
 # Relative or absolute path to the NEO430 home folder
-NEO430_HOME = ../..
+NEO430_HOME = ../../..
 #*******************************************************************************
 
 
@@ -45,15 +45,15 @@ NEO430_HOME = ../..
 # NEO430 framework
 #-------------------------------------------------------------------------------
 # Path to NEO430 linker script and startup file
-NEO430_COM_PATH=$(NEO430_HOME)/common
+NEO430_COM_PATH=$(NEO430_HOME)/sw/common
 # Path to main NEO430 library include files
-NEO430_INC_PATH=$(NEO430_HOME)/lib/neo430/include
+NEO430_INC_PATH=$(NEO430_HOME)/sw/lib/neo430/include
 # Path to main NEO430 library source files
-NEO430_SRC_PATH=$(NEO430_HOME)/lib/neo430/source
+NEO430_SRC_PATH=$(NEO430_HOME)/sw/lib/neo430/source
 # Path to NEO430 executable generator
-NEO430_EXE_PATH=$(NEO430_HOME)/tools/image_gen
+NEO430_EXE_PATH=$(NEO430_HOME)/sw/tools/image_gen
 # Path to NEO430 core rtl folder
-NEO430_RTL_PATH=$(NEO430_HOME)/../rtl/core
+NEO430_RTL_PATH=$(NEO430_HOME)/rtl/core
 
 
 #-------------------------------------------------------------------------------
@@ -154,6 +154,7 @@ $(APP_ASM): main.elf
 
 # Generate NEO430 executable image for bootloader update
 $(APP_BIN): image.dat $(IMAGE_GEN)
+	@set -e
 	@$(IMAGE_GEN) -app_bin $< $@
 
 # Generate NEO430 executable VHDL boot image
