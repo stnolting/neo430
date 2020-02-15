@@ -50,8 +50,8 @@ ghdl -a --work=neo430 $srcdir_top_templates/*.vhd $srcdir_sim/*.vhd
 ghdl -e --work=neo430 neo430_top
 
 # Prepare UART tx output log file and run simulation
-touch $homedir/neo430.uart_tx.txt
-chmod 777 $homedir/neo430.uart_tx.txt
+touch neo430.uart_tx.txt
+chmod 777 neo430.uart_tx.txt
 ghdl -e --work=neo430 neo430_tb
 ghdl -r --work=neo430 neo430_tb --stop-time=20ms --ieee-asserts=disable-at-0 --assert-level=error
 
@@ -59,5 +59,5 @@ ghdl -r --work=neo430 neo430_tb --stop-time=20ms --ieee-asserts=disable-at-0 --a
 uart_res_reference="Blinking LED demo program"
 echo "Checking UART output. Should be" $uart_res_reference
 echo "UART output is:"
-cat $homedir/neo430.uart_tx.txt
-grep -q "$uart_res_reference" $homedir/neo430.uart_tx.txt
+cat neo430.uart_tx.txt
+grep -q "$uart_res_reference" neo430.uart_tx.txt
