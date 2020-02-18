@@ -57,7 +57,7 @@ ghdl -r --work=neo430 neo430_tb --stop-time=20ms --ieee-asserts=disable-at-0 --a
 
 # Check output
 uart_res_reference="Blinking LED demo program"
-echo "Checking UART output. Should be" $uart_res_reference
+echo "Checking UART output. Should be:" $uart_res_reference
 echo "UART output is:"
 cat neo430.uart_tx.txt
 grep -q "$uart_res_reference" neo430.uart_tx.txt
