@@ -24,7 +24,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- #  tephan Nolting, Hannover, Germany                                                 16.01.2020 #
+-- #  tephan Nolting, Hannover, Germany                                                 04.03.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -115,9 +115,6 @@ begin
     end if;
   end process wr_access;
 
-  -- timer clock select --
-  prsc_tick <= clkgen_i(to_integer(unsigned(ctrl(ctrl_prsc2_bit_c downto ctrl_prsc0_bit_c))));
-
   -- enable external clock generator --
   clkgen_en_o <= ctrl(ctrl_en_bit_c);
 
@@ -127,6 +124,8 @@ begin
   counter_update: process(clk_i)
   begin
     if rising_edge(clk_i) then
+      -- clock_en buffer --
+      prsc_tick <= clkgen_i(to_integer(unsigned(ctrl(ctrl_prsc2_bit_c downto ctrl_prsc0_bit_c))));
       -- irq edge detector --
       irq_fire_ff <= irq_fire;
       -- counter update --

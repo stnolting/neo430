@@ -235,7 +235,7 @@ begin
     end if;
   end process clock_generator_buf;
 
-  -- clock enable select - rising edge detectors --
+  -- clock enable select: rising edge detectors --
   clk_gen(clk_div2_c)    <= clk_div(0)  and (not clk_div_ff(0));  -- CLK/2
   clk_gen(clk_div4_c)    <= clk_div(1)  and (not clk_div_ff(1));  -- CLK/4
   clk_gen(clk_div8_c)    <= clk_div(2)  and (not clk_div_ff(2));  -- CLK/8

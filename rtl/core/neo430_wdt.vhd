@@ -25,7 +25,7 @@
 -- # You should have received a copy of the GNU Lesser General Public License along with this      #
 -- # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 -- # ********************************************************************************************* #
--- # Stephan Nolting, Hannover, Germany                                                 15.01.2020 #
+-- # Stephan Nolting, Hannover, Germany                                                 04.03.2020 #
 -- #################################################################################################
 
 library ieee;
@@ -125,12 +125,17 @@ begin
     end if;
   end process wdt_core;
 
+  -- enable external clock generator --
+  clkgen_en_o <= enable;
+
 
   -- Counter Update -----------------------------------------------------------
   -- -----------------------------------------------------------------------------
   cnt_sync: process(clk_i)
   begin
     if rising_edge(clk_i) then
+      -- clock_en buffer --
+      prsc_tick <= clkgen_i(to_integer(unsigned(clk_sel)));
       -- unauthorized access buffer --
       fail_ff <= fail;
       -- reset synchronizer --
@@ -143,10 +148,6 @@ begin
       end if;
     end if;
   end process cnt_sync;
-
-  -- counter clock select --
-  clkgen_en_o <= enable;
-  prsc_tick   <= clkgen_i(to_integer(unsigned(clk_sel)));
 
   -- system reset --
   rst_o <= rst_sync(1);
