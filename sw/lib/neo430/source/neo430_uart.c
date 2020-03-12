@@ -19,7 +19,7 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 06.02.2020 #
+// # Stephan Nolting, Hannover, Germany                                                 11.03.2020 #
 // #################################################################################################
 
 #include "neo430.h"
@@ -491,5 +491,63 @@ void neo430_uart_bs(uint16_t n) {
   while (n--) {
     neo430_uart_putc(0x08);
   }
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Print signed 32-bit fixed point number (num)
+ * PARAM fpf_c: Number of bin fractional bits in input (max 32)
+ * PARAM num_frac_digits_c: Number of fractional digits to show (max 8)
+ * ------------------------------------------------------------ */
+void neo430_uart_print_fpf_32(int32_t num, const int fpf_c, const int num_frac_digits_c) {
+
+  char string_buf[11];
+  int i;
+
+
+  // make positive
+  if (num < 0) {
+    neo430_uart_putc('-');
+    num = -num;
+  }
+  uint32_t num_int = (uint32_t)num;
+
+
+  // compute resolution
+  uint32_t frac_dec_base = 1;
+  for (i=0; i<num_frac_digits_c; i++) {
+    frac_dec_base *= 10;
+  }
+  frac_dec_base >>= 1;
+
+
+  // print integer part
+  uint32_t int_data = num_int >> fpf_c;
+  neo430_itoa((uint32_t)int_data, 0, string_buf);
+  neo430_uart_br_print(string_buf);
+
+
+  // compute fractional part's shift mask
+  uint32_t frac_dec_mask = 1;
+  for (i=0; i<fpf_c-1; i++) {
+    frac_dec_mask <<= 1;
+  }
+
+  // compute actual fractional part
+  uint32_t frac_data = num_int & ((1 << fpf_c)-1);
+  uint32_t frac_sum = 0;
+  for (i=0; i<fpf_c; i++) {
+
+    if (frac_data & frac_dec_mask) { // frac bit set?
+      frac_sum += frac_dec_base;
+    }
+    frac_dec_mask >>= 1; // got from MSB to LSB
+    frac_dec_base >>= 1;
+  }
+
+  // print fractional part
+  neo430_uart_putc('.');
+  neo430_itoa((uint32_t)frac_sum, num_frac_digits_c-1, string_buf);
+  neo430_uart_br_print(string_buf);
 }
 
