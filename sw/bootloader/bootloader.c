@@ -4,12 +4,12 @@
 // # Boot from IMEM, UART or SPI Flash at SPI.CS[0]                                                #
 // #                                                                                               #
 // # UART configuration: 8N1 at 19200 baud                                                         #
-// # Boot Flash: 8-bit SPI, 24-bit addresses (e.g., Micron N25Q032A) @ SPI.CS[0]                   #
-// # GPIO.out[0] is used as high-active status LED                                                 #
+// # Boot Flash: 8-bit SPI, 24-bit addresses (like Micron N25Q032A) @ NEO430_SPI.CS[0]             #
+// # NEO430_GPIO.out[0] is used as high-active status LED                                          #
 // #                                                                                               #
 // # Auto boot sequence after timeout:                                                             #
 // #  -> Try booting from SPI flash at SPI.CS[0]                                                   #
-// #  -> permanently light up status led and freeze if SPI flash booting attempt fails             #
+// #  -> Permanently light up status led and freeze if SPI flash booting attempt fails             #
 // # ********************************************************************************************* #
 // # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
 // # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
@@ -29,20 +29,20 @@
 // # You should have received a copy of the GNU Lesser General Public License along with this      #
 // # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 10.02.2020 #
+// # Stephan Nolting, Hannover, Germany                                                 12.03.2020 #
 // #################################################################################################
 
 // Libraries
 #include <stdint.h>
 #include <neo430.h>
 
+// SPI flash: NEO430 boot base address
+#define SPI_FLASH_BOOT_ADR  0x00040000L
+
 // Configuration
 #define BAUD_RATE        19200 // default UART baud rate
 #define AUTOBOOT_TIMEOUT 4     // countdown (seconds) to auto boot
 #define STATUS_LED       0     // GPIO.out(0) is status LED
-
-// SPI flash boot base address
-#define SPI_FLASH_BOOT_ADR  0x00040000L
 
 // SPI flash hardware configuration
 #define SPI_FLASH_CS     0
