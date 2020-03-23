@@ -247,19 +247,12 @@ begin
         alu_res <= (others => '-');
         flag_o(flag_c_c) <= '-';
         flag_o(flag_v_c) <= '-';
+        flag_o(flag_n_c) <= '-';
+        flag_o(flag_z_c) <= '-';
+        flag_o(flag_p_c) <= '-';
 
     end case;
   end process alu_core;
-
-  -- are we really using the DADD instruction? --
-  alu_core_sanity_check: process(clk_i)
-  begin
-    if rising_edge(clk_i) then
-      if (ctrl_i(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) = alu_dadd_c) then
-        assert false report "DADD instruction not supported!" severity error;
-      end if;
-    end if;
-  end process alu_core_sanity_check;
 
 
   -- Post processing logic ----------------------------------------------------

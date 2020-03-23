@@ -108,8 +108,8 @@ begin
       if (ctrl_i(ctrl_adr_ivec_oe_c) = '1') then -- interrupt handler call
         mem_addr_o <= dmem_base_c; -- IRQ vectors are located at the beginning of DMEM
         mem_addr_o(2 downto 0) <= irq_sel_i & '0'; -- select according word-aligned entry
-      else -- direct output of reg file (for instruction fetch only)
-        mem_addr_o <= reg_i(15 downto 1) & '0'; -- instructions have to be word-aligned
+      else -- direct output of reg file
+        mem_addr_o <= reg_i;
       end if;
     else
       mem_addr_o <= mem_addr_reg;
