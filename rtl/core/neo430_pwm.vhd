@@ -153,11 +153,11 @@ begin
       if (enable = '0') then 
         pwm_cnt <= (others => '0');
       elsif (prsc_tick = '1') then
-        -- constrain counter to virtual size configured by SIZE register
         pwm_cnt <= std_ulogic_vector(unsigned(pwm_cnt) + 1);
       end if;
       -- channels --
       for i in 0 to num_pwm_channels_c-1 loop
+        -- constrain counter to virtual size configured by SIZE register
         if (unsigned(pwm_cnt and mask) >= unsigned(pwm_ch(i))) or (enable = '0') then
           pwm_out(i) <= '0';
         else

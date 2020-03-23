@@ -180,14 +180,14 @@ begin
 
   -- activate both WE lines when in word mode, use corresponding WE line when in byte mode
   mem_wr_o(0) <= ctrl_bus(ctrl_mem_wr_c) when (bw_ff = '0') else (ctrl_bus(ctrl_mem_wr_c) and (not mem_addr(0)));
-  mem_wr_o(1) <= ctrl_bus(ctrl_mem_wr_c) when (bw_ff = '0') else (ctrl_bus(ctrl_mem_wr_c) and mem_addr(0));
+  mem_wr_o(1) <= ctrl_bus(ctrl_mem_wr_c) when (bw_ff = '0') else (ctrl_bus(ctrl_mem_wr_c) and      mem_addr(0) );
 
   -- only allow write-access to IMEM when r-flag is set --
   mem_imwe_o <= sreg(sreg_r_c);
 
   -- data in/out swap --
   mdi_gate   <= mem_data_i when ((rd_ff = '1') or (low_power_mode_c = false)) else (others => '0'); -- AND GATE to reduce switching activity in low power mode
-  mdi        <= mdi_gate   when (dio_swap = '0') else mem_data_i(7 downto 0) & mem_data_i(15 downto 8);
+  mdi        <= mdi_gate   when (dio_swap = '0') else mdi_gate(7 downto 0) & mdi_gate(15 downto 8);
   mdo_gate   <= alu_res    when (dio_swap = '0') else alu_res(7 downto 0) & alu_res(15 downto 8);
   mem_data_o <= mdo_gate   when ((ctrl_bus(ctrl_mem_wr_c) = '1') or (low_power_mode_c = false)) else (others => '0'); -- AND GATE to reduce switching activity in low power mode
 
