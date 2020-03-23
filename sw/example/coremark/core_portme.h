@@ -33,8 +33,13 @@ Modified for neo430 by Stephan Nolting
 #define BAUD_RATE       (19200)
 #define ITERATIONS      (2000)
 #define NEO430_TIMER_F  (10) // Hertz
-#define FLAGS_STR        "-O3" // compiler optimization
+#define FLAGS_STR        "-Os" // compiler optimization
+
+#ifndef USE_NEO430_MULTIPLIER
 #define USE_NEO430_MUL   0 // set 1 to use MULDIV unit for matrix core operations
+#else
+#define USE_NEO430_MUL   1 // set 1 to use MULDIV unit for matrix core operations  
+#endif
 
 // For debugging
 #define xstr(a) str(a)

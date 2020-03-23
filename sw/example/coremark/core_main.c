@@ -94,6 +94,12 @@ MAIN_RETURN_TYPE main(int argc, char *argv[]) {
 #endif
 
 // -----------------------------------------------
+#ifndef USE_NEO430_MULTIPLIER
+#pragma warning ("Using SW multiplication. Use >>make clean compile CC_USER_FLAGS+=-DUSE_NEO430_MULTIPLIER<< to use the NEO430 MULDIV unit instead.")
+#else
+#pragma warning ("Using NEO430 MULDIV unit for multiplications.")
+#endif
+
 #ifndef RUN_COREMARK
   #pragma warning ("COREMARK HAS NOT BEEN COMPILED! Use >>make clean compile CC_USER_FLAGS+=-DRUN_COREMARK<< to compile it.")
   while(1) {}
