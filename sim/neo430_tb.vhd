@@ -116,7 +116,7 @@ begin
     TIMER_USE   => true,              -- implement timer? (default=true)
     UART_USE    => true,              -- implement UART? (default=true)
     CRC_USE     => true,              -- implement CRC unit? (default=true)
-    CFU_USE     => true,              -- implement custom functions unit? (default=false)
+    CFU_USE     => false,             -- implement custom functions unit? (default=false)
     PWM_USE     => true,              -- implement PWM controller? (default=true)
     TWI_USE     => true,              -- implement two wire serial interface? (default=true)
     SPI_USE     => true,              -- implement SPI? (default=true)
