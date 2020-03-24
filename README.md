@@ -178,13 +178,12 @@ its complex operand and adressing modes (e.g., ALU operations executing directly
 the processor to use very **dense and powerfull CISC-like operations**.
 
 Furthermore, the multi-cycle architecture features a **very short crtitical path** when compared to other (even 32-bit)
-processors. Thus, the NEO430 can operate at very high frequencies even on low-cost (e.g., +120MHz on an Intel Cyclone 4)
-and low-power FPGAs (e.g., +20MHz on a Lattice iCE40 UltraPlus).
+processors. Thus, the NEO430 can operate at very high frequencies even on low-cost (e.g., +110MHz on an Intel Cyclone 4)
+and low-power FPGAs (e.g., +20MHz on a Lattice iCE40 UltraPlus) and without area constraints.
 
-Depending on the format of the instruction, the actual execution can take 3 to 11 clock cycles. If all possible instruction
-types and formates are executed in an eually distributed manner (worse case), the average CPI (clock cycles per instruction)
-evaluates to ~8 cycles/instruction resulting in **0.125 instructions per Hertz** of the operating frequency. However, this mix
-is quite unrealistic, so the real average CPI will be somewhere below 8 cycles/instruction.
+Depending on the format of the instruction, the actual execution can take 3 to 10 clock cycles. If all possible instruction
+types and formates are executed in an eually distributed manner (i.e. worst case), the average CPI (clock cycles per instruction)
+evaluates to **7.33 cycles/instruction resulting in 0.136 MIPS per MHz (worst case)**.
 
 
 ### Coremark Benchmark
@@ -194,13 +193,15 @@ project's [sw/example/coremark](https://github.com/stnolting/neo430/blob/master/
 tests the capabilities of the CPU itself rather than the functions provided by the whole system / SoC.
 
 ~~~
-Hardware: 100 MHz, 16kB IMEM, 8kB DMEM, HW verison 0x0322, no peripherals used (except for the TIMER and the UART)
-Software: Optimization level -Os, msp430-gcc 8.3.0 for Linux, MEM_METHOD is MEM_STACK, 2000 coremark iterations
+Hardware: 100 MHz, 32kB IMEM, 12kB DMEM, HW verison 0x0401, no peripherals used (except for the TIMER and the UART)
+Software: msp430-gcc 8.3.0 for Linux, MEM_METHOD is MEM_STACK, 2000 coremark iterations
 ~~~
 
-| __Coremark Score__ | __Relative Score__    |
-|:------------------:|:---------------------:|
-| 6.38               | 0.064 Coremarks/MHz   |
+|__Optimization__     | __Coremark Score__ | __Relative Score__    |
+|:-------------------:|:------------------:|:---------------------:|
+| -Os                 | 6.56               | 0.066 Coremarks/MHz   |
+| -O3                 | 6.92               | 0.069 Coremarks/MHz   |
+| -O3 + NEO430_MULDIV | 14.82              | 0.148 Coremarks/MHz   |
 
 Even though a score of 6.38 can outnumber certain architectures and configurations (see the score table on the coremark
 homepage), the relative score of 0.064 coremarks per second might pretty low. But you have to keep in mind that benchmark
