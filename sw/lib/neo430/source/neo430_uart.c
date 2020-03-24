@@ -318,10 +318,10 @@ void neo430_uart_print_bin_dword(uint32_t dw) {
 
 
 /* ------------------------------------------------------------
- * INFO Print 32-bit number as decimal number
+ * INFO Print 32-bit number as decimal number (10 digits)
  * INFO Slow custom version of itoa
  * PARAM 32-bit value to be printed as decimal number
- * PARAM show leading zeros when set
+ * PARAM show #leading_zeros leading zeros
  * PARAM pointer to array (11 elements!!!) to store conversion result string
  * ------------------------------------------------------------ */
 void neo430_itoa(uint32_t x, const uint16_t leading_zeros, char *res) {
@@ -514,14 +514,12 @@ void neo430_uart_print_fpf_32(int32_t num, const int fpf_c, const int num_frac_d
   char string_buf[11];
   int i;
 
-
   // make positive
   if (num < 0) {
     neo430_uart_putc('-');
     num = -num;
   }
   uint32_t num_int = (uint32_t)num;
-
 
   // compute resolution
   uint32_t frac_dec_base = 1;
@@ -530,11 +528,11 @@ void neo430_uart_print_fpf_32(int32_t num, const int fpf_c, const int num_frac_d
   }
   frac_dec_base >>= 1;
 
-
   // print integer part
   uint32_t int_data = num_int >> fpf_c;
   neo430_itoa((uint32_t)int_data, 0, string_buf);
   neo430_uart_br_print(string_buf);
+  neo430_uart_putc('.');
 
 
   // compute fractional part's shift mask
@@ -551,13 +549,13 @@ void neo430_uart_print_fpf_32(int32_t num, const int fpf_c, const int num_frac_d
     if (frac_data & frac_dec_mask) { // frac bit set?
       frac_sum += frac_dec_base;
     }
-    frac_dec_mask >>= 1; // got from MSB to LSB
+    frac_dec_mask >>= 1; // go from MSB to LSB
     frac_dec_base >>= 1;
   }
 
   // print fractional part
-  neo430_uart_putc('.');
   neo430_itoa((uint32_t)frac_sum, num_frac_digits_c-1, string_buf);
+  string_buf[num_frac_digits_c] = '\0'; // truncate
   neo430_uart_br_print(string_buf);
 }
 
