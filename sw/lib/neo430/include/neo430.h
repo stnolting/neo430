@@ -86,15 +86,24 @@
 // ----------------------------------------------------------------------------
 // Unsigned Multiplier/Divider Unit (MULDIV)
 // ----------------------------------------------------------------------------
-#define MULDIV_OPA     (*(REG16 0xFF80)) // -/w: operand A (dividend or factor1)
-#define MULDIV_OPB_DIV (*(REG16 0xFF82)) // -/w: operand B (divisor) for division
-#define MULDIV_OPB_MUL (*(REG16 0xFF84)) // -/w: operand B (factor2) for multiplication
-//#define reserved     (*(REG16 0xFF86))
-//#define reserved     (*(REG16 0xFF88))
-//#define reserved     (*(REG16 0xFF8A))
-#define MULDIV_RESX    (*(ROM16 0xFF8C)) // r/-: quotient or product low word
-#define MULDIV_RESY    (*(ROM16 0xFF8E)) // r/-: remainder or product high word
-#define MULDIV_R32bit  (*(ROM32 (&MULDIV_RESX))) // r/-: read result as 32-bit data word
+#define MULDIV_OPA_CTRL (*(REG16 0xFF80)) // -/w: operand A (dividend or factor1) / function config
+#define MULDIV_OPB      (*(REG16 0xFF82)) // -/w: operand B (factor2) for multiplication
+#define MULDIV_RESX     (*(ROM16 0xFF84)) // r/-: quotient or product low word
+#define MULDIV_RESY     (*(ROM16 0xFF86)) // r/-: remainder or product high word
+#define MULDIV_R32bit   (*(ROM32 (&MULDIV_RESX))) // r/-: read result as 32-bit data word
+
+// function config bits
+#define MULDIV_CONFIG_MUL ((uint16_t)(0b01 << 0))
+#define MULDIV_CONFIG_DIV ((uint16_t)(0b10 << 0))
+
+
+// ----------------------------------------------------------------------------
+// reserved
+// ----------------------------------------------------------------------------
+//#define reserved (*(REG16 0xFF88)) // -/-: reserved
+//#define reserved (*(REG16 0xFF8A)) // -/-: reserved
+//#define reserved (*(REG16 0xFF8E)) // -/-: reserved
+//#define reserved (*(REG16 0xFF8E)) // -/-: reserved
 
 
 // ----------------------------------------------------------------------------
@@ -432,22 +441,22 @@
 #define CLOCKSPEED_32bit (*(ROM32 (&CLOCKSPEED_LO))) // r/-: clock speed (in Hz)
 
 // SYS features
-#define SYS_MULDIV_EN 0 // r/-: MULDIV synthesized
-#define SYS_WB32_EN   1 // r/-: WB32 synthesized
-#define SYS_WDT_EN    2 // r/-: WDT synthesized
-#define SYS_GPIO_EN   3 // r/-: GPIO synthesized
-#define SYS_TIMER_EN  4 // r/-: TIMER synthesized
-#define SYS_UART_EN   5 // r/-: UART synthesized
-#define SYS_XALU_EN   6 // r/-: Extended ALU operations synthesized
-#define SYS_BTLD_EN   7 // r/-: Bootloader installed and enabled
-#define SYS_IROM_EN   8 // r/-: Implement IMEM as true ROM
-#define SYS_CRC_EN    9 // r/-: CRC synthesized
-#define SYS_CFU_EN   10 // r/-: CFU synthesized
-#define SYS_PWM_EN   11 // r/-: PWM controller synthesized
-#define SYS_TWI_EN   12 // r/-: TWI synthesized
-#define SYS_SPI_EN   13 // r/-: SPI synthesized
-#define SYS_TRNG_EN  14 // r/-: TRNG synthesized
-#define SYS_EXIRQ_EN 15 // r/-: EXIRQ synthesized
+#define SYS_MULDIV_EN    0 // r/-: MULDIV synthesized
+#define SYS_WB32_EN      1 // r/-: WB32 synthesized
+#define SYS_WDT_EN       2 // r/-: WDT synthesized
+#define SYS_GPIO_EN      3 // r/-: GPIO synthesized
+#define SYS_TIMER_EN     4 // r/-: TIMER synthesized
+#define SYS_UART_EN      5 // r/-: UART synthesized
+//#define SYS_???_EN     6 // r/-: reserved
+#define SYS_BTLD_EN      7 // r/-: Bootloader installed and enabled
+#define SYS_IROM_EN      8 // r/-: Implement IMEM as true ROM
+#define SYS_CRC_EN       9 // r/-: CRC synthesized
+#define SYS_CFU_EN      10 // r/-: CFU synthesized
+#define SYS_PWM_EN      11 // r/-: PWM controller synthesized
+#define SYS_TWI_EN      12 // r/-: TWI synthesized
+#define SYS_SPI_EN      13 // r/-: SPI synthesized
+#define SYS_TRNG_EN     14 // r/-: TRNG synthesized
+#define SYS_EXIRQ_EN    15 // r/-: EXIRQ synthesized
 
 
 // ----------------------------------------------------------------------------

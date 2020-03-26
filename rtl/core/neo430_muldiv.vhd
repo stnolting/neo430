@@ -4,6 +4,12 @@
 -- # NOTE: This unit uses "repeated trial subtraction" as division algorithm.                      #
 -- # NOTE: This unit uses "shifted add" as multiplication algorithm. Set 'use_dsp_mul_c' in the    #
 -- # package file to TRUE to use DSP slices for multiplication.                                    #
+-- #                                                                                               #
+-- # OpA is used for storing the first operand as well as for function configuration. Set this     #
+-- # register to 0 reset the unit. Afterwards, set it to 0b01 for multiplication or to 0b10 for    #
+-- # division. Afterwards, write the actual operand. The actual operation is started by            #
+-- # writing OpB.                                                                                  #
+-- #                                                                                               #
 -- # Division: DIVIDEND / DIVIDER = QUOTIENT + REMAINDER (16-bit) / DIVIDER (16-bit)               #
 -- # Multiplication: FACTOR1 * FACTOR2 = PRODUCT (32-bit)                                          #
 -- # ********************************************************************************************* #
@@ -68,10 +74,14 @@ architecture neo430_muldiv_rtl of neo430_muldiv is
   signal addr   : std_ulogic_vector(15 downto 0); -- access address
   signal wr_en  : std_ulogic; -- only full 16-bit word accesses!
 
+  -- control --
+  signal ctrl_state : std_ulogic;
+  signal operation  : std_ulogic; -- '1' division, '0' multiplication
+  signal func_rst   : std_ulogic;
+
   -- accessible regs --
   signal opa, opb   : std_ulogic_vector(15 downto 0);
   signal resx, resy : std_ulogic_vector(15 downto 0);
-  signal operation  : std_ulogic;
 
   -- arithmetic core & arbitration --
   signal start     : std_ulogic;
@@ -100,22 +110,29 @@ begin
       start <= '0';
       if (wr_en = '1') then -- only full word accesses!
         -- operands --
-        if (addr = muldiv_opa_addr_c) then -- dividend or factor 1
-          opa <= data_i;
+        if (addr = muldiv_opa_ctrl_addr_c) then -- reset/control OR dividend or mul_factor a
+          opa   <= data_i;
         end if;
-        if (addr = muldiv_opb_div_addr_c) or (addr = muldiv_opb_mul_addr_c) then -- divisor or factor 2
-          opb <= data_i;
-          start <= '1'; -- trigger operation
+        if (addr = muldiv_opb_addr_c) then -- divisor or mul_factor b
+          opb   <= data_i;
+          start <= '1'; -- start operation
         end if;
-        -- operation: division/multiplication --
-        if (addr = muldiv_opb_div_addr_c) then -- division
-          operation <= '1';
-        else -- multiplication
-          operation <= '0';
+        -- operation configuration --
+        if (func_rst = '1') then -- reset configuration
+          ctrl_state <= '0';
+        elsif (ctrl_state = '0') then -- get new configuration
+          if (wr_en = '1') then
+            operation  <= opa(1); -- '1' division, '0' multiplication
+            ctrl_state <= '1';
+          end if;
+--      else -- execute configuration
         end if;
       end if;
     end if;
   end process wr_access;
+
+  -- reset when OpA is zero --
+  func_rst <= '1' when (opa = x"0000") else '0';
 
 
   -- Arithmetic core ----------------------------------------------------------
