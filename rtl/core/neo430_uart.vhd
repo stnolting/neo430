@@ -258,7 +258,7 @@ begin
           data_o(ctrl_uart_tx_busy_c) <= uart_tx_busy;
         else -- uart_rtx_addr_c
           data_o(data_rx_avail_c) <= uart_rx_avail(0);
-          data_o(07 downto 0) <= uart_rx_reg;
+          data_o(07 downto 0)     <= uart_rx_reg;
         end if;
       end if;
     end if;

@@ -70,7 +70,7 @@ int main(void) {
     // multiply test
     prod_ref = (uint32_t)a * (uint32_t)b;
     prod = neo430_umul32(a, b);
-    neo430_printf("UNSIGNED %u: %u * %u  =  %n  vs ref.  %n\n", i, a, b, prod, prod_ref);
+    neo430_printf("UNSIGNED %u: %u * %u  =  P: %n  vs ref.  P: %n\n", i, a, b, prod, prod_ref);
 
     // division test
     if (b == 0) // dont divide by zero
@@ -78,7 +78,7 @@ int main(void) {
     quot_ref = a / b;
     rem_ref  = a % b;
     quot = neo430_umoddiv16(&rem, a, b);
-    neo430_printf("UNSIGNED %u: %u / %u  =  %u & %u  vs ref.  %u & %u\n", i, a, b, quot, rem, quot_ref, rem_ref);
+    neo430_printf("UNSIGNED %u: %u / %u  =  Q: %u & R: %u  vs ref.  Q: %u & R: %u\n", i, a, b, quot, rem, quot_ref, rem_ref);
 
 
     // get "random" operands
@@ -91,12 +91,12 @@ int main(void) {
     squot_ref = sa / sb;
     srem_ref  = sa % sb;
     squot = neo430_moddiv16(&srem, sa, sb);
-    neo430_printf("SIGNED   %u: %i / %i  =  %i & %i  vs ref.  %i & %i\n", i, sa, sb, squot, srem, squot_ref, srem_ref);
+    neo430_printf("SIGNED   %u: %i / %i  =  Q: %i & R: %i  vs ref.  Q: %i & R: %i\n", i, sa, sb, squot, srem, squot_ref, srem_ref);
 
     // multiply test - signed
     sprod_ref = (int32_t)sa * (int32_t)sb;
     sprod = neo430_mul32(sa, sb);
-    neo430_printf("SIGNED   %u: %i * %i  =  %l  vs ref.  %l\n", i, sa, sb, sprod, sprod_ref);
+    neo430_printf("SIGNED   %u: %i * %i  =  P: %l  vs ref.  P: %l\n", i, sa, sb, sprod, sprod_ref);
 
 
     // all correct?
