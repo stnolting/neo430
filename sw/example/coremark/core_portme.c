@@ -79,7 +79,7 @@ void start_time(void) {
 	or other system parameters - e.g. reading the current value of cpu cycles counter.
 */
 void stop_time(void) {
-  neo430_timer_stop();
+  neo430_timer_pause();
 	//GETMYTIME(&stop_time_val );      
 }
 /* Function : get_time
@@ -135,7 +135,7 @@ void portable_init(core_portable *p, int *argc, char *argv[])
            (1<<TMR_CT_ARST) | // auto-reset on match
            (1<<TMR_CT_IRQ)  | // interrupt enable
            (0<<TMR_CT_RUN);   // timer not running yet
-  neo430_timer_config_period(NEO430_TIMER_F);
+  neo430_timer_config_freq(NEO430_TIMER_F);
 
   neo430_printf("NEO430: clock speed  : %n Hz\n", CLOCKSPEED_32bit);
   neo430_printf("NEO430: timer THRES  : %u\n", TMR_THRES);

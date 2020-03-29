@@ -113,10 +113,6 @@ int main(void) {
   neo430_printf("- SPI:                   ");
   print_state(ft & (1<<SYS_SPI_EN));
 
-  // XALIU
-  neo430_printf("- Extended ALU Ops.:     ");
-  print_state(ft & (1<<SYS_XALU_EN));
-
   // Bootloader installed
   neo430_printf("- Internal Bootloader:   ");
   print_state(ft & (1<<SYS_BTLD_EN));

@@ -83,7 +83,7 @@ int main(void) {
 
   // configure timer frequency
   neo430_timer_disable();
-  if (neo430_timer_config_period(1000)) // 1kHz to increment every 1ms
+  if (neo430_timer_config_freq(1000)) // 1kHz to increment every 1ms
     neo430_uart_br_print("Invalid TIMER frequency!\n");
 
   neo430_printf("THR: %x, CTR: %x\n", TMR_THRES, TMR_CT);
