@@ -99,8 +99,7 @@ begin
       sreg <= (others => '0'); -- here we NEED a true hardware reset
     elsif rising_edge(clk_i) then
       -- physical status register --
-      if ((ctrl_i(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) = reg_sr_c) and
-          (ctrl_i(ctrl_rf_ad_c) = '0') and (ctrl_i(ctrl_rf_wb_en_c) = '1')) then -- only write in reg-addr-mode!
+      if ((ctrl_i(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) = reg_sr_c) and (ctrl_i(ctrl_rf_wb_en_c) = '1')) then -- valid SREG write
         sreg(sreg_c_c) <= in_data(sreg_c_c);
         sreg(sreg_z_c) <= in_data(sreg_z_c);
         sreg(sreg_n_c) <= in_data(sreg_n_c);
@@ -173,7 +172,7 @@ begin
   rf_write: process(clk_i)
   begin
     if rising_edge(clk_i) then
-      if (ctrl_i(ctrl_rf_ad_c) = '0') and (ctrl_i(ctrl_rf_wb_en_c) = '1') then -- only write in reg-addr-mode!
+      if (ctrl_i(ctrl_rf_wb_en_c) = '1') then -- valid register file write
         reg_file(to_integer(unsigned(ctrl_i(ctrl_rf_adr3_c downto ctrl_rf_adr0_c)))) <= in_data;
       end if;
     end if;
