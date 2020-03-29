@@ -139,14 +139,14 @@ int main(void) {
   // disable EXIRQ
   EXIRQ_CT = 0;
 
+  // init GPIO
+  GPIO_IRQMASK = 0; // no pin change interrupt please, thanks
+  neo430_gpio_port_set(1<<STATUS_LED); // activate status LED, clear all others
+
   // init interrupt vectors
   IRQVEC_TIMER  = (uint16_t)(&timer_irq_handler); // timer match
 //IRQVEC_EXT    = 0; // unused
 //IRQVEC_SERIAL = 0; // unused
-
-  // init GPIO
-  GPIO_IRQMASK = 0; // no pin change interrupt please, thanks
-  neo430_gpio_port_set(1<<STATUS_LED); // activate status LED, clear all others
 
   // set Baud rate & init UART control register:
   // enable UART, no IRQs
@@ -159,6 +159,7 @@ int main(void) {
 
   // Timeout counter: init timer, irq tick @ ~1Hz (prescaler = 4096)
   // THR = f_main / (1Hz + 4096) -1
+  TMR_NCO = 0; // disable frequency generator
   TMR_CT = 0; // reset timer
   //uint32_t clock = CLOCKSPEED_32bit >> 14; // divide by 4096
   TMR_THRES = (CLOCKSPEED_HI << 2) -1; // "fake" ;D
@@ -290,7 +291,7 @@ void print_help(void) {
                        "h: Help\n"
                        "r: Restart\n"
                        "u: Upload\n"
-                       "p: Program\n"
+                       "p: Prog\n"
                        "e: Execute");
 }
 
