@@ -103,38 +103,40 @@ begin
   neo430_top_inst: neo430_top
   generic map (
     -- general configuration --
-    CLOCK_SPEED => f_clk_c,           -- main clock in Hz
-    IMEM_SIZE   => 4*1024,            -- internal IMEM size in bytes, max 48kB (default=4kB)
-    DMEM_SIZE   => 2*1024,            -- internal DMEM size in bytes, max 12kB (default=2kB)
+    CLOCK_SPEED  => f_clk_c,          -- main clock in Hz
+    IMEM_SIZE    => 4*1024,           -- internal IMEM size in bytes, max 48kB (default=4kB)
+    DMEM_SIZE    => 2*1024,           -- internal DMEM size in bytes, max 12kB (default=2kB)
     -- additional configuration --
-    USER_CODE   => x"4788",           -- custom user code
+    USER_CODE    => x"4788",          -- custom user code
     -- module configuration --
-    MULDIV_USE  => true,              -- implement multiplier/divider unit? (default=true)
-    WB32_USE    => true,              -- implement WB32 unit? (default=true)
-    WDT_USE     => true,              -- implement WBT? (default=true)
-    GPIO_USE    => true,              -- implement GPIO unit? (default=true)
-    TIMER_USE   => true,              -- implement timer? (default=true)
-    UART_USE    => true,              -- implement UART? (default=true)
-    CRC_USE     => true,              -- implement CRC unit? (default=true)
-    CFU_USE     => false,             -- implement custom functions unit? (default=false)
-    PWM_USE     => true,              -- implement PWM controller? (default=true)
-    TWI_USE     => true,              -- implement two wire serial interface? (default=true)
-    SPI_USE     => true,              -- implement SPI? (default=true)
-    TRNG_USE    => false,             -- implement TRNG? (default=false) - CANNOT BE SIMULATED!
-    EXIRQ_USE   => true,              -- implement EXIRQ? (default=true)
+    MULDIV_USE   => true,             -- implement multiplier/divider unit? (default=true)
+    WB32_USE     => true,             -- implement WB32 unit? (default=true)
+    WDT_USE      => true,             -- implement WBT? (default=true)
+    GPIO_USE     => true,             -- implement GPIO unit? (default=true)
+    TIMER_USE    => true,             -- implement timer? (default=true)
+    UART_USE     => true,             -- implement UART? (default=true)
+    CRC_USE      => true,             -- implement CRC unit? (default=true)
+    CFU_USE      => false,            -- implement custom functions unit? (default=false)
+    PWM_USE      => true,             -- implement PWM controller? (default=true)
+    TWI_USE      => true,             -- implement two wire serial interface? (default=true)
+    SPI_USE      => true,             -- implement SPI? (default=true)
+    TRNG_USE     => false,            -- implement TRNG? (default=false) - CANNOT BE SIMULATED!
+    EXIRQ_USE    => true,             -- implement EXIRQ? (default=true)
     -- boot configuration --
-    BOOTLD_USE  => false,             -- implement and use bootloader? (default=true)
-    IMEM_AS_ROM => false              -- implement IMEM as read-only memory? (default=false)
+    BOOTLD_USE   => false,            -- implement and use bootloader? (default=true)
+    IMEM_AS_ROM  => false             -- implement IMEM as read-only memory? (default=false)
   )
   port map (
     -- global control --
     clk_i      => clk_gen,            -- global clock, rising edge
     rst_i      => rst_gen,            -- global reset, async, low-active
     -- gpio --
-    gpio_o      => open,              -- parallel output
-    gpio_i      => x"0000",           -- parallel input
+    gpio_o     => open,               -- parallel output
+    gpio_i     => x"0000",            -- parallel input
     -- pwm channels --
-    pwm_o       => open,              -- pwm channels
+    pwm_o      => open,               -- pwm channels
+    -- timer frequency generator --
+    timer_fg_o => open,               -- programmable frequency output
     -- serial com --
     uart_txd_o => uart_txd,           -- UART send data
     uart_rxd_i => uart_txd,           -- UART receive data

@@ -74,6 +74,8 @@ entity neo430_top_std_logic is
     gpio_i      : in  std_logic_vector(15 downto 0); -- parallel input
     -- pwm channels --
     pwm_o       : out std_logic_vector(03 downto 0); -- pwm channels
+    -- timer frequency generator --
+    timer_fg_o  : out std_logic; -- programmable frequency output
     -- serial com --
     uart_txd_o  : out std_logic; -- UART send data
     uart_rxd_i  : in  std_logic; -- UART receive data
@@ -123,6 +125,7 @@ architecture neo430_top_std_logic_rtl of neo430_top_std_logic is
   signal wb_stb_o_int   : std_ulogic;
   signal wb_cyc_o_int   : std_ulogic;
   signal wb_ack_i_int   : std_ulogic;
+  signal timer_fg_o_int : std_ulogic;
 
 begin
 
@@ -211,6 +214,7 @@ begin
   wb_stb_o       <= std_logic(wb_stb_o_int);
   wb_cyc_o       <= std_logic(wb_cyc_o_int);
   ext_ack_o      <= std_logic_vector(irq_ack_o_int);
+  timer_fg_o     <= std_logic(timer_fg_o_int);
 
 
 end neo430_top_std_logic_rtl;

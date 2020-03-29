@@ -74,6 +74,8 @@ entity neo430_top_avm is
     gpio_i          : in  std_logic_vector(15 downto 0); -- parallel input
     -- pwm channels --
     pwm_o           : out std_logic_vector(03 downto 0); -- pwm channels
+    -- timer frequency generator --
+    timer_fg_o      : out std_logic; -- programmable frequency output
     -- UART --
     uart_txd_o      : out std_logic; -- UART send data
     uart_rxd_i      : in  std_logic; -- UART receive data
@@ -140,6 +142,7 @@ architecture neo430_top_avm_rtl of neo430_top_avm is
   signal spi_cs_o_int   : std_ulogic_vector(05 downto 0);
   signal irq_i_int      : std_ulogic_vector(07 downto 0);
   signal irq_ack_o_int  : std_ulogic_vector(07 downto 0);
+  signal timer_fg_o_int : std_ulogic;
   constant usrcode_c    : std_ulogic_vector(15 downto 0) := std_ulogic_vector(USER_CODE);
 
   -- misc --
@@ -224,6 +227,7 @@ begin
   spi_mosi_o     <= std_logic(spi_mosi_o_int);
   spi_cs_o       <= std_logic_vector(spi_cs_o_int);
   ext_ack_o      <= std_logic_vector(irq_ack_o_int);
+  timer_fg_o     <= std_logic(timer_fg_o_int);
 
 
   -- Wishbone-to-Avalon Bridge ------------------------------------------------

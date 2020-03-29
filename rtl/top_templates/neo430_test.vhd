@@ -103,6 +103,8 @@ begin
     gpio_i     => x"0000",            -- parallel input
     -- pwm channels --
     pwm_o      => open,               -- pwm channels
+    -- timer frequency generator --
+    timer_fg_o => open,               -- programmable frequency output
     -- serial com --
     uart_txd_o => uart_txd_o,         -- UART send data
     uart_rxd_i => uart_rxd_i,         -- UART receive data
