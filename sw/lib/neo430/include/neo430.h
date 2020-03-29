@@ -207,10 +207,10 @@
 // ----------------------------------------------------------------------------
 // General Purpose Inputs/Outputs (GPIO)
 // ----------------------------------------------------------------------------
-//#define reserved   (*(REG16 0xFFA8)) // reserved
-#define GPIO_IRQMASK (*(REG16 0xFFAA)) // -/w: irq mask register
-#define GPIO_INPUT   (*(ROM16 0xFFAC)) // r/-: parallel input
-#define GPIO_OUTPUT  (*(REG16 0xFFAE)) // r/w: parallel output
+#define GPIO_IRQMASK (*(REG16 0xFFA8)) // -/w: irq mask register
+#define GPIO_INPUT   (*(ROM16 0xFFAA)) // r/-: parallel input
+#define GPIO_OUTPUT  (*(REG16 0xFFAC)) // r/w: parallel output
+//#define reserved   (*(REG16 0xFFAE)) // reserved
 
 
 // ----------------------------------------------------------------------------
@@ -219,16 +219,20 @@
 #define TMR_CT    (*(REG16 0xFFB0)) // r/w: control register
 #define TMR_CNT   (*(ROM16 0xFFB2)) // r/-: counter register
 #define TMR_THRES (*(REG16 0xFFB4)) // r/w: threshold register
-//#define reserved     (*(REG16 0xFFB6))
+#define TMR_NCO   (*(REG16 0xFFB6)) // -/w: frequency generator
 
 // Timer control register
-#define TMR_CT_EN    0 // r/w: timer enable
-#define TMR_CT_ARST  1 // r/w: auto reset on match
-#define TMR_CT_IRQ   2 // r/w: interrupt enable
-#define TMR_CT_RUN   3 // r/w: start/stop timer
-#define TMR_CT_PRSC0 4 // r/w: clock prescaler select bit 0
-#define TMR_CT_PRSC1 5 // r/w: clock prescaler select bit 1
-#define TMR_CT_PRSC2 6 // r/w: clock prescaler select bit 2
+#define TMR_CT_EN         0 // r/w: timer unit global enable
+#define TMR_CT_ARST       1 // r/w: auto reset on match
+#define TMR_CT_IRQ        2 // r/w: interrupt enable
+#define TMR_CT_RUN        3 // r/w: start/stop timer
+#define TMR_CT_PRSC0      4 // r/w: clock prescaler select bit 0
+#define TMR_CT_PRSC1      5 // r/w: clock prescaler select bit 1
+#define TMR_CT_PRSC2      6 // r/w: clock prescaler select bit 2
+#define TMR_CT_NCO_EN     7 // r/w: NCO enable
+#define TMR_CT_NCO_PRSC0  8 // r/w: NCO prescaler select bit 0
+#define TMR_CT_NCO_PRSC1  9 // r/w: NCO prescaler select bit 1
+#define TMR_CT_NCO_PRSC2 10 // r/w: NCO prescaler select bit 2
 
 // Timer clock prescaler select:
 #define TMR_PRSC_2    0 // CLK/2
@@ -397,14 +401,13 @@
 #define EXIRQ_CT (*(REG16 0xFFEE)) // r/w: control register
 
 // EXIRQ control register
-#define EXIRQ_CT_SRC0         0 // r/-: IRQ source bit 0
-#define EXIRQ_CT_SRC1         1 // r/-: IRQ source bit 1
-#define EXIRQ_CT_SRC2         2 // r/-: IRQ source bit 2
+#define EXIRQ_CT_SEL0         0 // r/w: IRQ source bit 0 / SW_IRQ select / ACK select
+#define EXIRQ_CT_SEL1         1 // r/w: IRQ source bit 1 / SW_IRQ select / ACK select
+#define EXIRQ_CT_SEL2         2 // r/w: IRQ source bit 2 / SW_IRQ select / ACK select
 #define EXIRQ_CT_EN           3 // r/w: unit enable
-#define EXIRQ_CT_SW_IRQ       4 // -/w: enable SW IRQ trigger, auto-clears
-#define EXIRQ_CT_SW_IRQ_SEL0  5 // -/w: SW IRQ select bit 0, read as zero
-#define EXIRQ_CT_SW_IRQ_SEL1  6 // -/w: SW IRQ select bit 1, read as zero
-#define EXIRQ_CT_SW_IRQ_SEL2  7 // -/w: SW IRQ select bit 2, read as zero
+#define EXIRQ_CT_SW_IRQ       4 // -/w: use irq_sel as SW IRQ trigger, auto-clears
+#define EXIRQ_CT_ACK_IRQ      5 // -/w: use irq_sel as ACK select, auto-clears
+// ...
 #define EXIRQ_CT_IRQ0_EN      8 // r/w: Enable IRQ channel 0
 #define EXIRQ_CT_IRQ1_EN      9 // r/w: Enable IRQ channel 1
 #define EXIRQ_CT_IRQ2_EN     10 // r/w: Enable IRQ channel 2
