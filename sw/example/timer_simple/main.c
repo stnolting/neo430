@@ -76,7 +76,7 @@ int main(void) {
 
   // configure timer frequency
   neo430_timer_disable();
-  if (neo430_timer_config_period(BLINK_FREQ))
+  if (neo430_timer_config_freq(BLINK_FREQ))
     neo430_uart_br_print("Invalid TIMER frequency!\n");
 
   TMR_CT |= (1<<TMR_CT_EN) | (1<<TMR_CT_ARST) | (1<<TMR_CT_IRQ) | (1<<TMR_CT_RUN); // enable timer, auto-reset, irq enabled, timer start
@@ -84,10 +84,25 @@ int main(void) {
   // enable global IRQs
   neo430_eint();
 
-  // do something else...
-  while (1) {
-    neo430_sleep(); // go to power down mode
+
+  // test frequency generator
+  neo430_timer_nco_enable();
+  uint32_t nco_target_frequency = 0, nco_real_frequency;
+
+  while(1) {
+    neo430_uart_br_print("Target freq.: 0x");
+    neo430_uart_print_hex_dword(nco_target_frequency);
+
+    nco_real_frequency = neo430_timer_nco_set(nco_target_frequency);
+
+    neo430_uart_br_print(", Real freq.: 0x");
+    neo430_uart_print_hex_dword(nco_real_frequency);
+    neo430_uart_br_print("\n");
+
+    nco_target_frequency++; // go through all possible frequencies
+    neo430_cpu_delay_ms(250); // wait 250ms
   }
+
 
   return 0;
 }
