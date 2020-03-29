@@ -1,5 +1,5 @@
 // #################################################################################################
-// #  < neo430_timer.h - Tim helper functions ;) >                                                 #
+// #  < neo430_timer.h - Timer helper functions >                                                  #
 // # ********************************************************************************************* #
 // # BSD 3-Clause License                                                                          #
 // #                                                                                               #
@@ -36,12 +36,13 @@
 #define neo430_timer_h
 
 // prototypes
-void    neo430_timer_enable(void);                    // enable timer unit
-void    neo430_timer_disable(void);                   // disable timer unit
-void    neo430_timer_stop(void);                      // stop timer
-void    neo430_timer_reset(void);                     // reset timer
-void    neo430_timer_run(void);                       // run timer
-void    neo430_timer_pause(void);                     // pause timer
-uint8_t neo430_timer_config_period(uint32_t f_timer); // configure (irq) frequency
+void     neo430_timer_enable(void);                  // enable timer unit
+void     neo430_timer_disable(void);                 // disable timer unit
+void     neo430_timer_run(void);                     // run timer
+void     neo430_timer_pause(void);                   // pause timer
+uint8_t  neo430_timer_config_freq(uint32_t f_timer); // configure timer frequency
+void     neo430_timer_nco_enable(void);              // enable programmable frequency output
+void     neo430_timer_nco_disable(void);             // disable programmable frequency output
+uint32_t neo430_timer_nco_set(uint32_t frequency);   // set programmable output frequency, returns actual output frequency
 
 #endif // neo430_timer_h
