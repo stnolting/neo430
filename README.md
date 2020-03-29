@@ -73,7 +73,7 @@ NEO430 setup run: [![NEO430 Datasheet](https://raw.githubusercontent.com/stnolti
 - Internal [DMEM](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_dmem.vhd) (RAM, for data) and [IMEM](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_imem.vhd) (RAM or ROM, for code), configurable sizes
 - Customizable processor hardware configuration:
   - Optional multiplier/divider unit ([MULDIV](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_muldiv.vhd))
-  - Optional high-precision timer ([TIMER](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_timer.vhd))
+  - Optional high-precision timer ([TIMER](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_timer.vhd)) with arbitrary frequency generator output
   - Optional universal asynchronous receiver and transmitter ([UART](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_uart.vhd))
   - Optional serial peripheral interface ([SPI](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_spi.vhd)), 8 or 16 bit tansfer data size, 6 dedicated CS lines
   - Optional I2C-compatible two wire serial interface ([TWI](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_twi.vhd)) supporting clock stretching
