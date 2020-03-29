@@ -135,8 +135,9 @@ char neo430_uart_getc(void){
   uint16_t d = 0;
   while (1) {
     d = UART_RTX;
-    if ((d & (1<<UART_RTX_AVAIL)) != 0) // char received?
+    if ((d & (1<<UART_RTX_AVAIL)) != 0) { // char received?
       return (char)d;
+    }
   }
 }
 
@@ -170,8 +171,9 @@ char neo430_uart_char_read(void){
 void neo430_uart_print(char *s){
 
   char c = 0;
-  while ((c = *s++))
+  while ((c = *s++)) {
     neo430_uart_putc(c);
+  }
 }
 
 
@@ -184,8 +186,9 @@ void neo430_uart_br_print(char *s){
 
   char c = 0;
   while ((c = *s++)) {
-    if (c == '\n')
+    if (c == '\n') {
       neo430_uart_putc('\r');
+    }
     neo430_uart_putc(c);
   }
 }
@@ -280,6 +283,17 @@ void neo430_uart_print_hex_dword(uint32_t dw) {
 
 
 /* ------------------------------------------------------------
+ * INFO Print 64-bit hexadecimal value (16 digits)
+ * PARAM uint64_t value to be printed
+ * ------------------------------------------------------------ */
+void neo430_uart_print_hex_qword(uint64_t qw) {
+
+  neo430_uart_print_hex_dword((uint32_t)(qw >> 32));
+  neo430_uart_print_hex_dword((uint32_t)(qw >>  0));
+}
+
+
+/* ------------------------------------------------------------
  * INFO Print 8-bit binary value (8 digits)
  * PARAM uint8_t value to be printed
  * ------------------------------------------------------------ */
@@ -296,7 +310,7 @@ void neo430_uart_print_bin_byte(uint8_t b) {
 
 
 /* ------------------------------------------------------------
- * INFO Print 16-bit decimal value (16 digits)
+ * INFO Print 16-bit binary value (16 digits)
  * PARAM uint16_t value to be printed
  * ------------------------------------------------------------ */
 void neo430_uart_print_bin_word(uint16_t w) {
@@ -307,7 +321,7 @@ void neo430_uart_print_bin_word(uint16_t w) {
 
 
 /* ------------------------------------------------------------
- * INFO Print 32-bit decimal value (32 digits)
+ * INFO Print 32-bit binary value (32 digits)
  * PARAM uint32_t value to be printed
  * ------------------------------------------------------------ */
 void neo430_uart_print_bin_dword(uint32_t dw) {
@@ -324,9 +338,9 @@ void neo430_uart_print_bin_dword(uint32_t dw) {
  * PARAM show #leading_zeros leading zeros
  * PARAM pointer to array (11 elements!!!) to store conversion result string
  * ------------------------------------------------------------ */
-void neo430_itoa(uint32_t x, const uint16_t leading_zeros, char *res) {
+void neo430_itoa(uint32_t x, uint16_t leading_zeros, char *res) {
 
-  static const char numbers[10] = "0123456789";
+  const char numbers[10] = "0123456789";
   char buffer1[11];
   uint16_t i, j;
 
@@ -433,36 +447,6 @@ void neo430_printf(char *format, ...) {
 
 
 /* ------------------------------------------------------------
- * INFO Print fixed point number
- * INFO HIGHLY EXPERIMENTAL!
- * PARAM fixed point number (32-bit)
- * PARAM number of fractional bits
- * ------------------------------------------------------------ */
-void neo430_fp_print(int32_t num, const uint16_t fp) {
-
-  char string_buf[11];
-
-  // print integer part
-  int32_t num_int = num;
-
-  if (num_int < (int32_t)0) {
-    num_int = -num_int;
-    neo430_uart_putc('-');
-  }
-  neo430_itoa((uint32_t)num_int >> fp, 0, string_buf);
-  neo430_uart_br_print(string_buf);
-
-  neo430_uart_putc('.');
-
-  // print fractional part (3 digits)
-  uint32_t frac_part = (uint32_t)(num_int & ((1<<fp)-1));
-  frac_part = (frac_part * 1000) / (1<<fp);
-  neo430_itoa(frac_part, 2, string_buf);
-  neo430_uart_br_print(string_buf);
-}
-
-
-/* ------------------------------------------------------------
  * INFO Convert N hex chars into uint32
  * PARAM Pointer to buffer with hex chars
  * PARAM Number of hex chars to convert (1..8)
@@ -509,10 +493,9 @@ void neo430_uart_bs(uint16_t n) {
  * PARAM fpf_c: Number of bin fractional bits in input (max 32)
  * PARAM num_frac_digits_c: Number of fractional digits to show (max 8)
  * ------------------------------------------------------------ */
-void neo430_uart_print_fpf_32(int32_t num, const int fpf_c, const int num_frac_digits_c) {
+void neo430_uart_print_fpf_32(int32_t num, uint16_t fpf_c, uint16_t num_frac_digits_c) {
 
-  char string_buf[11];
-  int i;
+  uint16_t i;
 
   // make positive
   if (num < 0) {
@@ -521,32 +504,30 @@ void neo430_uart_print_fpf_32(int32_t num, const int fpf_c, const int num_frac_d
   }
   uint32_t num_int = (uint32_t)num;
 
-  // compute resolution
-  uint32_t frac_dec_base = 1;
-  for (i=0; i<num_frac_digits_c; i++) {
-    frac_dec_base *= 10;
-  }
-  frac_dec_base >>= 1;
 
   // print integer part
-  uint32_t int_data = num_int >> fpf_c;
-  neo430_itoa((uint32_t)int_data, 0, string_buf);
-  neo430_uart_br_print(string_buf);
+  char int_buf[11];
+  neo430_itoa((uint32_t)(num_int >> fpf_c), 0, int_buf);
+  neo430_uart_br_print(int_buf);
   neo430_uart_putc('.');
 
 
-  // compute fractional part's shift mask
-  uint32_t frac_dec_mask = 1;
-  for (i=0; i<fpf_c-1; i++) {
-    frac_dec_mask <<= 1;
+  // compute fractional resolution
+  uint32_t frac_dec_base = 1;
+  for (i=0; i<num_frac_digits_c; i++) {
+    frac_dec_base = frac_dec_base * 10;
   }
+  frac_dec_base = frac_dec_base >> 1;
+
+  // compute fractional part's bit-insulation shift mask
+  uint32_t frac_dec_mask = 1L << (fpf_c-1);
+
 
   // compute actual fractional part
-  uint32_t frac_data = num_int & ((1 << fpf_c)-1);
-  uint32_t frac_sum = 0;
-  for (i=0; i<fpf_c; i++) {
-
-    if (frac_data & frac_dec_mask) { // frac bit set?
+  uint32_t frac_data = num_int & ((1 << fpf_c)-1); // only keep fractional bits
+  uint32_t frac_sum = 1;
+  for (i=0; i<fpf_c; i++) { // test each fractional bit
+    if (frac_data & frac_dec_mask) { // insulate current fractional bit
       frac_sum += frac_dec_base;
     }
     frac_dec_mask >>= 1; // go from MSB to LSB
@@ -554,8 +535,9 @@ void neo430_uart_print_fpf_32(int32_t num, const int fpf_c, const int num_frac_d
   }
 
   // print fractional part
-  neo430_itoa((uint32_t)frac_sum, num_frac_digits_c-1, string_buf);
-  string_buf[num_frac_digits_c] = '\0'; // truncate
-  neo430_uart_br_print(string_buf);
+  char frac_buf[11];
+  neo430_itoa((uint32_t)frac_sum, num_frac_digits_c-1, frac_buf);
+  frac_buf[num_frac_digits_c] = '\0'; // truncate
+  neo430_uart_br_print(frac_buf);
 }
 
