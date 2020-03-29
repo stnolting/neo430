@@ -45,10 +45,9 @@ struct neo430_exirq_config_t {
 static uint16_t neo430_exirq_vectors[8] __attribute__((unused)); // do not ouput a warning when this variable is unused
 
 // prototypes
-void   neo430_exirq_enable(void);                                // activate EXIRQ controller
-void   neo430_exirq_disable(void);                               // deactivate EXIRQ controller
-void   neo430_exirq_config(struct neo430_exirq_config_t config); // configure EXIRQ controller
-void   neo430_exirq_sw_irq(uint8_t id);                          // trigger interrupt by software
-void __attribute__((__interrupt__)) exirq_irq_handler(void);     // EXIRQ IRQ handler
+void neo430_exirq_enable(void);                                // activate EXIRQ controller
+void neo430_exirq_disable(void);                               // deactivate EXIRQ controller
+void neo430_exirq_config(struct neo430_exirq_config_t config); // configure EXIRQ controller
+void neo430_exirq_sw_irq(uint8_t id);                          // trigger interrupt by software
 
 #endif // neo430_exirq_h

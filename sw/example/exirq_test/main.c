@@ -86,7 +86,7 @@ int main(void) {
   exirq_config.address[7] = (uint16_t)(&ext_irq_ch7_handler);
 
   // only enable the actually used IRQ channels
-  exirq_config.enable = 0b10001111;
+  exirq_config.enable = 0b10001111; // each bit represents the according channel
 
   // program configuration and activate EXIRQ controller
   neo430_exirq_config(exirq_config);

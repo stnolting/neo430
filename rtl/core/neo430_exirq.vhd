@@ -63,7 +63,7 @@ entity neo430_exirq is
     -- cpu interrupt --
     cpu_irq_o : out std_ulogic;
     -- external interrupt lines --
-    ext_irq_i : in  std_ulogic_vector(7 downto 0); -- IRQ
+    ext_irq_i : in  std_ulogic_vector(7 downto 0); -- IRQ, triggering on HIGH level
     ext_ack_o : out std_ulogic_vector(7 downto 0)  -- acknowledge
   );
 end neo430_exirq;
@@ -71,22 +71,21 @@ end neo430_exirq;
 architecture neo430_exirq_rtl of neo430_exirq is
 
   -- control register bits --
-  constant ctrl_src0_c        : natural :=  0; -- r/-: IRQ source bit 0
-  constant ctrl_src1_c        : natural :=  1; -- r/-: IRQ source bit 1
-  constant ctrl_src2_c        : natural :=  2; -- r/-: IRQ source bit 2
-  constant ctrl_en_c          : natural :=  3; -- r/w: unit enable
-  constant ctrl_sw_irq_c      : natural :=  4; -- -/w: enable SW IRQ trigger, auto-clears
-  constant ctrl_sw_irq_sel0_c : natural :=  5; -- -/w: SW IRQ select bit 0
-  constant ctrl_sw_irq_sel1_c : natural :=  6; -- -/w: SW IRQ select bit 1
-  constant ctrl_sw_irq_sel2_c : natural :=  7; -- -/w: SW IRQ select bit 2
-  constant ctrl_en_irq0_c     : natural :=  8; -- r/w: IRQ channel 0 enable
-  constant ctrl_en_irq1_c     : natural :=  9; -- r/w: IRQ channel 1 enable
-  constant ctrl_en_irq2_c     : natural := 10; -- r/w: IRQ channel 2 enable
-  constant ctrl_en_irq3_c     : natural := 11; -- r/w: IRQ channel 3 enable
-  constant ctrl_en_irq4_c     : natural := 12; -- r/w: IRQ channel 4 enable
-  constant ctrl_en_irq5_c     : natural := 13; -- r/w: IRQ channel 5 enable
-  constant ctrl_en_irq6_c     : natural := 14; -- r/w: IRQ channel 6 enable
-  constant ctrl_en_irq7_c     : natural := 15; -- r/w: IRQ channel 7 enable
+  constant ctrl_irq_sel0_c : natural :=  0; -- r/w: IRQ source bit 0 (r); SW IRQ select / ACK select (w)
+  constant ctrl_irq_sel1_c : natural :=  1; -- r/w: IRQ source bit 1 (r); SW IRQ select / ACK select (w)
+  constant ctrl_irq_sel2_c : natural :=  2; -- r/w: IRQ source bit 2 (r); SW IRQ select / ACK select (w)
+  constant ctrl_en_c       : natural :=  3; -- r/w: unit enable
+  constant ctrl_sw_irq_c   : natural :=  4; -- -/w: use irq_sel as SW IRQ trigger, auto-clears
+  constant ctrl_ack_irq_c  : natural :=  5; -- -/w: use irq_sel as ACK select, auto-clears
+  -- ...
+  constant ctrl_en_irq0_c  : natural :=  8; -- r/w: IRQ channel 0 enable
+  constant ctrl_en_irq1_c  : natural :=  9; -- r/w: IRQ channel 1 enable
+  constant ctrl_en_irq2_c  : natural := 10; -- r/w: IRQ channel 2 enable
+  constant ctrl_en_irq3_c  : natural := 11; -- r/w: IRQ channel 3 enable
+  constant ctrl_en_irq4_c  : natural := 12; -- r/w: IRQ channel 4 enable
+  constant ctrl_en_irq5_c  : natural := 13; -- r/w: IRQ channel 5 enable
+  constant ctrl_en_irq6_c  : natural := 14; -- r/w: IRQ channel 6 enable
+  constant ctrl_en_irq7_c  : natural := 15; -- r/w: IRQ channel 7 enable
 
   -- IO space: module base address --
   constant hi_abb_c : natural := index_size_f(io_size_c)-1; -- high address boundary bit
@@ -99,9 +98,10 @@ architecture neo430_exirq_rtl of neo430_exirq is
 
   -- r/w accessible registers --
   signal irq_enable  : std_ulogic_vector(7 downto 0);
-  signal enable      : std_ulogic;
+  signal enable      : std_ulogic; -- global enable
+  signal irq_sel     : std_ulogic_vector(2 downto 0);
   signal sw_trig     : std_ulogic;
-  signal sw_trig_src : std_ulogic_vector(2 downto 0);
+  signal ack_trig    : std_ulogic;
 
   -- irq input / ack output system --
   signal irq_sync, irq_raw, sw_irq, irq_valid, ack_mask : std_ulogic_vector(7 downto 0);
@@ -125,13 +125,15 @@ begin
   wr_access: process(clk_i)
   begin
     if rising_edge(clk_i) then
-      sw_trig <= '0';
+      sw_trig  <= '0';
+      ack_trig <= '0';
       if (wren = '1') then
+        irq_sel    <= data_i(ctrl_irq_sel2_c downto ctrl_irq_sel0_c);
         enable     <= data_i(ctrl_en_c);
         irq_enable <= data_i(ctrl_en_irq7_c downto ctrl_en_irq0_c);
-        -- software irq trigger --
-        sw_trig     <= data_i(ctrl_sw_irq_c);
-        sw_trig_src <= data_i(ctrl_sw_irq_sel2_c downto ctrl_sw_irq_sel0_c);
+        -- irq_sel options --
+        sw_trig    <= data_i(ctrl_sw_irq_c);
+        ack_trig   <= data_i(ctrl_ack_irq_c);
       end if;
     end if;
   end process wr_access;
@@ -147,10 +149,10 @@ begin
     end if;
   end process ext_irq_source_sync;
 
-  sw_irq_source: process(sw_trig, sw_trig_src)
+  sw_irq_source: process(sw_trig, irq_sel)
     variable sw_irq_v : std_ulogic_vector(3 downto 0);
   begin
-    sw_irq_v := sw_trig & sw_trig_src;
+    sw_irq_v := sw_trig & irq_sel;
     case sw_irq_v is
       when "1000" => sw_irq <= "00000001";
       when "1001" => sw_irq <= "00000010";
@@ -192,9 +194,8 @@ begin
           cpu_irq_o <= '1'; -- trigger CPU
           state     <= '1'; -- go to active IRQ state
         end if;
-
       else -- active IRQ
-        if (rden = '1') then -- ACK when reading IRQ source
+        if (ack_trig = '1') then 
           ext_ack_o <= ack_mask;
           state     <= '0';
         end if;
@@ -218,11 +219,11 @@ begin
 
   -- ACK priority decoder -----------------------------------------------------
   -- -----------------------------------------------------------------------------
-  ack_priority_dec: process(state, irq_src_reg)
-    variable irq_src_v : std_ulogic_vector(3 downto 0);
+  ack_priority_dec: process(ack_trig, irq_src_reg)
+    variable irq_ack_v : std_ulogic_vector(3 downto 0);
   begin
-    irq_src_v := state & irq_src_reg;
-    case irq_src_v is
+    irq_ack_v := ack_trig & irq_src_reg;
+    case irq_ack_v is
       when "1000" => ack_mask <= "00000001";
       when "1001" => ack_mask <= "00000010";
       when "1010" => ack_mask <= "00000100";
@@ -243,7 +244,7 @@ begin
     if rising_edge(clk_i) then
       data_o <= (others => '0');
       if (rden = '1') then
-        data_o(ctrl_src2_c downto ctrl_src0_c) <= irq_src_reg;
+        data_o(ctrl_irq_sel2_c downto ctrl_irq_sel0_c) <= irq_src_reg;
         data_o(ctrl_en_irq7_c downto ctrl_en_irq0_c) <= irq_enable;
         data_o(ctrl_en_c) <= enable;
       end if;
