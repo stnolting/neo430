@@ -401,8 +401,7 @@ package neo430_package is
       irq_vec_o : out std_ulogic_vector(01 downto 0); -- irq channel address
       imm_o     : out std_ulogic_vector(15 downto 0); -- branch offset
       -- irq lines --
-      irq_i     : in  std_ulogic_vector(03 downto 0); -- IRQ lines
-      irq_ack_o : out std_ulogic_vector(03 downto 0)  -- IRQ acknowledge
+      irq_i     : in  std_ulogic_vector(03 downto 0)  -- IRQ lines
     );
   end component;
 
@@ -485,8 +484,7 @@ package neo430_package is
       mem_data_o : out std_ulogic_vector(15 downto 0); -- write data
       mem_data_i : in  std_ulogic_vector(15 downto 0); -- read data
       -- interrupt system --
-      irq_i      : in  std_ulogic_vector(03 downto 0); -- interrupt requests
-      irq_ack_o  : out std_ulogic_vector(03 downto 0)  -- IRQ acknowledge
+      irq_i      : in  std_ulogic_vector(03 downto 0)  -- interrupt requests
     );
   end component;
 

@@ -54,8 +54,7 @@ entity neo430_control is
     irq_vec_o : out std_ulogic_vector(01 downto 0); -- irq channel address
     imm_o     : out std_ulogic_vector(15 downto 0); -- branch offset
     -- irq lines --
-    irq_i     : in  std_ulogic_vector(03 downto 0); -- IRQ lines
-    irq_ack_o : out std_ulogic_vector(03 downto 0)  -- IRQ acknowledge
+    irq_i     : in  std_ulogic_vector(03 downto 0)  -- IRQ lines^
   );
 end neo430_control;
 
@@ -697,9 +696,6 @@ begin
     end case;
   end process;
 
-  -- ack output --
-  irq_ack_o <= irq_ack_mask;
-
   -- interrupt priority encoder --
   irq_priority: process(irq_buf)
   begin
@@ -711,7 +707,7 @@ begin
         irq_vec_nxt <= "01";
       when "0100" | "1100" => -- "-100"
         irq_vec_nxt <= "10";
-      when others => -- "1000"
+      when others => -- "1000" ("0000" -> dont't care)
         irq_vec_nxt <= "11";
     end case;
   end process irq_priority;

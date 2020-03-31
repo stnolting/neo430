@@ -133,7 +133,7 @@ architecture neo430_top_rtl of neo430_top is
   -- generators --
   signal rst_i_sync0 : std_ulogic;
   signal rst_i_sync1 : std_ulogic;
-  signal rst_gen     : std_ulogic_vector(03 downto 0) := (others => '0'); -- perform reset on bitstream upload
+  signal rst_gen     : std_ulogic_vector(03 downto 0) := (others => '0'); -- reset on bitstream upload
   signal ext_rst     : std_ulogic;
   signal sys_rst     : std_ulogic;
   signal wdt_rst     : std_ulogic;
@@ -182,16 +182,13 @@ architecture neo430_top_rtl of neo430_top is
   signal sysconfig_rdata : std_ulogic_vector(15 downto 0);
 
   -- interrupt system --
-  signal irq        : std_ulogic_vector(03 downto 0);
-  signal irq_ack    : std_ulogic_vector(03 downto 0);
-  signal timer_irq  : std_ulogic;
-  signal uart_irq   : std_ulogic;
-  signal spi_irq    : std_ulogic;
-  signal twi_irq    : std_ulogic;
-  signal gpio_irq   : std_ulogic;
-  signal xirq_sync0 : std_ulogic;
-  signal xirq_sync1 : std_ulogic;
-  signal ext_irq    : std_ulogic;
+  signal irq       : std_ulogic_vector(03 downto 0);
+  signal timer_irq : std_ulogic;
+  signal uart_irq  : std_ulogic;
+  signal spi_irq   : std_ulogic;
+  signal twi_irq   : std_ulogic;
+  signal gpio_irq  : std_ulogic;
+  signal ext_irq   : std_ulogic;
 
   -- misc --
   signal imem_up_en : std_ulogic;
@@ -233,7 +230,8 @@ begin
     if (sys_rst = '0') then
       clk_div <= (others => '0');
     elsif rising_edge(clk_i) then
-      if ((timer_cg_en or uart_cg_en or spi_cg_en or wdt_cg_en or pwm_cg_en or twi_cg_en or cfu_cg_en) = '1') then -- anybody needing clocks?
+      -- anybody needing fresh clocks?
+      if ((timer_cg_en or uart_cg_en or spi_cg_en or wdt_cg_en or pwm_cg_en or twi_cg_en or cfu_cg_en) = '1') then
         clk_div <= std_ulogic_vector(unsigned(clk_div) + 1);
       end if;
     end if;
@@ -276,8 +274,7 @@ begin
     mem_data_o => cpu_bus.wdata,    -- write data
     mem_data_i => cpu_bus.rdata,    -- read data
     -- interrupt system --
-    irq_i      => irq,              -- interrupt request lines
-    irq_ack_o  => irq_ack           -- IRQ acknowledge
+    irq_i      => irq              -- interrupt request lines
   );
 
   -- final CPU read data --
@@ -732,20 +729,9 @@ begin
   neo430_exirq_inst_false:
   if (EXIRQ_USE = false) generate
     exirq_rdata <= (others => '0');
-    ext_ack_o   <= "0000000" & irq_ack(3);
-    ext_irq     <= xirq_sync1;
+    ext_ack_o   <= (others => '0');
+    ext_irq     <= '0';
   end generate;
-
-  -- sync for single external IRQ if EXIRQ is not implemented --
-  external_irq_sync: process(clk_i)
-  begin
-    if rising_edge(clk_i) then
-      if (EXIRQ_USE = false) then
-        xirq_sync0 <= ext_irq_i(0);
-        xirq_sync1 <= xirq_sync0;
-      end if;
-    end if;
-  end process external_irq_sync;
 
 
   -- System Configuration -----------------------------------------------------

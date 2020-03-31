@@ -58,8 +58,7 @@ entity neo430_cpu is
     mem_data_o : out std_ulogic_vector(15 downto 0); -- write data
     mem_data_i : in  std_ulogic_vector(15 downto 0); -- read data
     -- interrupt system --
-    irq_i      : in  std_ulogic_vector(03 downto 0); -- interrupt requests
-    irq_ack_o  : out std_ulogic_vector(03 downto 0)  -- IRQ acknowledge
+    irq_i      : in  std_ulogic_vector(03 downto 0)  -- interrupt requests
   );
 end neo430_cpu;
 
@@ -99,8 +98,7 @@ begin
     irq_vec_o  => irq_sel,    -- irq channel address
     imm_o      => imm,        -- branch offset
     -- irq lines --
-    irq_i      => irq_i,      -- IRQ lines
-    irq_ack_o  => irq_ack_o   -- IRQ acknowledge
+    irq_i      => irq_i       -- IRQ lines
   );
 
 
