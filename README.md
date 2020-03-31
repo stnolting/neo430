@@ -1,10 +1,8 @@
 # The NEO430 Processor
 
 [![Build Status](https://travis-ci.com/stnolting/neo430.svg?branch=master)](https://travis-ci.com/stnolting/neo430)
-[![GitHub release](https://img.shields.io/github/v/release/stnolting/neo430?include_prereleases)](https://GitHub.com/stnolting/neo430/releases/)
 [![last commit](https://img.shields.io/github/last-commit/stnolting/neo430)](https://github.com/stnolting/neo430/commits/master)
 [![issues](https://img.shields.io/github/issues/stnolting/neo430)](https://github.com/stnolting/neo430/issues)
-[![documentation](https://img.shields.io/badge/documentation-available-brightgreen)](https://raw.githubusercontent.com/stnolting/neo430/master/doc/NEO430.pdf)
 [![license](https://img.shields.io/github/license/stnolting/neo430)](https://github.com/stnolting/neo430/blob/master/LICENSE)
 
 ## Table of Content
@@ -12,6 +10,7 @@
 * [Introduction](#Introduction)
 * [Processor Features](#Processor-Features)
 * [Differences to the Original MSP430 Processors](#Differences-to-the-Original-MSP430-Processors)
+* [Top Entity](#Top-Entity)
 * [Implementation Results](#Implementation-Results)
 * [Performance](#Performance)
 * [Quick Start](#Quick-Start)
@@ -98,7 +97,7 @@ NEO430 setup run: [![NEO430 Datasheet](https://raw.githubusercontent.com/stnolti
 - No hardware debugging interface
 - No analog components
 - No support of TI's Code Composer Studio
-- No support of CPU's DADD instruction (which is never used by the compiler...)
+- No support of CPU's DADD operation
 - Just 4 CPU interrupt channels
 - Single clock domain for complete processor
 - Different numbers of instruction execution cycles
@@ -106,6 +105,71 @@ NEO430 setup run: [![NEO430 Datasheet](https://raw.githubusercontent.com/stnolti
 - Wishbone-compatible interface to attach custom IP
 - Internal bootloader with text interface (via UART serial port)
 - Extended ALU functions (if enabled)
+
+
+
+## Top Entity
+
+The top entity of the processor is [neo430_top.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_top.vhd) (in the rtl\core folder).
+Just instantiate this file in you project and you are ready to go! All signals of this top entity are of type *std_ulogic* or *std_ulogic_vector*, respectively.
+If you need a top entity with resolved signals, take a look at the [top_templates](https://github.com/stnolting/neo430/blob/master/rtl/top_templates) folder.
+These alternative top entities also support AXI or Avalon connectivity.
+
+### Generics
+
+| Generic Name | Type                    | Default Value | Function                                                 |
+|:-------------|:-----------------------:|:-------------:|:---------------------------------------------------------|
+| CLOCK_SPEED  | natural                 | 100000000     | Clock speed of CPU clock input "clk_i" in Hz             |
+| IMEM_SIZE    | natural                 | 4*1024        | Size of internal instruction memory in bytes (max 48 kB) |
+| DMEM_SIZE    | natural                 | 2*1024        | Size of internal data memory in bytes (max 12 kB)        |
+| USER_CODE    | std_ulogic_vector(15:0) | x"0000"       | 16-bit custom user code, can be read by user software    |
+| MULDIV_USE   | boolean                 | true          | Implement multiplier/divider unit                        |
+| WB32_USE     | boolean                 | true          | Implement Wishbone interface adapter                     |
+| WDT_USE      | boolean                 | true          | Implement watchdog timer                                 |
+| GPIO_USE     | boolean                 | true          | Implement general purpose parallel in/out port           |
+| TIMER_USE    | boolean                 | true          | Implement high-precision timer                           |
+| UART_USE     | boolean                 | true          | Implement UART serial communication unit                 |
+| CRC_USE      | boolean                 | true          | Implement checksum computation unit                      |
+| CFU_USE      | boolean                 | false         | Implement custom functions unit                          |
+| PWM_USE      | boolean                 | true          | Implement pulse width controller                         |
+| TWI_USE      | boolean                 | true          | Implement two wire serial interface unit                 |
+| SPI_USE      | boolean                 | true          | Implement serial peripheral interface unit               |
+| TRNG_USE     | boolean                 | false         | Implement true random number generator                   |
+| EXIRQ_USE    | boolean                 | true          | Implement external interrupts controller                 |
+| BOOTLD_USE   | boolean                 | true          | Implement and auto-start internal bootloader             |
+| IMEM_AS_ROM  | boolean                 | false         | Implement internal instruction memory as read-only       |
+
+### Signals
+
+Note regarding unused unit's IO: Connect all unused inputs to low and leave all unused outputs 'open'.
+Signal driections are seen from the processor.
+
+| Signal Name  | Width | Direction | HW Unit | Function                                                 |
+|:-------------|:-----:|:---------:|:-------:|:---------------------------------------------------------|
+| clk_i        | 1     | In        | -       | Global clock line; all FFs triggering on rising edge     |
+| rst_i        | 1     | In        | -       | Global reset, low-active                                 |
+| gpio_o       | 16    | Out       | GPIO    | General purpose parallel output                          |
+| gpio_i       | 16    | In        | GPIO    | General purpose parallel input                           |
+| pwm_o        | 4     | Out       | PWM     | Pulse width modulation channels                          |
+| timer_fg_o   | 1     | Out       | TIMER   | Arbitrar frequency generator output                      |
+| uart_txd_o   | 1     | Out       | UART    | UART serial transmitter                                  |
+| uart_rxd_i   | 1     | In        | UART    | UARt serial receiver                                     |
+| spi_sclk_o   | 1     | Out       | SPI     | SPI master clock                                         |
+| spi_mosi_o   | 1     | Out       | SPI     | SPI serial data output                                   |
+| spi_miso_i   | 1     | In        | SPI     | SPI serial data input                                    |
+| spi_cs_o     | 8     | Out       | SPI     | SPI chip select lines (active-low)                       |
+| twi_sda_io   | 1     | InOut     | TWI     | TWI master serial data line                              |
+| twi_scl_io   | 1     | InOut     | TWI     | TWI master serial clock line                             |
+| wb_adr_o     | 32    | Out       | WB32    | Slave address                                            |
+| wb_dat_i     | 32    | In        | WB32    | Write data                                               |
+| wb_dat_o     | 32    | Out       | WB32    | Read data                                                |
+| wb_we_o      | 1     | Out       | WB32    | Write enable                                             |
+| wb_sel_o     | 1     | Out       | WB32    | Byte enable                                              |
+| wb_stb_o     | 1     | Out       | WB32    | Strobe                                                   |
+| wb_cyc_o     | 1     | Out       | WB32    | Valid cycle                                              |
+| wb_ack_i     | 1     | In        | WB32    | Transfer acknowledge                                     |
+| ext_irq_i    | 8     | In        | EXIRQ   | Interrupt request lines, high-active                     |
+| ext_ack_o    | 8     | Out       | EXIRQ   | Interrupt acknowledge, high-active, single-shot          |
 
 
 
@@ -186,30 +250,33 @@ types and formates are executed in an eually distributed manner (i.e. worst case
 evaluates to **7.33 cycles/instruction resulting in 0.136 MIPS per MHz (worst case)**.
 
 
-### Coremark Benchmark
+### CoreMark Benchmark
 
-The [coremark CPU benchmark](https://www.eembc.org/coremark/) was executed on the NEO430 and is available in the
+The [CoreMark CPU benchmark](https://www.eembc.org/coremark/) was executed on the NEO430 and is available in the
 project's [sw/example/coremark](https://github.com/stnolting/neo430/blob/master/sw/example/coremark) folder This benchmark
 tests the capabilities of the CPU itself rather than the functions provided by the whole system / SoC.
 
 ~~~
-Hardware: 100 MHz, 32kB IMEM, 12kB DMEM, HW verison 0x0401, no peripherals used (except for the TIMER and the UART)
+Hardware: 100 MHz, 32kB IMEM, 12kB DMEM, HW verison 0x0404, no peripherals used (except for the TIMER and the UART)
 Software: msp430-gcc 8.3.0 for Linux, MEM_METHOD is MEM_STACK, 2000 coremark iterations
 ~~~
 
-|__Optimization__     | __Coremark Score__ | __Relative Score__    |
-|:-------------------:|:------------------:|:---------------------:|
-| -Os                 | 6.56               | 0.066 Coremarks/MHz   |
-| -O3                 | 6.92               | 0.069 Coremarks/MHz   |
-| -O3 + NEO430_MULDIV | 14.82              | 0.148 Coremarks/MHz   |
+|__Optimization__      | __Coremark Score__ | __Relative Score__    |
+|:--------------------:|:------------------:|:---------------------:|
+| -Os                  | 6.57               | 0.065 Coremarks/MHz   |
+| -O2                  | 7.16               | 0.072 Coremarks/MHz   |
+| -Os + NEO430_MULDIV* | 12.98              | 0.129 Coremarks/MHz   |
+| -O2 + NEO430_MULDIV* | 15.26              | 0.152 Coremarks/MHz   |
 
-Even though a score of 6.38 can outnumber certain architectures and configurations (see the score table on the coremark
-homepage), the relative score of 0.064 coremarks per second might pretty low. But you have to keep in mind that benchmark
+*) Using the NEO430 MULDIV unit for the core of the matrix multiplications
+
+Even though a score of 6.57 can outnumber certain architectures and configurations (see the score table on the coremark
+homepage), the relative score of 0.065 coremarks per second might pretty low. But you have to keep in mind that benchmark
 was executed using only the resources of the CPU itself. The CPU consists of only ~500 Intel Cyclone IV LUTs and does not
 contain any sophisticated ALU operations like multiplication or barrel shifting. Also, all instructions are executed in a
 multi-cycle scheme requiring several clock cycles to complete. When explicitly using the NEO430 MULDIV unit for performing
 the matrix-operations benchmark scenario (among other operations, it is based on matrix-scalar, matrix-vector and
-matrix-matrix multiplications) the **coremark score is increased to 12.56**. By using additional HW accelerators from the
+matrix-matrix multiplications) the **coremark score is increased to 15.26**. By using additional HW accelerators from the
 NEO430 ecosystem (like the CRC unit) or by using the MULDIV unit also for address and index computations the performance
 and thus, the coremark score can be further increased
 
