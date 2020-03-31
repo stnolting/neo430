@@ -218,7 +218,7 @@
 // ----------------------------------------------------------------------------
 #define TMR_CT    (*(REG16 0xFFB0)) // r/w: control register
 #define TMR_CNT   (*(ROM16 0xFFB2)) // r/-: counter register
-#define TMR_THRES (*(REG16 0xFFB4)) // r/w: threshold register
+#define TMR_THRES (*(REG16 0xFFB4)) // -/w: threshold register
 #define TMR_NCO   (*(REG16 0xFFB6)) // -/w: frequency generator
 
 // Timer control register
@@ -401,9 +401,9 @@
 #define EXIRQ_CT (*(REG16 0xFFEE)) // r/w: control register
 
 // EXIRQ control register
-#define EXIRQ_CT_SEL0         0 // r/w: IRQ source bit 0 / SW_IRQ select / ACK select
-#define EXIRQ_CT_SEL1         1 // r/w: IRQ source bit 1 / SW_IRQ select / ACK select
-#define EXIRQ_CT_SEL2         2 // r/w: IRQ source bit 2 / SW_IRQ select / ACK select
+#define EXIRQ_CT_SEL0         0 // r/w: IRQ source bit 0 / SW_IRQ select
+#define EXIRQ_CT_SEL1         1 // r/w: IRQ source bit 1 / SW_IRQ select
+#define EXIRQ_CT_SEL2         2 // r/w: IRQ source bit 2 / SW_IRQ select
 #define EXIRQ_CT_EN           3 // r/w: unit enable
 #define EXIRQ_CT_SW_IRQ       4 // -/w: use irq_sel as SW IRQ trigger, auto-clears
 #define EXIRQ_CT_ACK_IRQ      5 // -/w: use irq_sel as ACK select, auto-clears

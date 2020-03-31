@@ -71,12 +71,12 @@ end neo430_exirq;
 architecture neo430_exirq_rtl of neo430_exirq is
 
   -- control register bits --
-  constant ctrl_irq_sel0_c : natural :=  0; -- r/w: IRQ source bit 0 (r); SW IRQ select / ACK select (w)
-  constant ctrl_irq_sel1_c : natural :=  1; -- r/w: IRQ source bit 1 (r); SW IRQ select / ACK select (w)
-  constant ctrl_irq_sel2_c : natural :=  2; -- r/w: IRQ source bit 2 (r); SW IRQ select / ACK select (w)
+  constant ctrl_irq_sel0_c : natural :=  0; -- r/w: IRQ source bit 0 (r); SW IRQ select (w)
+  constant ctrl_irq_sel1_c : natural :=  1; -- r/w: IRQ source bit 1 (r); SW IRQ select (w)
+  constant ctrl_irq_sel2_c : natural :=  2; -- r/w: IRQ source bit 2 (r); SW IRQ select (w)
   constant ctrl_en_c       : natural :=  3; -- r/w: unit enable
   constant ctrl_sw_irq_c   : natural :=  4; -- -/w: use irq_sel as SW IRQ trigger, auto-clears
-  constant ctrl_ack_irq_c  : natural :=  5; -- -/w: use irq_sel as ACK select, auto-clears
+  constant ctrl_ack_irq_c  : natural :=  5; -- -/w: ACK current IRQ, auto-clears
   -- ...
   constant ctrl_en_irq0_c  : natural :=  8; -- r/w: IRQ channel 0 enable
   constant ctrl_en_irq1_c  : natural :=  9; -- r/w: IRQ channel 1 enable
@@ -175,6 +175,9 @@ begin
   irq_core: process(clk_i)
   begin
     if rising_edge(clk_i) then
+      -- ack output --
+      ext_ack_o <= ack_mask;
+
       -- irq buffer --
       for i in 0 to 7 loop
         -- keep requests until they are acknowledged
@@ -184,20 +187,17 @@ begin
 
       -- mini state FSM - defaults --
       cpu_irq_o <= '0';
-      ext_ack_o <= (others => '0');
-
       -- mini state FSM --
       if (state = '0') or (enable = '0') then -- idle or deactivated
         state       <= '0';
         irq_src_reg <= irq_src; -- capture source
         if (irq_fire = '1') then
-          cpu_irq_o <= '1'; -- trigger CPU
+          cpu_irq_o <= '1'; -- trigger CPU interrupt
           state     <= '1'; -- go to active IRQ state
         end if;
       else -- active IRQ
-        if (ack_trig = '1') then 
-          ext_ack_o <= ack_mask;
-          state     <= '0';
+        if (ack_trig = '1') or (enable = '0') then 
+          state <= '0';
         end if;
       end if;
     end if;
@@ -219,10 +219,10 @@ begin
 
   -- ACK priority decoder -----------------------------------------------------
   -- -----------------------------------------------------------------------------
-  ack_priority_dec: process(ack_trig, irq_src_reg)
+  ack_priority_dec: process(state, ack_trig, irq_src_reg)
     variable irq_ack_v : std_ulogic_vector(3 downto 0);
   begin
-    irq_ack_v := ack_trig & irq_src_reg;
+    irq_ack_v := (ack_trig and state) & irq_src_reg;
     case irq_ack_v is
       when "1000" => ack_mask <= "00000001";
       when "1001" => ack_mask <= "00000010";
