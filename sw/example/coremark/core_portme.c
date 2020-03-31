@@ -135,12 +135,15 @@ void portable_init(core_portable *p, int *argc, char *argv[])
            (1<<TMR_CT_ARST) | // auto-reset on match
            (1<<TMR_CT_IRQ)  | // interrupt enable
            (0<<TMR_CT_RUN);   // timer not running yet
-  neo430_timer_config_freq(NEO430_TIMER_F);
 
-  neo430_printf("NEO430: clock speed  : %n Hz\n", CLOCKSPEED_32bit);
-  neo430_printf("NEO430: timer THRES  : %u\n", TMR_THRES);
-  neo430_printf("NEO430: timer CTRL   : %x\n", TMR_CT);
-  neo430_printf("NEO430: timer IRQs/s : %u\n", (uint16_t)NEO430_TIMER_F);
+  uint16_t timer_thres;
+  if (neo430_timer_config_freq(NEO430_TIMER_F, &timer_thres)) {
+    neo430_printf("NEO430: timer frequency config error!\n");
+    while(1);
+  }
+
+  neo430_printf("NEO430: clock speed  = %n Hz\n", CLOCKSPEED_32bit);
+  neo430_printf("NEO430: timer IRQs/s = %u\n", (uint16_t)NEO430_TIMER_F);
 #if USE_NEO430_MUL
   neo430_printf("NEO430: using NEO430 MULDIV unit for matrix core operations\n");
 #endif

@@ -76,8 +76,10 @@ int main(void) {
 
   // configure timer frequency
   neo430_timer_disable();
-  if (neo430_timer_config_freq(BLINK_FREQ))
+  uint16_t timer_thres;
+  if (neo430_timer_config_freq(BLINK_FREQ, &timer_thres)) {
     neo430_uart_br_print("Invalid TIMER frequency!\n");
+  }
 
   TMR_CT |= (1<<TMR_CT_EN) | (1<<TMR_CT_ARST) | (1<<TMR_CT_IRQ) | (1<<TMR_CT_RUN); // enable timer, auto-reset, irq enabled, timer start
 
