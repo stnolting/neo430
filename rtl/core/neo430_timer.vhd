@@ -91,7 +91,7 @@ architecture neo430_timer_rtl of neo430_timer is
 
   -- timer regs --
   signal cnt   : std_ulogic_vector(15 downto 0); -- r/-: counter register
-  signal thres : std_ulogic_vector(15 downto 0); -- r/w: threshold register 
+  signal thres : std_ulogic_vector(15 downto 0); -- -/w: threshold register 
   signal ctrl  : std_ulogic_vector(10 downto 0); -- r/w: control register 
 
   -- prescaler clock generator --
@@ -175,7 +175,7 @@ begin
   match <= '1' when (cnt = thres) else '0';
 
   -- interrupt line --
-  irq_fire <= match and ctrl(ctrl_en_c) and ctrl(ctrl_irq_en_c) and ctrl(ctrl_run_c);
+  irq_fire <= match and ctrl(ctrl_en_c) and ctrl(ctrl_irq_en_c); -- and ctrl(ctrl_run_c);
 
   -- edge detector --
   irq_o <= irq_fire and (not irq_fire_ff);
@@ -219,12 +219,12 @@ begin
           data_o(ctrl_nco_prsc0_c) <= ctrl(ctrl_nco_prsc0_c);
           data_o(ctrl_nco_prsc1_c) <= ctrl(ctrl_nco_prsc1_c);
           data_o(ctrl_nco_prsc2_c) <= ctrl(ctrl_nco_prsc2_c);
-        elsif (addr = timer_cnt_addr_c) then
+        else--if (addr = timer_cnt_addr_c) then
           data_o <= cnt;
-        else--if (addr = timer_thres_addr_c) then
-          data_o <= thres;
---        else -- timer_nco_addr_c
---          data_o <= nco_tuning_word;
+--      else--if (addr = timer_thres_addr_c) then
+--        data_o <= thres;
+--      else -- timer_nco_addr_c
+--        data_o <= nco_tuning_word;
         end if;
       end if;
     end if;
