@@ -77,10 +77,10 @@ void neo430_timer_pause(void) {
 
 /* ------------------------------------------------------------
  * INFO Configure timer period
- * PARAM Timer frequency in Hz (1Hz ... F_CPU/2)
- * RETURN 0 if successful, !=0 if error
+ * PARAM Timer frequency in Hz (1 ... F_CPU/2), uint16_t pointer to store computed THRES value
+ * RETURN 0 if successful, 0xff if error
  * ------------------------------------------------------------ */
-uint8_t neo430_timer_config_freq(uint32_t f_timer) {
+uint8_t neo430_timer_config_freq(uint32_t f_timer, uint16_t *thres) {
 
   uint32_t clock = CLOCKSPEED_32bit;
   uint32_t ticks = (clock / f_timer) >> 1; // divide by lowest prescaler (= f/2)
@@ -92,18 +92,22 @@ uint8_t neo430_timer_config_freq(uint32_t f_timer) {
 
   // find prescaler
   while(prsc < 8) {
-    if (ticks <= 0x0000ffff)
+    if (ticks <= 0x0000ffff) {
       break;
+    }
     else {
-      if ((prsc == 2) || (prsc == 4))
+      if ((prsc == 2) || (prsc == 4)) {
         ticks >>= 3;
-      else
+      }
+      else {
         ticks >>= 1;
+      }
       prsc++;
     }
   }
 
   TMR_THRES = (uint16_t)ticks;
+  *thres = (uint16_t)ticks;
   TMR_CT &= ~(7<<TMR_CT_PRSC0); // clear prsc bits
   TMR_CT |= (prsc<<TMR_CT_PRSC0);
 
