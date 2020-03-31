@@ -95,7 +95,7 @@ void neo430_exirq_sw_irq(uint8_t id) {
 
   // apply sw irq enable bit and according irq select
   uint16_t exirq_ctrl = EXIRQ_CT & (~(0b111 << EXIRQ_CT_SEL0)); // clear IRQ src output
-  EXIRQ_CT = exirq_ctrl | (1<<EXIRQ_CT_SW_IRQ) | (irq_sel<<EXIRQ_CT_SEL0);
+  EXIRQ_CT = exirq_ctrl | (1<<EXIRQ_CT_SW_IRQ) | (irq_sel<<EXIRQ_CT_SEL0); // set dst. IRQ and set SW_IRQ flag
 }
 
 
