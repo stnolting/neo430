@@ -375,6 +375,8 @@ begin
         ctrl_nxt(ctrl_rf_in_sel_c) <= '1'; -- select addr gen feedback (only relevant for last two 'when')
         ctrl_nxt(ctrl_mem_rd_c) <= '1'; -- Memory read (fast) (only relevant for last two 'when' 4)
         mem_rd <= '1'; -- Memory read (only relevant for last two 'when' 5)
+        ctrl_nxt(ctrl_adr_off2_c downto ctrl_adr_off0_c) <= "010"; -- add +2
+        ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_pc_c; -- source/destination: PC
         --
         case am is -- addressing mode
           -- "000-" = CLASS II, SRC/DST: register direct                   [ACTUAL DON'T CARE; STATE NOT USED]
@@ -408,10 +410,10 @@ begin
             -- "1101" = CLASS  I, SRC: indirect, DST: indexed
             --
             -- "1111" = CLASS  I, SRC: indirect auto inc, DST: indexed
-            ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_pc_c; -- source/destination: PC
+-->         ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_pc_c; -- source/destination: PC
             ctrl_nxt(ctrl_adr_bp_en_c) <= '1'; -- directly output RF.out to address bus
 -->         ctrl_nxt(ctrl_mem_rd_c) <= '1'; -- Memory read (fast)
-            ctrl_nxt(ctrl_adr_off2_c downto ctrl_adr_off0_c) <= "010"; -- add +2
+-->         ctrl_nxt(ctrl_adr_off2_c downto ctrl_adr_off0_c) <= "010"; -- add +2
 -->         ctrl_nxt(ctrl_rf_in_sel_c) <= '1'; -- select addr gen feedback 
             ctrl_nxt(ctrl_rf_wb_en_c) <= '1'; -- valid RF write back
             ctrl_nxt(ctrl_alu_in_sel_c) <= '1'; -- get data from memory
@@ -420,10 +422,10 @@ begin
 
           when others =>
             -- "1011" = CLASS  I, SRC: indexed/symbolic/absolute, DST: indexed
-            ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_pc_c; -- source/destination: PC
+-->         ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_pc_c; -- source/destination: PC
             ctrl_nxt(ctrl_adr_mar_wr_c) <= '1'; -- write to MAR
 -->         mem_rd <= '1'; -- Memory read
-            ctrl_nxt(ctrl_adr_off2_c downto ctrl_adr_off0_c) <= "010"; -- add +2
+-->         ctrl_nxt(ctrl_adr_off2_c downto ctrl_adr_off0_c) <= "010"; -- add +2
 -->         ctrl_nxt(ctrl_rf_in_sel_c) <= '1'; -- select addr gen feedback 
             ctrl_nxt(ctrl_rf_wb_en_c) <= '1'; -- valid RF write back
             state_nxt <= TRANS_2;
