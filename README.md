@@ -4,6 +4,7 @@
 [![last commit](https://img.shields.io/github/last-commit/stnolting/neo430)](https://github.com/stnolting/neo430/commits/master)
 [![issues](https://img.shields.io/github/issues/stnolting/neo430)](https://github.com/stnolting/neo430/issues)
 [![license](https://img.shields.io/github/license/stnolting/neo430)](https://github.com/stnolting/neo430/blob/master/LICENSE)
+[![release](https://img.shields.io/github/v/release/stnolting/neo430)](https://github.com/stnolting/neo430/releases)
 
 ## Table of Content
 
@@ -160,14 +161,14 @@ Signal driections are seen from the processor.
 | spi_cs_o     | 8     | Out       | SPI     | SPI chip select lines (active-low)                       |
 | twi_sda_io   | 1     | InOut     | TWI     | TWI master serial data line                              |
 | twi_scl_io   | 1     | InOut     | TWI     | TWI master serial clock line                             |
-| wb_adr_o     | 32    | Out       | WB32    | Slave address                                            |
-| wb_dat_i     | 32    | In        | WB32    | Write data                                               |
-| wb_dat_o     | 32    | Out       | WB32    | Read data                                                |
-| wb_we_o      | 1     | Out       | WB32    | Write enable                                             |
-| wb_sel_o     | 1     | Out       | WB32    | Byte enable                                              |
-| wb_stb_o     | 1     | Out       | WB32    | Strobe                                                   |
-| wb_cyc_o     | 1     | Out       | WB32    | Valid cycle                                              |
-| wb_ack_i     | 1     | In        | WB32    | Transfer acknowledge                                     |
+| wb_adr_o     | 32    | Out       | WB32    | Wishbone slave address                                   |
+| wb_dat_i     | 32    | In        | WB32    | Wishbone write data                                      |
+| wb_dat_o     | 32    | Out       | WB32    | Wishbone read data                                       |
+| wb_we_o      | 1     | Out       | WB32    | Wishbone write enable                                    |
+| wb_sel_o     | 1     | Out       | WB32    | Wishbone byte enable                                     |
+| wb_stb_o     | 1     | Out       | WB32    | Wishbone strobe                                          |
+| wb_cyc_o     | 1     | Out       | WB32    | Wishbone valid cycle                                     |
+| wb_ack_i     | 1     | In        | WB32    | Wishbone transfer acknowledge                            |
 | ext_irq_i    | 8     | In        | EXIRQ   | Interrupt request lines, high-active                     |
 | ext_ack_o    | 8     | Out       | EXIRQ   | Interrupt acknowledge, high-active, single-shot          |
 
