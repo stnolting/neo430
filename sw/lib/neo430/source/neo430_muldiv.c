@@ -35,10 +35,6 @@
 #include "neo430.h"
 #include "neo430_muldiv.h"
 
-// private prototypes
-static inline void neo430_muldiv_set_mul(void);
-static inline void neo430_muldiv_set_div(void);
-
 
 /* ------------------------------------------------------------
  * INFO Unsigned 16x16-bit multiplication
@@ -48,9 +44,8 @@ static inline void neo430_muldiv_set_div(void);
  * ------------------------------------------------------------ */
 uint32_t neo430_umul32(uint16_t a, uint16_t b) {
 
-  neo430_muldiv_set_mul();
-  MULDIV_OPA_CTRL = a;
-  MULDIV_OPB = b;
+  MULDIV_OPA_RESX = a;
+  MULDIV_OPB_UMUL_RESY = b;
 
   // HW processing delay
   asm volatile("nop");
@@ -69,17 +64,8 @@ uint32_t neo430_umul32(uint16_t a, uint16_t b) {
  * ------------------------------------------------------------ */
 int32_t neo430_mul32(int16_t a, int16_t b) {
 
-  int16_t sign = a ^ b;
-
-  // make positive / unsigned
-  if (a < 0)
-    a = 0 - a;
-  if (b < 0)
-    b = 0 - b;
-
-  neo430_muldiv_set_mul();
-  MULDIV_OPA_CTRL = (uint16_t)a;
-  MULDIV_OPB = (uint16_t)b;
+  MULDIV_OPA_RESX = (uint16_t)a;
+  MULDIV_OPB_SMUL = (uint16_t)b;
 
   // HW processing delay
   asm volatile("nop");
@@ -88,10 +74,7 @@ int32_t neo430_mul32(int16_t a, int16_t b) {
 
   int32_t r = (int32_t)MULDIV_R32bit;
 
-  if (sign < 0)
-    return 0 - r;
-  else
-    return r;
+  return r;
 }
 
 
@@ -103,16 +86,15 @@ int32_t neo430_mul32(int16_t a, int16_t b) {
  * ------------------------------------------------------------ */
 uint16_t neo430_udiv16(uint16_t dividend, uint16_t divisor) {
 
-  neo430_muldiv_set_div();
-  MULDIV_OPA_CTRL = dividend;
-  MULDIV_OPB = divisor;
+  MULDIV_OPA_RESX = dividend;
+  MULDIV_OPB_UDIV = divisor;
 
   // HW processing delay
   asm volatile("nop");
   asm volatile("nop");
   asm volatile("nop");
 
-  return MULDIV_RESX;
+  return MULDIV_OPA_RESX;
 }
 
 
@@ -130,16 +112,15 @@ int16_t neo430_div16(int16_t dividend, int16_t divisor) {
   if (divisor < 0)
     divisor = 0 - divisor;
 
-  neo430_muldiv_set_div();
-  MULDIV_OPA_CTRL = (uint16_t)dividend;
-  MULDIV_OPB = (uint16_t)divisor;
+  MULDIV_OPA_RESX = (uint16_t)dividend;
+  MULDIV_OPB_UDIV = (uint16_t)divisor;
 
   // HW processing delay
   asm volatile("nop");
   asm volatile("nop");
   asm volatile("nop");
 
-  int16_t r = (int16_t)MULDIV_RESX;
+  int16_t r = (int16_t)MULDIV_OPA_RESX;
 
   if (dividend < 0)
     return 0 - r;
@@ -156,16 +137,15 @@ int16_t neo430_div16(int16_t dividend, int16_t divisor) {
  * ------------------------------------------------------------ */
 uint16_t neo430_umod16(uint16_t dividend, uint16_t divisor) {
 
-  neo430_muldiv_set_div();
-  MULDIV_OPA_CTRL = dividend;
-  MULDIV_OPB = divisor;
+  MULDIV_OPA_RESX = dividend;
+  MULDIV_OPB_UDIV = divisor;
 
   // HW processing delay
   asm volatile("nop");
   asm volatile("nop");
   asm volatile("nop");
 
-  return MULDIV_RESY;
+  return MULDIV_OPB_UMUL_RESY;
 }
 
 
@@ -185,16 +165,15 @@ int16_t neo430_mod16(int16_t dividend, int16_t divisor) {
   if (divisor < 0)
     divisor = 0 - divisor;
 
-  neo430_muldiv_set_div();
-  MULDIV_OPA_CTRL = (uint16_t)dividend_int;
-  MULDIV_OPB = (uint16_t)divisor;
+  MULDIV_OPA_RESX = (uint16_t)dividend_int;
+  MULDIV_OPB_UDIV = (uint16_t)divisor;
 
   // HW processing delay
   asm volatile("nop");
   asm volatile("nop");
   asm volatile("nop");
 
-  int16_t r = (int16_t)MULDIV_RESY;
+  int16_t r = (int16_t)MULDIV_OPB_UMUL_RESY;
 
   if (dividend < 0)
     return 0 - r;
@@ -212,17 +191,16 @@ int16_t neo430_mod16(int16_t dividend, int16_t divisor) {
  * ------------------------------------------------------------ */
 uint16_t neo430_umoddiv16(uint16_t *remainder, uint16_t dividend, uint16_t divisor) {
 
-  neo430_muldiv_set_div();
-  MULDIV_OPA_CTRL = dividend;
-  MULDIV_OPB = divisor;
+  MULDIV_OPA_RESX = dividend;
+  MULDIV_OPB_UDIV = divisor;
 
   // HW processing delay
   asm volatile("nop");
   asm volatile("nop");
   asm volatile("nop");
 
-  *remainder = MULDIV_RESY;
-  return MULDIV_RESX;
+  *remainder = MULDIV_OPB_UMUL_RESY;
+  return MULDIV_OPA_RESX;
 }
 
 
@@ -244,17 +222,16 @@ int16_t neo430_moddiv16(int16_t *remainder, int16_t dividend, int16_t divisor) {
   if (divisor < 0)
     divisor = 0 - divisor;
 
-  neo430_muldiv_set_div();
-  MULDIV_OPA_CTRL = (uint16_t)dividend_int;
-  MULDIV_OPB = (uint16_t)divisor;
+  MULDIV_OPA_RESX = (uint16_t)dividend_int;
+  MULDIV_OPB_UDIV = (uint16_t)divisor;
 
   // HW processing delay
   asm volatile("nop");
   asm volatile("nop");
   asm volatile("nop");
 
-  int16_t q = (int16_t)MULDIV_RESX;
-  int16_t r = (int16_t)MULDIV_RESY;
+  int16_t q = (int16_t)MULDIV_OPA_RESX;
+  int16_t r = (int16_t)MULDIV_OPB_UMUL_RESY;
 
   if (dividend < 0)
     *remainder = 0 - r;
@@ -266,24 +243,3 @@ int16_t neo430_moddiv16(int16_t *remainder, int16_t dividend, int16_t divisor) {
   else
     return q;
 }
-
-
-/* ------------------------------------------------------------
- * INFO Configure MULDIV for multiplication
- * ------------------------------------------------------------ */
-static inline void neo430_muldiv_set_mul(void) {
-
-  MULDIV_OPA_CTRL = 0x0000; // reset
-  MULDIV_OPA_CTRL = MULDIV_CONFIG_MUL; // configure for multiplication
-}
-
-
-/* ------------------------------------------------------------
- * INFO Configure MULDIV for division
- * ------------------------------------------------------------ */
-static inline void neo430_muldiv_set_div(void) {
-
-  MULDIV_OPA_CTRL = 0x0000; // reset
-  MULDIV_OPA_CTRL = MULDIV_CONFIG_DIV; // configure for division
-}
-

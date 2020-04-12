@@ -1,14 +1,12 @@
 -- #################################################################################################
 -- #  << NEO430 - 16-Bit Unsigned Multiplier & Divider Unit >>                                     #
 -- # ********************************************************************************************* #
--- # NOTE: This unit uses "repeated trial subtraction" as division algorithm.                      #
+-- # NOTE: This unit uses "repeated trial subtraction" as division algorithm (restoring).          #
 -- # NOTE: This unit uses "shifted add" as multiplication algorithm. Set 'use_dsp_mul_c' in the    #
 -- # package file to TRUE to use DSP slices for multiplication.                                    #
 -- #                                                                                               #
--- # OpA is used for storing the first operand as well as for function configuration. Set this     #
--- # register to 0 reset the unit. Afterwards, set it to 0b01 for multiplication or to 0b10 for    #
--- # division. Afterwards, write the actual operand. The actual operation is started by            #
--- # writing OpB.                                                                                  #
+-- # The division unit only supports unsigned divisions.                                           #
+-- # The multiplication unit supports signed and unsigned division.                                #
 -- #                                                                                               #
 -- # Division: DIVIDEND / DIVIDER = QUOTIENT + REMAINDER (16-bit) / DIVIDER (16-bit)               #
 -- # Multiplication: FACTOR1 * FACTOR2 = PRODUCT (32-bit)                                          #
@@ -73,25 +71,27 @@ architecture neo430_muldiv_rtl of neo430_muldiv is
   signal acc_en : std_ulogic; -- module access enable
   signal addr   : std_ulogic_vector(15 downto 0); -- access address
   signal wr_en  : std_ulogic; -- only full 16-bit word accesses!
-
-  -- control --
-  signal ctrl_state : std_ulogic;
-  signal operation  : std_ulogic; -- '1' division, '0' multiplication
-  signal func_rst   : std_ulogic;
+  signal rd_en  : std_ulogic;
 
   -- accessible regs --
   signal opa, opb   : std_ulogic_vector(15 downto 0);
   signal resx, resy : std_ulogic_vector(15 downto 0);
+  signal operation  : std_ulogic; -- '1' division, '0' multiplication
+  signal signed_op  : std_ulogic;
 
   -- arithmetic core & arbitration --
-  signal start     : std_ulogic;
-  signal run       : std_ulogic;
-  signal enable    : std_ulogic_vector(15 downto 0);
-  signal try_sub   : std_ulogic_vector(16 downto 0);
-  signal remainder : std_ulogic_vector(15 downto 0);
-  signal quotient  : std_ulogic_vector(15 downto 0);
-  signal product   : std_ulogic_vector(31 downto 0);
-  signal do_add    : std_ulogic_vector(16 downto 0);
+  signal start      : std_ulogic;
+  signal run        : std_ulogic;
+  signal enable     : std_ulogic_vector(15 downto 0);
+  signal try_sub    : std_ulogic_vector(16 downto 0);
+  signal remainder  : std_ulogic_vector(15 downto 0);
+  signal quotient   : std_ulogic_vector(15 downto 0);
+  signal product    : std_ulogic_vector(31 downto 0);
+  signal do_add     : std_ulogic_vector(16 downto 0);
+  signal sign_cycle : std_ulogic;
+  signal opa_sext   : std_ulogic;
+  signal opb_sext   : std_ulogic;
+  signal p_sext     : std_ulogic;
 
 begin
 
@@ -100,6 +100,7 @@ begin
   acc_en <= '1' when (addr_i(hi_abb_c downto lo_abb_c) = muldiv_base_c(hi_abb_c downto lo_abb_c)) else '0';
   addr   <= muldiv_base_c(15 downto lo_abb_c) & addr_i(lo_abb_c-1 downto 1) & '0'; -- word aligned
   wr_en  <= acc_en and wren_i;
+  rd_en  <= acc_en and rden_i;
 
 
   -- Write access -------------------------------------------------------------
@@ -107,32 +108,35 @@ begin
   wr_access: process(clk_i)
   begin
     if rising_edge(clk_i) then
-      start <= '0';
+      start    <= '0';
+      opa_sext <= opa(opa'left) and signed_op;
+      opb_sext <= opb(opb'left) and signed_op;
       if (wr_en = '1') then -- only full word accesses!
         -- operands --
-        if (addr = muldiv_opa_ctrl_addr_c) then -- reset/control OR dividend or mul_factor a
-          opa   <= data_i;
+        if (addr = muldiv_opa_resx_addr_c) then -- dividend or factor 1
+          opa <= data_i;
         end if;
-        if (addr = muldiv_opb_addr_c) then -- divisor or mul_factor b
+        if (addr = muldiv_opb_umul_resy_addr_c) or
+           (addr = muldiv_opb_smul_addr_c) or
+           (addr = muldiv_opb_udiv_addr_c) then -- divisor or factor 2
           opb   <= data_i;
-          start <= '1'; -- start operation
+          start <= '1'; -- trigger operation
         end if;
-        -- operation configuration --
-        if (func_rst = '1') then -- reset configuration
-          ctrl_state <= '0';
-        elsif (ctrl_state = '0') then -- get new configuration
-          if (wr_en = '1') then
-            operation  <= opa(1); -- '1' division, '0' multiplication
-            ctrl_state <= '1';
-          end if;
---      else -- execute configuration
+        -- operation: division/multiplication --
+        if (addr = muldiv_opb_umul_resy_addr_c) or (addr = muldiv_opb_smul_addr_c) then -- multiplication
+          operation <= '0';
+        else -- division
+          operation <= '1';
+        end if;
+        -- signed/unsigned operation --
+        if (addr = muldiv_opb_smul_addr_c) then
+          signed_op <= '1';
+        else
+          signed_op <= '0';
         end if;
       end if;
     end if;
   end process wr_access;
-
-  -- reset when OpA is zero --
-  func_rst <= '1' when (opa = x"0000") else '0';
 
 
   -- Arithmetic core ----------------------------------------------------------
@@ -165,24 +169,39 @@ begin
       else
         if (use_dsp_mul_c = false) then -- implement serial multiplication
           if (start = '1') then -- load factor 1
-            product(31 downto 16) <= (others => '0');
+            product(31 downto 16) <= (others => opa_sext);
             product(15 downto  0) <= opa;
           elsif (run = '1') then
             product(31 downto 15) <= do_add(16 downto 0);
             product(14 downto  0) <= product(15 downto 1);
           end if;
         else -- use DSP for multiplication
-          product(31 downto 0) <= std_ulogic_vector(unsigned(opa) * unsigned(opb));
+          product(31 downto 0) <= std_ulogic_vector(signed(opa_sext & opa) * signed(opb_sext & opb))(31 downto 0);
         end if;
       end if;
     end if;
   end process arithmetic_core;
 
+
   -- DIV: try another subtraction --
   try_sub <= std_ulogic_vector(unsigned('0' & remainder(14 downto 0) & quotient(15)) - unsigned('0' & opb));
 
   -- MUL: do another addition
-  do_add <= std_ulogic_vector(unsigned('0' & product(31 downto 16)) + unsigned('0' & opb)) when (product(0) = '1') else ('0' & product(31 downto 16));
+  mul_update: process(product, sign_cycle, p_sext, opb_sext, opb)
+  begin
+    if (product(0) = '1') then
+      if (sign_cycle = '1') then
+        do_add <= std_ulogic_vector(unsigned(p_sext & product(31 downto 16)) - unsigned(opb_sext & opb));
+      else
+        do_add <= std_ulogic_vector(unsigned(p_sext & product(31 downto 16)) + unsigned(opb_sext & opb));
+      end if;
+    else
+      do_add <= p_sext & product(31 downto 16);
+    end if;
+  end process mul_update;
+
+  sign_cycle <= enable(enable'left) and signed_op;
+  p_sext     <= product(product'left) and signed_op;
 
 
   -- Read access --------------------------------------------------------------
@@ -191,10 +210,10 @@ begin
   begin
     if rising_edge(clk_i) then
       data_o <= (others => '0');
-      if (acc_en = '1') and (rden_i = '1') then -- valid read access
-        if (addr = muldiv_resx_addr_c) then
+      if (rd_en = '1') then -- valid read access
+        if (addr = muldiv_opa_resx_addr_c) then
           data_o <= resx; -- quotient or product low word
-        else -- muldiv_resy_addr_c =>
+        else -- muldiv_opb_umul_resy_addr_c =>
           data_o <= resy; -- remainder or product high word
         end if;
       end if;

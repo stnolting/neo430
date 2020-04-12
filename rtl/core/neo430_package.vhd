@@ -40,7 +40,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0404"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0405"; -- no touchy!
 
   -- Danger Zone (Advanced Hardware Configuration) ------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -92,10 +92,10 @@ package neo430_package is
   constant muldiv_base_c : std_ulogic_vector(15 downto 0) := x"FF80";
   constant muldiv_size_c : natural := 8; -- bytes
 
-  constant muldiv_opa_ctrl_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0000");
-  constant muldiv_opb_addr_c      : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0002");
-  constant muldiv_resx_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0004");
-  constant muldiv_resy_addr_c     : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0006");
+  constant muldiv_opa_resx_addr_c      : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0000");
+  constant muldiv_opb_umul_resy_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0002");
+  constant muldiv_opb_smul_addr_c      : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0004");
+  constant muldiv_opb_udiv_addr_c      : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0006");
 
   -- IO: reserved --
 --constant reserved_base_c : std_ulogic_vector(15 downto 0) := x"FF88";
@@ -149,7 +149,7 @@ package neo430_package is
   constant timer_ctrl_addr_c  : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0000");
   constant timer_cnt_addr_c   : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0002");
   constant timer_thres_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0004");
-  constant timer_nco_addr_c   : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0006");
+--constant timer_???_addr_c   : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(timer_base_c) + x"0006");
 
   -- IO: Watchdog Timer (WDT) --
   constant wdt_base_c : std_ulogic_vector(15 downto 0) := x"FFB8";
