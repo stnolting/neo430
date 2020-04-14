@@ -42,28 +42,29 @@ use neo430.neo430_package.all;
 entity neo430_top_std_logic is
   generic (
     -- general configuration --
-    CLOCK_SPEED : natural := 100000000; -- main clock in Hz
-    IMEM_SIZE   : natural := 4*1024; -- internal IMEM size in bytes, max 48kB (default=4kB)
-    DMEM_SIZE   : natural := 2*1024; -- internal DMEM size in bytes, max 12kB (default=2kB)
+    CLOCK_SPEED  : natural := 100000000; -- main clock in Hz
+    IMEM_SIZE    : natural := 4*1024; -- internal IMEM size in bytes, max 48kB (default=4kB)
+    DMEM_SIZE    : natural := 2*1024; -- internal DMEM size in bytes, max 12kB (default=2kB)
     -- additional configuration --
-    USER_CODE   : std_logic_vector(15 downto 0) := x"0000"; -- custom user code
+    USER_CODE    : std_logic_vector(15 downto 0) := x"0000"; -- custom user code
     -- module configuration --
-    MULDIV_USE  : boolean := true; -- implement multiplier/divider unit? (default=true)
-    WB32_USE    : boolean := true; -- implement WB32 unit? (default=true)
-    WDT_USE     : boolean := true; -- implement WDT? (default=true)
-    GPIO_USE    : boolean := true; -- implement GPIO unit? (default=true)
-    TIMER_USE   : boolean := true; -- implement timer? (default=true)
-    UART_USE    : boolean := true; -- implement UART? (default=true)
-    CRC_USE     : boolean := true; -- implement CRC unit? (default=true)
-    CFU_USE     : boolean := false; -- implement custom functions unit? (default=false)
-    PWM_USE     : boolean := true; -- implement PWM controller?
-    TWI_USE     : boolean := true; -- implement two wire serial interface? (default=true)
-    SPI_USE     : boolean := true; -- implement SPI? (default=true)
-    TRNG_USE    : boolean := false; -- implement TRNG? (default=false)
-    EXIRQ_USE   : boolean := true; -- implement EXIRQ? (default=true)
+    MULDIV_USE   : boolean := true; -- implement multiplier/divider unit? (default=true)
+    WB32_USE     : boolean := true; -- implement WB32 unit? (default=true)
+    WDT_USE      : boolean := true; -- implement WDT? (default=true)
+    GPIO_USE     : boolean := true; -- implement GPIO unit? (default=true)
+    TIMER_USE    : boolean := true; -- implement timer? (default=true)
+    UART_USE     : boolean := true; -- implement UART? (default=true)
+    CRC_USE      : boolean := true; -- implement CRC unit? (default=true)
+    CFU_USE      : boolean := false; -- implement custom functions unit? (default=false)
+    PWM_USE      : boolean := true; -- implement PWM controller?
+    TWI_USE      : boolean := true; -- implement two wire serial interface? (default=true)
+    SPI_USE      : boolean := true; -- implement SPI? (default=true)
+    TRNG_USE     : boolean := false; -- implement TRNG? (default=false)
+    EXIRQ_USE    : boolean := true; -- implement EXIRQ? (default=true)
+    FREQ_GEN_USE : boolean := true; -- implement FREQ_GEN? (default=true)
     -- boot configuration --
-    BOOTLD_USE  : boolean := true; -- implement and use bootloader? (default=true)
-    IMEM_AS_ROM : boolean := false -- implement IMEM as read-only memory? (default=false)
+    BOOTLD_USE   : boolean := true; -- implement and use bootloader? (default=true)
+    IMEM_AS_ROM  : boolean := false -- implement IMEM as read-only memory? (default=false)
   );
   port (
     -- global control --
@@ -74,8 +75,8 @@ entity neo430_top_std_logic is
     gpio_i      : in  std_logic_vector(15 downto 0); -- parallel input
     -- pwm channels --
     pwm_o       : out std_logic_vector(03 downto 0); -- pwm channels
-    -- timer frequency generator --
-    timer_fg_o  : out std_logic; -- programmable frequency output
+    -- arbitrary frequency generator --
+    freq_gen_o  : out std_logic_vector(02 downto 0); -- programmable frequency output
     -- serial com --
     uart_txd_o  : out std_logic; -- UART send data
     uart_rxd_i  : in  std_logic; -- UART receive data
@@ -125,7 +126,7 @@ architecture neo430_top_std_logic_rtl of neo430_top_std_logic is
   signal wb_stb_o_int   : std_ulogic;
   signal wb_cyc_o_int   : std_ulogic;
   signal wb_ack_i_int   : std_ulogic;
-  signal timer_fg_o_int : std_ulogic;
+  signal freq_gen_o_int : std_ulogic_vector(02 downto 0);
 
 begin
 
@@ -134,28 +135,29 @@ begin
   neo430_top_inst: neo430_top
   generic map (
     -- general configuration --
-    CLOCK_SPEED => CLOCK_SPEED,       -- main clock in Hz
-    IMEM_SIZE   => IMEM_SIZE,         -- internal IMEM size in bytes, max 48kB (default=4kB)
-    DMEM_SIZE   => DMEM_SIZE,         -- internal DMEM size in bytes, max 12kB (default=2kB)
+    CLOCK_SPEED  => CLOCK_SPEED,      -- main clock in Hz
+    IMEM_SIZE    => IMEM_SIZE,        -- internal IMEM size in bytes, max 48kB (default=4kB)
+    DMEM_SIZE    => DMEM_SIZE,        -- internal DMEM size in bytes, max 12kB (default=2kB)
     -- additional configuration --
-    USER_CODE   => usrcode_c,         -- custom user code
+    USER_CODE    => usrcode_c,        -- custom user code
     -- module configuration --
-    MULDIV_USE  => MULDIV_USE,        -- implement multiplier/divider unit? (default=true)
-    WB32_USE    => WB32_USE,          -- implement WB32 unit? (default=true)
-    WDT_USE     => WDT_USE,           -- implement WDT? (default=true)
-    GPIO_USE    => GPIO_USE,          -- implement GPIO unit? (default=true)
-    TIMER_USE   => TIMER_USE,         -- implement timer? (default=true)
-    UART_USE    => UART_USE,          -- implement UART? (default=true)
-    CRC_USE     => CRC_USE,           -- implement CRC unit? (default=true)
-    CFU_USE     => CFU_USE,           -- implement CF unit? (default=false)
-    PWM_USE     => PWM_USE,           -- implement PWM controller? (default=true)
-    TWI_USE     => TWI_USE,           -- implement two wire serial interface? (default=true)
-    SPI_USE     => SPI_USE,           -- implement SPI? (default=true)
-    TRNG_USE    => TRNG_USE,          -- implement TRNG? (default=false)
-    EXIRQ_USE   => EXIRQ_USE,         -- implement EXIRQ? (default=true)
+    MULDIV_USE   => MULDIV_USE,       -- implement multiplier/divider unit? (default=true)
+    WB32_USE     => WB32_USE,         -- implement WB32 unit? (default=true)
+    WDT_USE      => WDT_USE,          -- implement WDT? (default=true)
+    GPIO_USE     => GPIO_USE,         -- implement GPIO unit? (default=true)
+    TIMER_USE    => TIMER_USE,        -- implement timer? (default=true)
+    UART_USE     => UART_USE,         -- implement UART? (default=true)
+    CRC_USE      => CRC_USE,          -- implement CRC unit? (default=true)
+    CFU_USE      => CFU_USE,          -- implement CF unit? (default=false)
+    PWM_USE      => PWM_USE,          -- implement PWM controller? (default=true)
+    TWI_USE      => TWI_USE,          -- implement two wire serial interface? (default=true)
+    SPI_USE      => SPI_USE,          -- implement SPI? (default=true)
+    TRNG_USE     => TRNG_USE,         -- implement TRNG? (default=false)
+    EXIRQ_USE    => EXIRQ_USE,        -- implement EXIRQ? (default=true)
+    FREQ_GEN_USE => FREQ_GEN_USE,     -- implement FREQ_GEN? (default=true)
     -- boot configuration --
-    BOOTLD_USE  => BOOTLD_USE,        -- implement and use bootloader? (default=true)
-    IMEM_AS_ROM => IMEM_AS_ROM        -- implement IMEM as read-only memory? (default=false)
+    BOOTLD_USE   => BOOTLD_USE,       -- implement and use bootloader? (default=true)
+    IMEM_AS_ROM  => IMEM_AS_ROM       -- implement IMEM as read-only memory? (default=false)
   )
   port map (
     -- global control --
@@ -166,6 +168,8 @@ begin
     gpio_i     => gpio_i_int,         -- parallel input
     -- pwm channels --
     pwm_o      => pwm_o_int,          -- pwm channels
+    -- arbitrary frequency generator --
+    freq_gen_o => freq_gen_o_int,     -- programmable frequency output
     -- serial com --
     uart_txd_o => uart_txd_o_int,     -- UART send data
     uart_rxd_i => uart_rxd_i_int,     -- UART receive data
@@ -214,7 +218,7 @@ begin
   wb_stb_o       <= std_logic(wb_stb_o_int);
   wb_cyc_o       <= std_logic(wb_cyc_o_int);
   ext_ack_o      <= std_logic_vector(irq_ack_o_int);
-  timer_fg_o     <= std_logic(timer_fg_o_int);
+  timer_fg_o     <= std_logic(freq_gen_o_int);
 
 
 end neo430_top_std_logic_rtl;
