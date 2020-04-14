@@ -80,18 +80,19 @@ architecture neo430_muldiv_rtl of neo430_muldiv is
   signal signed_op  : std_ulogic;
 
   -- arithmetic core & arbitration --
-  signal start      : std_ulogic;
-  signal run        : std_ulogic;
-  signal enable     : std_ulogic_vector(15 downto 0);
-  signal try_sub    : std_ulogic_vector(16 downto 0);
-  signal remainder  : std_ulogic_vector(15 downto 0);
-  signal quotient   : std_ulogic_vector(15 downto 0);
-  signal product    : std_ulogic_vector(31 downto 0);
-  signal do_add     : std_ulogic_vector(16 downto 0);
-  signal sign_cycle : std_ulogic;
-  signal opa_sext   : std_ulogic;
-  signal opb_sext   : std_ulogic;
-  signal p_sext     : std_ulogic;
+  signal start       : std_ulogic;
+  signal run         : std_ulogic;
+  signal enable      : std_ulogic_vector(15 downto 0);
+  signal try_sub     : std_ulogic_vector(16 downto 0);
+  signal remainder   : std_ulogic_vector(15 downto 0);
+  signal quotient    : std_ulogic_vector(15 downto 0);
+  signal product     : std_ulogic_vector(31 downto 0);
+  signal do_add      : std_ulogic_vector(16 downto 0);
+  signal sign_cycle  : std_ulogic;
+  signal opa_sext    : std_ulogic;
+  signal opb_sext    : std_ulogic;
+  signal p_sext      : std_ulogic;
+  signal dsp_mul_res : std_ulogic_vector(33 downto 0);
 
 begin
 
@@ -176,21 +177,23 @@ begin
             product(14 downto  0) <= product(15 downto 1);
           end if;
         else -- use DSP for multiplication
-          product(31 downto 0) <= std_ulogic_vector(signed(opa_sext & opa) * signed(opb_sext & opb))(31 downto 0);
+          product(31 downto 0) <= dsp_mul_res(31 downto 0);
         end if;
       end if;
     end if;
   end process arithmetic_core;
 
+  -- DSP multiplication --
+  dsp_mul_res <= std_ulogic_vector(signed(opa_sext & opa) * signed(opb_sext & opb));
 
   -- DIV: try another subtraction --
   try_sub <= std_ulogic_vector(unsigned('0' & remainder(14 downto 0) & quotient(15)) - unsigned('0' & opb));
 
-  -- MUL: do another addition
+  -- MUL: do another addition --
   mul_update: process(product, sign_cycle, p_sext, opb_sext, opb)
   begin
     if (product(0) = '1') then
-      if (sign_cycle = '1') then
+      if (sign_cycle = '1') then -- for signed operation only: take care of negative weighted MSB
         do_add <= std_ulogic_vector(unsigned(p_sext & product(31 downto 16)) - unsigned(opb_sext & opb));
       else
         do_add <= std_ulogic_vector(unsigned(p_sext & product(31 downto 16)) + unsigned(opb_sext & opb));

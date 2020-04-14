@@ -157,7 +157,7 @@ begin
       end if;
       -- channels --
       for i in 0 to num_pwm_channels_c-1 loop
-        -- constrain to virtual size configured by SIZE register
+        -- constrain to virtual size configured by SIZE control register bit
         if (unsigned(pwm_cnt and mask) >= unsigned(pwm_ch(i) and mask)) or (enable = '0') then
           pwm_out(i) <= '0';
         else
