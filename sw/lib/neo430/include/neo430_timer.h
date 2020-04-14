@@ -37,12 +37,9 @@
 
 // prototypes
 void     neo430_timer_enable(void);                  // enable timer unit
-void     neo430_timer_disable(void);                 // disable timer unit
+void     neo430_timer_disable(void);                 // disable (and reset) timer unit
 void     neo430_timer_run(void);                     // run timer
 void     neo430_timer_pause(void);                   // pause timer
 uint8_t  neo430_timer_config_freq(uint32_t f_timer, uint16_t *thres); // configure timer frequency
-void     neo430_timer_nco_enable(void);              // enable programmable frequency output
-void     neo430_timer_nco_disable(void);             // disable programmable frequency output
-uint32_t neo430_timer_nco_set(uint32_t frequency);   // set programmable output frequency, returns actual output frequency
 
 #endif // neo430_timer_h

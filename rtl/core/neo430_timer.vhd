@@ -5,8 +5,6 @@
 -- # counter value reaches the programmable threshold an interrupt can be triggered. Optionally,   #
 -- # the counter can be automatically reset when reaching the threshold value to restart counting. #
 -- # Configure THRES before enabling the timer to prevent false interrupt requests.                #
--- # The time also features a numerically controlled oscillator (NCO) for generating arbitrary     #
--- # frequency outputs: f_out = ((f_cpu / nco_prsc) * tuning_word[15:0]) / 2^17                    #
 -- # ********************************************************************************************* #
 -- # BSD 3-Clause License                                                                          #
 -- #                                                                                               #
@@ -58,8 +56,6 @@ entity neo430_timer is
     -- clock generator --
     clkgen_en_o : out std_ulogic; -- enable clock generator
     clkgen_i    : in  std_ulogic_vector(07 downto 0);
-    -- frequency generator --
-    timer_fg_o  : out std_ulogic; -- programmable frequency output
     -- interrupt --
     irq_o       : out std_ulogic  -- interrupt request
   );
@@ -79,10 +75,6 @@ architecture neo430_timer_rtl of neo430_timer is
   constant ctrl_prsc0_c     : natural :=  4; -- r/w: prescaler select bit 0
   constant ctrl_prsc1_c     : natural :=  5; -- r/w: prescaler select bit 1
   constant ctrl_prsc2_c     : natural :=  6; -- r/w: prescaler select bit 2
-  constant ctrl_nco_en_c    : natural :=  7; -- r/w: enable NCO
-  constant ctrl_nco_prsc0_c : natural :=  8; -- r/w: NCO prescaler select bit 0
-  constant ctrl_nco_prsc1_c : natural :=  9; -- r/w: NCO prescaler select bit 1
-  constant ctrl_nco_prsc2_c : natural := 10; -- r/w: NCO prescaler select bit 2
 
   -- access control --
   signal acc_en : std_ulogic; -- module access enable
@@ -90,22 +82,17 @@ architecture neo430_timer_rtl of neo430_timer is
   signal wr_en  : std_ulogic; -- word write enable
 
   -- timer regs --
-  signal cnt   : std_ulogic_vector(15 downto 0); -- r/-: counter register
+  signal ctrl  : std_ulogic_vector(06 downto 0); -- r/w: control register
   signal thres : std_ulogic_vector(15 downto 0); -- -/w: threshold register 
-  signal ctrl  : std_ulogic_vector(10 downto 0); -- r/w: control register 
+  signal cnt   : std_ulogic_vector(15 downto 0); -- r/-: counter register
 
   -- prescaler clock generator --
   signal prsc_tick : std_ulogic;
 
   -- timer control --
-  signal match       : std_ulogic; -- thres = cnt
+  signal match       : std_ulogic; -- set if thres == cnt
   signal irq_fire    : std_ulogic;
   signal irq_fire_ff : std_ulogic;
-
-  -- nco --
-  signal nco_prsc_tick   : std_ulogic;
-  signal nco_tuning_word : std_ulogic_vector(15 downto 0); -- -/w: NCO tuning word
-  signal nco_phase_accu  : std_ulogic_vector(16 downto 0);
 
 begin
 
@@ -126,20 +113,13 @@ begin
           thres <= data_i;
         end if;
         if (addr = timer_ctrl_addr_c) then
-          ctrl(ctrl_en_c)        <= data_i(ctrl_en_c);
-          ctrl(ctrl_arst_c)      <= data_i(ctrl_arst_c);
-          ctrl(ctrl_irq_en_c)    <= data_i(ctrl_irq_en_c);
-          ctrl(ctrl_run_c)       <= data_i(ctrl_run_c);
-          ctrl(ctrl_prsc0_c)     <= data_i(ctrl_prsc0_c);
-          ctrl(ctrl_prsc1_c)     <= data_i(ctrl_prsc1_c);
-          ctrl(ctrl_prsc2_c)     <= data_i(ctrl_prsc2_c);
-          ctrl(ctrl_nco_en_c)    <= data_i(ctrl_nco_en_c);
-          ctrl(ctrl_nco_prsc0_c) <= data_i(ctrl_nco_prsc0_c);
-          ctrl(ctrl_nco_prsc1_c) <= data_i(ctrl_nco_prsc1_c);
-          ctrl(ctrl_nco_prsc2_c) <= data_i(ctrl_nco_prsc2_c);
-        end if;
-        if (addr = timer_nco_addr_c) then
-          nco_tuning_word <= data_i;
+          ctrl(ctrl_en_c)     <= data_i(ctrl_en_c);
+          ctrl(ctrl_arst_c)   <= data_i(ctrl_arst_c);
+          ctrl(ctrl_irq_en_c) <= data_i(ctrl_irq_en_c);
+          ctrl(ctrl_run_c)    <= data_i(ctrl_run_c);
+          ctrl(ctrl_prsc0_c)  <= data_i(ctrl_prsc0_c);
+          ctrl(ctrl_prsc1_c)  <= data_i(ctrl_prsc1_c);
+          ctrl(ctrl_prsc2_c)  <= data_i(ctrl_prsc2_c);
         end if;
       end if;
     end if;
@@ -181,25 +161,6 @@ begin
   irq_o <= irq_fire and (not irq_fire_ff);
 
 
-  -- NCO core (number controlled oscillator) ----------------------------------
-  -- -----------------------------------------------------------------------------
-  nco_core: process(clk_i)
-  begin
-    if rising_edge(clk_i) then
-      -- NCO clock enable --
-      nco_prsc_tick <= clkgen_i(to_integer(unsigned(ctrl(ctrl_nco_prsc2_c downto ctrl_nco_prsc0_c))));
-      -- phase accu --
-      if ((ctrl(ctrl_en_c) and ctrl(ctrl_nco_en_c)) = '0') then -- disabled
-        nco_phase_accu <= (others => '0');
-      elsif (nco_prsc_tick = '1') then -- enabled; wait for clock enable tick
-        nco_phase_accu <= std_ulogic_vector(unsigned(nco_phase_accu) + unsigned('0' & nco_tuning_word));
-      end if;
-      -- output --
-      timer_fg_o <= nco_phase_accu(nco_phase_accu'left); -- MSB (carry_out) is output
-    end if;
-  end process nco_core;
-
-
   -- Read access --------------------------------------------------------------
   -- -----------------------------------------------------------------------------
   rd_access: process(clk_i)
@@ -208,23 +169,17 @@ begin
       data_o <= (others => '0');
       if (rden_i = '1') and (acc_en = '1') then
         if (addr = timer_ctrl_addr_c) then
-          data_o(ctrl_en_c)        <= ctrl(ctrl_en_c);
-          data_o(ctrl_arst_c)      <= ctrl(ctrl_arst_c);
-          data_o(ctrl_irq_en_c)    <= ctrl(ctrl_irq_en_c);
-          data_o(ctrl_run_c)       <= ctrl(ctrl_run_c);
-          data_o(ctrl_prsc0_c)     <= ctrl(ctrl_prsc0_c);
-          data_o(ctrl_prsc1_c)     <= ctrl(ctrl_prsc1_c);
-          data_o(ctrl_prsc2_c)     <= ctrl(ctrl_prsc2_c);
-          data_o(ctrl_nco_en_c)    <= ctrl(ctrl_nco_en_c);
-          data_o(ctrl_nco_prsc0_c) <= ctrl(ctrl_nco_prsc0_c);
-          data_o(ctrl_nco_prsc1_c) <= ctrl(ctrl_nco_prsc1_c);
-          data_o(ctrl_nco_prsc2_c) <= ctrl(ctrl_nco_prsc2_c);
+          data_o(ctrl_en_c)     <= ctrl(ctrl_en_c);
+          data_o(ctrl_arst_c)   <= ctrl(ctrl_arst_c);
+          data_o(ctrl_irq_en_c) <= ctrl(ctrl_irq_en_c);
+          data_o(ctrl_run_c)    <= ctrl(ctrl_run_c);
+          data_o(ctrl_prsc0_c)  <= ctrl(ctrl_prsc0_c);
+          data_o(ctrl_prsc1_c)  <= ctrl(ctrl_prsc1_c);
+          data_o(ctrl_prsc2_c)  <= ctrl(ctrl_prsc2_c);
         else--if (addr = timer_cnt_addr_c) then
           data_o <= cnt;
---      else--if (addr = timer_thres_addr_c) then
+--      else -- (addr = timer_thres_addr_c) then
 --        data_o <= thres;
---      else -- timer_nco_addr_c
---        data_o <= nco_tuning_word;
         end if;
       end if;
     end if;
