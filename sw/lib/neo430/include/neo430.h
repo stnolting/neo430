@@ -86,24 +86,44 @@
 // ----------------------------------------------------------------------------
 // Unsigned Multiplier/Divider Unit (MULDIV)
 // ----------------------------------------------------------------------------
-#define MULDIV_OPA_CTRL (*(REG16 0xFF80)) // -/w: operand A (dividend or factor1) / function config
-#define MULDIV_OPB      (*(REG16 0xFF82)) // -/w: operand B (factor2) for multiplication
-#define MULDIV_RESX     (*(ROM16 0xFF84)) // r/-: quotient or product low word
-#define MULDIV_RESY     (*(ROM16 0xFF86)) // r/-: remainder or product high word
-#define MULDIV_R32bit   (*(ROM32 (&MULDIV_RESX))) // r/-: read result as 32-bit data word
-
-// function config bits
-#define MULDIV_CONFIG_MUL ((uint16_t)(0b01 << 0))
-#define MULDIV_CONFIG_DIV ((uint16_t)(0b10 << 0))
+#define MULDIV_OPA_RESX      (*(REG16 0xFF80)) // r/w: operand A (dividend or factor1) / resx: quotient or product low word
+#define MULDIV_OPB_UMUL_RESY (*(REG16 0xFF82)) // r/w: operand B (factor2) for unsigned multiplication / resy: remainder or product high word
+#define MULDIV_OPB_SMUL      (*(REG16 0xFF84)) // -/w: operand B (factor2) for signed multiplication
+#define MULDIV_OPB_UDIV      (*(REG16 0xFF86)) // -/w: operand B (divisor) for unsigned division
+#define MULDIV_R32bit        (*(ROM32 (&MULDIV_OPA_RESX))) // r/-: read result as 32-bit data word
 
 
 // ----------------------------------------------------------------------------
-// reserved
+// Frequency Generator (FREQ_GEN)
 // ----------------------------------------------------------------------------
-//#define reserved (*(REG16 0xFF88)) // -/-: reserved
-//#define reserved (*(REG16 0xFF8A)) // -/-: reserved
-//#define reserved (*(REG16 0xFF8E)) // -/-: reserved
-//#define reserved (*(REG16 0xFF8E)) // -/-: reserved
+#define FREQ_GEN_CT     (*(REG16 0xFF88)) // r/w: control register
+#define FREQ_GEN_TW_CH0 (*(REG16 0xFF8A)) // -/w: tuning word channel 0
+#define FREQ_GEN_TW_CH1 (*(REG16 0xFF8E)) // -/w: tuning word channel 1
+#define FREQ_GEN_TW_CH2 (*(REG16 0xFF8E)) // -/w: tuning word channel 2
+
+// FREQ_GEN control register
+#define FREQ_GEN_CT_CH0_EN     0 // r/w: enable NCO channel 0
+#define FREQ_GEN_CT_CH1_EN     1 // r/w: enable NCO channel 1
+#define FREQ_GEN_CT_CH2_EN     2 // r/w: enable NCO channel 2
+#define FREQ_GEN_CT_CH0_PRSC0  3 // r/w: prescaler select bit 0 for channel 0
+#define FREQ_GEN_CT_CH0_PRSC1  4 // r/w: prescaler select bit 1 for channel 0
+#define FREQ_GEN_CT_CH0_PRSC2  5 // r/w: prescaler select bit 2 for channel 0
+#define FREQ_GEN_CT_CH1_PRSC0  6 // r/w: prescaler select bit 0 for channel 1
+#define FREQ_GEN_CT_CH1_PRSC1  7 // r/w: prescaler select bit 1 for channel 1
+#define FREQ_GEN_CT_CH1_PRSC2  8 // r/w: prescaler select bit 2 for channel 1
+#define FREQ_GEN_CT_CH2_PRSC0  9 // r/w: prescaler select bit 0 for channel 2
+#define FREQ_GEN_CT_CH2_PRSC1 10 // r/w: prescaler select bit 1 for channel 2
+#define FREQ_GEN_CT_CH2_PRSC2 11 // r/w: prescaler select bit 2 for channel 2
+
+// clock prescalers 
+#define FREQ_GEN_PRSC_2    0 // CLK/2
+#define FREQ_GEN_PRSC_4    1 // CLK/4
+#define FREQ_GEN_PRSC_8    2 // CLK/8
+#define FREQ_GEN_PRSC_64   3 // CLK/64
+#define FREQ_GEN_PRSC_128  4 // CLK/128
+#define FREQ_GEN_PRSC_1024 5 // CLK/1024
+#define FREQ_GEN_PRSC_2048 6 // CLK/2048
+#define FREQ_GEN_PRSC_4096 7 // CLK/4096
 
 
 // ----------------------------------------------------------------------------
@@ -216,23 +236,19 @@
 // ----------------------------------------------------------------------------
 // High-Precision Timer (TIMER)
 // ----------------------------------------------------------------------------
-#define TMR_CT    (*(REG16 0xFFB0)) // r/w: control register
-#define TMR_CNT   (*(ROM16 0xFFB2)) // r/-: counter register
-#define TMR_THRES (*(REG16 0xFFB4)) // -/w: threshold register
-#define TMR_NCO   (*(REG16 0xFFB6)) // -/w: frequency generator
+#define TMR_CT     (*(REG16 0xFFB0)) // r/w: control register
+#define TMR_CNT    (*(ROM16 0xFFB2)) // r/-: counter register
+#define TMR_THRES  (*(REG16 0xFFB4)) // -/w: threshold register
+//#define reserved (*(REG16 0xFFB6)) // reserved
 
 // Timer control register
-#define TMR_CT_EN         0 // r/w: timer unit global enable
-#define TMR_CT_ARST       1 // r/w: auto reset on match
-#define TMR_CT_IRQ        2 // r/w: interrupt enable
-#define TMR_CT_RUN        3 // r/w: start/stop timer
-#define TMR_CT_PRSC0      4 // r/w: clock prescaler select bit 0
-#define TMR_CT_PRSC1      5 // r/w: clock prescaler select bit 1
-#define TMR_CT_PRSC2      6 // r/w: clock prescaler select bit 2
-#define TMR_CT_NCO_EN     7 // r/w: NCO enable
-#define TMR_CT_NCO_PRSC0  8 // r/w: NCO prescaler select bit 0
-#define TMR_CT_NCO_PRSC1  9 // r/w: NCO prescaler select bit 1
-#define TMR_CT_NCO_PRSC2 10 // r/w: NCO prescaler select bit 2
+#define TMR_CT_EN     0 // r/w: timer unit global enable
+#define TMR_CT_ARST   1 // r/w: auto reset on match
+#define TMR_CT_IRQ    2 // r/w: interrupt enable
+#define TMR_CT_RUN    3 // r/w: start/stop timer
+#define TMR_CT_PRSC0  4 // r/w: clock prescaler select bit 0
+#define TMR_CT_PRSC1  5 // r/w: clock prescaler select bit 1
+#define TMR_CT_PRSC2  6 // r/w: clock prescaler select bit 2
 
 // Timer clock prescaler select:
 #define TMR_PRSC_2    0 // CLK/2
@@ -450,7 +466,7 @@
 #define SYS_GPIO_EN      3 // r/-: GPIO synthesized
 #define SYS_TIMER_EN     4 // r/-: TIMER synthesized
 #define SYS_UART_EN      5 // r/-: UART synthesized
-//#define SYS_???_EN     6 // r/-: reserved
+#define SYS_FREQ_GEN_EN  6 // r/-: FREQ_GEN synthesized
 #define SYS_BTLD_EN      7 // r/-: Bootloader installed and enabled
 #define SYS_IROM_EN      8 // r/-: Implement IMEM as true ROM
 #define SYS_CRC_EN       9 // r/-: CRC synthesized
@@ -468,6 +484,7 @@
 #include "neo430_cpu.h"
 #include "neo430_crc.h"
 #include "neo430_exirq.h"
+#include "neo430_freq_gen.h"
 #include "neo430_gpio.h"
 #include "neo430_muldiv.h"
 #include "neo430_pwm.h"

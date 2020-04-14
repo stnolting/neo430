@@ -64,6 +64,7 @@ entity neo430_sysconfig is
     SPI_USE      : boolean := true; -- implement SPI?
     TRNG_USE     : boolean := true; -- implement TRNG?
     EXIRQ_USE    : boolean := true; -- implement EXIRQ?
+    FREQ_GEN_USE : boolean := true; -- implement FREQ_GEN?
     -- boot configuration --
     BOOTLD_USE   : boolean := true; -- implement and use bootloader?
     IMEM_AS_ROM  : boolean := false -- implement IMEM as read-only memory?
@@ -114,22 +115,22 @@ begin
   sysinfo_mem(0) <= hw_version_c; -- HW version
 
   -- CPUID1: System setup (available HW units / IO / peripheral devices) --
-  sysinfo_mem(1)(00) <= bool_to_ulogic_f(MULDIV_USE);     -- MULDIV present?
-  sysinfo_mem(1)(01) <= bool_to_ulogic_f(WB32_USE);       -- WB32 present?
-  sysinfo_mem(1)(02) <= bool_to_ulogic_f(WDT_USE);        -- WDT present?
-  sysinfo_mem(1)(03) <= bool_to_ulogic_f(GPIO_USE);       -- GPIO present?
-  sysinfo_mem(1)(04) <= bool_to_ulogic_f(TIMER_USE);      -- TIMER present?
-  sysinfo_mem(1)(05) <= bool_to_ulogic_f(UART_USE);       -- UART present?
-  sysinfo_mem(1)(06) <= '0';                              -- reserved
-  sysinfo_mem(1)(07) <= bool_to_ulogic_f(BOOTLD_USE);     -- bootloader present?
-  sysinfo_mem(1)(08) <= bool_to_ulogic_f(IMEM_AS_ROM);    -- IMEM implemented as true ROM?
-  sysinfo_mem(1)(09) <= bool_to_ulogic_f(CRC_USE);        -- CRC present?
-  sysinfo_mem(1)(10) <= bool_to_ulogic_f(CFU_USE);        -- CFU present?
-  sysinfo_mem(1)(11) <= bool_to_ulogic_f(PWM_USE);        -- PWM present?
-  sysinfo_mem(1)(12) <= bool_to_ulogic_f(TWI_USE);        -- TWI present?
-  sysinfo_mem(1)(13) <= bool_to_ulogic_f(SPI_USE);        -- SPI present?
-  sysinfo_mem(1)(14) <= bool_to_ulogic_f(TRNG_USE);       -- TRNG present?
-  sysinfo_mem(1)(15) <= bool_to_ulogic_f(EXIRQ_USE);      -- EXIRQ present?
+  sysinfo_mem(1)(00) <= '1' when (MULDIV_USE   = true) else '0'; -- MULDIV present?
+  sysinfo_mem(1)(01) <= '1' when (WB32_USE     = true) else '0'; -- WB32 present?
+  sysinfo_mem(1)(02) <= '1' when (WDT_USE      = true) else '0'; -- WDT present?
+  sysinfo_mem(1)(03) <= '1' when (GPIO_USE     = true) else '0'; -- GPIO present?
+  sysinfo_mem(1)(04) <= '1' when (TIMER_USE    = true) else '0'; -- TIMER present?
+  sysinfo_mem(1)(05) <= '1' when (UART_USE     = true) else '0'; -- UART present?
+  sysinfo_mem(1)(06) <= '1' when (FREQ_GEN_USE = true) else '0'; -- FREQ_GEN present?
+  sysinfo_mem(1)(07) <= '1' when (BOOTLD_USE   = true) else '0'; -- bootloader present?
+  sysinfo_mem(1)(08) <= '1' when (IMEM_AS_ROM  = true) else '0'; -- IMEM implemented as true ROM?
+  sysinfo_mem(1)(09) <= '1' when (CRC_USE      = true) else '0'; -- CRC present?
+  sysinfo_mem(1)(10) <= '1' when (CFU_USE      = true) else '0'; -- CFU present?
+  sysinfo_mem(1)(11) <= '1' when (PWM_USE      = true) else '0'; -- PWM present?
+  sysinfo_mem(1)(12) <= '1' when (TWI_USE      = true) else '0'; -- TWI present?
+  sysinfo_mem(1)(13) <= '1' when (SPI_USE      = true) else '0'; -- SPI present?
+  sysinfo_mem(1)(14) <= '1' when (TRNG_USE     = true) else '0'; -- TRNG present?
+  sysinfo_mem(1)(15) <= '1' when (EXIRQ_USE    = true) else '0'; -- EXIRQ present?
 
   -- CPUID2: User code --
   sysinfo_mem(2) <= USER_CODE;

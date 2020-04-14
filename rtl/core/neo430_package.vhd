@@ -40,7 +40,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0405"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0406"; -- no touchy!
 
   -- Danger Zone (Advanced Hardware Configuration) ------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -79,8 +79,8 @@ package neo430_package is
 
   -- Boot ROM --
   constant boot_base_c     : std_ulogic_vector(15 downto 0) := x"F000"; -- bootloader base address, fixed!
-  constant boot_size_c     : natural := 2048; -- bytes, max 2048 bytes!
-  constant boot_max_size_c : natural := 2048; -- bytes, fixed!
+  constant boot_size_c     : natural := 2*1024; -- bytes, max 2048 bytes!
+  constant boot_max_size_c : natural := 2*1024; -- bytes, fixed!
 
   -- IO: Peripheral Devices ("IO") Area --
   -- Each device must use 2 bytes or a multiple of 2 bytes as address space!
@@ -97,14 +97,14 @@ package neo430_package is
   constant muldiv_opb_smul_addr_c      : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0004");
   constant muldiv_opb_udiv_addr_c      : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(muldiv_base_c) + x"0006");
 
-  -- IO: reserved --
---constant reserved_base_c : std_ulogic_vector(15 downto 0) := x"FF88";
---constant reserved_size_c : natural := 8; -- bytes
+  -- IO: Frequency Generator (FREQ_GEN) --
+  constant freq_gen_base_c : std_ulogic_vector(15 downto 0) := x"FF88";
+  constant freq_gen_size_c : natural := 8; -- bytes
 
---constant reserved_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(reserved_base_c) + x"0000");
---constant reserved_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(reserved_base_c) + x"0002");
---constant reserved_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(reserved_base_c) + x"0004");
---constant reserved_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(reserved_base_c) + x"0006");
+  constant freq_gen_ctrl_addr_c   : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(freq_gen_base_c) + x"0000");
+  constant freq_gen_tw_ch0_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(freq_gen_base_c) + x"0002");
+  constant freq_gen_tw_ch1_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(freq_gen_base_c) + x"0004");
+  constant freq_gen_tw_ch2_addr_c : std_ulogic_vector(15 downto 0) := std_ulogic_vector(unsigned(freq_gen_base_c) + x"0006");
 
   -- IO: Wishbone32 Interface (WB32) --
   constant wb32_base_c : std_ulogic_vector(15 downto 0) := x"FF90";
@@ -360,8 +360,8 @@ package neo430_package is
       gpio_i     : in  std_ulogic_vector(15 downto 0); -- parallel input
       -- pwm channels --
       pwm_o      : out std_ulogic_vector(03 downto 0); -- pwm channels
-      -- timer frequency generator --
-      timer_fg_o : out std_ulogic; -- programmable frequency output
+      -- arbitrary frequency generator --
+      freq_gen_o : out std_ulogic_vector(02 downto 0); -- programmable frequency output
       -- serial com --
       uart_txd_o : out std_ulogic; -- UART send data
       uart_rxd_i : in  std_ulogic; -- UART receive data
@@ -652,8 +652,6 @@ package neo430_package is
       -- clock generator --
       clkgen_en_o : out std_ulogic; -- enable clock generator
       clkgen_i    : in  std_ulogic_vector(07 downto 0);
-      -- frequency generator --
-      timer_fg_o  : out std_ulogic; -- programmable frequency output
       -- interrupt --
       irq_o       : out std_ulogic  -- interrupt request
     );
@@ -788,6 +786,25 @@ package neo430_package is
     );
   end component;
 
+  -- Component: Arbitrary Frequency Generator (FREG_GEN)) -----------------------------------
+  -- -------------------------------------------------------------------------------------------
+  component neo430_freq_gen
+    port (
+      -- host access --
+      clk_i       : in  std_ulogic; -- global clock line
+      rden_i      : in  std_ulogic; -- read enable
+      wren_i      : in  std_ulogic; -- write enable
+      addr_i      : in  std_ulogic_vector(15 downto 0); -- address
+      data_i      : in  std_ulogic_vector(15 downto 0); -- data in
+      data_o      : out std_ulogic_vector(15 downto 0); -- data out
+      -- clock generator --
+      clkgen_en_o : out std_ulogic; -- enable clock generator
+      clkgen_i    : in  std_ulogic_vector(07 downto 0);
+      -- frequency generator --
+      freq_gen_o  : out std_ulogic_vector(02 downto 0)  -- programmable frequency output
+    );
+  end component;
+
   -- Component: System Configuration (SYSCONFIG) --------------------------------------------
   -- -------------------------------------------------------------------------------------------
   component neo430_sysconfig
@@ -812,6 +829,7 @@ package neo430_package is
       SPI_USE      : boolean := true; -- implement SPI?
       TRNG_USE     : boolean := true; -- implement TRNG?
       EXIRQ_USE    : boolean := true; -- implement EXIRQ?
+      FREQ_GEN_USE : boolean := true; -- implement FREQ_GEN?
       -- boot configuration --
       BOOTLD_USE   : boolean := true; -- implement and use bootloader?
       IMEM_AS_ROM  : boolean := false -- implement IMEM as read-only memory?

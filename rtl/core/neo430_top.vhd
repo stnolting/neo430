@@ -16,7 +16,7 @@
 -- #  - Optional 16-bit multiplier/divider unit (MULDIV)                                           #
 -- #  - Optional 16-bit IN and 16-bit OUT GPIO port with pin-change interrupt (GPIO)               #
 -- #  - Optional 32-bit Wishbone interface (WB32)                                                  #
--- #  - Optional High precision timer (TIMER) with frequency generator output                      #
+-- #  - Optional High precision timer (TIMER)                                                      #
 -- #  - Optional Universal Asynchronous Receiver and Transmitter (UART)                            #
 -- #  - Optional Serial Peripheral Interface (SPI)                                                 #
 -- #  - Optional Internal ROM for bootloader (BOOTLD)                                              #
@@ -27,6 +27,7 @@
 -- #  - Optional Two Wire Serial Interface (TWI)                                                   #
 -- #  - Optional True Random Number Generator (TRNG)                                               #
 -- #  - Optional External Interrupts Controller (EXIRQ)                                            #
+-- #  - Optional Arbitrary Frequency Generator (FREQ_GEN)                                          #
 -- # ********************************************************************************************* #
 -- # BSD 3-Clause License                                                                          #
 -- #                                                                                               #
@@ -102,8 +103,8 @@ entity neo430_top is
     gpio_i     : in  std_ulogic_vector(15 downto 0); -- parallel input
     -- pwm channels --
     pwm_o      : out std_ulogic_vector(03 downto 0); -- pwm channels
-    -- timer frequency generator --
-    timer_fg_o : out std_ulogic; -- programmable frequency output
+    -- arbitrary frequency generator --
+    freq_gen_o : out std_ulogic_vector(02 downto 0); -- programmable frequency output
     -- serial com --
     uart_txd_o : out std_ulogic; -- UART send data
     uart_rxd_i : in  std_ulogic; -- UART receive data
@@ -131,23 +132,24 @@ end neo430_top;
 architecture neo430_top_rtl of neo430_top is
 
   -- generators --
-  signal rst_i_sync0 : std_ulogic;
-  signal rst_i_sync1 : std_ulogic;
-  signal rst_gen     : std_ulogic_vector(03 downto 0) := (others => '0'); -- reset on bitstream upload
-  signal ext_rst     : std_ulogic;
-  signal sys_rst     : std_ulogic;
-  signal wdt_rst     : std_ulogic;
-  signal clk_div     : std_ulogic_vector(11 downto 0);
-  signal clk_div_ff  : std_ulogic_vector(11 downto 0);
-  signal clk_gen     : std_ulogic_vector(07 downto 0);
-  signal timer_cg_en : std_ulogic;
-  signal uart_cg_en  : std_ulogic;
-  signal spi_cg_en   : std_ulogic;
-  signal wdt_cg_en   : std_ulogic;
-  signal pwm_cg_en   : std_ulogic;
-  signal twi_cg_en   : std_ulogic;
-  signal cfu_cg_en   : std_ulogic;
-                     
+  signal rst_i_sync0    : std_ulogic;
+  signal rst_i_sync1    : std_ulogic;
+  signal rst_gen        : std_ulogic_vector(03 downto 0) := (others => '0'); -- reset on bitstream upload
+  signal ext_rst        : std_ulogic;
+  signal sys_rst        : std_ulogic;
+  signal wdt_rst        : std_ulogic;
+  signal clk_div        : std_ulogic_vector(11 downto 0);
+  signal clk_div_ff     : std_ulogic_vector(11 downto 0);
+  signal clk_gen        : std_ulogic_vector(07 downto 0);
+  signal timer_cg_en    : std_ulogic;
+  signal uart_cg_en     : std_ulogic;
+  signal spi_cg_en      : std_ulogic;
+  signal wdt_cg_en      : std_ulogic;
+  signal pwm_cg_en      : std_ulogic;
+  signal twi_cg_en      : std_ulogic;
+  signal cfu_cg_en      : std_ulogic;
+  signal freq_gen_cg_en : std_ulogic;
+
   type cpu_bus_t is record
     rd_en : std_ulogic;
     wr_en : std_ulogic_vector(01 downto 0);
@@ -179,6 +181,7 @@ architecture neo430_top_rtl of neo430_top is
   signal twi_rdata       : std_ulogic_vector(15 downto 0);
   signal trng_rdata      : std_ulogic_vector(15 downto 0);
   signal exirq_rdata     : std_ulogic_vector(15 downto 0);
+  signal freq_gen_rdata  : std_ulogic_vector(15 downto 0);
   signal sysconfig_rdata : std_ulogic_vector(15 downto 0);
 
   -- interrupt system --
@@ -231,7 +234,7 @@ begin
       clk_div <= (others => '0');
     elsif rising_edge(clk_i) then
       -- anybody needing fresh clocks?
-      if ((timer_cg_en or uart_cg_en or spi_cg_en or wdt_cg_en or pwm_cg_en or twi_cg_en or cfu_cg_en) = '1') then
+      if ((timer_cg_en or uart_cg_en or spi_cg_en or wdt_cg_en or pwm_cg_en or twi_cg_en or cfu_cg_en or freq_gen_cg_en) = '1') then
         clk_div <= std_ulogic_vector(unsigned(clk_div) + 1);
       end if;
     end if;
@@ -279,7 +282,7 @@ begin
 
   -- final CPU read data --
   cpu_bus.rdata <= rom_rdata or ram_rdata or boot_rdata or muldiv_rdata or
-                   wb_rdata or uart_rdata or spi_rdata or gpio_rdata or
+                   wb_rdata or uart_rdata or spi_rdata or gpio_rdata or freq_gen_rdata or
                    timer_rdata or wdt_rdata or sysconfig_rdata or crc_rdata or
                    cfu_rdata or pwm_rdata or twi_rdata or trng_rdata or exirq_rdata;
 
@@ -524,8 +527,6 @@ begin
       -- clock generator --
       clkgen_en_o => timer_cg_en,   -- enable clock generator
       clkgen_i    => clk_gen,
-      -- frequency generator --
-      timer_fg_o  => timer_fg_o,    -- programmable frequency output
       -- interrupt --
       irq_o       => timer_irq      -- interrupt request
     );
@@ -536,7 +537,6 @@ begin
     timer_rdata <= (others => '0');
     timer_irq   <= '0';
     timer_cg_en <= '0';
-    timer_fg_o  <= '0';
   end generate;
 
 
@@ -734,6 +734,35 @@ begin
   end generate;
 
 
+  -- Arbitrary Frequency Generator (FREW_GEN)) --------------------------------
+  -- -----------------------------------------------------------------------------
+  neo430_freq_gen_inst_true:
+  if (FREQ_GEN_USE = true) generate
+    neo430_freq_gen_inst: neo430_freq_gen
+    port map (
+      -- host access --
+      clk_i       => clk_i,           -- global clock line
+      rden_i      => io_rd_en,        -- read enable
+      wren_i      => io_wr_en,        -- write enable
+      addr_i      => cpu_bus.addr,    -- address
+      data_i      => cpu_bus.wdata,   -- data in
+      data_o      => freq_gen_rdata,  -- data out
+      -- clock generator --
+      clkgen_en_o => freq_gen_cg_en,  -- enable clock generator
+      clkgen_i    => clk_gen,
+      -- frequency generator --
+      freq_gen_o  => freq_gen_o  -- programmable frequency output
+    );
+  end generate;
+
+  neo430_freq_gen_inst_false:
+  if (FREQ_GEN_USE = false) generate
+    freq_gen_cg_en <= '0';
+    freq_gen_rdata <= (others => '0');
+    freq_gen_o     <= (others => '0');
+  end generate;
+
+
   -- System Configuration -----------------------------------------------------
   -- -----------------------------------------------------------------------------
   neo430_sysconfig_inst: neo430_sysconfig
@@ -758,6 +787,7 @@ begin
     SPI_USE      => SPI_USE,        -- implement SPI?
     TRNG_USE     => TRNG_USE,       -- implement TRNG?
     EXIRQ_USE    => EXIRQ_USE,      -- implement EXIRQ?
+    FREQ_GEN_USE => FREQ_GEN_USE,   -- implement FREQ_GEN?
     -- boot configuration --
     BOOTLD_USE   => BOOTLD_USE,     -- implement and use bootloader?
     IMEM_AS_ROM  => IMEM_AS_ROM     -- implement IMEM as read-only memory?
