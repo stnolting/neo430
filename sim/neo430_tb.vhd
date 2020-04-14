@@ -122,6 +122,7 @@ begin
     SPI_USE      => true,             -- implement SPI? (default=true)
     TRNG_USE     => false,            -- implement TRNG? (default=false) - CANNOT BE SIMULATED!
     EXIRQ_USE    => true,             -- implement EXIRQ? (default=true)
+    FREQ_GEN_USE => true,             -- implement FREQ_GEN? (default=true)
     -- boot configuration --
     BOOTLD_USE   => false,            -- implement and use bootloader? (default=true)
     IMEM_AS_ROM  => false             -- implement IMEM as read-only memory? (default=false)
@@ -135,8 +136,8 @@ begin
     gpio_i     => x"0000",            -- parallel input
     -- pwm channels --
     pwm_o      => open,               -- pwm channels
-    -- timer frequency generator --
-    timer_fg_o => open,               -- programmable frequency output
+    -- arbitrary frequency generator --
+    freq_gen_o => open,               -- programmable frequency output
     -- serial com --
     uart_txd_o => uart_txd,           -- UART send data
     uart_rxd_i => uart_txd,           -- UART receive data
