@@ -172,7 +172,7 @@ begin
     if rising_edge(clk_i) then
       data_o <= (others => '0');
       if (rden = '1') then
-        if (addr = freq_gen_ctrl_addr_c) then
+--      if (addr = freq_gen_ctrl_addr_c) then
           data_o(ctrl_en_ch0_c)    <= ctrl(ctrl_en_ch0_c);
           data_o(ctrl_en_ch1_c)    <= ctrl(ctrl_en_ch1_c);
           data_o(ctrl_en_ch2_c)    <= ctrl(ctrl_en_ch2_c);
@@ -185,7 +185,7 @@ begin
           data_o(ctrl_ch2_prsc0_c) <= ctrl(ctrl_ch2_prsc0_c);
           data_o(ctrl_ch2_prsc1_c) <= ctrl(ctrl_ch2_prsc1_c);
           data_o(ctrl_ch2_prsc2_c) <= ctrl(ctrl_ch2_prsc2_c);
-        end if;
+--      end if;
       end if;
     end if;
   end process rd_access;
