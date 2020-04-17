@@ -73,9 +73,9 @@ int main(void) {
     
     neo430_uart_br_print("Target frequency: 0x");
     neo430_uart_print_hex_dword(target_frequency);
-    neo430_uart_br_print("Hz, real frequency: 0x");
+    neo430_uart_br_print(" Hz, real frequency: 0x");
     neo430_uart_print_hex_dword(neo430_freq_gen_set_freq(FREQ_GEN_CHANNEL, target_frequency)); // try to set target frequency, returns actual freq.
-    neo430_uart_br_print("Hz\n");
+    neo430_uart_br_print(" Hz\n");
 
     neo430_cpu_delay_ms(500); // wait 0.5 seconds
   }
