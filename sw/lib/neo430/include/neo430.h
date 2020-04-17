@@ -98,7 +98,7 @@
 // ----------------------------------------------------------------------------
 #define FREQ_GEN_CT     (*(REG16 0xFF88)) // r/w: control register
 #define FREQ_GEN_TW_CH0 (*(REG16 0xFF8A)) // -/w: tuning word channel 0
-#define FREQ_GEN_TW_CH1 (*(REG16 0xFF8E)) // -/w: tuning word channel 1
+#define FREQ_GEN_TW_CH1 (*(REG16 0xFF8C)) // -/w: tuning word channel 1
 #define FREQ_GEN_TW_CH2 (*(REG16 0xFF8E)) // -/w: tuning word channel 2
 
 // FREQ_GEN control register
