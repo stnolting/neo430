@@ -139,6 +139,9 @@ int main(void) {
   // disable EXIRQ
   EXIRQ_CT = 0;
 
+  // disable FREQ_GEN
+  FREQ_GEN_CT = 0;
+
   // init GPIO
   GPIO_IRQMASK = 0; // no pin change interrupt please, thanks
   neo430_gpio_port_set(1<<STATUS_LED); // activate status LED, clear all others
@@ -159,7 +162,6 @@ int main(void) {
 
   // Timeout counter: init timer, irq tick @ ~1Hz (prescaler = 4096)
   // THR = f_main / (1Hz + 4096) -1
-  TMR_NCO = 0; // disable frequency generator
   TMR_CT = 0; // reset timer
   //uint32_t clock = CLOCKSPEED_32bit >> 14; // divide by 4096
   TMR_THRES = (CLOCKSPEED_HI << 2) -1; // "fake" ;D
