@@ -3,8 +3,9 @@
 [![Build Status](https://travis-ci.com/stnolting/neo430.svg?branch=master)](https://travis-ci.com/stnolting/neo430)
 [![last commit](https://img.shields.io/github/last-commit/stnolting/neo430)](https://github.com/stnolting/neo430/commits/master)
 [![issues](https://img.shields.io/github/issues/stnolting/neo430)](https://github.com/stnolting/neo430/issues)
-[![license](https://img.shields.io/github/license/stnolting/neo430)](https://github.com/stnolting/neo430/blob/master/LICENSE)
 [![release](https://img.shields.io/github/v/release/stnolting/neo430)](https://github.com/stnolting/neo430/releases)
+[![license](https://img.shields.io/github/license/stnolting/neo430)](https://github.com/stnolting/neo430/blob/master/LICENSE)
+[![documentary](https://img.shields.io/badge/datasheet-neo430.pdf-blue)](https://raw.githubusercontent.com/stnolting/neo430/master/doc/NEO430.pdf)
 
 ## Table of Content
 
@@ -12,9 +13,10 @@
 * [Processor Features](#Processor-Features)
 * [Differences to the Original MSP430 Processors](#Differences-to-the-Original-MSP430-Processors)
 * [Top Entity](#Top-Entity)
-* [Implementation Results](#Implementation-Results)
+* [FPGA Implementation Results](#FPGA-Implementation-Results)
+* [HW-SW Ecosystem](#HW-SW-Ecosystem)
 * [Performance](#Performance)
-* [Quick Start](#Quick-Start)
+* [**Quick Start**](#Quick-Start)
 * [Change Log](#Change-Log)
 * [Contact](#Contact)
 * [Disclaimer, Proprietary and Legal Notice](#Disclaimer-Proprietary-and-Legal-Notice)
@@ -61,7 +63,7 @@ NEO430 setup run: [![NEO430 Datasheet](https://raw.githubusercontent.com/stnolti
 - 16-bit open source soft-core microcontroller-like processor system
 - Full support of the original [MSP430 instruction set architecture](https://raw.githubusercontent.com/stnolting/neo430/master/doc/instruction_set.pdf)
 - Code-efficient CISC-like instruction capabilities
-- Tool chain based on free [TI msp430-gcc compiler](http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/index_FDS.html "TI `msp430-gcc` compiler")
+- Tool chain based on free [TI msp430-gcc compiler](http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/index_FDS.html "TI `msp430-gcc` compiler") (also available here [on github](https://github.com/stnolting/msp430-gcc))
 - Application compilation scripts ([makefiles](https://github.com/stnolting/neo430/blob/master/sw/example/blink_led/Makefile)) for Windows Powershell / Windows Subsystem for Linux / native Linux
 - Software requirements (regardless of platform):
   - TI `msp430-gcc` compiler
@@ -73,7 +75,7 @@ NEO430 setup run: [![NEO430 Datasheet](https://raw.githubusercontent.com/stnolti
 - Internal [DMEM](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_dmem.vhd) (RAM, for data) and [IMEM](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_imem.vhd) (RAM or ROM, for code), configurable sizes
 - Customizable processor hardware configuration:
   - Optional multiplier/divider unit ([MULDIV](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_muldiv.vhd))
-  - Optional high-precision timer ([TIMER](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_timer.vhd)) with arbitrary frequency generator output
+  - Optional high-precision timer ([TIMER](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_timer.vhd))
   - Optional universal asynchronous receiver and transmitter ([UART](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_uart.vhd))
   - Optional serial peripheral interface ([SPI](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_spi.vhd)), 8 or 16 bit tansfer data size, 6 dedicated CS lines
   - Optional I2C-compatible two wire serial interface ([TWI](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_twi.vhd)) supporting clock stretching
@@ -85,6 +87,7 @@ NEO430 setup run: [![NEO430 Datasheet](https://raw.githubusercontent.com/stnolti
   - Optional 4 channel PWM controller with 4 or 8 bit resolution ([PWM](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_pwm.vhd))
   - Optional Galois Ring Oscillator (GARO) based true random number generator ([TRNG](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_trng.vhd)) with de-biasing and internal post-processing
   - Optional external interrupts controller with 8 independent channels ([EXIRQ](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_exirq.vhd)), can also be used for software-triggered interrupts (traps, breakpoints, etc.)
+  - Optional NCO-based programmable frequency generator with 3 independent channels ([FREQ_GEN](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_freq_gen.vhd))
   - Optional internal [bootloader](https://github.com/stnolting/neo430/blob/master/sw/bootloader/bootloader.c) (2kB ROM) with serial user console and automatic boot from external SPI flash (like the FPGA configuration storage)
 
 
@@ -116,6 +119,7 @@ Just instantiate this file in you project and you are ready to go! All signals o
 If you need a top entity with resolved signals, take a look at the [top_templates](https://github.com/stnolting/neo430/blob/master/rtl/top_templates) folder.
 These alternative top entities also support AXI or Avalon connectivity.
 
+
 ### Generics
 
 | Generic Name | Type                    | Default Value | Function                                                 |
@@ -124,112 +128,145 @@ These alternative top entities also support AXI or Avalon connectivity.
 | IMEM_SIZE    | natural                 | 4*1024        | Size of internal instruction memory in bytes (max 48 kB) |
 | DMEM_SIZE    | natural                 | 2*1024        | Size of internal data memory in bytes (max 12 kB)        |
 | USER_CODE    | std_ulogic_vector(15:0) | x"0000"       | 16-bit custom user code, can be read by user software    |
-| MULDIV_USE   | boolean                 | true          | Implement multiplier/divider unit                        |
-| WB32_USE     | boolean                 | true          | Implement Wishbone interface adapter                     |
-| WDT_USE      | boolean                 | true          | Implement watchdog timer                                 |
-| GPIO_USE     | boolean                 | true          | Implement general purpose parallel in/out port           |
-| TIMER_USE    | boolean                 | true          | Implement high-precision timer                           |
-| UART_USE     | boolean                 | true          | Implement UART serial communication unit                 |
-| CRC_USE      | boolean                 | true          | Implement checksum computation unit                      |
-| CFU_USE      | boolean                 | false         | Implement custom functions unit                          |
-| PWM_USE      | boolean                 | true          | Implement pulse width controller                         |
-| TWI_USE      | boolean                 | true          | Implement two wire serial interface unit                 |
-| SPI_USE      | boolean                 | true          | Implement serial peripheral interface unit               |
-| TRNG_USE     | boolean                 | false         | Implement true random number generator                   |
-| EXIRQ_USE    | boolean                 | true          | Implement external interrupts controller                 |
+| MULDIV_USE   | boolean                 | true          | Implement multiplier/divider unit (MULDIV)               |
+| WB32_USE     | boolean                 | true          | Implement Wishbone interface adapter (WB32)              |
+| WDT_USE      | boolean                 | true          | Implement watchdog timer (WDT)                           |
+| GPIO_USE     | boolean                 | true          | Implement general purpose parallel in/out port (GPIO)    |
+| TIMER_USE    | boolean                 | true          | Implement high-precision timer (TIMER)                   |
+| UART_USE     | boolean                 | true          | Implement UART serial communication unit (UART)          |
+| CRC_USE      | boolean                 | true          | Implement checksum computation unit (CRC16/32)           |
+| CFU_USE      | boolean                 | false         | Implement custom functions unit (CFU)                    |
+| PWM_USE      | boolean                 | true          | Implement pulse width controller (PWM)                   |
+| TWI_USE      | boolean                 | true          | Implement two wire serial interface unit (TWI)           |
+| SPI_USE      | boolean                 | true          | Implement serial peripheral interface unit (SPI)         |
+| TRNG_USE     | boolean                 | false         | Implement true random number generator (TRNG)            |
+| EXIRQ_USE    | boolean                 | true          | Implement external interrupts controller (EXIRQ)         |
+| FREQ_GEN_USE | boolean                 | true          | Implement programmable frequency generator (FREQ_GEN)    |
 | BOOTLD_USE   | boolean                 | true          | Implement and auto-start internal bootloader             |
 | IMEM_AS_ROM  | boolean                 | false         | Implement internal instruction memory as read-only       |
+
 
 ### Signals
 
 Note regarding unused unit's IO: Connect all unused inputs to low and leave all unused outputs 'open'.
 Signal driections are seen from the processor.
 
-| Signal Name  | Width | Direction | HW Unit | Function                                                 |
-|:-------------|:-----:|:---------:|:-------:|:---------------------------------------------------------|
-| clk_i        | 1     | In        | -       | Global clock line; all FFs triggering on rising edge     |
-| rst_i        | 1     | In        | -       | Global reset, low-active                                 |
-| gpio_o       | 16    | Out       | GPIO    | General purpose parallel output                          |
-| gpio_i       | 16    | In        | GPIO    | General purpose parallel input                           |
-| pwm_o        | 4     | Out       | PWM     | Pulse width modulation channels                          |
-| timer_fg_o   | 1     | Out       | TIMER   | Arbitrar frequency generator output                      |
-| uart_txd_o   | 1     | Out       | UART    | UART serial transmitter                                  |
-| uart_rxd_i   | 1     | In        | UART    | UARt serial receiver                                     |
-| spi_sclk_o   | 1     | Out       | SPI     | SPI master clock                                         |
-| spi_mosi_o   | 1     | Out       | SPI     | SPI serial data output                                   |
-| spi_miso_i   | 1     | In        | SPI     | SPI serial data input                                    |
-| spi_cs_o     | 8     | Out       | SPI     | SPI chip select lines (active-low)                       |
-| twi_sda_io   | 1     | InOut     | TWI     | TWI master serial data line                              |
-| twi_scl_io   | 1     | InOut     | TWI     | TWI master serial clock line                             |
-| wb_adr_o     | 32    | Out       | WB32    | Wishbone slave address                                   |
-| wb_dat_i     | 32    | In        | WB32    | Wishbone write data                                      |
-| wb_dat_o     | 32    | Out       | WB32    | Wishbone read data                                       |
-| wb_we_o      | 1     | Out       | WB32    | Wishbone write enable                                    |
-| wb_sel_o     | 1     | Out       | WB32    | Wishbone byte enable                                     |
-| wb_stb_o     | 1     | Out       | WB32    | Wishbone strobe                                          |
-| wb_cyc_o     | 1     | Out       | WB32    | Wishbone valid cycle                                     |
-| wb_ack_i     | 1     | In        | WB32    | Wishbone transfer acknowledge                            |
-| ext_irq_i    | 8     | In        | EXIRQ   | Interrupt request lines, high-active                     |
-| ext_ack_o    | 8     | Out       | EXIRQ   | Interrupt acknowledge, high-active, single-shot          |
+| Signal Name  | Width | Direction | HW Unit  | Function                                                 |
+|:-------------|:-----:|:---------:|:--------:|:---------------------------------------------------------|
+| clk_i        | 1     | In        | -        | Global clock line; all FFs triggering on rising edge     |
+| rst_i        | 1     | In        | -        | Global reset, low-active                                 |
+| gpio_o       | 16    | Out       | GPIO     | General purpose parallel output                          |
+| gpio_i       | 16    | In        | GPIO     | General purpose parallel input                           |
+| pwm_o        | 4     | Out       | PWM      | Pulse width modulation channels                          |
+| timer_fg_o   | 1     | Out       | FREQ_GEN | Programmable frequency generator output                  |
+| uart_txd_o   | 1     | Out       | UART     | UART serial transmitter                                  |
+| uart_rxd_i   | 1     | In        | UART     | UARt serial receiver                                     |
+| spi_sclk_o   | 1     | Out       | SPI      | SPI master clock                                         |
+| spi_mosi_o   | 1     | Out       | SPI      | SPI serial data output                                   |
+| spi_miso_i   | 1     | In        | SPI      | SPI serial data input                                    |
+| spi_cs_o     | 8     | Out       | SPI      | SPI chip select lines (active-low)                       |
+| twi_sda_io   | 1     | InOut     | TWI      | TWI master serial data line (external pull-up required)  |
+| twi_scl_io   | 1     | InOut     | TWI      | TWI master serial clock line (external pull-up required) |
+| wb_adr_o     | 32    | Out       | WB32     | Wishbone slave address                                   |
+| wb_dat_i     | 32    | In        | WB32     | Wishbone write data                                      |
+| wb_dat_o     | 32    | Out       | WB32     | Wishbone read data                                       |
+| wb_we_o      | 1     | Out       | WB32     | Wishbone write enable                                    |
+| wb_sel_o     | 1     | Out       | WB32     | Wishbone byte enable                                     |
+| wb_stb_o     | 1     | Out       | WB32     | Wishbone strobe                                          |
+| wb_cyc_o     | 1     | Out       | WB32     | Wishbone valid cycle                                     |
+| wb_ack_i     | 1     | In        | WB32     | Wishbone transfer acknowledge                            |
+| ext_irq_i    | 8     | In        | EXIRQ    | Interrupt request lines, high-active                     |
+| ext_ack_o    | 8     | Out       | EXIRQ    | Interrupt acknowledge, high-active, single-shot          |
 
 
 
-## Implementation Results
+## FPGA Implementation Results
 
-Mapping results generated for HW version 0x0320. The full (default) hardware configuration includes
+Mapping results generated for HW version 0x0406. The full (default) hardware configuration includes
 all optional processor modules (excluding the CFU and the TRNG), an IMEM size of 4kB and a DMEM
-size of 2kB. The minimal configuration only includes the CPU and the GPIO module. Results generated with Xilinx Vivado 2017.3,
-Intel Quartus Prime Lite 17.1 and Lattice Radiant 1.1 (Synplify)
+size of 2kB. The minimal configuration only includes the CPU (including IMEM and DMEM) and the GPIO module.
+Results generated with Xilinx Vivado 2019.2, Intel Quartus Prime Lite 17.1 and Lattice Radiant 1.1 (Synplify)
 
-| __Xilinx Artix-7 (XC7A35TICSG324-1L)__  | LUTs       | FFs         | BRAMs    | DSPs   | f_max*  |
-|:----------------------------------------|:----------:|:-----------:|:--------:|:------:|:-------:|
-| Full (default) configuration:           | 983 (4.7%) | 1014 (2.5%) | 2.5 (5%) | 0 (0%) | 100 MHz |
-| Minimal configuration (CPU + GPIO):     | 685 (3.3%) | 290 (0.7%)  | 1 (2%)   | 0 (0%) | 100 MHz |
+| __Xilinx Artix-7 (XC7A35TICSG324-1L)__ | LUTs      | FFs          | BRAMs    | DSPs   | f_max*  |
+|:---------------------------------------|:---------:|:------------:|:--------:|:------:|:-------:|
+| Full (default) configuration:          | 1036 (5%) | 1144 (2.75%) | 2.5 (5%) | 0 (0%) | 100 MHz |
+| Minimal configuration (CPU + GPIO):    |  576 (3%) |  266 (0.6%)  |   1 (2%) | 0 (0%) | 100 MHz |
 
-| __Intel Cyclone IV (EP4CE22F17C6)__  | LUTs      | FFs      | Memory bits | DSPs   | f_max   |
-|:-------------------------------------|:---------:|:--------:|:-----------:|:------:|:-------:|
-| Full (default) configuration:        | 1648 (7%) | 990 (4%) | 65800 (11%) | 0 (0%) | 122 MHz |
-| Minimal configuration (CPU + GPIO):  | 596 (3%)  | 233 (1%) | 49408 (8%)  | 0 (0%) | 126 MHz |
+| __Intel Cyclone IV (EP4CE22F17C6)__ | LUTs      | FFs       | Memory bits | DSPs   | f_max   |
+|:------------------------------------|:---------:|:---------:|:-----------:|:------:|:-------:|
+| Full (default) configuration:       | 1869 (8%) | 1137 (5%) | 65800 (11%) | 0 (0%) | 121 MHz |
+| Minimal configuration (CPU + GPIO): |  590 (3%) |  230 (1%) |  49408 (8%) | 0 (0%) | 122 MHz |
 
-| __Lattice iCE40 UltraPlus (iCE40UP5K-SG48I)__  | LUTs       | FFs        | EBRs     | DSPs   | SRAMs  | f_max* |
-|:-----------------------------------------------|:----------:|:----------:|:--------:|:------:|:------:|:------:|
-| Full (default) configuration:                  | 2600 (49%) | 1152 (21%) | 16 (53%) | 0 (0%) | 0 (0%) | 20 MHz |
-| Minimal configuration (CPU + GPIO):            | 1365 (25%) | 493 (9%)   | 12 (40%) | 0 (0%) | 0 (0%) | 20 MHz |
+| __Lattice iCE40 UltraPlus** (iCE40UP5K-SG48I)__  | LUTs       | FFs        | EBRs    | DSPs   | SRAMs   | f_max*    |
+|:-------------------------------------------------|:----------:|:----------:|:-------:|:------:|:-------:|:---------:|
+| Full (default) configuration:                    | 3928 (74%) | 1923 (36%) | 9 (30%) | 0 (0%) | 2 (50%) | 20.25 MHz |
+| Minimal configuration (CPU + GPIO + Bootloader): | 1812 (34%) |  755 (14%) | 4 (13%) | 0 (0%) | 2 (50%) | 20.25 MHz |
 
 *) Constrained
+
+**) Using optimized memory modules for IMEM (32kB) & DMEM(12kB) from the `rtl\fpga_specific\lattice_ice40up` folder
 
 
 ### Device Utilization by Entity
 
 The following table shows the required resources for each module of the NEO430 processor system. Note that the provided
-numbers only represent a coarse overview as logic elements might be merged and optimized beyond module boundaries.
+numbers only represent a coarse overview as logic elements might be merged and optimized beyond entity boundaries.
 
-Mapping results generated for HW version 0x0320. The full (default) hardware configuration includes all optional
+Mapping results generated for HW version 0x0406. The full (default) hardware configuration includes all optional
 processor modules (excluding the CFU but including the TRNG), an IMEM size of 4kB and a DMEM size of
 2kB. Results were generated using Intel Quartus Prime Lite 17.1.
 
 | __Intel Cyclone IV (EP4CE22F17C6)__    | LUTs | FFs | Memory Bits | DSPs |
-|:---------------------------------------|:----:|:---:|:------------|:----:|
+|:---------------------------------------|:----:|:---:|:-----------:|:----:|
 | Bootloader Memory (Boot ROM, 2kB)      | 2    | 1   | 16384       | 0    |
-| Central Processing Unit (CPU)          | 506  | 171 | 256         | 0    |
-| Checksum Unit (CRC)                    | 110  | 94  | 0           | 0    |
+| Central Processing Unit (CPU)          | 525  | 169 | 264         | 0    |
+| Checksum Unit (CRC)                    | 111  | 94  | 0           | 0    |
 | Custom Functions Unit (CFU)*           | -    | -   | -           | -    |
-| Data Memory (DMEM, 2kB)                | 6    | 1   | 16384       | 0    |
-| External Interrupts Controller (EXIRQ) | 72   | 54  | 0           | 0    |
-| High-Precision Timer (TIMER)           | 70   | 55  | 0           | 0    |
-| Instruction Memory (IMEM, 4kB)         | 4    | 1   | 32768       | 0    |
-| IO Port Unit (GPIO)                    | 49   | 45  | 0           | 0    |
-| Multiplier & Divider (MULDIV)          | 184  | 131 | 0           | 0    |
-| Pulse-Width Modulation Unit (PWM)      | 80   | 66  | 0           | 0    |
-| Serial Peripheral Interface (SPI)      | 57   | 43  | 0           | 0    |
-| System Info Memory (SYSCONFIG)         | 15   | 13  | 0           | 0    |
-| True Random Number Generator (TRNG)    | 44   | 36  | 0           | 0    |
-| Two Wire Interface (TWI)               | 80   | 41  | 0           | 0    |
-| Universal Asynchronous Rx/Tx (UART)    | 129  | 89  | 0           | 0    |
-| Watchdog TImer (WDT)                   | 49   | 36  | 0           | 0    |
-| Wishbone Interface (WB32)              | 128  | 117 | 0           | 0    |
+| Data Memory (DMEM, 2kB)                | 5    | 1   | 16384       | 0    |
+| External Interrupts Controller (EXIRQ) | 70   | 55  | 0           | 0    |
+| Frequency Generator (FREQ_GEN)         | 140  | 130 | 0           | 0    |
+| GPIO Port Unit (GPIO)                  | 50   | 45  | 0           | 0    |
+| High-Precision Timer (TIMER)           | 66   | 57  | 0           | 0    |
+| Instruction Memory (IMEM, 4kB)         | 5    | 1   | 32768       | 0    |
+| Multiplier & Divider (MULDIV)          | 209  | 134 | 0           | 0    |
+| Pulse-Width Modulation Unit (PWM)      | 96   | 66  | 0           | 0    |
+| Serial Peripheral Interface (SPI)      | 82   | 59  | 0           | 0    |
+| System Info Memory (SYSCONFIG)         | 12   | 11  | 0           | 0    |
+| True Random Number Generator (TRNG)    | 92   | 76  | 0           | 0    |
+| Two Wire Interface (TWI)               | 78   | 43  | 0           | 0    |
+| Universal Asynchronous Rx/Tx (UART)    | 130  | 91  | 0           | 0    |
+| Watchdog Timer (WDT)                   | 53   | 37  | 0           | 0    |
+| Wishbone Interface (WB32)              | 129  | 117 | 0           | 0    |
 
 *) Hardware requirements defined by user application
+
+
+
+## HW-SW Ecosystem
+
+The NEO430 Processor porjects provides driver libraries for the CPU itself and all included peripheral modules. These libraries
+provide a certain level of hardware abstraction and allow an easier usage of the different hardware module. Hw modules that cannot
+be "explicitly" used (like CPU modules or the different memories) are not listed below. Also, there is no CFU driver library or
+example project - this has to be provided by the CFU designer.
+
+| Hardware unit                          | VHDL source | C library source | C library header | SW example project |
+|:---------------------------------------|:-----------:|:----------------:|:----------------:|:------------------:|
+| Main CPU defines file                  | - | - | [neo430.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430.h) | - |
+| Central Processing Unit (CPU)          | [neo430_cpu.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_cpu.vhd) | [neo430_cpu.c](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/source/neo430_cpu.c) | [neo430_cpu.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430_cpu.h) |- |
+| Checksum Unit (CRC16/32)               | [neo430_crc.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_crc.vhd) | [neo430_crc.c](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/source/neo430_crc.c) | [neo430_crc.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430_crc.h) | [example](https://github.com/stnolting/neo430/tree/master/sw/example/crc_test) |
+| External Interrupts Controller (EXIRQ) | [neo430_exirq.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_exirq.vhd) | [neo430_exirq.c](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/source/neo430_exirq.c) | [neo430_exirq.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430_exirq.h) | [example](https://github.com/stnolting/neo430/tree/master/sw/example/exirq_test) |
+| Frequency Generator (FREQ_GEN)         | [neo430_freq_gen.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_freq_gen.vhd) | [neo430_freq_gen.c](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/source/neo430_freq_gen.c) | [neo430_freq_gen.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430_freq_gen.h) | [example](https://github.com/stnolting/neo430/tree/master/sw/example/freq_gen_demo) |
+| IO Port Unit (GPIO)                    | [neo430_gpio.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_gpio.vhd) | [neo430_gpio.c](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/source/neo430_gpio.c) | [neo430_gpio.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430_gpio.h) | [example](https://github.com/stnolting/neo430/tree/master/sw/example/blink_led) |
+| Multiplier & Divider (MULDIV)          | [neo430_muldiv.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_muldiv.vhd) | [neo430_muldiv.c](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/source/neo430_muldiv.c) | [neo430_muldiv.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430_muldiv.h) | [example](https://github.com/stnolting/neo430/tree/master/sw/example/muldiv_test) |
+| Pulse-Width Modulation Unit (PWM)      | [neo430_pwm.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_pwm.vhd) | [neo430_pwm.c](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/source/neo430_pwm.c) | [neo430_pwm.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430_pwm.h) | [example](https://github.com/stnolting/neo430/tree/master/sw/example/pwm_demo) |
+| Serial Peripheral Interface (SPI)      | [neo430_spi.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_spi.vhd) | [neo430_spi.c](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/source/neo430_spi.c) | [neo430_spi.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430_spi.h) | [example](https://github.com/stnolting/neo430/tree/master/sw/bootloader) |
+| High-Precision Timer (TIMER)           | [neo430_timer.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_timer.vhd) | [neo430_timer.c](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/source/neo430_timer.c) | [neo430_timer.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430_timer.h) | [example](https://github.com/stnolting/neo430/tree/master/sw/example/timer_simple) |
+| True Random Number Generator (TRNG)    | [neo430_trng.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_trng.vhd) | [neo430_trng.c](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/source/neo430_trng.c) | [neo430_trng.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430_trng.h) | [example](https://github.com/stnolting/neo430/tree/master/sw/example/trng_test) |
+| Two Wire Interface (TWI)               | [neo430_twi.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_twi.vhd) | [neo430_twi.c](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/source/neo430_twi.c) | [neo430_twi.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430_twi.h) | [example](https://github.com/stnolting/neo430/tree/master/sw/example/twi_test) |
+| Universal Asynchronous Rx/Tx (UART)    | [neo430_uart.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_uart.vhd) | [neo430_uart.c](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/source/neo430_uart.c) | [neo430_uart.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430_uart.h) | [example](https://github.com/stnolting/neo430/tree/master/sw/example/uart_irq) |
+| Watchdog Timer (WDT)                   | [neo430_wdt.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_wdt.vhd) | [neo430_wdt.c](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/source/neo430_wdt.c) | [neo430_wdt.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430_wdt.h) | [example](https://github.com/stnolting/neo430/tree/master/sw/example/wdt_test) |
+| Wishbone Interface (WB32)              | [neo430_wb_interface.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_wb_interface.vhd) | [neo430_wishbone.c](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/source/neo430_wishbone.c) | [neo430_wishbone.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430_wishbone.h) | [example](https://github.com/stnolting/neo430/tree/master/sw/example/wb_terminal) |
+
 
 
 ## Performance
@@ -269,7 +306,7 @@ Software: msp430-gcc 8.3.0 for Linux, MEM_METHOD is MEM_STACK, 2000 coremark ite
 | -Os + NEO430_MULDIV* | 12.98              | 0.129 Coremarks/MHz   |
 | -O2 + NEO430_MULDIV* | 15.26              | 0.152 Coremarks/MHz   |
 
-*) Using the NEO430 MULDIV unit for the core of the matrix multiplications
+*) Using the NEO430 MULDIV unit for the core of the matrix multiplications.
 
 Even though a score of 6.57 can outnumber certain architectures and configurations (see the score table on the coremark
 homepage), the relative score of 0.065 coremarks per second might pretty low. But you have to keep in mind that benchmark
@@ -298,8 +335,12 @@ and thus, the coremark score can be further increased
  * Next, install the free `MSP430-GCC` compiler toolchain from the TI homepage (select the "compiler only" package according to your system OS):
 
    https://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/index_FDS.html
+   
+   * Alternatively, you can [directly download a copy](https://github.com/stnolting/msp430-gcc) of the msp430-gcc toolchain for Windows/Linux from github
 
  * Make sure `GNU Make` and a native `GCC` compiler are installed (double check for the newest versions)
+
+ * Create a new HW project with your FPGA synthesis tool of choice. Add all files from the `rtl\core` folder to this project (and add them to a new library called "neo430").
 
  * Follow the instructions from the "Let's Get It Started" section of the NEO430 documentary: [![NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/figures/PDF_32.png) NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/NEO430.pdf "NEO430 Datasheet from GitHub")
 
@@ -331,7 +372,7 @@ hear what cool projects people are realizing with this core :smiley:
 
 ## Citation
 
-If you are using the NEO430 for some kind of publication, please cite it as follows:
+If you are using the NEO430 in some kind of publication, please cite it as follows:
 
 > S. Nolting, "The NEO430 Processor", github.com/stnolting/neo430
 
@@ -340,8 +381,6 @@ If you are using the NEO430 for some kind of publication, please cite it as foll
 ## Disclaimer, Proprietary and Legal Notice
 
 This is a hobby project released under the BSD 3-Clause license. No copyright infringement intended.
-
-
 
 **BSD 3-Clause License**
 
@@ -382,6 +421,10 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 
 "AXI", "AXI4" and "AXI4-Lite" are trademarks of Arm Holdings plc.
 
+
+[![Continous Integration provided by Travis CI](https://travis-ci.com/images/logos/TravisCI-Full-Color.png)](https://travis-ci.com/stnolting/neo430)
+
+Continous integration provided by [Travis CI](https://travis-ci.com/stnolting/neo430).
 
 
 ![Open Source Hardware Logo https://www.oshwa.org](https://raw.githubusercontent.com/stnolting/neo430/master/doc/figures/oshw_logo.png)
