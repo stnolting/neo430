@@ -29,6 +29,7 @@ ghdl -a --work=neo430 $srcdir_core/neo430_cpu.vhd
 ghdl -a --work=neo430 $srcdir_core/neo430_crc.vhd
 ghdl -a --work=neo430 $srcdir_core/neo430_dmem.vhd
 ghdl -a --work=neo430 $srcdir_core/neo430_exirq.vhd
+ghdl -a --work=neo430 $srcdir_core/neo430_freq_gen.vhd
 ghdl -a --work=neo430 $srcdir_core/neo430_gpio.vhd
 ghdl -a --work=neo430 $srcdir_core/neo430_imem.vhd
 ghdl -a --work=neo430 $srcdir_core/neo430_muldiv.vhd
