@@ -86,25 +86,9 @@ int main(void) {
   // enable global IRQs
   neo430_eint();
 
-
-  // test frequency generator
-  neo430_timer_nco_enable();
-  uint32_t nco_target_frequency = 0, nco_real_frequency;
-
   while(1) {
-    neo430_uart_br_print("Target freq.: 0x");
-    neo430_uart_print_hex_dword(nco_target_frequency);
-
-    nco_real_frequency = neo430_timer_nco_set(nco_target_frequency);
-
-    neo430_uart_br_print(", Real freq.: 0x");
-    neo430_uart_print_hex_dword(nco_real_frequency);
-    neo430_uart_br_print("\n");
-
-    nco_target_frequency++; // go through all possible frequencies
-    neo430_cpu_delay_ms(250); // wait 250ms
+    neo430_sleep();
   }
-
 
   return 0;
 }
