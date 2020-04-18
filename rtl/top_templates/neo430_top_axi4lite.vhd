@@ -236,7 +236,7 @@ begin
   spi_mosi_o     <= std_logic(spi_mosi_o_int);
   spi_cs_o       <= std_logic_vector(spi_cs_o_int);
   ext_ack_o      <= std_logic_vector(irq_ack_o_int);
-  freq_gen_o     <= std_logic(freq_gen_o_int);
+  freq_gen_o     <= std_logic_vector(freq_gen_o_int);
 
 
   -- Wishbone-to-AXI4-Lite-compatible Bridge ----------------------------------

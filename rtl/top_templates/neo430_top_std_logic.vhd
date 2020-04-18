@@ -218,7 +218,7 @@ begin
   wb_stb_o       <= std_logic(wb_stb_o_int);
   wb_cyc_o       <= std_logic(wb_cyc_o_int);
   ext_ack_o      <= std_logic_vector(irq_ack_o_int);
-  freq_gen_o     <= std_logic(freq_gen_o_int);
+  freq_gen_o     <= std_logic_vector(freq_gen_o_int);
 
 
 end neo430_top_std_logic_rtl;
