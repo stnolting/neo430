@@ -108,8 +108,14 @@ SIZE      = msp430-elf-size
 IMAGE_GEN = $(NEO430_EXE_PATH)/image_gen
 
 # Compiler flags
-CC_OPTS = -mcpu=msp430 -pipe -Wall -Xassembler --mY -mhwmult=none -fno-delete-null-pointer-checks
+CC_OPTS = -mcpu=msp430 -pipe -Wall -Xassembler --mY -fno-delete-null-pointer-checks
 CC_OPTS += -Wl,-static -mrelax -minrt -nostartfiles -fdata-sections -ffunction-sections -Xlinker --gc-sections
+# Use NEO430 multiplier? (still experimental!)
+ifeq (,$(findstring NEO430_HWMUL_ABI_OVERRIDE,$(CC_USER_FLAGS)))
+	CC_OPTS += -mhwmult=none
+else
+	CC_OPTS += -mhwmult=16bit
+endif
 # Add user flags if available
 CC_OPTS += ${CC_USER_FLAGS}
 
