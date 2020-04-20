@@ -35,12 +35,6 @@ Modified for neo430 by Stephan Nolting
 #define NEO430_TIMER_F  (10) // Hz
 #define FLAGS_STR        "-> see makefile" // compiler optimization
 
-#ifndef USE_NEO430_MULTIPLIER
-#define USE_NEO430_MUL   0 // set 1 to use MULDIV unit for matrix core operations
-#else
-#define USE_NEO430_MUL   1 // set 1 to use MULDIV unit for matrix core operations  
-#endif
-
 // For debugging
 #define xstr(a) str(a)
 #define str(a) #a

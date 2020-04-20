@@ -241,11 +241,7 @@ void matrix_mul_const(ee_u32 N, MATRES *C, MATDAT *A, MATDAT val) {
 	ee_u32 i,j;
 	for (i=0; i<N; i++) {
 		for (j=0; j<N; j++) {
-#if USE_NEO430_MUL
-			C[i*N+j]=(MATRES)neo430_mul32((int16_t)A[i*N+j], (int16_t)val);
-#else
 			C[i*N+j]=(MATRES)A[i*N+j] * (MATRES)val;
-#endif
 		}
 	}
 }
@@ -271,11 +267,7 @@ void matrix_mul_vect(ee_u32 N, MATRES *C, MATDAT *A, MATDAT *B) {
 	for (i=0; i<N; i++) {
 		C[i]=0;
 		for (j=0; j<N; j++) {
-#if USE_NEO430_MUL
-			C[i]+=(MATRES)neo430_mul32((int16_t)A[i*N+j], (int16_t)B[j]);
-#else
 			C[i]+=(MATRES)A[i*N+j] * (MATRES)B[j];
-#endif
 		}
 	}
 }
@@ -291,11 +283,7 @@ void matrix_mul_matrix(ee_u32 N, MATRES *C, MATDAT *A, MATDAT *B) {
 			C[i*N+j]=0;
 			for(k=0;k<N;k++)
 			{
-#if USE_NEO430_MUL
-				C[i*N+j]+=(MATRES)neo430_mul32((int16_t)A[i*N+k], (int16_t)B[k*N+j]);
-#else
 				C[i*N+j]+=(MATRES)A[i*N+k] * (MATRES)B[k*N+j];
-#endif
 			}
 		}
 	}
@@ -312,11 +300,7 @@ void matrix_mul_matrix_bitextract(ee_u32 N, MATRES *C, MATDAT *A, MATDAT *B) {
 			C[i*N+j]=0;
 			for(k=0;k<N;k++)
 			{
-#if USE_NEO430_MUL
-				MATRES tmp=(MATRES)neo430_mul32((int16_t)A[i*N+k], (int16_t)B[k*N+j]);
-#else
 				MATRES tmp=(MATRES)A[i*N+k] * (MATRES)B[k*N+j];
-#endif
 				C[i*N+j]+=bit_extract(tmp,2,4)*bit_extract(tmp,5,7);
 			}
 		}

@@ -37,15 +37,18 @@
 
 // prototypes
 uint32_t neo430_umul32(uint16_t a, uint16_t b);
-int32_t neo430_mul32(int16_t a, int16_t b);
+uint64_t neo430_umul64(uint32_t a, uint32_t b);
+
+int32_t  neo430_mul32(int16_t a, int16_t b);
+int64_t  neo430_mul64(int32_t a, int32_t b);
 
 uint16_t neo430_udiv16(uint16_t dividend, uint16_t divisor);
-int16_t neo430_div16(int16_t dividend, int16_t divisor);
+int16_t  neo430_div16(int16_t dividend, int16_t divisor);
 
 uint16_t neo430_umod16(uint16_t dividend, uint16_t divisor);
-int16_t neo430_mod16(int16_t dividend, int16_t divisor);
+int16_t  neo430_mod16(int16_t dividend, int16_t divisor);
 
 uint16_t neo430_umoddiv16(uint16_t *remainder, uint16_t dividend, uint16_t divisor);
-int16_t neo430_moddiv16(int16_t *remainder, int16_t dividend, int16_t divisor);
+int16_t  neo430_moddiv16(int16_t *remainder, int16_t dividend, int16_t divisor);
 
 #endif // neo430_muldiv_h
