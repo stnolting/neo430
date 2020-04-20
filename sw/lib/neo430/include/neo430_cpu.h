@@ -36,6 +36,8 @@
 #define neo430_cpu_h
 
 // prototypes
+void     neo430_critical_start(void);                             // start critical section
+void     neo430_critical_end(void);                               // end critical section
 void     neo430_eint(void);                                       // enable global interrupts
 void     neo430_dint(void);                                       // disable global interrupts
 uint16_t neo430_get_sp(void);                                     // get stack pointer

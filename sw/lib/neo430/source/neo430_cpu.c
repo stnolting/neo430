@@ -35,6 +35,33 @@
 #include "neo430.h"
 #include "neo430_cpu.h"
 
+// Private variables
+static uint16_t __neo430_sreg __attribute__((unused)); // do not ouput a warning when this variable is unused
+
+
+/* ------------------------------------------------------------
+ * INFO Beginning of critical section (store SREG and disable interrupts)
+ * ------------------------------------------------------------ */
+void neo430_critical_start(void) {
+
+  register uint16_t d;
+  asm volatile ("mov r2, %0" : "=r" (d));
+  __neo430_sreg = d; // store current SREG
+  
+  asm volatile ("dint");
+  asm volatile ("nop");
+}
+
+
+/* ------------------------------------------------------------
+ * INFO End of critical section (restore original SREG)
+ * ------------------------------------------------------------ */
+void neo430_critical_end(void) {
+
+  register uint16_t r = __neo430_sreg;
+  asm volatile ("mov %0, r2" : : "r" (r));
+}
+
 
 /* ------------------------------------------------------------
  * INFO Enable global interrupt flag
