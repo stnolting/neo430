@@ -35,6 +35,9 @@
 #include "neo430.h"
 #include "neo430_exirq.h"
 
+// Private variables
+static uint16_t neo430_exirq_vectors[8] __attribute__((unused)); // do not ouput a warning when this variable is unused
+
 // Private function prototypes
 static void __attribute__((__interrupt__)) _exirq_irq_handler_(void);
 

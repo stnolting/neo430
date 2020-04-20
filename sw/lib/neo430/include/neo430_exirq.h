@@ -41,9 +41,6 @@ struct neo430_exirq_config_t {
   uint8_t  enable;
 };
 
-// private variables
-static uint16_t neo430_exirq_vectors[8] __attribute__((unused)); // do not ouput a warning when this variable is unused
-
 // prototypes
 void neo430_exirq_enable(void);                                // activate EXIRQ controller
 void neo430_exirq_disable(void);                               // deactivate EXIRQ controller
