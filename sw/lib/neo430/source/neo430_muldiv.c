@@ -60,65 +60,103 @@ uint32_t neo430_umul32(uint16_t a, uint16_t b) {
  * INFO Unsigned 32x32-bit multiplication (large!)
  * PARAM 32-bit factor a
  * PARAM 32-bit factor b
- * RETURN 64-bit product
+ * RETURN 32-bit product
  * ------------------------------------------------------------ */
-uint64_t neo430_umul64(uint32_t a, uint32_t b) {
+uint32_t neo430_umul32_32(uint32_t a, uint32_t b) {
 
-union uint32_words {
-  uint32_t num32;
-  uint16_t word16[sizeof(uint32_t)/2];
-} tmp32;
-
-union uint64_words {
-  uint64_t num64;
-  uint16_t word16[sizeof(uint64_t)/2];
-} tmp64;
+  union uint32_u tmp32;
 
   // get input words (16-bit)
-  tmp32.num32 = a;
-  register uint16_t a_lo = tmp32.word16[0];
-  register uint16_t a_hi = tmp32.word16[1];
+  tmp32.uint32 = a;
+  register uint16_t a_lo = tmp32.uint16[0];
+  register uint16_t a_hi = tmp32.uint16[1];
 
-  tmp32.num32 = b;
-  register uint16_t b_lo = tmp32.word16[0];
-  register uint16_t b_hi = tmp32.word16[1];
+  tmp32.uint32 = b;
+  register uint16_t b_lo = tmp32.uint16[0];
+  register uint16_t b_hi = tmp32.uint16[1];
 
   // compute partial results and arrange in 64-bit word
   MULDIV_OPA_RESX      = a_lo;
   MULDIV_OPB_UMUL_RESY = b_lo;
   muldiv_processing_delay // HW processing delay
-  tmp64.word16[0] = MULDIV_OPA_RESX;
-  tmp64.word16[1] = MULDIV_OPB_UMUL_RESY;
-  tmp64.word16[2] = 0;
-  tmp64.word16[3] = 0;
-  uint64_t res64 = tmp64.num64;
+  tmp32.uint16[0] = MULDIV_OPA_RESX;
+  tmp32.uint16[1] = MULDIV_OPB_UMUL_RESY;
+  uint32_t res32 = tmp32.uint32;
 
 //MULDIV_OPA_RESX      = a_lo;
   MULDIV_OPB_UMUL_RESY = b_hi;
   muldiv_processing_delay // HW processing delay
-  tmp64.word16[0] = 0;
-  tmp64.word16[1] = MULDIV_OPA_RESX;
-  tmp64.word16[2] = MULDIV_OPB_UMUL_RESY;
-  tmp64.word16[3] = 0;
-  res64 += tmp64.num64;
+  tmp32.uint16[0] = 0;
+  tmp32.uint16[1] = MULDIV_OPA_RESX;
+  res32 += tmp32.uint32;
 
   MULDIV_OPA_RESX      = a_hi;
   MULDIV_OPB_UMUL_RESY = b_lo;
   muldiv_processing_delay // HW processing delay
-  tmp64.word16[0] = 0;
-  tmp64.word16[1] = MULDIV_OPA_RESX;
-  tmp64.word16[2] = MULDIV_OPB_UMUL_RESY;
-  tmp64.word16[3] = 0;
-  res64 += tmp64.num64;
+  tmp32.uint16[0] = 0;
+  tmp32.uint16[1] = MULDIV_OPA_RESX;
+  res32 += tmp32.uint32;
+
+  return res32;
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Unsigned 32x32-bit multiplication (large!)
+ * PARAM 32-bit factor a
+ * PARAM 32-bit factor b
+ * RETURN 64-bit product
+ * ------------------------------------------------------------ */
+uint64_t neo430_umul64(uint32_t a, uint32_t b) {
+
+  union uint32_u tmp32;
+  union uint64_u tmp64;
+
+  // get input words (16-bit)
+  tmp32.uint32 = a;
+  register uint16_t a_lo = tmp32.uint16[0];
+  register uint16_t a_hi = tmp32.uint16[1];
+
+  tmp32.uint32 = b;
+  register uint16_t b_lo = tmp32.uint16[0];
+  register uint16_t b_hi = tmp32.uint16[1];
+
+  // compute partial results and arrange in 64-bit word
+  MULDIV_OPA_RESX      = a_lo;
+  MULDIV_OPB_UMUL_RESY = b_lo;
+  muldiv_processing_delay // HW processing delay
+  tmp64.uint16[0] = MULDIV_OPA_RESX;
+  tmp64.uint16[1] = MULDIV_OPB_UMUL_RESY;
+  tmp64.uint16[2] = 0;
+  tmp64.uint16[3] = 0;
+  uint64_t res64 = tmp64.uint64;
+
+//MULDIV_OPA_RESX      = a_lo;
+  MULDIV_OPB_UMUL_RESY = b_hi;
+  muldiv_processing_delay // HW processing delay
+  tmp64.uint16[0] = 0;
+  tmp64.uint16[1] = MULDIV_OPA_RESX;
+  tmp64.uint16[2] = MULDIV_OPB_UMUL_RESY;
+  tmp64.uint16[3] = 0;
+  res64 += tmp64.uint64;
+
+  MULDIV_OPA_RESX      = a_hi;
+  MULDIV_OPB_UMUL_RESY = b_lo;
+  muldiv_processing_delay // HW processing delay
+  tmp64.uint16[0] = 0;
+  tmp64.uint16[1] = MULDIV_OPA_RESX;
+  tmp64.uint16[2] = MULDIV_OPB_UMUL_RESY;
+  tmp64.uint16[3] = 0;
+  res64 += tmp64.uint64;
 
 //MULDIV_OPA_RESX      = a_hi;
   MULDIV_OPB_UMUL_RESY = b_hi;
   muldiv_processing_delay // HW processing delay
-  tmp64.word16[0] = 0;
-  tmp64.word16[1] = 0;
-  tmp64.word16[2] = MULDIV_OPA_RESX;
-  tmp64.word16[3] = MULDIV_OPB_UMUL_RESY;
-  res64 += tmp64.num64;
+  tmp64.uint16[0] = 0;
+  tmp64.uint16[1] = 0;
+  tmp64.uint16[2] = MULDIV_OPA_RESX;
+  tmp64.uint16[3] = MULDIV_OPB_UMUL_RESY;
+  res64 += tmp64.uint64;
 
   return res64;
 }
@@ -151,67 +189,60 @@ int32_t neo430_mul32(int16_t a, int16_t b) {
  * ------------------------------------------------------------ */
 int64_t neo430_mul64(int32_t a, int32_t b) {
 
-union int32_words {
-  int32_t num32;
-  int16_t word16[sizeof(int32_t)/2];
-} tmp32;
-
-union int64_words {
-  int64_t num64;
-  int16_t word16[sizeof(int64_t)/2];
-} tmp64;
+  union int32_u tmp32;
+  union int64_u tmp64;
 
   // get input words (16-bit)
-  tmp32.num32 = a;
-  register int16_t a_lo = tmp32.word16[0];
-  register int16_t a_hi = tmp32.word16[1];
+  tmp32.int32 = a;
+  register int16_t a_lo = tmp32.int16[0];
+  register int16_t a_hi = tmp32.int16[1];
 
-  tmp32.num32 = b;
-  register int16_t b_lo = tmp32.word16[0];
-  register int16_t b_hi = tmp32.word16[1];
+  tmp32.int32 = b;
+  register int16_t b_lo = tmp32.int16[0];
+  register int16_t b_hi = tmp32.int16[1];
 
   // compute partial results and arrange in 64-bit word
   MULDIV_OPA_RESX = (uint16_t)a_lo;
   MULDIV_OPB_SMUL = (uint16_t)b_lo;
   muldiv_processing_delay // HW processing delay
-  tmp64.word16[0] = MULDIV_OPA_RESX;
-  tmp64.word16[1] = MULDIV_OPB_UMUL_RESY;
-  tmp64.word16[2] = 0;
-  tmp64.word16[3] = 0;
-  int64_t res64 = tmp64.num64;
+  tmp64.int16[0] = MULDIV_OPA_RESX;
+  tmp64.int16[1] = MULDIV_OPB_UMUL_RESY;
+  tmp64.int16[2] = 0;
+  tmp64.int16[3] = 0;
+  int64_t res64 = tmp64.int64;
 
 //MULDIV_OPA_RESX = (uint16_t)a_lo;
   MULDIV_OPB_SMUL = (uint16_t)b_hi;
   muldiv_processing_delay // HW processing delay
-  tmp64.word16[0] = 0;
-  tmp64.word16[1] = MULDIV_OPA_RESX;
-  tmp64.word16[2] = MULDIV_OPB_UMUL_RESY;
-  if (tmp64.word16[2] < 0) // sign extension
-    tmp64.word16[3] = 0xffff;
+  tmp64.int16[0] = 0;
+  tmp64.int16[1] = MULDIV_OPA_RESX;
+  tmp64.int16[2] = MULDIV_OPB_UMUL_RESY;
+  if (tmp64.int16[2] < 0) // sign extension
+    tmp64.int16[3] = 0xffff;
   else
-    tmp64.word16[3] = 0;
-  res64 += tmp64.num64;
+    tmp64.int16[3] = 0;
+  res64 += tmp64.int64;
 
   MULDIV_OPA_RESX = (uint16_t)a_hi;
   MULDIV_OPB_SMUL = (uint16_t)b_lo;
   muldiv_processing_delay // HW processing delay
-  tmp64.word16[0] = 0;
-  tmp64.word16[1] = MULDIV_OPA_RESX;
-  tmp64.word16[2] = MULDIV_OPB_UMUL_RESY;
-  if (tmp64.word16[2] < 0) // sign extension
-    tmp64.word16[3] = 0xffff;
+  tmp64.int16[0] = 0;
+  tmp64.int16[1] = MULDIV_OPA_RESX;
+  tmp64.int16[2] = MULDIV_OPB_UMUL_RESY;
+  if (tmp64.int16[2] < 0) // sign extension
+    tmp64.int16[3] = 0xffff;
   else
-    tmp64.word16[3] = 0;
-  res64 += tmp64.num64;
+    tmp64.int16[3] = 0;
+  res64 += tmp64.int64;
 
 //MULDIV_OPA_RESX = (uint16_t)a_hi;
   MULDIV_OPB_SMUL = (uint16_t)b_lo;
   muldiv_processing_delay // HW processing delay
-  tmp64.word16[0] = 0;
-  tmp64.word16[1] = 0;
-  tmp64.word16[2] = MULDIV_OPA_RESX;
-  tmp64.word16[3] = MULDIV_OPB_UMUL_RESY;
-  res64 += tmp64.num64;
+  tmp64.int16[0] = 0;
+  tmp64.int16[1] = 0;
+  tmp64.int16[2] = MULDIV_OPA_RESX;
+  tmp64.int16[3] = MULDIV_OPB_UMUL_RESY;
+  res64 += tmp64.int64;
 
   return res64;
 }
@@ -364,3 +395,37 @@ int16_t neo430_moddiv16(int16_t *remainder, int16_t dividend, int16_t divisor) {
   else
     return q;
 }
+
+
+// *****************************************************************************
+// * DANGER ZONE!!!                                                            *
+// * Override primitives for multiplication to use the MULDIV hardware unit    *
+// *****************************************************************************
+#if NEO430_HWMUL_ABI_OVERRIDE
+
+int16_t __mulhi2(int16_t x, int16_t y) {
+  return (int16_t)neo430_umul32((uint16_t)x,(uint16_t)y);
+}
+
+int32_t __mulhisi2(int16_t x, int16_t y) {
+  return neo430_mul32(x,y);
+}
+
+uint32_t __umulhisi2(uint16_t x, uint16_t y) {
+  return neo430_umul32(x,y);
+}
+
+int32_t __mulsi2(int32_t x, int32_t y) {
+  return (int32_t)neo430_umul32_32((uint32_t)x,(uint32_t)y);
+}
+
+int32_t __mulsidi2(int32_t x, int32_t y) {
+  return neo430_mul64(x,y);
+}
+
+uint64_t __umulsidi2(uint32_t x, uint32_t y) {
+  return neo430_umul64(x,y);
+}
+
+#endif
+// *****************************************************************************
