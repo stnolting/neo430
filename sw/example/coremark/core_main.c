@@ -94,10 +94,10 @@ MAIN_RETURN_TYPE main(int argc, char *argv[]) {
 #endif
 
 // -----------------------------------------------
-#ifndef USE_NEO430_MULTIPLIER
-#pragma warning ("Using SW multiplication. Use >>make clean compile CC_USER_FLAGS+=-DUSE_NEO430_MULTIPLIER<< to use the NEO430 MULDIV unit instead.")
+#ifndef NEO430_HWMUL_ABI_OVERRIDE
+#pragma warning ("Using SW multiplication. Use >>make clean compile CC_USER_FLAGS+=-DNEO430_HWMUL_ABI_OVERRIDE<< to use the NEO430 MULDIV unit instead (experimental!)")
 #else
-#pragma warning ("Using NEO430 MULDIV unit for multiplications.")
+#pragma warning ("Using NEO430 MULDIV unit for multiplications (highly experimental!)")
 #endif
 
 #ifndef RUN_COREMARK
