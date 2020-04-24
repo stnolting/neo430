@@ -12,5 +12,5 @@ ls -al $srcdir_examples
 ls -al $srcdir_bootloader
 
 # Try to compile all example projects
-make -C $srcdir_examples compile
-make -C $srcdir_bootloader all
+make -C $srcdir_examples clean_all compile
+make -C $srcdir_bootloader clean_all all
