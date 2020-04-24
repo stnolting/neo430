@@ -37,6 +37,7 @@
 
 // prototypes
 uint32_t neo430_umul32(uint16_t a, uint16_t b);
+uint32_t neo430_umul32_32(uint32_t a, uint32_t b);
 uint64_t neo430_umul64(uint32_t a, uint32_t b);
 
 int32_t  neo430_mul32(int16_t a, int16_t b);
