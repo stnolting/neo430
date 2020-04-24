@@ -1,0 +1,52 @@
+# ************************************************************************
+#  @author:  	Andreas Kaeberlein
+#  @copyright:	Copyright 2020
+# 
+#  @license:  	BSDv3
+#  @maintainer:	Andreas Kaeberlein
+#  @email:		andreas.kaeberlein@web.de
+# 
+#  @file:       .gitignore.
+# 
+#  @brief:      refuses generated files from repo check-in
+# ************************************************************************
+
+
+
+# Exceptions
+#
+!.gitignore.
+!.gitconfig.
+**/!.gitkeep.
+#
+
+
+# Software Examples w/ GCC
+#
+sw/**/*.elf
+sw/**/*.dat
+sw/**/*.bin
+sw/**/*.o
+sw/**/*.s
+#
+
+
+# Modelsim directory
+# Exclude all subdirectories, f.e. compiled hdl code
+#
+sim/modelsim/neo430/*
+#
+
+
+# Quartus
+#
+fpga/db/
+fpga/incremental_db/
+fpga/simulation/
+fpga/timing/
+fpga/testbench/
+fpga/*_sim/
+fpga/incremental_db/
+fpga/db/
+fpga/output_files/
+#
