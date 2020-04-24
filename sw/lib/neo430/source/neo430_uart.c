@@ -266,8 +266,11 @@ void neo430_uart_print_hex_byte(uint8_t b) {
  * ------------------------------------------------------------ */
 void neo430_uart_print_hex_word(uint16_t w) {
 
-  neo430_uart_print_hex_byte((uint8_t)(w >> 8));
-  neo430_uart_print_hex_byte((uint8_t)(w >> 0));
+  union uint16_u tmp;
+  tmp.uint16 = w;
+
+  neo430_uart_print_hex_byte(tmp.uint8[1]);
+  neo430_uart_print_hex_byte(tmp.uint8[0]);
 }
 
 
@@ -277,8 +280,13 @@ void neo430_uart_print_hex_word(uint16_t w) {
  * ------------------------------------------------------------ */
 void neo430_uart_print_hex_dword(uint32_t dw) {
 
-  neo430_uart_print_hex_word((uint16_t)(dw >> 16));
-  neo430_uart_print_hex_word((uint16_t)(dw >>  0));
+  union uint32_u tmp;
+  tmp.uint32 = dw;
+
+  neo430_uart_print_hex_byte(tmp.uint8[3]);
+  neo430_uart_print_hex_byte(tmp.uint8[2]);
+  neo430_uart_print_hex_byte(tmp.uint8[1]);
+  neo430_uart_print_hex_byte(tmp.uint8[0]);
 }
 
 
@@ -288,8 +296,17 @@ void neo430_uart_print_hex_dword(uint32_t dw) {
  * ------------------------------------------------------------ */
 void neo430_uart_print_hex_qword(uint64_t qw) {
 
-  neo430_uart_print_hex_dword((uint32_t)(qw >> 32));
-  neo430_uart_print_hex_dword((uint32_t)(qw >>  0));
+  union uint64_u tmp;
+  tmp.uint64 = qw;
+
+  neo430_uart_print_hex_byte(tmp.uint8[7]);
+  neo430_uart_print_hex_byte(tmp.uint8[6]);
+  neo430_uart_print_hex_byte(tmp.uint8[5]);
+  neo430_uart_print_hex_byte(tmp.uint8[4]);
+  neo430_uart_print_hex_byte(tmp.uint8[3]);
+  neo430_uart_print_hex_byte(tmp.uint8[2]);
+  neo430_uart_print_hex_byte(tmp.uint8[1]);
+  neo430_uart_print_hex_byte(tmp.uint8[0]);
 }
 
 
@@ -315,8 +332,11 @@ void neo430_uart_print_bin_byte(uint8_t b) {
  * ------------------------------------------------------------ */
 void neo430_uart_print_bin_word(uint16_t w) {
 
-  neo430_uart_print_bin_byte((uint8_t)(w >> 8));
-  neo430_uart_print_bin_byte((uint8_t)(w >> 0));
+  union uint16_u tmp;
+  tmp.uint16 = w;
+
+  neo430_uart_print_bin_byte(tmp.uint8[1]);
+  neo430_uart_print_bin_byte(tmp.uint8[0]);
 }
 
 
@@ -326,8 +346,13 @@ void neo430_uart_print_bin_word(uint16_t w) {
  * ------------------------------------------------------------ */
 void neo430_uart_print_bin_dword(uint32_t dw) {
 
-  neo430_uart_print_bin_word((uint16_t)(dw >> 16));
-  neo430_uart_print_bin_word((uint16_t)(dw >>  0));
+  union uint32_u tmp;
+  tmp.uint32 = dw;
+
+  neo430_uart_print_bin_byte(tmp.uint8[3]);
+  neo430_uart_print_bin_byte(tmp.uint8[2]);
+  neo430_uart_print_bin_byte(tmp.uint8[1]);
+  neo430_uart_print_bin_byte(tmp.uint8[0]);
 }
 
 
