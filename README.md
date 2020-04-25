@@ -1,11 +1,13 @@
 # The NEO430 Processor
 
 [![Build Status](https://travis-ci.com/stnolting/neo430.svg?branch=master)](https://travis-ci.com/stnolting/neo430)
-[![last commit](https://img.shields.io/github/last-commit/stnolting/neo430)](https://github.com/stnolting/neo430/commits/master)
-[![issues](https://img.shields.io/github/issues/stnolting/neo430)](https://github.com/stnolting/neo430/issues)
-[![release](https://img.shields.io/github/v/release/stnolting/neo430)](https://github.com/stnolting/neo430/releases)
 [![license](https://img.shields.io/github/license/stnolting/neo430)](https://github.com/stnolting/neo430/blob/master/LICENSE)
+[![release](https://img.shields.io/github/v/release/stnolting/neo430)](https://github.com/stnolting/neo430/releases)
 [![documentary](https://img.shields.io/badge/datasheet-neo430.pdf-blue)](https://raw.githubusercontent.com/stnolting/neo430/master/doc/NEO430.pdf)
+
+[![issues](https://img.shields.io/github/issues/stnolting/neo430)](https://github.com/stnolting/neo430/issues)
+[![open pull requests](https://img.shields.io/github/issues-pr-raw/stnolting/neo430)](https://github.com/stnolting/neo430/pulls)
+[![last commit](https://img.shields.io/github/last-commit/stnolting/neo430)](https://github.com/stnolting/neo430/commits/master)
 
 ## Table of Content
 
@@ -63,7 +65,7 @@ NEO430 setup run: [![NEO430 Datasheet](https://raw.githubusercontent.com/stnolti
 - 16-bit open source soft-core microcontroller-like processor system
 - Full support of the original [MSP430 instruction set architecture](https://raw.githubusercontent.com/stnolting/neo430/master/doc/instruction_set.pdf)
 - Code-efficient CISC-like instruction capabilities
-- Tool chain based on free [TI msp430-gcc compiler](http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/index_FDS.html "TI `msp430-gcc` compiler") (also available here [on github](https://github.com/stnolting/msp430-gcc))
+- Tool chain based on free [TI msp430-gcc compiler](http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/index_FDS.html "TI `msp430-gcc` compiler") (also available [here on github](https://github.com/stnolting/msp430-gcc))
 - Application compilation scripts ([makefiles](https://github.com/stnolting/neo430/blob/master/sw/example/blink_led/Makefile)) for Windows Powershell / Windows Subsystem for Linux / native Linux
 - Software requirements (regardless of platform):
   - TI `msp430-gcc` compiler
@@ -77,18 +79,18 @@ NEO430 setup run: [![NEO430 Datasheet](https://raw.githubusercontent.com/stnolti
   - Optional multiplier/divider unit ([MULDIV](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_muldiv.vhd))
   - Optional high-precision timer ([TIMER](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_timer.vhd))
   - Optional universal asynchronous receiver and transmitter ([UART](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_uart.vhd))
-  - Optional serial peripheral interface ([SPI](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_spi.vhd)), 8 or 16 bit tansfer data size, 6 dedicated CS lines
-  - Optional I2C-compatible two wire serial interface ([TWI](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_twi.vhd)) supporting clock stretching
+  - Optional serial peripheral interface master ([SPI](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_spi.vhd)), 8 or 16 bit transfer data size, 6 dedicated chip-select lines
+  - Optional I2C-compatible two wire serial interface master ([TWI](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_twi.vhd)) supporting clock stretching
   - Optional general purpose parallel IO port ([GPIO](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_gpio.vhd)), 16 inputs & 16 outputs, with pin-change interrupt and PWM option
-  - Optional 32-bit Wishbone bus interface adapter ([WB32](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_wb_interface.vhd)) - including bridges to [Avalon (TM](https://github.com/stnolting/neo430/blob/master/rtl/top_templates/neo430_top_avm.vhd)) bus and [AXI4-Lite (TM](https://github.com/stnolting/neo430/blob/master/rtl/top_templates/neo430_top_axi4lite.vhd))
+  - Optional 32-bit Wishbone bus master interface adapter ([WB32](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_wb_interface.vhd)) - including bridges to [Avalon (TM](https://github.com/stnolting/neo430/blob/master/rtl/top_templates/neo430_top_avm.vhd)) bus and [AXI4-Lite (TM](https://github.com/stnolting/neo430/blob/master/rtl/top_templates/neo430_top_axi4lite.vhd))
   - Optional watchdog timer ([WDT](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_wdt.vhd))
   - Optional cyclic redundancy check unit ([CRC16/32](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_crc.vhd))
-  - Optional custom functions unit ([CFU](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_cfu.vhd)) for user-defined processor extensions
+  - Optional custom functions unit ([CFU](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_cfu.vhd)) for processor-internal user-defined processor extensions
   - Optional 4 channel PWM controller with 4 or 8 bit resolution ([PWM](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_pwm.vhd))
   - Optional Galois Ring Oscillator (GARO) based true random number generator ([TRNG](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_trng.vhd)) with de-biasing and internal post-processing
   - Optional external interrupts controller with 8 independent channels ([EXIRQ](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_exirq.vhd)), can also be used for software-triggered interrupts (traps, breakpoints, etc.)
-  - Optional NCO-based programmable frequency generator with 3 independent channels ([FREQ_GEN](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_freq_gen.vhd))
-  - Optional internal [bootloader](https://github.com/stnolting/neo430/blob/master/sw/bootloader/bootloader.c) (2kB ROM) with serial user console and automatic boot from external SPI flash (like the FPGA configuration storage)
+  - Optional NCO-based programmable frequency generator ([FREQ_GEN](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_freq_gen.vhd)) with 3 independent output channels
+  - Optional internal [bootloader](https://github.com/stnolting/neo430/blob/master/sw/bootloader/bootloader.c) (2kB ROM) with serial user console and automatic application boot from external SPI flash (like the FPGA configuration storage)
 
 
 
@@ -102,25 +104,28 @@ NEO430 setup run: [![NEO430 Datasheet](https://raw.githubusercontent.com/stnolti
 - No analog components
 - No support of TI's Code Composer Studio
 - No support of CPU's DADD operation
-- Just 4 CPU interrupt channels
+- No *implicit* software support of the NEO430 multiplier - but: there is a work-around* for that! ;)
+- Just 4 CPU interrupt channels (can be extended via the external IRQ controller)
 - Single clock domain for complete processor
 - Different numbers of instruction execution cycles
 - Only one power-down (sleep) mode
-- Wishbone-compatible interface to attach custom IP
-- Internal bootloader with text interface (via UART serial port)
-- Extended ALU functions (if enabled)
+
+*) A quite promising experimental mode to allow implicit multiplier usage (just write A*B in your code and the compiler
+will automatically utilize the multiplier unit for this)
 
 
 
 ## Top Entity
 
-The top entity of the processor is [neo430_top.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_top.vhd) (in the rtl\core folder).
-Just instantiate this file in you project and you are ready to go! All signals of this top entity are of type *std_ulogic* or *std_ulogic_vector*, respectively.
-If you need a top entity with resolved signals, take a look at the [top_templates](https://github.com/stnolting/neo430/blob/master/rtl/top_templates) folder.
+The top entity of the processor is [**neo430_top.vhd**](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_top.vhd) (from the rtl\core folder).
+Just instantiate this file in your project and you are ready to go! All signals of this top entity are of type *std_ulogic* or *std_ulogic_vector*, respectively.
+If you need a top entity with resolved signals (*std_logic*), take a look at the [top_templates](https://github.com/stnolting/neo430/blob/master/rtl/top_templates) folder.
 These alternative top entities also support AXI or Avalon connectivity.
 
 
 ### Generics
+
+The main features and the actually implemented peripheral modules are configured via the top unit's generics.
 
 | Generic Name | Type                    | Default Value | Function                                                 |
 |:-------------|:-----------------------:|:-------------:|:---------------------------------------------------------|
@@ -148,7 +153,7 @@ These alternative top entities also support AXI or Avalon connectivity.
 
 ### Signals
 
-Note regarding unused unit's IO: Connect all unused inputs to low and leave all unused outputs 'open'.
+Regarding unused unit's signals: Connect all unused inputs to low and leave all unused outputs 'open'.
 Signal driections are seen from the processor.
 
 | Signal Name  | Width | Direction | HW Unit  | Function                                                 |
@@ -197,14 +202,14 @@ Results generated with Xilinx Vivado 2019.2, Intel Quartus Prime Lite 17.1 and L
 | Full (default) configuration:       | 1869 (8%) | 1137 (5%) | 65800 (11%) | 0 (0%) | 121 MHz |
 | Minimal configuration (CPU + GPIO): |  590 (3%) |  230 (1%) |  49408 (8%) | 0 (0%) | 122 MHz |
 
-| __Lattice iCE40 UltraPlus** (iCE40UP5K-SG48I)__  | LUTs       | FFs        | EBRs    | DSPs   | SRAMs   | f_max*    |
+| __Lattice iCE40 UltraPlus** (iCE40UP5K-SG48I)__  | LUTs       | FFs        | EBRs    | DSPs   | SPRAMs  | f_max*    |
 |:-------------------------------------------------|:----------:|:----------:|:-------:|:------:|:-------:|:---------:|
 | Full (default) configuration:                    | 3928 (74%) | 1923 (36%) | 9 (30%) | 0 (0%) | 2 (50%) | 20.25 MHz |
 | Minimal configuration (CPU + GPIO + Bootloader): | 1812 (34%) |  755 (14%) | 4 (13%) | 0 (0%) | 2 (50%) | 20.25 MHz |
 
 *) Constrained
 
-**) Using optimized memory modules for IMEM (32kB) & DMEM(12kB) from the `rtl\fpga_specific\lattice_ice40up` folder
+**) Using optimized memory modules for IMEM (32kB) & DMEM (12kB) from the `rtl\fpga_specific\lattice_ice40up` folder
 
 
 ### Device Utilization by Entity
@@ -244,15 +249,15 @@ processor modules (excluding the CFU but including the TRNG), an IMEM size of 4k
 
 ## HW-SW Ecosystem
 
-The NEO430 Processor porjects provides driver libraries for the CPU itself and all included peripheral modules. These libraries
-provide a certain level of hardware abstraction and allow an easier usage of the different hardware module. Hw modules that cannot
-be "explicitly" used (like CPU modules or the different memories) are not listed below. Also, there is no CFU driver library or
-example project - this has to be provided by the CFU designer.
+The NEO430 Processor project provides driver libraries for the CPU itself and all included peripheral modules. These libraries
+provide a certain level of hardware abstraction and allow an easy usage of the different hardware modules. Modules that cannot
+be used "explicitly" (like CPU modules or the different memories) are not listed below. 
 
 | Hardware unit                          | VHDL source | C library source | C library header | SW example project |
 |:---------------------------------------|:-----------:|:----------------:|:----------------:|:------------------:|
 | Main CPU defines file                  | - | - | [neo430.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430.h) | - |
 | Central Processing Unit (CPU)          | [neo430_cpu.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_cpu.vhd) | [neo430_cpu.c](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/source/neo430_cpu.c) | [neo430_cpu.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430_cpu.h) |- |
+| Custom Functions Unit (CFU)            | [neo430_cpu.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_cfu.vhd) | provided by CFU designer | provided by CFU designer | [example](https://github.com/stnolting/neo430/tree/master/sw/example/cfu_test) |
 | Checksum Unit (CRC16/32)               | [neo430_crc.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_crc.vhd) | [neo430_crc.c](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/source/neo430_crc.c) | [neo430_crc.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430_crc.h) | [example](https://github.com/stnolting/neo430/tree/master/sw/example/crc_test) |
 | External Interrupts Controller (EXIRQ) | [neo430_exirq.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_exirq.vhd) | [neo430_exirq.c](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/source/neo430_exirq.c) | [neo430_exirq.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430_exirq.h) | [example](https://github.com/stnolting/neo430/tree/master/sw/example/exirq_test) |
 | Frequency Generator (FREQ_GEN)         | [neo430_freq_gen.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_freq_gen.vhd) | [neo430_freq_gen.c](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/source/neo430_freq_gen.c) | [neo430_freq_gen.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430_freq_gen.h) | [example](https://github.com/stnolting/neo430/tree/master/sw/example/freq_gen_demo) |
@@ -271,52 +276,52 @@ example project - this has to be provided by the CFU designer.
 
 ## Performance
 
-In contrast to most mainstream processors the NEO430 processor does not implement a pipelined instruction execution. Instead,
+In contrast to most mainstream processors the NEO430 processor does not implement a "classic" pipelined instruction execution. Instead,
 a **multi-cycle instruction execution scheme** is used: Each single instruction is executed in a series of micro instructions
 requiring several clock cycles to complete. The main benefit of this execution style is the highly reduced logic overhead as no
-complex pipeline hazard detection and resolving logic is required making the NEO430 even sammler - at the cost of a reduced IPC
-(instructions per cycle). Also, the MSP430 ISA is not really compatible to the classic (e.g., DLX/MIPS) pipeline scheme due to
+complex pipeline hazard detection and resolving logic is required. This makes the NEO430 even smaller - at the cost of a reduced IPC
+(*instructions per cycle*). Also, the MSP430 ISA is not really compatible to the classic (DLX/MIPS-like) pipeline scheme due to
 its complex operand and adressing modes (e.g., ALU operations executing directly on memory data). However, this concept allows
 the processor to use very **dense and powerfull CISC-like operations**.
 
 Furthermore, the multi-cycle architecture features a **very short crtitical path** when compared to other (even 32-bit)
-processors. Thus, the NEO430 can operate at very high frequencies even on low-cost (e.g., +110MHz on an Intel Cyclone 4)
-and low-power FPGAs (e.g., +20MHz on a Lattice iCE40 UltraPlus) and without area constraints.
+processors. Thus, the NEO430 can operate at very high frequencies even on low-cost (e.g., +120MHz on an Intel Cyclone IV)
+and low-power FPGAs (e.g., +20MHz on a Lattice iCE40 UltraPlus) even without any area constraints.
 
-Depending on the format of the instruction, the actual execution can take 3 to 10 clock cycles. If all possible instruction
-types and formates are executed in an eually distributed manner (i.e. worst case), the average CPI (clock cycles per instruction)
-evaluates to **7.33 cycles/instruction resulting in 0.136 MIPS per MHz (worst case)**.
+Depending on the format / operand addressing mode of an instruction, the actual execution can take 3 to 10 clock cycles. If all possible instruction
+types and formats are executed in an equally distributed manner (this is the worst case), the average CPI (clock cycles per instruction)
+evaluates to **7.33 cycles/instruction resulting in 0.136 MIPS per MHz (again: worst case)**.
 
 
 ### CoreMark Benchmark
 
 The [CoreMark CPU benchmark](https://www.eembc.org/coremark/) was executed on the NEO430 and is available in the
-project's [sw/example/coremark](https://github.com/stnolting/neo430/blob/master/sw/example/coremark) folder This benchmark
-tests the capabilities of the CPU itself rather than the functions provided by the whole system / SoC.
+[sw/example/coremark](https://github.com/stnolting/neo430/blob/master/sw/example/coremark) project folder This benchmark
+tests the capabilities of a CPU itself rather than the functions provided by the whole system / SoC.
 
 ~~~
-Hardware: 100 MHz, 32kB IMEM, 12kB DMEM, HW verison 0x0404, no peripherals used (except for the TIMER and the UART)
-Software: msp430-gcc 8.3.0 for Linux, MEM_METHOD is MEM_STACK, 2000 coremark iterations
+Configuration
+Hardware: 100 MHz, 32kB IMEM, 12kB DMEM, HW verison 0x0406, peripherals used: TIMER, UART, MULDIV
+Software: msp430-gcc 8.3.0 for Linux, MEM_METHOD is MEM_STACK, 2000 CoreMark iterations
 ~~~
 
-|__Optimization__      | __Coremark Score__ | __Relative Score__    |
-|:--------------------:|:------------------:|:---------------------:|
-| -Os                  | 6.57               | 0.065 Coremarks/MHz   |
-| -O2                  | 7.16               | 0.072 Coremarks/MHz   |
-| -Os + NEO430_MULDIV* | 12.98              | 0.129 Coremarks/MHz   |
-| -O2 + NEO430_MULDIV* | 15.26              | 0.152 Coremarks/MHz   |
+| __Optimization__     | __Executable Size__ | __CoreMark Score__ | __Relative Score__  |
+|:---------------------|:-------------------:|:------------------:|:-------------------:|
+| -Os                  | 12150 bytes         | 6.57               | 0.065 CoreMarks/MHz |
+| -O2                  | 14600 bytes         | 7.16               | 0.072 CoreMarks/MHz |
+| -Os + NEO430_MULDIV* | 12118 bytes         | 14.43              | 0.144 CoreMarks/MHz |
+| -O2 + NEO430_MULDIV* | 14562 bytes         | 17.68              | 0.176 CoreMarks/MHz |
 
-*) Using the NEO430 MULDIV unit for the core of the matrix multiplications.
+*) These results were generated using the "NEO430_HWMUL_ABI_OVERRIDE" feature, which allows to map implicit multiplications
+in the source code via compiler primitives directly to the multiplier core of the MULDIV unit. For more information see
+chapter "Multiplier and Divider Unit (MULDIV)" of [NEO430.pdf](https://raw.githubusercontent.com/stnolting/neo430/master/doc/NEO430.pdf).
 
-Even though a score of 6.57 can outnumber certain architectures and configurations (see the score table on the coremark
-homepage), the relative score of 0.065 coremarks per second might pretty low. But you have to keep in mind that benchmark
-was executed using only the resources of the CPU itself. The CPU consists of only ~500 Intel Cyclone IV LUTs and does not
-contain any sophisticated ALU operations like multiplication or barrel shifting. Also, all instructions are executed in a
-multi-cycle scheme requiring several clock cycles to complete. When explicitly using the NEO430 MULDIV unit for performing
-the matrix-operations benchmark scenario (among other operations, it is based on matrix-scalar, matrix-vector and
-matrix-matrix multiplications) the **coremark score is increased to 15.26**. By using additional HW accelerators from the
-NEO430 ecosystem (like the CRC unit) or by using the MULDIV unit also for address and index computations the performance
-and thus, the coremark score can be further increased
+Even though a score of 6.57 can outnumber certain architectures and configurations (see the score table on the CoreMark
+homepage), the relative score of 0.065 coremarks per second might sound pretty low. True. But you have to keep in mind that benchmark
+was executed using only the resources of the CPU itself. The CPU consists of only ~520 Intel Cyclone IV LUTs and does not
+contain any sophisticated ALU operations like multiplication or barrel shifting. When including NEO430 MULDIV unit (using the
+"NEO430_HWMUL_ABI_OVERRIDE" feature) the CoreMark score is increased to 17.6. By explicitly using additional HW accelerators
+from the NEO430 ecosystem (e.g. the CRC unit) the performance can be further increased.
 
 
 
@@ -362,9 +367,8 @@ The official change log of this project can be found at the end of the [![NEO430
 
 ## Contact
 
-If you have any questions, bug reports, ideas or if you are facing problems with the NEO430, open a
-[new issue](https://github.com/stnolting/neo430/issues) or directly drop me a line. Also, I'm always happy to
-hear what cool projects people are realizing with this core :smiley:
+If you have any questions, bug reports, ideas or if you are facing problems with the NEO430 or want to give some kinf of feedback, open a
+[new issue](https://github.com/stnolting/neo430/issues) or directly drop me a line:
 
   stnolting@gmail.com
 
@@ -372,7 +376,7 @@ hear what cool projects people are realizing with this core :smiley:
 
 ## Citation
 
-If you are using the NEO430 in some kind of publication, please cite it as follows:
+If you are using the NEO430 Processor in some kind of publication, please cite it as follows:
 
 > S. Nolting, "The NEO430 Processor", github.com/stnolting/neo430
 
