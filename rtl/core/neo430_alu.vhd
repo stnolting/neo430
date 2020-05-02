@@ -84,8 +84,6 @@ begin
       -- operand registers --
       if (ctrl_i(ctrl_alu_opa_wr_c) = '1') then
         op_a_ff <= op_data;
-      end if;
-      if (ctrl_i(ctrl_alu_opb_wr_c) = '1') then
         op_b_ff <= op_data;
       end if;
     end if;
