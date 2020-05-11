@@ -4,6 +4,7 @@
 *.elf
 *.dat
 *.s
+*.out
 
 # no executables
 sw/tools/image_gen/image_gen
