@@ -3,7 +3,7 @@
 *.o
 *.elf
 *.dat
-*.s
+*.a
 *.out
 
 # no executables
