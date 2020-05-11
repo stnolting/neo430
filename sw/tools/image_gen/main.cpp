@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
 	       " -bld_img : Generate bootloader raw executable memory image (text file, no header!)\n"
 		     "2nd: Input file (raw binary image)\n"
 		     "3rd: Output file\n");
-  	return 1;
+  	return 0;
   }
 
   FILE *input, *output;
