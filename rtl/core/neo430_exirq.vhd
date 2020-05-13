@@ -185,18 +185,17 @@ begin
         irq_buf(i) <= (irq_buf(i) or irq_valid(i)) and enable and (not ack_mask(i));
       end loop; -- i
 
-      -- mini state FSM - defaults --
-      cpu_irq_o <= '0';
       -- mini state FSM --
+      cpu_irq_o <= '0';
       if (state = '0') or (enable = '0') then -- idle or deactivated
-        state       <= '0';
-        irq_src_reg <= irq_src; -- capture source
-        if (irq_fire = '1') then
-          cpu_irq_o <= '1'; -- trigger CPU interrupt
-          state     <= '1'; -- go to active IRQ state
+        state <= '0';
+        if (irq_fire = '1') and (enable = '1') then -- valid active IRQ
+          irq_src_reg <= irq_src; -- capture source
+          cpu_irq_o   <= '1'; -- trigger CPU interrupt
+          state       <= '1'; -- go to active IRQ state
         end if;
-      else -- active IRQ
-        if (ack_trig = '1') or (enable = '0') then 
+      else -- active interrupt request
+        if (ack_trig = '1') or (enable = '0') then -- ack or disable
           state <= '0';
         end if;
       end if;

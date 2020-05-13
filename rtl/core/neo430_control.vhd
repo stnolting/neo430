@@ -81,6 +81,7 @@ architecture neo430_control_rtl of neo430_control is
   signal sam_nxt, sam      : std_ulogic_vector(01 downto 0); -- CMD according SRC addressing mode
 
   -- irq system --
+  signal irq_fire               : std_ulogic;
   signal irq_start, irq_ack     : std_ulogic;
   signal irq_ack_mask, irq_buf  : std_ulogic_vector(3 downto 0);
   signal irq_vec_nxt, irq_vec   : std_ulogic_vector(1 downto 0);
@@ -639,7 +640,7 @@ begin
         ctrl_nxt(ctrl_adr_ivec_oe_c) <= '1'; -- output IRQ vector
         ctrl_nxt(ctrl_mem_rd_c)      <= '1'; -- Memory read (fast)
         ctrl_nxt(ctrl_rf_dgie_c)     <= '1'; -- disable interrupt enable flag
-        irq_ack                      <= '1'; -- acknowledge IRQ
+        irq_ack                      <= '1'; -- acknowledge started IRQ handler
         state_nxt <= IRQ_4;
 
       when IRQ_4 => -- IRQ processing cycle 4: Write SR (push), get IRQ vector
@@ -674,15 +675,26 @@ begin
       i_flag_ff0 <= sreg_i(sreg_i_c);
       i_flag_ff1 <= i_flag_ff0;
       -- interrupt vector and queue buffer --
-      irq_vec <= irq_vec_nxt;
       for i in 0 to 3 loop
         irq_buf(i) <= (irq_buf(i) or irq_i(i)) and (not sreg_i(sreg_q_c)) and (not irq_ack_mask(i));
       end loop; -- i
+      -- interrupt control --
+      if (irq_start = '0') or (sreg_i(sreg_i_c) = '0') then -- idle or IRQs disabled
+        irq_start <= '0';
+        if (irq_fire = '1') then -- IRQ triggered
+          irq_vec   <= irq_vec_nxt; -- capture source
+          irq_start <= '1';
+        end if;
+      else -- active IRQ
+        if (irq_ack = '1') then -- handler started?
+          irq_start <= '0';
+        end if;
+      end if;
     end if;
   end process irq_buffer;
 
   -- valid start of IRQ handler --
-  irq_start <= '1' when (irq_buf /= "0000") and (i_flag_ff1 = '1') and (sreg_i(sreg_i_c) = '1') else '0';
+  irq_fire <= '1' when (irq_buf /= "0000") and (i_flag_ff1 = '1') and (sreg_i(sreg_i_c) = '1') else '0';
 
   -- acknowledge mask --
   irq_ack_mask_gen: process(irq_ack, irq_vec)
