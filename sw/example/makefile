@@ -1,5 +1,5 @@
 #################################################################################################
-# < NEO430 Application Compile Script - Linux/Cygwin/WinBash version >                          #
+# < NEO430 Application Compile Script - Linux / Windows Powershell / Windows Linux Subsystem >  #
 # ********************************************************************************************* #
 # BSD 3-Clause License                                                                          #
 #                                                                                               #
@@ -39,7 +39,7 @@
 .SUFFIXES:
 .DEFAULT_GOAL := help
 
-TOPTARGETS := compile clean_all
+TOPTARGETS := compile clean_all check info
 
 SUBDIRS := $(wildcard */.)
 # ignore dummy folders (starting with '~')
@@ -61,9 +61,8 @@ help:
 	@echo "Compile / clean up ALL project folders in this directory"
 	@echo "Targets:"
 	@echo " help      - show this text"
+	@echo " check     - check toolchain"
+	@echo " info      - show compiler configuration"
 	@echo " compile   - compile all projects"
 	@echo " clean_all - clean up everything"
 
-  
-#-------------------------------------------------------------------------------
-# eof
