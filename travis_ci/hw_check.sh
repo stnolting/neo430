@@ -11,6 +11,9 @@ srcdir_core=$homedir/rtl/core
 srcdir_top_templates=$homedir/rtl/top_templates
 srcdir_sim=$homedir/sim
 
+# Show GHDL version
+ghdl -v
+
 # List files
 ls -al $srcdir_core
 ls -al $srcdir_top_templates
