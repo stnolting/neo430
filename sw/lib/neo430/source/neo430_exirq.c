@@ -113,5 +113,6 @@ static void __attribute__((__interrupt__)) _exirq_irq_handler_(void) {
   EXIRQ_CT = exirq_ctrl | (1 << EXIRQ_CT_ACK_IRQ); // ACK IRQ
 
   register uint16_t src = exirq_ctrl & (0b111 << EXIRQ_CT_SEL0); // get IRQ source
-  neo430_call_address(neo430_exirq_vectors[src]); // call according handler
+  register uint16_t adr = neo430_exirq_vectors[src];
+  asm volatile ("call %0" : : "r" (adr)); // call according handler
 }

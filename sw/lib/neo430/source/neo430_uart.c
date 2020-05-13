@@ -438,7 +438,7 @@ void neo430_printf(char *format, ...) {
           neo430_itoa((uint32_t)va_arg(a, unsigned int), 0, string_buf);
           neo430_uart_br_print(string_buf);
           break;
-        case 'l': // 32-bit long
+        case 'l': // 32-bit signed long
           n = (int32_t)va_arg(a, int32_t);
           if (n < 0) {
             n = -n;
