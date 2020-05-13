@@ -97,6 +97,9 @@ OBJCOPY   = msp430-elf-objcopy
 SIZE      = msp430-elf-size
 IMAGE_GEN = $(NEO430_EXE_PATH)/image_gen
 
+# Assembler flags
+AS_OPTS = -mY -mcpu=msp430
+
 # Compiler flags
 CC_OPTS = -mcpu=msp430 -pipe -Wall -Xassembler --mY -mhwmult=none -fno-delete-null-pointer-checks
 CC_OPTS += -Wl,-static -mrelax -minrt -nostartfiles -fdata-sections -ffunction-sections -Xlinker --gc-sections
@@ -125,7 +128,7 @@ $(IMAGE_GEN): $(NEO430_EXE_PATH)/main.cpp
 #-------------------------------------------------------------------------------
 # Assemble startup code
 crt0.elf: boot_crt0.asm
-	@$(AS) -mY -mcpu=msp430 $< -o $@
+	@$(AS) $(AS_OPTS) $< -o $@
 
 # Compile app sources
 $(OBJ): %.o : %.c crt0.elf
@@ -155,12 +158,69 @@ neo430_bootloader_image.vhd: image.dat $(IMAGE_GEN)
 
 
 #-------------------------------------------------------------------------------
+# Check toolchain
+#-------------------------------------------------------------------------------
+check: $(IMAGE_GEN)
+	@echo "--------------- Check: $(AS) ---------------"
+	@$(AS) -version
+	@echo "--------------- Check: $(CC) ---------------"
+	@$(CC) -v
+	@echo "--------------- Check: $(LD) ---------------"
+	@$(LD) -V
+	@echo "--------------- Check: $(STRIP) ---------------"
+	@$(STRIP) -V
+	@echo "--------------- Check: $(OBJDUMP) ---------------"
+	@$(OBJDUMP) -V
+	@echo "--------------- Check: $(OBJCOPY) ---------------"
+	@$(OBJCOPY) -V
+	@echo "--------------- Check: $(SIZE) ---------------"
+	@$(SIZE) -V
+	@echo "--------------- Check: neo430 image_gen ---------------"
+	@$(IMAGE_GEN) -help
+	@echo "--------------- Check: native gcc ---------------"
+	@$(CC_X86) -v
+	@echo
+	@echo "Toolchain check OK"
+
+
+#-------------------------------------------------------------------------------
+# Show configuration
+#-------------------------------------------------------------------------------
+info:
+	@echo "--------------- Info: Project ---------------"
+	@echo "Project: $(shell basename $(CURDIR))"
+	@echo "Project source files: $(APP_SRC)"
+	@echo "Project include folders: $(NEO430_INC_PATH) $(APP_INC)"
+	@echo "Project object files: $(OBJ)"
+	@echo "NEO430 home folder: $(NEO430_HOME)"
+	@echo "--------------- Info: Tools ---------------"
+	@echo " AS:        $(AS)"
+	@echo " CC:        $(CC)"
+	@echo " LD:        $(LD)"
+	@echo " STRIP:     $(STRIP)"
+	@echo " OBJDUMP:   $(OBJDUMP)"
+	@echo " OBJCOPY:   $(OBJCOPY)"
+	@echo " SIZE:      $(SIZE)"
+	@echo " IMAGE_GEN: $(IMAGE_GEN)"
+	@echo " CC_X86:    $(CC_X86)"
+	@echo "--------------- Info: Flags ---------------"
+	@echo " EFFORT:        $(EFFORT)"
+	@echo " AS_OPTS:       $(AS_OPTS)"
+	@echo " CC_OPTS:       $(CC_OPTS)"
+	@echo " LD_OPTS:       $(LD_OPTS)"
+	@echo " CC_USER_FLAGS: $(CC_USER_FLAGS)"
+
+
+#-------------------------------------------------------------------------------
 # Help
 #-------------------------------------------------------------------------------
 help:
 	@echo "NEO430 Application Compilation Script"
+	@echo "Make sure to add the msp430-gcc bin folder to your system's PATH variable."
 	@echo "Targets:"
 	@echo " help      - show this text"
+	@echo " check     - check toolchain"
+	@echo " info      - show compiler configuration"
 	@echo " all       - compile and generate VHDL boot image and *.bin executable for upload via bootloader"
 	@echo " clean     - clean up this project only"
 	@echo " clean_all - clean up everything"
