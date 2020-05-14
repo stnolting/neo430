@@ -45,8 +45,8 @@ APP_SRC = core_list_join.c core_main.c core_matrix.c core_portme.c core_state.c 
 # User's application include folders (don't forget the '-I' before each entry)
 APP_INC = -I .
 
-# Relative or absolute path to the NEO430 home folder
-NEO430_HOME = ../../..
+# Relative or absolute path to the NEO430 home folder (use default if not set by user)
+NEO430_HOME ?= ../../..
 
 # Additional user flags:
 CC_USER_FLAGS += 
@@ -126,7 +126,7 @@ endif
 CC_OPTS += ${CC_USER_FLAGS}
 
 # Linker flags
-LD_OPTS = -mcpu=msp430 -Wl,--gc-sections -mrelax -minrt -nostartfiles
+LD_OPTS = -mcpu=msp430 -mrelax -minrt -nostartfiles
 
 
 #-------------------------------------------------------------------------------
@@ -228,10 +228,10 @@ check: $(IMAGE_GEN)
 info:
 	@echo "--------------- Info: Project ---------------"
 	@echo "Project: $(shell basename $(CURDIR))"
+	@echo "NEO430 home folder (NEO430_HOME): $(NEO430_HOME)"
 	@echo "Project source files: $(APP_SRC)"
 	@echo "Project include folders: $(NEO430_INC_PATH) $(APP_INC)"
 	@echo "Project object files: $(OBJ)"
-	@echo "NEO430 home folder: $(NEO430_HOME)"
 	@echo "--------------- Info: Tools ---------------"
 	@echo " AS:        $(AS)"
 	@echo " CC:        $(CC)"
@@ -259,12 +259,15 @@ help:
 	@echo "Targets:"
 	@echo " help      - show this text"
 	@echo " check     - check toolchain"
-	@echo " info      - show compiler configuration"
+	@echo " info      - show makefile configuration"
 	@echo " compile   - compile and generate *.bin executable for upload via bootloader"
 	@echo " install   - compile, generate and install VHDL boot image"
 	@echo " all       - compile and generate *.bin executable for upload via bootloader and generate and install VHDL boot image"
 	@echo " clean     - clean up project"
 	@echo " clean_all - clean up project, core libraries and helper tools"
+	@echo "CC_USER_FLAGS (usage example: CC_USER_FLAGS+=-DNEO430_HWMUL_ABI_OVERRIDE)"
+	@echo " NEO430_HWMUL_ABI_OVERRIDE - implicit usage of MULDIV.mul unit (make sure it is synthesized)"
+	@echo " NEO430_HWMUL_DSP          - use embedded multiplier fo MULDIV.mul unit (make also sure this option is synthesized)"
 
 
 #-------------------------------------------------------------------------------
