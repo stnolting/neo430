@@ -50,7 +50,11 @@ uint32_t neo430_umul32(uint16_t a, uint16_t b) {
   MULDIV_OPA_RESX = a;
   MULDIV_OPB_UMUL_RESY = b;
 
+#if NEO430_HWMUL_DSP
+  // no processind delay required for DSP (MUL) blocks
+#else
   muldiv_processing_delay // HW processing delay
+#endif
 
   return MULDIV_R32bit;
 }
@@ -78,21 +82,33 @@ uint32_t neo430_umul32_32(uint32_t a, uint32_t b) {
   // compute partial results and arrange in 64-bit word
   MULDIV_OPA_RESX      = a_lo;
   MULDIV_OPB_UMUL_RESY = b_lo;
+#if NEO430_HWMUL_DSP
+  // no processind delay required for DSP (MUL) blocks
+#else
   muldiv_processing_delay // HW processing delay
+#endif
   tmp32.uint16[0] = MULDIV_OPA_RESX;
   tmp32.uint16[1] = MULDIV_OPB_UMUL_RESY;
   uint32_t res32 = tmp32.uint32;
 
 //MULDIV_OPA_RESX      = a_lo;
   MULDIV_OPB_UMUL_RESY = b_hi;
+#if NEO430_HWMUL_DSP
+  // no processind delay required for DSP (MUL) blocks
+#else
   muldiv_processing_delay // HW processing delay
+#endif
   tmp32.uint16[0] = 0;
   tmp32.uint16[1] = MULDIV_OPA_RESX;
   res32 += tmp32.uint32;
 
   MULDIV_OPA_RESX      = a_hi;
   MULDIV_OPB_UMUL_RESY = b_lo;
+#if NEO430_HWMUL_DSP
+  // no processind delay required for DSP (MUL) blocks
+#else
   muldiv_processing_delay // HW processing delay
+#endif
   tmp32.uint16[0] = 0;
   tmp32.uint16[1] = MULDIV_OPA_RESX;
   res32 += tmp32.uint32;
@@ -124,7 +140,11 @@ uint64_t neo430_umul64(uint32_t a, uint32_t b) {
   // compute partial results and arrange in 64-bit word
   MULDIV_OPA_RESX      = a_lo;
   MULDIV_OPB_UMUL_RESY = b_lo;
+#if NEO430_HWMUL_DSP
+  // no processind delay required for DSP (MUL) blocks
+#else
   muldiv_processing_delay // HW processing delay
+#endif
   tmp64.uint16[0] = MULDIV_OPA_RESX;
   tmp64.uint16[1] = MULDIV_OPB_UMUL_RESY;
   tmp64.uint16[2] = 0;
@@ -133,7 +153,11 @@ uint64_t neo430_umul64(uint32_t a, uint32_t b) {
 
 //MULDIV_OPA_RESX      = a_lo;
   MULDIV_OPB_UMUL_RESY = b_hi;
+#if NEO430_HWMUL_DSP
+  // no processind delay required for DSP (MUL) blocks
+#else
   muldiv_processing_delay // HW processing delay
+#endif
   tmp64.uint16[0] = 0;
   tmp64.uint16[1] = MULDIV_OPA_RESX;
   tmp64.uint16[2] = MULDIV_OPB_UMUL_RESY;
@@ -142,7 +166,11 @@ uint64_t neo430_umul64(uint32_t a, uint32_t b) {
 
   MULDIV_OPA_RESX      = a_hi;
   MULDIV_OPB_UMUL_RESY = b_lo;
+#if NEO430_HWMUL_DSP
+  // no processind delay required for DSP (MUL) blocks
+#else
   muldiv_processing_delay // HW processing delay
+#endif
   tmp64.uint16[0] = 0;
   tmp64.uint16[1] = MULDIV_OPA_RESX;
   tmp64.uint16[2] = MULDIV_OPB_UMUL_RESY;
@@ -151,7 +179,11 @@ uint64_t neo430_umul64(uint32_t a, uint32_t b) {
 
 //MULDIV_OPA_RESX      = a_hi;
   MULDIV_OPB_UMUL_RESY = b_hi;
+#if NEO430_HWMUL_DSP
+  // no processind delay required for DSP (MUL) blocks
+#else
   muldiv_processing_delay // HW processing delay
+#endif
   tmp64.uint16[0] = 0;
   tmp64.uint16[1] = 0;
   tmp64.uint16[2] = MULDIV_OPA_RESX;
@@ -173,7 +205,11 @@ int32_t neo430_mul32(int16_t a, int16_t b) {
   MULDIV_OPA_RESX = (uint16_t)a;
   MULDIV_OPB_SMUL = (uint16_t)b;
 
+#if NEO430_HWMUL_DSP
+  // no processind delay required for DSP (MUL) blocks
+#else
   muldiv_processing_delay // HW processing delay
+#endif
 
   int32_t r = (int32_t)MULDIV_R32bit;
 
@@ -204,7 +240,11 @@ int64_t neo430_mul64(int32_t a, int32_t b) {
   // compute partial results and arrange in 64-bit word
   MULDIV_OPA_RESX = (uint16_t)a_lo;
   MULDIV_OPB_SMUL = (uint16_t)b_lo;
+#if NEO430_HWMUL_DSP
+  // no processind delay required for DSP (MUL) blocks
+#else
   muldiv_processing_delay // HW processing delay
+#endif
   tmp64.int16[0] = MULDIV_OPA_RESX;
   tmp64.int16[1] = MULDIV_OPB_UMUL_RESY;
   tmp64.int16[2] = 0;
@@ -213,7 +253,11 @@ int64_t neo430_mul64(int32_t a, int32_t b) {
 
 //MULDIV_OPA_RESX = (uint16_t)a_lo;
   MULDIV_OPB_SMUL = (uint16_t)b_hi;
+#if NEO430_HWMUL_DSP
+  // no processind delay required for DSP (MUL) blocks
+#else
   muldiv_processing_delay // HW processing delay
+#endif
   tmp64.int16[0] = 0;
   tmp64.int16[1] = MULDIV_OPA_RESX;
   tmp64.int16[2] = MULDIV_OPB_UMUL_RESY;
@@ -225,7 +269,11 @@ int64_t neo430_mul64(int32_t a, int32_t b) {
 
   MULDIV_OPA_RESX = (uint16_t)a_hi;
   MULDIV_OPB_SMUL = (uint16_t)b_lo;
+#if NEO430_HWMUL_DSP
+  // no processind delay required for DSP (MUL) blocks
+#else
   muldiv_processing_delay // HW processing delay
+#endif
   tmp64.int16[0] = 0;
   tmp64.int16[1] = MULDIV_OPA_RESX;
   tmp64.int16[2] = MULDIV_OPB_UMUL_RESY;
@@ -237,7 +285,11 @@ int64_t neo430_mul64(int32_t a, int32_t b) {
 
 //MULDIV_OPA_RESX = (uint16_t)a_hi;
   MULDIV_OPB_SMUL = (uint16_t)b_lo;
+#if NEO430_HWMUL_DSP
+  // no processind delay required for DSP (MUL) blocks
+#else
   muldiv_processing_delay // HW processing delay
+#endif
   tmp64.int16[0] = 0;
   tmp64.int16[1] = 0;
   tmp64.int16[2] = MULDIV_OPA_RESX;
