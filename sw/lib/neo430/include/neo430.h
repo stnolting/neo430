@@ -453,7 +453,7 @@ union  int64_u { int64_t  int64; int32_t  int32[sizeof(int64_t)/4]; int16_t int1
 #define CPUID1 (*(ROM16 0xFFF2)) // r/-: synthesized system features
 #define CPUID2 (*(ROM16 0xFFF4)) // r/-: custom user code
 #define CPUID3 (*(ROM16 0xFFF6)) // r/-: IMEM/ROM size in bytes
-#define CPUID4 (*(ROM16 0xFFF8)) // r/-: reserved
+#define CPUID4 (*(ROM16 0xFFF8)) // r/-: advanced/experimental hardware configuration features
 #define CPUID5 (*(ROM16 0xFFFA)) // r/-: DMEM/RAM size in bytes
 #define CPUID6 (*(ROM16 0xFFFC)) // r/-: clock speed (in Hz) low part
 #define CPUID7 (*(ROM16 0xFFFE)) // r/-: clock speed (in Hz) high part
@@ -463,7 +463,7 @@ union  int64_u { int64_t  int64; int32_t  int32[sizeof(int64_t)/4]; int16_t int1
 #define SYS_FEATURES  CPUID1 // r/-: synthesized system features
 #define USER_CODE     CPUID2 // r/-: custom user code
 #define IMEM_SIZE     CPUID3 // r/-: IMEM/ROM size in bytes
-//#define             CPUID4 // r/-: reserved
+#define NX_FEATURES   CPUID4 // r/-: advanced/experimental hardware configuration features
 #define DMEM_SIZE     CPUID5 // r/-: DMEM/RAM size in bytes
 #define CLOCKSPEED_LO CPUID6 // r/-: clock speed (in Hz) low part
 #define CLOCKSPEED_HI CPUID7 // r/-: clock speed (in Hz) high part
@@ -488,6 +488,11 @@ union  int64_u { int64_t  int64; int32_t  int32[sizeof(int64_t)/4]; int16_t int1
 #define SYS_SPI_EN      13 // r/-: SPI synthesized
 #define SYS_TRNG_EN     14 // r/-: TRNG synthesized
 #define SYS_EXIRQ_EN    15 // r/-: EXIRQ synthesized
+
+// NX features (advanced/experimental features)
+#define NX_DSP_MUL_EN   0 // r/-: using DSP-blocks for MULDIV.multiplier
+#define NX_XALU_EN      1 // r/-: implement eXtended ALU functions
+#define NX_LOWPOWER_EN  2 // r/-: use low-power implementation (experimental!)
 
 
 // ----------------------------------------------------------------------------

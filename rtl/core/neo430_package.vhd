@@ -40,14 +40,13 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0406"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0407"; -- no touchy!
 
   -- Danger Zone (Advanced Hardware Configuration) ------------------------------------------
   -- -------------------------------------------------------------------------------------------
   constant use_dsp_mul_c    : boolean := false; -- use DSP blocks for MULDIV's multiplication core (default=false)
   constant use_xalu_c       : boolean := false; -- implement extended ALU function (default=false)
   constant low_power_mode_c : boolean := false; -- can reduce switching activity, but will also decrease f_max and might increase area (default=false)
-  constant awesome_mode_c   : boolean := true;  -- of course! (default=true)
 
   -- Internal Functions ---------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------

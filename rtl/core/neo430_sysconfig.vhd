@@ -138,8 +138,11 @@ begin
   -- CPUID3: IMEM (ROM/RAM) size --
   sysinfo_mem(3) <= std_ulogic_vector(to_unsigned(IMEM_SIZE, 16)); -- size in bytes
 
-  -- CPUID4: reserved --
-  sysinfo_mem(4) <= (others => '0');
+  -- CPUID4: Advanced hardware configuration --
+  sysinfo_mem(4)(00) <= '1' when (use_dsp_mul_c    = true) else '0'; -- use DSP blocks for MULDIV.multiplier
+  sysinfo_mem(4)(01) <= '1' when (use_xalu_c       = true) else '0'; -- implement eXtended ALU functions
+  sysinfo_mem(4)(02) <= '1' when (low_power_mode_c = true) else '0'; -- use (experimental) low-power mode
+  sysinfo_mem(4)(15 downto 03) <= (others => '0'); -- reserved
 
   -- CPUID5: DMEM (RAM) size --
   sysinfo_mem(5) <= std_ulogic_vector(to_unsigned(DMEM_SIZE, 16)); -- size in bytes
