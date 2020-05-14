@@ -45,6 +45,7 @@
 
 // Prototypes
 void print_state(uint16_t d);
+void print_state2(uint16_t d);
 
 
 /* ------------------------------------------------------------
@@ -56,7 +57,7 @@ int main(void) {
   neo430_uart_setup(BAUD_RATE);
 
   // intro text
-  neo430_printf("\nNEO430 Hardware Analysis Tool\n\n");
+  neo430_printf("\nNEO430 Processor Hardware Analysis Tool\n\n");
 
   // General information
   // --------------------------------------------
@@ -119,7 +120,7 @@ int main(void) {
 
   // is IMEM true ROM?
   neo430_printf("- IMEM as True ROM:      ");
-  print_state(ft & (1<<SYS_IROM_EN));
+  print_state2(ft & (1<<SYS_IROM_EN));
 
   // CRC
   neo430_printf("- CRC16/CRC32:           ");
@@ -146,6 +147,24 @@ int main(void) {
   print_state(ft & (1<<SYS_EXIRQ_EN));
 
 
+  // Advanced/experimental features
+  // --------------------------------------------
+  uint16_t nx = NX_FEATURES;
+  neo430_printf("\nAdvanced/experimental (NX) features\n");
+
+  // DSP for multiplication
+  neo430_printf("- Using embedded DSP.mul:   ");
+  print_state2(nx & (1<<NX_DSP_MUL_EN));
+
+  // extended ALU functions
+  neo430_printf("- Extended ALU functions:   ");
+  print_state2(nx & (1<<NX_XALU_EN));
+
+  // low-power implementation
+  neo430_printf("- Low-Power Implementation: ");
+  print_state2(nx & (1<<NX_LOWPOWER_EN));
+
+
   // Exit
   // --------------------------------------------
   neo430_printf("\n\nPress any key to return to bootloader.\n");
@@ -169,4 +188,16 @@ void print_state(uint16_t d) {
     neo430_printf("synthesized\n");
   else
     neo430_printf("-\n");
+}
+
+
+/* ------------------------------------------------------------
+ * INFO print state 2
+ * ------------------------------------------------------------ */
+void print_state2(uint16_t d) {
+
+  if (d)
+    neo430_printf("true\n");
+  else
+    neo430_printf("false\n");
 }
