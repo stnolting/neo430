@@ -11,6 +11,9 @@ srcdir_bootloader=/mnt/data/sw/bootloader
 ls -al $srcdir_examples
 ls -al $srcdir_bootloader
 
+# check toolchain
+make -C $srcdir_examples/blink_led check
+
 # Try to compile all example projects
-make -C $srcdir_examples clean_all compile
-make -C $srcdir_bootloader clean_all all
+make -C $srcdir_examples clean_all info compile
+make -C $srcdir_bootloader clean_all info all
