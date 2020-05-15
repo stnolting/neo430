@@ -67,6 +67,8 @@ NEO430_SRC_PATH=$(NEO430_HOME)/sw/lib/neo430/source
 NEO430_EXE_PATH=$(NEO430_HOME)/sw/tools/image_gen
 # Path to NEO430 core rtl folder
 NEO430_RTL_PATH=$(NEO430_HOME)/rtl/core
+# Marker file to verify NEO430 home folder
+NEO430_HOME_MARKER=$(NEO430_INC_PATH)/neo430.h
 
 
 #-------------------------------------------------------------------------------
@@ -188,6 +190,11 @@ neo430_bootloader_image.vhd: image.dat $(IMAGE_GEN)
 # Check toolchain
 #-------------------------------------------------------------------------------
 check: $(IMAGE_GEN)
+	@echo "--------------- Check: NEO430_HOME folder ---------------"
+ifneq ($(shell [ -e $(NEO430_HOME_MARKER) ] && echo 1 || echo 0 ), 1)
+$(error NEO430_HOME folder not found!)
+endif
+	@echo "NEO430_HOME: $(NEO430_HOME)"
 	@echo "--------------- Check: $(AS) ---------------"
 	@$(AS) -version
 	@echo "--------------- Check: $(CC) ---------------"
@@ -251,6 +258,9 @@ help:
 	@echo " all       - compile and generate and install VHDL bootloader boot image"
 	@echo " clean     - clean up this project only"
 	@echo " clean_all - clean up everything"
+	@echo "CC_USER_FLAGS (usage example: CC_USER_FLAGS+=-DNEO430_HWMUL_ABI_OVERRIDE)"
+	@echo " NEO430_HWMUL_ABI_OVERRIDE - implicit usage of MULDIV.mul unit (make sure it is synthesized)"
+	@echo " NEO430_HWMUL_DSP          - use embedded multiplier for MULDIV.mul unit (make also sure this option is synthesized)"
 
 
 #-------------------------------------------------------------------------------
