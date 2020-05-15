@@ -6,7 +6,7 @@
 [![documentary](https://img.shields.io/badge/datasheet-neo430.pdf-blue)](https://raw.githubusercontent.com/stnolting/neo430/master/doc/NEO430.pdf)
 
 [![issues](https://img.shields.io/github/issues/stnolting/neo430)](https://github.com/stnolting/neo430/issues)
-[![open pull requests](https://img.shields.io/github/issues-pr-raw/stnolting/neo430)](https://github.com/stnolting/neo430/pulls)
+[![pull requests](https://img.shields.io/github/issues-pr/stnolting/neo430)](https://github.com/stnolting/neo430/pulls)
 [![last commit](https://img.shields.io/github/last-commit/stnolting/neo430)](https://github.com/stnolting/neo430/commits/master)
 
 ## Table of Content
@@ -104,13 +104,13 @@ NEO430 setup run: [![NEO430 Datasheet](https://raw.githubusercontent.com/stnolti
 - No analog components
 - No support of TI's Code Composer Studio
 - No support of CPU's DADD operation
-- No *implicit* software support of the NEO430 multiplier - but: there is a work-around* for that! ;)
+- _Implicit_ software support of the NEO430 multiplier only via experimental ABI-override mode**
 - Just 4 CPU interrupt channels (can be extended via the external IRQ controller)
 - Single clock domain for complete processor
 - Different numbers of instruction execution cycles
 - Only one power-down (sleep) mode
 
-*) A quite promising experimental mode to allow implicit multiplier usage (just write A*B in your code and the compiler
+**) A quite promising experimental mode to allow implicit multiplier usage (just write A*B in your code and the compiler
 will automatically utilize the multiplier unit for this)
 
 
@@ -257,7 +257,7 @@ be used "explicitly" (like CPU modules or the different memories) are not listed
 |:---------------------------------------|:-----------:|:----------------:|:----------------:|:------------------:|
 | Main CPU defines file                  | - | - | [neo430.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430.h) | - |
 | Central Processing Unit (CPU)          | [neo430_cpu.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_cpu.vhd) | [neo430_cpu.c](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/source/neo430_cpu.c) | [neo430_cpu.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430_cpu.h) |- |
-| Custom Functions Unit (CFU)            | [neo430_cpu.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_cfu.vhd) | provided by CFU designer | provided by CFU designer | [example](https://github.com/stnolting/neo430/tree/master/sw/example/cfu_test) |
+| Custom Functions Unit (CFU)            | [neo430_cfu.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_cfu.vhd) | provided by CFU designer | provided by CFU designer | [example](https://github.com/stnolting/neo430/tree/master/sw/example/cfu_test) |
 | Checksum Unit (CRC16/32)               | [neo430_crc.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_crc.vhd) | [neo430_crc.c](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/source/neo430_crc.c) | [neo430_crc.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430_crc.h) | [example](https://github.com/stnolting/neo430/tree/master/sw/example/crc_test) |
 | External Interrupts Controller (EXIRQ) | [neo430_exirq.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_exirq.vhd) | [neo430_exirq.c](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/source/neo430_exirq.c) | [neo430_exirq.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430_exirq.h) | [example](https://github.com/stnolting/neo430/tree/master/sw/example/exirq_test) |
 | Frequency Generator (FREQ_GEN)         | [neo430_freq_gen.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_freq_gen.vhd) | [neo430_freq_gen.c](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/source/neo430_freq_gen.c) | [neo430_freq_gen.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430_freq_gen.h) | [example](https://github.com/stnolting/neo430/tree/master/sw/example/freq_gen_demo) |
@@ -272,6 +272,7 @@ be used "explicitly" (like CPU modules or the different memories) are not listed
 | Watchdog Timer (WDT)                   | [neo430_wdt.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_wdt.vhd) | [neo430_wdt.c](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/source/neo430_wdt.c) | [neo430_wdt.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430_wdt.h) | [example](https://github.com/stnolting/neo430/tree/master/sw/example/wdt_test) |
 | Wishbone Interface (WB32)              | [neo430_wb_interface.vhd](https://github.com/stnolting/neo430/blob/master/rtl/core/neo430_wb_interface.vhd) | [neo430_wishbone.c](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/source/neo430_wishbone.c) | [neo430_wishbone.h](https://github.com/stnolting/neo430/blob/master/sw/lib/neo430/include/neo430_wishbone.h) | [example](https://github.com/stnolting/neo430/tree/master/sw/example/wb_terminal) |
 
+All software projects are compiled using an [application makefile](https://github.com/stnolting/neo430/blob/master/sw/example/blink_led/makefile).
 
 
 ## Performance
@@ -305,23 +306,28 @@ Hardware: 100 MHz, 32kB IMEM, 12kB DMEM, HW verison 0x0406, peripherals used: TI
 Software: msp430-gcc 8.3.0 for Linux, MEM_METHOD is MEM_STACK, 2000 CoreMark iterations
 ~~~
 
-| __Optimization__     | __Executable Size__ | __CoreMark Score__ | __Relative Score__  |
-|:---------------------|:-------------------:|:------------------:|:-------------------:|
-| -Os                  | 12150 bytes         | 6.57               | 0.065 CoreMarks/MHz |
-| -O2                  | 14600 bytes         | 7.16               | 0.072 CoreMarks/MHz |
-| -Os + NEO430_MULDIV* | 12118 bytes         | 14.43              | 0.144 CoreMarks/MHz |
-| -O2 + NEO430_MULDIV* | 14562 bytes         | 17.68              | 0.176 CoreMarks/MHz |
+| __Optimization/Configuration__ | __Executable Size__ | __CoreMark Score__ | __Relative Score__  |
+|:-------------------------------|:-------------------:|:------------------:|:-------------------:|
+| -Os                            | 12150 bytes         | 6.57               | 0.065 CoreMarks/MHz |
+| -O2                            | 14600 bytes         | 7.16               | 0.072 CoreMarks/MHz |
+| -Os + NEO430_MULDIV*           | 12118 bytes         | 14.43              | 0.144 CoreMarks/MHz |
+| -O2 + NEO430_MULDIV*           | 14562 bytes         | 17.68              | 0.176 CoreMarks/MHz |
+| -Os + NEO430_MULDIV* (DSP**)   | 12060 bytes         | 15.63              | 0.156 CoreMarks/MHz |
+| -O2 + NEO430_MULDIV* (DSP**)   | 14510 bytes         | 19.42              | 0.194 CoreMarks/MHz |
 
-*) These results were generated using the "NEO430_HWMUL_ABI_OVERRIDE" feature, which allows to map implicit multiplications
+*) These results were generated using the "NEO430_HWMUL_ABI_OVERRIDE" feature flag, which allows to map implicit multiplications
 in the source code via compiler primitives directly to the multiplier core of the MULDIV unit. For more information see
 chapter "Multiplier and Divider Unit (MULDIV)" of [NEO430.pdf](https://raw.githubusercontent.com/stnolting/neo430/master/doc/NEO430.pdf).
+
+**) This setup uses the FPGA's embedded multipliers (DSP blocks) for the MULDIV's multiplier unit. The "NEO430_HWMUL_DSP" feature flag eliminates
+the wait cycles usually required to wait for the result generated by the default serial MULDIV multiplier core.
 
 Even though a score of 6.57 can outnumber certain architectures and configurations (see the score table on the CoreMark
 homepage), the relative score of 0.065 coremarks per second might sound pretty low. True. But you have to keep in mind that benchmark
 was executed using only the resources of the CPU itself. The CPU consists of only ~520 Intel Cyclone IV LUTs and does not
 contain any sophisticated ALU operations like multiplication or barrel shifting. When including NEO430 MULDIV unit (using the
-"NEO430_HWMUL_ABI_OVERRIDE" feature) the CoreMark score is increased to 17.6. By explicitly using additional HW accelerators
-from the NEO430 ecosystem (e.g. the CRC unit) the performance can be further increased.
+"NEO430_HWMUL_ABI_OVERRIDE" feature and using embedded DSP blocks ("NEO430_HWMUL_DSP")) the CoreMark score is increased to 19.42.
+By explicitly using additional HW accelerators from the NEO430 ecosystem (e.g. the CRC unit) the performance can be further increased.
 
 
 
