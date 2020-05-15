@@ -14,6 +14,6 @@ ls -al $srcdir_bootloader
 # check toolchain
 make -C $srcdir_examples/blink_led check
 
-# Try to compile all example projects
+# Try to compile all example + bootloader
 make -C $srcdir_examples clean_all info compile
 make -C $srcdir_bootloader clean_all info all
