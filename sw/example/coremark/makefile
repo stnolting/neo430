@@ -40,7 +40,7 @@
 EFFORT = -Os
 
 # User's application sources (add additional files here)
-APP_SRC = main.c 
+APP_SRC = core_list_join.c core_main.c core_matrix.c core_portme.c core_state.c core_util.c ee_printf.c 
 
 # User's application include folders (don't forget the '-I' before each entry)
 APP_INC = -I .
