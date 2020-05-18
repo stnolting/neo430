@@ -67,6 +67,10 @@ end neo430_imem;
 
 architecture neo430_imem_rtl of neo430_imem is
 
+  -- advanced configuration ------------------------------------------------------------------------------------
+  constant spram_sleep_mode_en_c : boolean := false; -- put IMEM into sleep mode when idle (for low power)
+  -- -------------------------------------------------------------------------------------------------------
+
   -- ROM types --
   type imem_file8_t is array (0 to IMEM_SIZE/2-1) of std_ulogic_vector(07 downto 0);
 
@@ -85,10 +89,12 @@ architecture neo430_imem_rtl of neo430_imem is
   end function init_imem;
 
   -- local signals --
-  signal acc_en : std_ulogic;
-  signal rdata  : std_ulogic_vector(15 downto 0);
-  signal rden   : std_ulogic;
-  signal addr   : integer;
+  signal acc_en  : std_ulogic;
+  signal mem_cs  : std_ulogic;
+  signal rdata   : std_ulogic_vector(15 downto 0);
+  signal rden    : std_ulogic;
+  signal mem_sel : std_ulogic;
+  signal addr    : integer;
 
   -- internal "RAM" type - implemented if bootloader is used and IMEM is RAM and initialized with app code --
   signal imem_file_init_ram_l : imem_file8_t := init_imem('0', application_init_image);
@@ -117,12 +123,15 @@ architecture neo430_imem_rtl of neo430_imem is
   attribute syn_ramstyle of imem_file_ram_h : signal is "no_rw_check";
 
   -- SPRAM signals --
-  signal spram_clk  : std_logic;
-  signal spram_addr : std_logic_vector(13 downto 0);
-  signal spram_di   : std_logic_vector(15 downto 0);
-  signal spram_do   : std_logic_vector(15 downto 0);
-  signal spram_be   : std_logic_vector(03 downto 0);
-  signal spram_we   : std_logic;
+  signal spram_clk   : std_logic;
+  signal spram_addr  : std_logic_vector(13 downto 0);
+  signal spram_di    : std_logic_vector(15 downto 0);
+  signal spram_do_lo : std_logic_vector(15 downto 0);
+  signal spram_do_hi : std_logic_vector(15 downto 0);
+  signal spram_be    : std_logic_vector(03 downto 0);
+  signal spram_we    : std_logic;
+  signal spram_pwr_n : std_logic;
+  signal spram_cs    : std_logic_vector(01 downto 0);
 
 begin
 
@@ -130,6 +139,7 @@ begin
   -- -----------------------------------------------------------------------------
   acc_en <= '1' when (addr_i >= imem_base_c) and (addr_i < std_ulogic_vector(unsigned(imem_base_c) + IMEM_SIZE)) else '0';
   addr   <= to_integer(unsigned(addr_i(index_size_f(IMEM_SIZE/2) downto 1))); -- word aligned
+  mem_cs <= acc_en and (rden_i or wren_i(1) or wren_i(0));
 
 
   -- Memory Access ------------------------------------------------------------
@@ -137,26 +147,48 @@ begin
   imem_spram_lo_inst : SP256K
   port map (
     AD       => spram_addr,  -- I
-    DI       => spram_di,  -- I
-    MASKWE   => spram_be,  -- I
-    WE       => spram_we,  -- I
-    CS       => '1',  -- I
-    CK       => spram_clk,  -- I
-    STDBY    => '0',  -- I
-    SLEEP    => '0',  -- I
-    PWROFF_N => '1',  -- I
-    DO       => spram_do   -- O
+    DI       => spram_di,    -- I
+    MASKWE   => spram_be,    -- I
+    WE       => spram_we,    -- I
+    CS       => spram_cs(0), -- I
+    CK       => spram_clk,   -- I
+    STDBY    => '0',         -- I
+    SLEEP    => spram_pwr_n, -- I
+    PWROFF_N => '1',         -- I
+    DO       => spram_do_lo  -- O
   );
 
-  -- signal type conversion --
-  spram_clk  <= std_logic(clk_i);
-  spram_addr <= std_logic_vector(addr_i(13+1 downto 0+1));
-  spram_di   <= std_logic_vector(data_i(15 downto 0));
-  spram_we   <= '1' when ((acc_en and upen_i and (wren_i(0) or wren_i(1))) = '1') else '0'; -- global write enable
-  rdata      <= std_ulogic_vector(spram_do);
+  -- instantiate second SPRAM if IMEM size > 32kB --
+  imem_spram_hi_bank:
+  if (IMEM_SIZE > 32*1024) generate
+    imem_spram_hi_inst : SP256K
+    port map (
+      AD       => spram_addr,  -- I
+      DI       => spram_di,    -- I
+      MASKWE   => spram_be,    -- I
+      WE       => spram_we,    -- I
+      CS       => spram_cs(1), -- I
+      CK       => spram_clk,   -- I
+      STDBY    => '0',         -- I
+      SLEEP    => spram_pwr_n, -- I
+      PWROFF_N => '1',         -- I
+      DO       => spram_do_hi  -- O
+    );
+  end generate;
+
+  -- access logic and signal type conversion --
+  spram_clk   <= std_logic(clk_i);
+  spram_addr  <= std_logic_vector(addr_i(13+1 downto 0+1));
+  spram_di    <= std_logic_vector(data_i(15 downto 0));
+  spram_we    <= '1' when ((acc_en and upen_i and (wren_i(0) or wren_i(1))) = '1') else '0'; -- global write enable
+  rdata       <= std_ulogic_vector(spram_do_lo) when (mem_sel = '0') else std_ulogic_vector(spram_do_hi); -- lo/hi memory bank
+  spram_cs(0) <= '1' when (addr_i(15) = '0') else '0'; -- low memory bank
+  spram_cs(1) <= '1' when (addr_i(15) = '1') else '0'; -- high memory bank
 
   spram_be(1 downto 0) <= "11" when (wren_i(0) = '1') else "00"; -- low byte write enable
   spram_be(3 downto 2) <= "11" when (wren_i(1) = '1') else "00"; -- high byte write enable
+
+  spram_pwr_n <= '0' when ((spram_sleep_mode_en_c = false) or (mem_cs = '1')) else '1'; -- LP mode disabled or IMEM selected
 
   buffer_ff: process(clk_i)
   begin
@@ -164,12 +196,13 @@ begin
     if (IMEM_AS_ROM = true) or (BOOTLD_USE = false) then
       assert false report "ICE40 Ultra Plus SPRAM cannot be initialized by bitstream!" severity error;
     end if;
-    if (IMEM_SIZE > 32*1024) then
-      assert false report "I-mem size out of range! Max 32kB!" severity error;
+    if (IMEM_SIZE > 48*1024) then
+      assert false report "I-mem size out of range! Max 48kB!" severity error;
     end if;
     -- buffer --
     if rising_edge(clk_i) then
-      rden <= rden_i and acc_en;
+      mem_sel <= addr_i(15);
+      rden    <= rden_i and acc_en;
     end if;
   end process buffer_ff;
 
