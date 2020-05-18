@@ -302,7 +302,7 @@ tests the capabilities of a CPU itself rather than the functions provided by the
 
 ~~~
 Configuration
-Hardware: 100 MHz, 32kB IMEM, 12kB DMEM, HW verison 0x0406, peripherals used: TIMER, UART, MULDIV
+Hardware: 100 MHz, 32kB IMEM, 12kB DMEM, HW verison 0x0407, peripherals used: TIMER, UART, MULDIV
 Software: msp430-gcc 8.3.0 for Linux, MEM_METHOD is MEM_STACK, 2000 CoreMark iterations
 ~~~
 
