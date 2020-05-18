@@ -8,7 +8,7 @@
 [![issues](https://img.shields.io/github/issues/stnolting/neo430)](https://github.com/stnolting/neo430/issues)
 [![pull requests](https://img.shields.io/github/issues-pr/stnolting/neo430)](https://github.com/stnolting/neo430/pulls)
 [![last commit](https://img.shields.io/github/last-commit/stnolting/neo430)](https://github.com/stnolting/neo430/commits/master)
-[![project status](https://img.shields.io/badge/project%20status-active-brightgreen)]
+![project status](https://img.shields.io/badge/project%20status-active-brightgreen)
 
 ## Table of Content
 
