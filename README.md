@@ -8,7 +8,7 @@
 [![issues](https://img.shields.io/github/issues/stnolting/neo430)](https://github.com/stnolting/neo430/issues)
 [![pull requests](https://img.shields.io/github/issues-pr/stnolting/neo430)](https://github.com/stnolting/neo430/pulls)
 [![last commit](https://img.shields.io/github/last-commit/stnolting/neo430)](https://github.com/stnolting/neo430/commits/master)
-![project status](https://img.shields.io/badge/project%20status-active-brightgreen)
+![processor status](https://img.shields.io/badge/processor%20status-stable-brightgreen)
 
 ## Table of Content
 
@@ -53,6 +53,8 @@ FPGA board of choice (the NEO430 uses a FPGA vendor-independent VHDL description
 the NEO430 processor. Application program generation works by executing a single "make" command. Jump to the
 "Let’s Get It Started" chapter in the NEO430 documentary, which provides a lot of guides and tutorials to make your first
 NEO430 setup run: [![NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/figures/PDF_32.png) NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/NEO430.pdf "NEO430 Datasheet from GitHub")
+
+**Want to go further? Check out the big brother of the NEO430: The RISC-V powered 32-bit [NEORV32](https://github.com/stnolting/neorv32).**
 
 
 
@@ -435,7 +437,7 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [![Continous Integration provided by Travis CI](https://travis-ci.com/images/logos/TravisCI-Full-Color.png)](https://travis-ci.com/stnolting/neo430)
 
-Continous integration provided by [Travis CI](https://travis-ci.com/stnolting/neo430).
+Continous integration provided by [Travis CI](https://travis-ci.com/stnolting/neo430) and powered by [GHDL](https://github.com/ghdl/ghdl).
 
 
 ![Open Source Hardware Logo https://www.oshwa.org](https://raw.githubusercontent.com/stnolting/neo430/master/doc/figures/oshw_logo.png)
