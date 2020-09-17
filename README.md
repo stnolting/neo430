@@ -3,11 +3,6 @@
 [![Build Status](https://travis-ci.com/stnolting/neo430.svg?branch=master)](https://travis-ci.com/stnolting/neo430)
 [![license](https://img.shields.io/github/license/stnolting/neo430)](https://github.com/stnolting/neo430/blob/master/LICENSE)
 [![release](https://img.shields.io/github/v/release/stnolting/neo430)](https://github.com/stnolting/neo430/releases)
-[![documentary](https://img.shields.io/badge/datasheet-neo430.pdf-blue)](https://raw.githubusercontent.com/stnolting/neo430/master/doc/NEO430.pdf)
-
-[![issues](https://img.shields.io/github/issues/stnolting/neo430)](https://github.com/stnolting/neo430/issues)
-[![pull requests](https://img.shields.io/github/issues-pr/stnolting/neo430)](https://github.com/stnolting/neo430/pulls)
-[![last commit](https://img.shields.io/github/last-commit/stnolting/neo430)](https://github.com/stnolting/neo430/commits/master)
 ![processor status](https://img.shields.io/badge/processor%20status-stable-brightgreen)
 
 ## Table of Content
