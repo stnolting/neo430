@@ -40,7 +40,7 @@ package neo430_package is
 
   -- Processor Hardware Version -------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0407"; -- no touchy!
+  constant hw_version_c : std_ulogic_vector(15 downto 0) := x"0408"; -- no touchy!
 
   -- Danger Zone (Advanced Hardware Configuration) ------------------------------------------
   -- -------------------------------------------------------------------------------------------

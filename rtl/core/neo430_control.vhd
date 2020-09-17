@@ -141,12 +141,10 @@ begin
   ctrl_o <= ctrl;
 
   -- someone using the DADD instruction? --
-  dadd_sanity_check: process(clk_i)
+  dadd_sanity_check: process(ir)
   begin
-    if rising_edge(clk_i) then
-      if (instr_i(15 downto 12) = "1010") then -- DADD
-        assert false report "DADD instruction not supported!" severity error;
-      end if;
+    if (ir(15 downto 12) = "1010") then -- DADD
+      assert false report "DADD instruction not supported!" severity warning;
     end if;
   end process dadd_sanity_check;
 
@@ -297,7 +295,6 @@ begin
       -- ------------------------------------------------------------
         -- (pseudo) defaults 
         ctrl_nxt(ctrl_rf_in_sel_c) <= '1'; -- select addr gen feedback (only relevant for when 2,3,5)
-        ctrl_nxt(ctrl_mem_rd_c) <= '1'; -- Memory read (fast)
         ctrl_nxt(ctrl_adr_bp_en_c) <= '1'; -- directly output RF.out to address bus
         ctrl_nxt(ctrl_adr_mar_wr_c) <= am(0); -- write to MAR [relevant for memory writeback when using CLASS II operations]
         --
@@ -323,7 +320,7 @@ begin
             -- "001-" = CLASS II, SRC: indexed/symbolic/absolute, DST: indexed/symbolic/absolute OR register direct
             ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_pc_c; -- source/destination: PC
 -->         ctrl_nxt(ctrl_adr_bp_en_c) <= '1'; -- directly output RF.out to address bus
--->         ctrl_nxt(ctrl_mem_rd_c) <= '1'; -- Memory read (fast)
+            ctrl_nxt(ctrl_mem_rd_c) <= '1'; -- Memory read (fast)
             ctrl_nxt(ctrl_adr_off2_c downto ctrl_adr_off0_c) <= "010"; -- add +2
 -->         ctrl_nxt(ctrl_rf_in_sel_c) <= '1'; -- select addr gen feedback
             ctrl_nxt(ctrl_rf_wb_en_c) <= '1'; -- valid RF write back
@@ -338,7 +335,7 @@ begin
             ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_pc_c; -- source/destination: PC
             ctrl_nxt(ctrl_adr_mar_wr_c) <= '1'; -- write to MAR
             mem_rd <= '1'; -- Memory read
--->         ctrl_nxt(ctrl_mem_rd_c) <= '1'; -- Memory read (fast)
+            ctrl_nxt(ctrl_mem_rd_c) <= '1'; -- Memory read (fast)
             ctrl_nxt(ctrl_adr_off2_c downto ctrl_adr_off0_c) <= "010"; -- add +2
 -->         ctrl_nxt(ctrl_rf_in_sel_c) <= '1'; -- select addr gen feedback
             ctrl_nxt(ctrl_rf_wb_en_c) <= '1'; -- valid RF write back
@@ -350,7 +347,7 @@ begin
             -- "1101" = CLASS  I, SRC: indirect, DST: indexed
             ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= src; -- source: reg A
 -->         cctrl_nxt(ctrl_adr_bp_en_c) <= '1'; -- directly output RF.out to address bus
--->         ctrl_nxt(ctrl_mem_rd_c) <= '1'; -- Memory read (fast)
+            ctrl_nxt(ctrl_mem_rd_c) <= '1'; -- Memory read (fast)
             state_nxt <= TRANS_1;
 
           when others =>
@@ -359,7 +356,7 @@ begin
             -- "1111" = CLASS  I, SRC: indirect auto inc, DST: indexed
             ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= src; -- source: reg A
 -->         cctrl_nxt(ctrl_adr_bp_en_c) <= '1'; -- directly output RF.out to address bus
--->         ctrl_nxt(ctrl_mem_rd_c) <= '1'; -- Memory read (fast)
+            ctrl_nxt(ctrl_mem_rd_c) <= '1'; -- Memory read (fast)
             if (ir(6) = '0') or (src = reg_pc_c) then -- word mode (force if accessing PC)
               ctrl_nxt(ctrl_adr_off2_c downto ctrl_adr_off0_c) <= "010"; -- add +2
             else -- byte mode
@@ -374,8 +371,6 @@ begin
       -- ------------------------------------------------------------
         -- (pseudo) defaults 
         ctrl_nxt(ctrl_rf_in_sel_c) <= '1'; -- select addr gen feedback (only relevant for last two 'when')
-        ctrl_nxt(ctrl_mem_rd_c) <= '1'; -- Memory read (fast) (only relevant for last two 'when' 4)
-        mem_rd <= '1'; -- Memory read (only relevant for last two 'when' 5)
         ctrl_nxt(ctrl_adr_off2_c downto ctrl_adr_off0_c) <= "010"; -- add +2
         ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_pc_c; -- source/destination: PC
         --
@@ -413,7 +408,7 @@ begin
             -- "1111" = CLASS  I, SRC: indirect auto inc, DST: indexed
 -->         ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_pc_c; -- source/destination: PC
             ctrl_nxt(ctrl_adr_bp_en_c) <= '1'; -- directly output RF.out to address bus
--->         ctrl_nxt(ctrl_mem_rd_c) <= '1'; -- Memory read (fast)
+            ctrl_nxt(ctrl_mem_rd_c) <= '1'; -- Memory read (fast)
 -->         ctrl_nxt(ctrl_adr_off2_c downto ctrl_adr_off0_c) <= "010"; -- add +2
 -->         ctrl_nxt(ctrl_rf_in_sel_c) <= '1'; -- select addr gen feedback 
             ctrl_nxt(ctrl_rf_wb_en_c) <= '1'; -- valid RF write back
@@ -425,7 +420,7 @@ begin
             -- "1011" = CLASS  I, SRC: indexed/symbolic/absolute, DST: indexed
 -->         ctrl_nxt(ctrl_rf_adr3_c downto ctrl_rf_adr0_c) <= reg_pc_c; -- source/destination: PC
             ctrl_nxt(ctrl_adr_mar_wr_c) <= '1'; -- write to MAR
--->         mem_rd <= '1'; -- Memory read
+            mem_rd <= '1'; -- Memory read
 -->         ctrl_nxt(ctrl_adr_off2_c downto ctrl_adr_off0_c) <= "010"; -- add +2
 -->         ctrl_nxt(ctrl_rf_in_sel_c) <= '1'; -- select addr gen feedback 
             ctrl_nxt(ctrl_rf_wb_en_c) <= '1'; -- valid RF write back
@@ -443,7 +438,6 @@ begin
         ctrl_nxt(ctrl_adr_mar_sel_c) <= '1'; -- use result from adder
         ctrl_nxt(ctrl_adr_off2_c downto ctrl_adr_off0_c) <= "1--"; -- add memory data in
         ctrl_nxt(ctrl_adr_mar_wr_c) <= '1'; -- write to MAR
-        mem_rd <= '1'; -- Memory read
         mem_rd <= '1'; -- Memory read
         state_nxt <= TRANS_3;
 
@@ -465,7 +459,9 @@ begin
 -->         ctrl_nxt(ctrl_adr_off2_c downto ctrl_adr_off0_c) <= "1--"; -- add memory data in
 -->         ctrl_nxt(ctrl_adr_mar_sel_c) <= '1'; -- use result from adder
             ctrl_nxt(ctrl_adr_mar_wr_c) <= '1'; -- write to MAR
-            mem_rd <= '1'; -- Memory read
+            if (ctrl(ctrl_alu_cmd3_c downto ctrl_alu_cmd0_c) /= alu_mov_c) then -- no read for MOV
+              mem_rd <= '1'; -- Memory read
+            end if;
             state_nxt <= TRANS_4;
 
           when others =>
