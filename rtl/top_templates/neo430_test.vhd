@@ -61,8 +61,6 @@ architecture neo430_test_rtl of neo430_test is
   -- local signals --
   signal gpio_out : std_ulogic_vector(15 downto 0);
   signal rst_int  : std_ulogic;
-  signal twi_sda  : std_logic;
-  signal twi_scl  : std_logic;
 
 begin
 
@@ -113,8 +111,8 @@ begin
     spi_mosi_o => open,               -- serial data line out
     spi_miso_i => '0',                -- serial data line in
     spi_cs_o   => open,               -- SPI CS
-    twi_sda_io => twi_sda,            -- twi serial data line
-    twi_scl_io => twi_scl,            -- twi serial clock line
+    twi_sda_io => open,               -- twi serial data line
+    twi_scl_io => open,               -- twi serial clock line
     -- 32-bit wishbone interface --
     wb_adr_o   => open,               -- address
     wb_dat_i   => x"00000000",        -- read data
@@ -134,10 +132,6 @@ begin
 
   -- internal reset (must be low-active!) --
   rst_int <= rst_i; -- invert me?!
-
-  -- twi --
-  twi_sda <= 'H';
-  twi_scl <= 'H';
 
 
 end neo430_test_rtl;
