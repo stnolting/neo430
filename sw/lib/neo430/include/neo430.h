@@ -44,11 +44,11 @@
 // ----------------------------------------------------------------------------
 union uint16_u { uint16_t uint16; uint8_t  uint8[ sizeof(uint16_t)/1]; };
 union uint32_u { uint32_t uint32; uint16_t uint16[sizeof(uint32_t)/2]; uint8_t  uint8[ sizeof(uint32_t)/1]; };
-union uint64_u { uint64_t uint64; uint32_t uint32[sizeof(uint64_t)/4];  uint16_t uint16[sizeof(uint64_t)/2]; uint8_t uint8[sizeof(uint32_t)/1]; };
+union uint64_u { uint64_t uint64; uint32_t uint32[sizeof(uint64_t)/4]; uint16_t uint16[sizeof(uint64_t)/2]; uint8_t uint8[sizeof(uint64_t)/1]; };
 
 union  int16_u { int16_t  int16; int8_t   int8[ sizeof(int16_t)/1]; };
 union  int32_u { int32_t  int32; int16_t  int16[sizeof(int32_t)/2]; int8_t  int8[ sizeof(int32_t)/1]; };
-union  int64_u { int64_t  int64; int32_t  int32[sizeof(int64_t)/4]; int16_t int16[sizeof(int64_t)/2]; int8_t int8[sizeof(int32_t)/1]; };
+union  int64_u { int64_t  int64; int32_t  int32[sizeof(int64_t)/4]; int16_t int16[sizeof(int64_t)/2]; int8_t int8[sizeof(int64_t)/1]; };
 
 
 // ----------------------------------------------------------------------------
