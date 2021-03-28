@@ -1,3 +1,6 @@
+:information_source: The processor is **stable** and fully **synthesizable** (verified on Lattice, Intel and Xilinx platforms). This project is still active(!) but is currently
+*shelved* as I am focusing right now on the NEO430's "big brother": [The RISC-V-powered 32-bit **NEORV32**](https://github.com/stnolting/neorv32)
+
 # The NEO430 Processor
 
 [![license](https://img.shields.io/github/license/stnolting/neo430)](https://github.com/stnolting/neo430/blob/master/LICENSE)
@@ -48,11 +51,6 @@ the NEO430 processor. Application program generation works by executing a single
 "Let’s Get It Started" chapter in the NEO430 documentary, which provides a lot of guides and tutorials to make your first
 NEO430 setup run: [![NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/figures/PDF_32.png) NEO430 Datasheet](https://raw.githubusercontent.com/stnolting/neo430/master/doc/NEO430.pdf "NEO430 Datasheet from GitHub")
 
-
-### Status :bulb:
-
-The processor is **stable** and **synthesizable** (verified on Lattice, Intel and Xilinx platforms). This project is still active but is currently shelved as
-I am focusing on the NEO430's "big brother": [The RISC-V-powered 32-bit **NEORV32**](https://github.com/stnolting/neorv32)
 
 
 ## Processor Features
