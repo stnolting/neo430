@@ -1,5 +1,4 @@
-:information_source: The processor is **stable** and fully **synthesizable** (verified on Lattice, Intel and Xilinx platforms). This project is still active(!) but is currently
-*shelved* as I am focusing right now on the NEO430's "big brother": [The RISC-V-powered 32-bit **NEORV32**](https://github.com/stnolting/neorv32)
+:information_source: Please check out the follow-up project: [The NEORV32 RISC-V Processor](https://github.com/stnolting/neorv32)
 
 # The NEO430 Processor
 
@@ -428,12 +427,3 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 "iCE40 UltraPlus", "Lattice Radiant" and "Lattice Diamond" are trademarks of Lattice Semiconductor Corporation.
 
 "AXI", "AXI4" and "AXI4-Lite" are trademarks of Arm Holdings plc.
-
-
-
-![Open Source Hardware Logo https://www.oshwa.org](https://raw.githubusercontent.com/stnolting/neo430/master/doc/figures/oshw_logo.png)
-
-This project is not affiliated with or endorsed by the Open Source Initiative (https://www.oshwa.org / https://opensource.org).
-
-
-Made with :beer: in Hannover, Germany.
